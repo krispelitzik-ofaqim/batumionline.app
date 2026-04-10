@@ -5,20 +5,24 @@ import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '../../constants/colors';
 import { ThemeContext } from '../../constants/theme';
+import { PreviewContext } from '../../constants/previewContext';
 import HeaderBar from '../../components/HeaderBar';
-
-const MAX_MOBILE = 375;
+import DevicePreviewBar from '../../components/DevicePreviewBar';
 
 export default function TabLayout() {
   const { dark } = useContext(ThemeContext);
-  const { width } = useWindowDimensions();
-  const isMobile = width < 768;
+  const { simulatedWidth } = useContext(PreviewContext);
+  const { width: realWidth } = useWindowDimensions();
   const outerBg = dark ? Colors.TEXT : Colors.BACKGROUND;
+
+  const effectiveWidth = simulatedWidth ? Math.min(simulatedWidth, realWidth) : realWidth;
+  const isMobile = effectiveWidth < 768;
 
   return (
     <View style={{ flex: 1, backgroundColor: outerBg }}>
       <SafeAreaView edges={['top']} style={{ backgroundColor: outerBg }}>
-        <View style={{ maxWidth: MAX_MOBILE, width: '100%', alignSelf: 'center' }}>
+        <DevicePreviewBar />
+        <View style={{ maxWidth: effectiveWidth, width: '100%', alignSelf: 'center' }}>
           <HeaderBar />
         </View>
       </SafeAreaView>
@@ -34,14 +38,13 @@ export default function TabLayout() {
             height: isMobile ? 50 : 60,
             paddingBottom: isMobile ? 4 : 8,
             paddingTop: 4,
-            flexDirection: 'row-reverse',
-            maxWidth: MAX_MOBILE,
+            maxWidth: effectiveWidth,
             width: '100%',
             alignSelf: 'center',
           },
           sceneStyle: {
             backgroundColor: outerBg,
-            maxWidth: MAX_MOBILE,
+            maxWidth: effectiveWidth,
             width: '100%',
             alignSelf: 'center',
           },
@@ -52,20 +55,11 @@ export default function TabLayout() {
         }}
       >
         <Tabs.Screen
-          name="index"
+          name="contact"
           options={{
-            title: 'בית',
+            title: 'WhatsApp',
             tabBarIcon: ({ color, size }) => (
-              <Ionicons name="home" size={isMobile ? 22 : size} color={color} />
-            ),
-          }}
-        />
-        <Tabs.Screen
-          name="map"
-          options={{
-            title: 'מפה',
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name="map" size={isMobile ? 22 : size} color={color} />
+              <Ionicons name="logo-whatsapp" size={isMobile ? 22 : size} color={color} />
             ),
           }}
         />
@@ -79,11 +73,20 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="contact"
+          name="map"
           options={{
-            title: 'צור קשר',
+            title: 'מפה',
             tabBarIcon: ({ color, size }) => (
-              <Ionicons name="chatbubble" size={isMobile ? 22 : size} color={color} />
+              <Ionicons name="map" size={isMobile ? 22 : size} color={color} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="index"
+          options={{
+            title: 'בית',
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="home" size={isMobile ? 22 : size} color={color} />
             ),
           }}
         />

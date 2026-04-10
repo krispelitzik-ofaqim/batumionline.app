@@ -12,7 +12,9 @@ const ITEMS = [
 
 export default function WelcomeSlider() {
   return (
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.row}>
+    <View>
+      <Text style={styles.sectionTitle}>ברוכים הבאים</Text>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.row}>
       {ITEMS.map((item) => (
         <TouchableOpacity key={item.id} style={[styles.card, { backgroundColor: item.bg }]} activeOpacity={0.7}>
           <Text style={styles.icon}>{item.icon}</Text>
@@ -23,10 +25,12 @@ export default function WelcomeSlider() {
         </TouchableOpacity>
       ))}
     </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  sectionTitle: { fontSize: 16, fontWeight: 'normal', color: '#999999', textAlign: 'right', writingDirection: 'rtl', marginBottom: 8 },
   row: { gap: 10, paddingVertical: 4 },
   card: {
     width: 140, height: 120,
@@ -34,6 +38,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   icon: { fontSize: 32 },
-  title: { fontSize: 13, fontWeight: '700', color: Colors.WHITE, textAlign: 'right', writingDirection: 'rtl' },
-  sub: { fontSize: 10, color: Colors.BACKGROUND, opacity: 0.7, textAlign: 'right', writingDirection: 'rtl', marginTop: 2 },
+  title: { fontSize: 16, fontWeight: '700', color: Colors.WHITE, textAlign: 'right', writingDirection: 'rtl' },
+  sub: { fontSize: 12, color: Colors.BACKGROUND, opacity: 0.7, textAlign: 'right', writingDirection: 'rtl', marginTop: 2 },
 });

@@ -1,126 +1,175 @@
-import React, { useState } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import {
   View,
   Text,
   ScrollView,
   StyleSheet,
-  useWindowDimensions,
   TouchableOpacity,
+  useWindowDimensions,
 } from 'react-native';
-import { useContext } from 'react';
 import { ThemeContext } from '../../constants/theme';
+import { AdminContext } from '../../constants/adminContext';
+import { PreviewContext } from '../../constants/previewContext';
 import { router } from 'expo-router';
+import { fetchContent } from '../../constants/api';
 import { Colors } from '../../constants/colors';
 import WelcomeSlider from '../../components/WelcomeSlider';
 import InfoPortal from '../../components/InfoPortal';
+import { AdminFloatingButton, EditToolbar, EditableText, ReorderControls } from '../../components/AdminEditOverlay';
+import { LinearGradient } from 'expo-linear-gradient';
+import WeatherModal from '../../components/WeatherModal';
+import CurrencyModal from '../../components/CurrencyModal';
+import NewsModal from '../../components/NewsModal';
+import FlightsModal from '../../components/FlightsModal';
 
 type CatItem = {
   id: string;
   title: string;
   subtitle: string;
+  description: string;
   icon: string;
   bg: string;
+  bgDark: string;
 };
 
 // 1. קטגוריות ראשיות (6 קארדים, 2 בשורה)
 const MAIN_CATEGORIES: CatItem[] = [
-  { id: '1', title: 'אירוח ולינה', subtitle: 'מלונות, דירות ואכסניות', icon: '🏨', bg: Colors.SECONDARY + '30' },
-  { id: '2', title: 'אתרים ואטרקציות', subtitle: 'גלה מקומות וחוויות', icon: '🎡', bg: Colors.ACCENT + '30' },
-  { id: '3', title: 'סיורים קוליים', subtitle: 'מסלולים מודרכים', icon: '🎧', bg: Colors.PRIMARY + '30' },
-  { id: '4', title: 'בילוי, פנאי וחיי לילה', subtitle: 'בידור והנאה', icon: '🎰', bg: Colors.PRIMARY },
-  { id: '5', title: 'תחבורה', subtitle: 'מוניות ותחבורה ציבורית', icon: '🚕', bg: Colors.ACCENT + '25' },
-  { id: '6', title: 'מסעדות ואוכל', subtitle: 'מטבח מקומי ואוכל משובח', icon: '🍽️', bg: Colors.SECONDARY + '25' },
+  { id: '1', title: 'אירוח ולינה', subtitle: 'מלונות, דירות ואכסניות', description: 'מצאו את מקום הלינה המושלם בבטומי — ממלונות יוקרה על חוף הים, דרך דירות Airbnb מרווחות, ועד אכסניות בתקציב נוח. כולל המלצות לפי אזורים, מחירים וביקורות אמיתיות.', icon: '🏨', bg: '#5BC0DE', bgDark: '#3DA5C4' },
+  { id: '2', title: 'אתרים ואטרקציות', subtitle: 'גלה מקומות וחוויות', description: 'גלו את האתרים המרהיבים של בטומי — מהגנים הבוטניים ועד כיכר פיאצה, הטיילת לאורך הים, ומוזיאונים מרתקים. אטרקציות לכל המשפחה בכל עונה.', icon: '🎡', bg: '#F7BE68', bgDark: '#F4A94E' },
+  { id: '3', title: 'סיורים קוליים', subtitle: 'מסלולים מודרכים', description: 'טיילו בבטומי עם מדריך אישי באוזן! סיורים קוליים בעברית לאורך מסלולים מרכזיים בעיר. היסטוריה, ארכיטקטורה, ותרבות — הכל בקצב שלכם.', icon: '🎧', bg: '#2E8BA8', bgDark: '#1A6B8A' },
+  { id: '4', title: 'בילוי, פנאי וחיי לילה', subtitle: 'בידור והנאה', description: 'חיי הלילה של בטומי תוססים ומגוונים. ברים על חוף הים, מועדוני לילה, קזינו, הופעות חיות ועוד. המדריך המלא לבילוי בכל שעה.', icon: '🎰', bg: '#2E8BA8', bgDark: '#1A6B8A' },
+  { id: '5', title: 'תחבורה', subtitle: 'מוניות ותחבורה ציבורית', description: 'כל מה שצריך לדעת על תחבורה בבטומי — מוניות, אוטובוסים, השכרת רכב, ואפליקציות מומלצות. טיפים לחיסכון ומסלולי נסיעה מומלצים.', icon: '🚕', bg: '#F7BE68', bgDark: '#F4A94E' },
+  { id: '6', title: 'מסעדות ואוכל', subtitle: 'מטבח מקומי ואוכל משובח', description: 'המטבח הגאורגי הוא חוויה בפני עצמה. חצ׳פורי, חינקלי, שש״ק ויין מעולה. המלצות למסעדות הטובות ביותר בבטומי, כולל מחירים ותפריטים.', icon: '🍽️', bg: '#5BC0DE', bgDark: '#3DA5C4' },
 ];
 
 // 2. קטגוריות נוספות (4 קארדים)
 const EXTRA_CATEGORIES: CatItem[] = [
-  { id: '7', title: 'קניות ומתנות', subtitle: 'שופינג ומזכרות', icon: '🛍️', bg: Colors.PRIMARY + '25' },
-  { id: '8', title: 'ספורט ואיכות חיים', subtitle: 'כושר ופעילויות', icon: '🏋️', bg: Colors.SECONDARY + '25' },
-  { id: '9', title: 'אקסטרים וסקי', subtitle: 'הרפתקאות ואתגרים', icon: '⛷️', bg: Colors.ACCENT + '30' },
-  { id: '10', title: 'מדריכים ישראלים וסוכנים', subtitle: 'ליווי אישי בעברית', icon: '🇮🇱', bg: Colors.PRIMARY + '30' },
+  { id: '7', title: 'קניות ומתנות', subtitle: 'שופינג ומזכרות', description: 'מרכזי קניות, שווקים מקומיים, חנויות מזכרות ומתנות מיוחדות מגאורגיה. איפה קונים, מה שווה, וטיפים למיקוח.', icon: '🛍️', bg: '#2E8BA8', bgDark: '#1A6B8A' },
+  { id: '8', title: 'ספורט ואיכות חיים', subtitle: 'כושר ופעילויות', description: 'חדרי כושר, בריכות שחייה, יוגה על החוף, רכיבה על אופניים וספורט ימי. שמרו על אורח חיים פעיל גם בחופשה.', icon: '🏋️', bg: '#5BC0DE', bgDark: '#3DA5C4' },
+  { id: '9', title: 'אקסטרים וסקי', subtitle: 'הרפתקאות ואתגרים', description: 'פעילויות אתגריות ואקסטרים — גלישת סקי בגודאורי, רפטינג, ג׳יפים בהרים, פרגליידינג ועוד הרפתקאות שלא תשכחו.', icon: '⛷️', bg: '#F7BE68', bgDark: '#F4A94E' },
+  { id: '10', title: 'מדריכים ישראלים וסוכנים', subtitle: 'ליווי אישי בעברית', description: 'מדריכים ישראלים מקומיים שמכירים כל פינה בבטומי. סוכני נסיעות, ליווי אישי, סיורים פרטיים והמלצות מקומיות בעברית.', icon: '🇮🇱', bg: '#2E8BA8', bgDark: '#1A6B8A' },
 ];
 
 // 6. באנרים רוחביים
 const BOTTOM_BANNERS = [
   { id: 'weather', title: 'מזג אוויר', icon: '🌤️', bg: Colors.PRIMARY },
   { id: 'currency', title: 'המרת מטבעות', icon: '💱', bg: Colors.SECONDARY },
-  { id: 'news', title: 'חדשות בעברית', icon: '📰', bg: Colors.TEXT },
-  { id: 'flights', title: 'לוח המראות ונחיתות', icon: '✈️', bg: Colors.ACCENT },
+  { id: 'news', title: 'חדשות בעברית', icon: '📰', bg: '#7ECFC0' },
+  { id: 'flights', title: 'לוח המראות ונחיתות', icon: '✈️', bg: '#2D4A5E' },
 ];
-
-const DEV_MODES = [
-  { key: 'mobile', label: '📱', w: 375 },
-  { key: 'tablet', label: '📲', w: 768 },
-  { key: 'desktop', label: '🖥️', w: 1024 },
-] as const;
 
 function isDark(bg: string) {
   return bg.startsWith('#2') || bg.startsWith('#1');
 }
 
 function CatCard({ item, width }: { item: CatItem; width: number }) {
-  const dark = isDark(item.bg);
   return (
     <TouchableOpacity
       style={[styles.card, { width }]}
       activeOpacity={0.7}
       onPress={() => router.push(`/category/${item.id}`)}
     >
-      <View style={[styles.cardTop, { backgroundColor: item.bg }]}>
+      <LinearGradient
+        colors={[item.bg, item.bgDark]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.cardTop}
+      >
         <Text style={styles.cardIcon}>{item.icon}</Text>
-      </View>
+      </LinearGradient>
       <View style={styles.cardBottom}>
         <Text style={styles.cardTitle}>{item.title}</Text>
         <Text style={styles.cardSub}>{item.subtitle}</Text>
+        <Text style={styles.cardDesc} numberOfLines={2}>{item.description}</Text>
       </View>
     </TouchableOpacity>
   );
 }
 
 export default function HomeScreen() {
-  const real = useWindowDimensions();
-  const [devMode, setDevMode] = useState<string | null>('mobile');
+  const { width: screenW } = useWindowDimensions();
   const [showExtra, setShowExtra] = useState(false);
-  const isDev = __DEV__;
-  const simW = devMode ? (DEV_MODES.find(m => m.key === devMode)?.w || real.width) : real.width;
-  const w = Math.min(simW, real.width);
+  const [editMode, setEditMode] = useState(false);
+  const [activeModal, setActiveModal] = useState<string | null>(null);
+  const [editHeaderTitle, setEditHeaderTitle] = useState('Batumi Online');
+  const [editHeaderSub, setEditHeaderSub] = useState('המדריך לתייר הישראלי בבטומי');
+  const [editMainCats, setEditMainCats] = useState(MAIN_CATEGORIES);
+  const [editExtraCats, setEditExtraCats] = useState(EXTRA_CATEGORIES);
+  const [editBottomBanners, setEditBottomBanners] = useState(BOTTOM_BANNERS);
+  const { simulatedWidth } = useContext(PreviewContext);
+  const w = simulatedWidth ? Math.min(simulatedWidth, screenW) : screenW;
   const cardW = (w - 48) / 2;
 
   const { dark } = useContext(ThemeContext);
+  const { isAdmin } = useContext(AdminContext);
+
+  // Fetch content from API on mount
+  useEffect(() => {
+    fetchContent()
+      .then(data => {
+        if (data.texts) {
+          setEditHeaderTitle(data.texts.headerTitle || 'Batumi Online');
+          setEditHeaderSub(data.texts.headerSub || 'המדריך לתייר הישראלי בבטומי');
+        }
+        if (data.mainCategories) setEditMainCats(data.mainCategories);
+        if (data.extraCategories) setEditExtraCats(data.extraCategories);
+        if (data.bottomBanners) setEditBottomBanners(data.bottomBanners);
+      })
+      .catch(() => {
+        // Fallback to hardcoded data — already set as defaults
+      });
+  }, []);
+
+  const handleSaveEdit = () => {
+    setEditMode(false);
+  };
+
+  const handleExitEdit = () => {
+    setEditHeaderTitle('Batumi Online');
+    setEditHeaderSub('המדריך לתייר הישראלי בבטומי');
+    setEditMainCats(MAIN_CATEGORIES);
+    setEditExtraCats(EXTRA_CATEGORIES);
+    setEditBottomBanners(BOTTOM_BANNERS);
+    setEditMode(false);
+  };
+
+  const moveMainCat = (idx: number, dir: -1 | 1) => {
+    const items = [...editMainCats];
+    const target = idx + dir;
+    if (target < 0 || target >= items.length) return;
+    [items[idx], items[target]] = [items[target], items[idx]];
+    setEditMainCats(items);
+  };
+
+  const moveBottomBanner = (idx: number, dir: -1 | 1) => {
+    const items = [...editBottomBanners];
+    const target = idx + dir;
+    if (target < 0 || target >= items.length) return;
+    [items[idx], items[target]] = [items[target], items[idx]];
+    setEditBottomBanners(items);
+  };
 
   return (
     <View style={[styles.safe, dark && { backgroundColor: Colors.TEXT }]}>
+      {editMode && <EditToolbar onSave={handleSaveEdit} onExit={handleExitEdit} />}
       <ScrollView
-        style={[styles.scroll, devMode ? { maxWidth: simW, alignSelf: 'center' as const } : null]}
+        style={styles.scroll}
         showsVerticalScrollIndicator={false}
       >
-        {/* Dev Toolbar */}
-        {isDev && (
-          <View style={styles.devBar}>
-            {DEV_MODES.map((m) => (
-              <TouchableOpacity
-                key={m.key}
-                style={[styles.devBtn, devMode === m.key && styles.devBtnOn]}
-                onPress={() => setDevMode(devMode === m.key ? null : m.key)}
-              >
-                <Text style={[styles.devTxt, devMode === m.key && { opacity: 1 }]}>{m.label}</Text>
-              </TouchableOpacity>
-            ))}
-            <Text style={styles.devW}>{Math.round(w)}px</Text>
-          </View>
-        )}
-
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Batumi Online</Text>
-          <Text style={styles.headerSub}>המדריך לתייר הישראלי בבטומי</Text>
+          <EditableText value={editHeaderTitle} onChangeText={setEditHeaderTitle} editMode={editMode} textStyle={styles.headerTitle} />
+          <EditableText value={editHeaderSub} onChangeText={setEditHeaderSub} editMode={editMode} textStyle={styles.headerSub} />
         </View>
 
         {/* 1. קטגוריות ראשיות — 6 קארדים, 2 בשורה */}
         <View style={styles.section}>
           <View style={styles.grid}>
-            {MAIN_CATEGORIES.map((cat) => (
-              <CatCard key={cat.id} item={cat} width={cardW} />
+            {editMainCats.map((cat, idx) => (
+              <View key={cat.id} style={{ position: 'relative' }}>
+                {editMode && <ReorderControls index={idx} total={editMainCats.length} onMove={(dir) => moveMainCat(idx, dir)} />}
+                <CatCard item={cat} width={cardW} />
+              </View>
             ))}
           </View>
         </View>
@@ -132,7 +181,7 @@ export default function HomeScreen() {
           </TouchableOpacity>
           {showExtra && (
             <View style={styles.grid}>
-              {EXTRA_CATEGORIES.map((cat) => (
+              {editExtraCats.map((cat) => (
                 <CatCard key={cat.id} item={cat} width={cardW} />
               ))}
             </View>
@@ -165,16 +214,29 @@ export default function HomeScreen() {
 
         {/* 6. באנרים רוחביים */}
         <View style={styles.section}>
-          {BOTTOM_BANNERS.map((b) => (
-            <TouchableOpacity key={b.id} style={[styles.bottomBanner, { backgroundColor: b.bg }]} activeOpacity={0.7}>
-              <Text style={styles.bottomBannerTitle}>{b.title}</Text>
-              <Text style={styles.bottomBannerIcon}>{b.icon}</Text>
-            </TouchableOpacity>
+          <Text style={styles.bottomSectionTitle}>מידע On Line</Text>
+          {editBottomBanners.map((b, idx) => (
+            <View key={b.id} style={{ position: 'relative' }}>
+              {editMode && <ReorderControls index={idx} total={editBottomBanners.length} onMove={(dir) => moveBottomBanner(idx, dir)} />}
+              <TouchableOpacity style={[styles.bottomBanner, { backgroundColor: b.bg }]} activeOpacity={0.7} onPress={() => setActiveModal(b.id)}>
+                <Text style={styles.bottomBannerTitle}>{b.title}</Text>
+                <Text style={styles.bottomBannerIcon}>{b.icon}</Text>
+              </TouchableOpacity>
+            </View>
           ))}
         </View>
 
         <View style={{ height: 24 }} />
       </ScrollView>
+
+      {/* Admin floating button */}
+      {!editMode && <AdminFloatingButton onEnterEdit={() => setEditMode(true)} />}
+
+      {/* Bottom banner modals */}
+      <WeatherModal visible={activeModal === 'weather'} onClose={() => setActiveModal(null)} bgColor={BOTTOM_BANNERS.find(b => b.id === 'weather')!.bg} />
+      <CurrencyModal visible={activeModal === 'currency'} onClose={() => setActiveModal(null)} bgColor={BOTTOM_BANNERS.find(b => b.id === 'currency')!.bg} />
+      <NewsModal visible={activeModal === 'news'} onClose={() => setActiveModal(null)} bgColor={BOTTOM_BANNERS.find(b => b.id === 'news')!.bg} />
+      <FlightsModal visible={activeModal === 'flights'} onClose={() => setActiveModal(null)} bgColor={BOTTOM_BANNERS.find(b => b.id === 'flights')!.bg} />
     </View>
   );
 }
@@ -185,7 +247,7 @@ const styles = StyleSheet.create({
 
   header: { paddingHorizontal: 20, paddingTop: 16, paddingBottom: 12 },
   headerTitle: { fontSize: 36, fontWeight: '800', color: Colors.TEXT, textAlign: 'left' },
-  headerSub: { fontSize: 14, color: Colors.TEXT, opacity: 0.5, textAlign: 'left', marginTop: 2 },
+  headerSub: { fontSize: 16, fontWeight: 'normal', color: '#999999', textAlign: 'left', marginTop: 2 },
 
   section: { paddingHorizontal: 16, marginBottom: 18 },
   grid: { flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 10 },
@@ -199,14 +261,15 @@ const styles = StyleSheet.create({
   cardTop: { height: 100, alignItems: 'center', justifyContent: 'center' },
   cardIcon: { fontSize: 52 },
   cardBottom: { backgroundColor: Colors.WHITE, paddingVertical: 10, paddingHorizontal: 12 },
-  cardTitle: { fontSize: 14, fontWeight: '800', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl' },
-  cardSub: { fontSize: 11, color: Colors.TEXT, opacity: 0.5, marginTop: 2, lineHeight: 16, textAlign: 'right', writingDirection: 'rtl' },
+  cardTitle: { fontSize: 16, fontWeight: 'bold', color: '#1C2B35', textAlign: 'right', writingDirection: 'rtl' },
+  cardSub: { fontSize: 12, fontWeight: 'normal', color: '#999999', marginTop: 2, lineHeight: 16, textAlign: 'right', writingDirection: 'rtl' },
+  cardDesc: { fontSize: 11, color: '#777', marginTop: 4, lineHeight: 15, textAlign: 'right', writingDirection: 'rtl' },
 
   // Dropdown
   dropdownBtn: {
     padding: 10, alignItems: 'flex-end', marginBottom: 10,
   },
-  dropdownTxt: { fontSize: 14, fontWeight: '600', color: Colors.TEXT, opacity: 0.5, writingDirection: 'rtl' },
+  dropdownTxt: { fontSize: 16, fontWeight: 'normal', color: '#999999', writingDirection: 'rtl' },
 
   // Side banners (5)
   sideBanner: {
@@ -223,15 +286,6 @@ const styles = StyleSheet.create({
   },
   bottomBannerTitle: { fontSize: 14, fontWeight: '700', color: Colors.WHITE, textAlign: 'right', writingDirection: 'rtl' },
   bottomBannerIcon: { fontSize: 20 },
+  bottomSectionTitle: { fontSize: 16, fontWeight: 'normal', color: '#999999', textAlign: 'right', writingDirection: 'rtl', marginBottom: 8 },
 
-  // Dev toolbar
-  devBar: {
-    flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'center',
-    gap: 12, paddingVertical: 6, paddingHorizontal: 12,
-    marginHorizontal: 16, marginTop: 4, marginBottom: 4,
-  },
-  devBtn: { padding: 4 },
-  devBtnOn: { opacity: 1 },
-  devTxt: { fontSize: 20, opacity: 0.35 },
-  devW: { fontSize: 10, color: Colors.TEXT, opacity: 0.4, marginEnd: 4 },
 });
