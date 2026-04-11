@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   useWindowDimensions,
+  Image,
 } from 'react-native';
 import { ThemeContext } from '../../constants/theme';
 import { AdminContext } from '../../constants/adminContext';
@@ -14,6 +15,7 @@ import { router } from 'expo-router';
 import { fetchContent } from '../../constants/api';
 import { Colors } from '../../constants/colors';
 import WelcomeSlider from '../../components/WelcomeSlider';
+import HomeGallery from '../../components/HomeGallery';
 import InfoPortal from '../../components/InfoPortal';
 import { AdminFloatingButton, EditToolbar, EditableText, ReorderControls } from '../../components/AdminEditOverlay';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -63,24 +65,28 @@ function isDark(bg: string) {
 }
 
 function CatCard({ item, width }: { item: CatItem; width: number }) {
+  const iconIsImage = !!item.icon && (item.icon.startsWith('data:') || item.icon.startsWith('http'));
   return (
     <TouchableOpacity
       style={[styles.card, { width }]}
       activeOpacity={0.7}
       onPress={() => router.push(`/category/${item.id}`)}
     >
-      <LinearGradient
-        colors={[item.bg, item.bgDark]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={styles.cardTop}
-      >
-        <Text style={styles.cardIcon}>{item.icon}</Text>
-      </LinearGradient>
+      {iconIsImage ? (
+        <Image source={{ uri: item.icon }} style={styles.cardTop} resizeMode="cover" />
+      ) : (
+        <LinearGradient
+          colors={[item.bg, item.bgDark]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.cardTop}
+        >
+          <Text style={styles.cardIcon}>{item.icon}</Text>
+        </LinearGradient>
+      )}
       <View style={styles.cardBottom}>
         <Text style={styles.cardTitle}>{item.title}</Text>
         <Text style={styles.cardSub}>{item.subtitle}</Text>
-        <Text style={styles.cardDesc} numberOfLines={2}>{item.description}</Text>
       </View>
     </TouchableOpacity>
   );
@@ -161,6 +167,8 @@ export default function HomeScreen() {
           <EditableText value={editHeaderTitle} onChangeText={setEditHeaderTitle} editMode={editMode} textStyle={styles.headerTitle} />
           <EditableText value={editHeaderSub} onChangeText={setEditHeaderSub} editMode={editMode} textStyle={styles.headerSub} />
         </View>
+
+        <HomeGallery />
 
         {/* 1. קטגוריות ראשיות — 6 קארדים, 2 בשורה */}
         <View style={styles.section}>
@@ -259,7 +267,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.07, shadowRadius: 8, elevation: 3,
   },
   cardTop: { height: 100, alignItems: 'center', justifyContent: 'center' },
-  cardIcon: { fontSize: 52 },
+  cardIcon: { fontSize: 68 },
   cardBottom: { backgroundColor: Colors.WHITE, paddingVertical: 10, paddingHorizontal: 12 },
   cardTitle: { fontSize: 16, fontWeight: 'bold', color: '#1C2B35', textAlign: 'right', writingDirection: 'rtl' },
   cardSub: { fontSize: 12, fontWeight: 'normal', color: '#999999', marginTop: 2, lineHeight: 16, textAlign: 'right', writingDirection: 'rtl' },

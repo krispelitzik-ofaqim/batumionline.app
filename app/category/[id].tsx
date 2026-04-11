@@ -1,75 +1,165 @@
-import React, { useContext } from 'react';
-import { View, Text, ScrollView, StyleSheet, useWindowDimensions } from 'react-native';
-import { useLocalSearchParams, Stack } from 'expo-router';
+import React, { useContext, useEffect, useState } from 'react';
+import { View, Text, ScrollView, StyleSheet, useWindowDimensions, TouchableOpacity, Image } from 'react-native';
+import { useLocalSearchParams, Stack, router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Colors } from '../../constants/colors';
 import { ThemeContext } from '../../constants/theme';
 import { PreviewContext } from '../../constants/previewContext';
+import { AdminContext } from '../../constants/adminContext';
 import DevicePreviewBar from '../../components/DevicePreviewBar';
+import { fetchContent } from '../../constants/api';
 
-type CatData = {
-  title: string;
-  subtitle: string;
-  description: string;
-  icon: string;
-  bg: string;
-  bgDark: string;
+type Item = {
+  id: string; title: string; subtitle?: string; icon: string; bg?: string;
+  bgDark?: string; description?: string; summary?: string; heroBg?: string;
+  layout?: 'card' | 'banner'; children?: Item[];
 };
 
-const CATEGORIES: Record<string, CatData> = {
-  '1': { title: 'אירוח ולינה', subtitle: 'מלונות, דירות ואכסניות', description: 'מצאו את מקום הלינה המושלם בבטומי — ממלונות יוקרה על חוף הים, דרך דירות Airbnb מרווחות, ועד אכסניות בתקציב נוח. כולל המלצות לפי אזורים, מחירים וביקורות אמיתיות.\n\nבטומי מציעה מגוון רחב של אפשרויות לינה לכל תקציב. באזור הטיילת תמצאו מלונות 5 כוכבים כמו Hilton ו-Radisson Blu, עם נוף מרהיב לים השחור. למטיילים בתקציב בינוני, ישנן דירות מרוהטות להשכרה לטווח קצר באזור העיר העתיקה וברחוב Chavchavadze.\n\nטיפ: הזמינו מראש בעונת הקיץ (יוני-ספטמבר) כי התפוסה מגיעה ל-95%. בעונת השכם (מרץ-מאי) ובסתיו תמצאו מחירים נמוכים ב-40% ואפילו יותר.', icon: '🏨', bg: '#5BC0DE', bgDark: '#3DA5C4' },
-  '2': { title: 'אתרים ואטרקציות', subtitle: 'גלה מקומות וחוויות', description: 'גלו את האתרים המרהיבים של בטומי — מהגנים הבוטניים ועד כיכר פיאצה, הטיילת לאורך הים, ומוזיאונים מרתקים. אטרקציות לכל המשפחה בכל עונה.\n\nהגן הבוטני של בטומי הוא אחד הגדולים בעולם ומשתרע על פני 111 הקטר. כיכר פיאצה, בהשראה איטלקית, היא הלב הפועם של העיר עם מסעדות, מוזיקה חיה ואדריכלות מרהיבה.\n\nאל תפספסו: פסל עלי ונינו הנע, מגדל האלפבית, ובולוור בטומי — טיילת חוף באורך 7 ק״מ. לילדים — פארק מים, אקווריום ודולפינריום.', icon: '🎡', bg: '#F7BE68', bgDark: '#F4A94E' },
-  '3': { title: 'סיורים קוליים', subtitle: 'מסלולים מודרכים', description: 'טיילו בבטומי עם מדריך אישי באוזן! סיורים קוליים בעברית לאורך מסלולים מרכזיים בעיר. היסטוריה, ארכיטקטורה, ותרבות — הכל בקצב שלכם.\n\nהסיורים הקוליים שלנו כוללים מסלולים מובנים עם תחנות עצירה, סיפורים היסטוריים, ואנקדוטות מקומיות. כל סיור נמשך כשעה-שעתיים ומותאם להליכה בקצב נוח.\n\nמסלולים זמינים: סיור העיר העתיקה, סיור הטיילת, סיור ההיסטוריה היהודית, וסיור האדריכלות המודרנית.', icon: '🎧', bg: '#2E8BA8', bgDark: '#1A6B8A' },
-  '4': { title: 'בילוי, פנאי וחיי לילה', subtitle: 'בידור והנאה', description: 'חיי הלילה של בטומי תוססים ומגוונים. ברים על חוף הים, מועדוני לילה, קזינו, הופעות חיות ועוד. המדריך המלא לבילוי בכל שעה.\n\nבטומי ידועה כבירת הבילוי של גאורגיה. לאורך הטיילת תמצאו ברים וקלאבים פתוחים עד השעות הקטנות. הקזינו של בטומי הוא אחד הגדולים באזור.\n\nלמשפחות — פארקי שעשועים, קולנוע, באולינג ומרכזי בידור. בקיץ — אירועי חוף, פסטיבלים ומופעים בחינם בטיילת.', icon: '🎰', bg: '#2E8BA8', bgDark: '#1A6B8A' },
-  '5': { title: 'תחבורה', subtitle: 'מוניות ותחבורה ציבורית', description: 'כל מה שצריך לדעת על תחבורה בבטומי — מוניות, אוטובוסים, השכרת רכב, ואפליקציות מומלצות. טיפים לחיסכון ומסלולי נסיעה מומלצים.\n\nהאפליקציה המומלצת למוניות היא Bolt (לשעבר Taxify). מחיר ממוצע לנסיעה בתוך העיר: 5-10 לארי (6-12 ש״ח). אוטובוסים עירוניים עולים 0.30 לארי.\n\nהשכרת רכב מתחילה מ-80 לארי ליום. שימו לב: הנהיגה בגאורגיה שונה מישראל — היזהרו בכבישים הררים מחוץ לעיר.', icon: '🚕', bg: '#F7BE68', bgDark: '#F4A94E' },
-  '6': { title: 'מסעדות ואוכל', subtitle: 'מטבח מקומי ואוכל משובח', description: 'המטבח הגאורגי הוא חוויה בפני עצמה. חצ׳פורי, חינקלי, שש״ק ויין מעולה. המלצות למסעדות הטובות ביותר בבטומי, כולל מחירים ותפריטים.\n\nחובה לטעום: חצ׳פורי אג׳רולי (הגרסה המקומית עם ביצה), חינקלי (כיסוני בשר), מצוואדי (שיפודים), ולובייני (שעועית). היין הגאורגי מיוצר בשיטה עתיקה בקווערי (כדי חרס).\n\nמסעדות מומלצות: Retro, Old Boulevard, Porto Franco, ו-Fanfan. ארוחה לזוג עם יין: 60-100 לארי (70-120 ש״ח).', icon: '🍽️', bg: '#5BC0DE', bgDark: '#3DA5C4' },
-  '7': { title: 'קניות ומתנות', subtitle: 'שופינג ומזכרות', description: 'מרכזי קניות, שווקים מקומיים, חנויות מזכרות ומתנות מיוחדות מגאורגיה. איפה קונים, מה שווה, וטיפים למיקוח.\n\nהשוק המרכזי של בטומי (Boni Market) הוא חובה לביקור — תבלינים, גבינות, ממתקים מקומיים (צ׳ורצ׳חלה), ויין. Metro City Mall הוא מרכז הקניות הגדול ביותר.\n\nמתנות מומלצות: יין גאורגי, צ׳ורצ׳חלה, חרסינה מסורתית, ובדים ארוגים ביד.', icon: '🛍️', bg: '#2E8BA8', bgDark: '#1A6B8A' },
-  '8': { title: 'ספורט ואיכות חיים', subtitle: 'כושר ופעילויות', description: 'חדרי כושר, בריכות שחייה, יוגה על החוף, רכיבה על אופניים וספורט ימי. שמרו על אורח חיים פעיל גם בחופשה.\n\nחוף הים של בטומי מושלם לריצה ורכיבה על אופניים. השכרת אופניים זמינה לאורך הטיילת. חדרי כושר מומלצים: Gym Nation, Sport Life.\n\nספורט ימי: ג׳ט סקי, פרשתינג, שיט בקיאקים ואפילו צלילה. יוגה על החוף בכל בוקר (חינם) ליד מגדל האלפבית.', icon: '🏋️', bg: '#5BC0DE', bgDark: '#3DA5C4' },
-  '9': { title: 'אקסטרים וסקי', subtitle: 'הרפתקאות ואתגרים', description: 'פעילויות אתגריות ואקסטרים — גלישת סקי בגודאורי, רפטינג, ג׳יפים בהרים, פרגליידינג ועוד הרפתקאות שלא תשכחו.\n\nגודאורי — אתר הסקי המוביל בגאורגיה, 4 שעות נסיעה מבטומי. עונת הסקי: דצמבר-אפריל. מחיר סקי פס: 40 לארי ליום.\n\nמבטומי עצמה: רפטינג בנהר Acharistskali, ג׳יפים להרי אג׳ארה, פרגליידינג מעל העיר, וטיולי הרים בפארק הלאומי Mtirala.', icon: '⛷️', bg: '#F7BE68', bgDark: '#F4A94E' },
-  '10': { title: 'מדריכים ישראלים וסוכנים', subtitle: 'ליווי אישי בעברית', description: 'מדריכים ישראלים מקומיים שמכירים כל פינה בבטומי. סוכני נסיעות, ליווי אישי, סיורים פרטיים והמלצות מקומיות בעברית.\n\nהמדריכים שלנו הם ישראלים שחיים בבטומי ומכירים את העיר על בוריה. הם יכולים לעזור בהזמנת מלונות, מסעדות, ותחבורה — הכל בעברית.\n\nשירותים: סיורים פרטיים, ליווי עסקי, סיוע בפתיחת חשבון בנק, והמלצות מקומיות אותנטיות.', icon: '🇮🇱', bg: '#2E8BA8', bgDark: '#1A6B8A' },
-};
+function SubCard({ item, width, onPress }: { item: Item; width: number; onPress: () => void }) {
+  const iconIsImage = !!item.icon && (item.icon.startsWith('data:') || item.icon.startsWith('http'));
+  const bg = item.bg || '#3DA5C4';
+  const bgDark = item.bgDark || '#1A6B8A';
+  return (
+    <TouchableOpacity style={[st.card, { width }]} activeOpacity={0.7} onPress={onPress}>
+      {iconIsImage ? (
+        <Image source={{ uri: item.icon }} style={st.cardTop} resizeMode="cover" />
+      ) : (
+        <LinearGradient colors={[bg, bgDark]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={st.cardTop}>
+          <Text style={st.cardIcon}>{item.icon}</Text>
+        </LinearGradient>
+      )}
+      <View style={st.cardBottom}>
+        <Text style={st.cardTitle}>{item.title}</Text>
+        {item.subtitle ? <Text style={st.cardSub}>{item.subtitle}</Text> : null}
+      </View>
+    </TouchableOpacity>
+  );
+}
+
+function SubBanner({ item, width, onPress }: { item: Item; width: number; onPress: () => void }) {
+  const iconIsImage = !!item.icon && (item.icon.startsWith('data:') || item.icon.startsWith('http'));
+  const bg = item.bg || '#3DA5C4';
+  const bgDark = item.bgDark || '#1A6B8A';
+  return (
+    <TouchableOpacity style={[st.banner, { width }]} activeOpacity={0.7} onPress={onPress}>
+      {iconIsImage ? (
+        <Image source={{ uri: item.icon }} style={st.bannerImg} resizeMode="cover" />
+      ) : (
+        <LinearGradient colors={[bg, bgDark]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={st.bannerImg}>
+          <Text style={st.bannerImgIcon}>{item.icon}</Text>
+        </LinearGradient>
+      )}
+      <View style={st.bannerText}>
+        <Text style={st.bannerTitle} numberOfLines={1}>{item.title}</Text>
+        {item.subtitle ? <Text style={st.bannerSub} numberOfLines={1}>{item.subtitle}</Text> : null}
+        {item.summary ? <Text style={st.bannerSummary} numberOfLines={2}>{item.summary}</Text> : null}
+      </View>
+    </TouchableOpacity>
+  );
+}
 
 export default function CategoryScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const cat = CATEGORIES[id || ''];
   const { dark } = useContext(ThemeContext);
   const { simulatedWidth } = useContext(PreviewContext);
+  const { isAdmin } = useContext(AdminContext);
   const { width: screenW } = useWindowDimensions();
-  const maxW = simulatedWidth ? Math.min(simulatedWidth, screenW) : undefined;
+  const w = simulatedWidth ? Math.min(simulatedWidth, screenW) : screenW;
+  const cardW = (w - 48) / 2;
+
+  const [cat, setCat] = useState<Item | null>(null);
+
+  useEffect(() => {
+    fetchContent().then(data => {
+      const all = [...(data.mainCategories || []), ...(data.extraCategories || [])];
+      const found = all.find((c: Item) => c.id === id);
+      if (found) setCat(found);
+    }).catch(() => {});
+  }, [id]);
 
   if (!cat) {
     return (
       <SafeAreaView style={st.safe}>
         <Stack.Screen options={{ headerShown: true, title: 'קטגוריה', headerBackTitle: 'חזרה' }} />
         <View style={st.emptyWrap}>
-          <Text style={st.emptyTxt}>קטגוריה לא נמצאה</Text>
+          <Text style={st.emptyTxt}>טוען…</Text>
         </View>
       </SafeAreaView>
     );
   }
 
+  const children = cat.children || [];
+
   return (
     <SafeAreaView style={[st.safe, dark && { backgroundColor: Colors.TEXT }]}>
       <Stack.Screen options={{ headerShown: true, title: cat.title, headerBackTitle: 'חזרה' }} />
       <DevicePreviewBar />
-      <ScrollView showsVerticalScrollIndicator={false} style={maxW ? { maxWidth: maxW, alignSelf: 'center', width: '100%' } : undefined}>
-        {/* Hero gradient header */}
-        <LinearGradient
-          colors={[cat.bg, cat.bgDark]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={st.hero}
-        >
-          <Text style={st.heroIcon}>{cat.icon}</Text>
+      <ScrollView showsVerticalScrollIndicator={false} style={{ maxWidth: w, alignSelf: 'center', width: '100%' }}>
+        <View style={[st.hero, { backgroundColor: cat.heroBg || cat.bg || '#3DA5C4' }]}>
           <Text style={st.heroTitle}>{cat.title}</Text>
-          <Text style={st.heroSub}>{cat.subtitle}</Text>
-        </LinearGradient>
-
-        {/* Content */}
-        <View style={st.body}>
-          <Text style={[st.content, dark && { color: Colors.BACKGROUND }]}>{cat.description}</Text>
+          {cat.subtitle ? <Text style={st.heroSub}>{cat.subtitle}</Text> : null}
         </View>
+
+        {children.length > 0 ? (
+          (() => {
+            const isBanner = children.some(c => c.layout === 'banner');
+            const bannerW = Math.min(w - 32, 350);
+            return (
+              <View style={st.section}>
+                {isBanner ? (
+                  <View style={{ alignItems: 'center', gap: 12 }}>
+                    {children.map(ch => (
+                      <SubBanner
+                        key={ch.id}
+                        item={ch}
+                        width={bannerW}
+                        onPress={() => router.push(`/category/${ch.id}` as any)}
+                      />
+                    ))}
+                    {isAdmin && (
+                      <TouchableOpacity
+                        style={[st.banner, st.addBanner, { width: bannerW }]}
+                        activeOpacity={0.7}
+                        onPress={() => router.push('/admin/dashboard' as any)}
+                      >
+                        <Text style={st.addPlus}>+</Text>
+                        <Text style={st.addLabel}>הוסף באנר</Text>
+                      </TouchableOpacity>
+                    )}
+                  </View>
+                ) : (
+                  <View style={st.grid}>
+                    {children.map(ch => (
+                      <SubCard
+                        key={ch.id}
+                        item={ch}
+                        width={cardW}
+                        onPress={() => router.push(`/category/${ch.id}` as any)}
+                      />
+                    ))}
+                    {isAdmin && (
+                      <TouchableOpacity
+                        style={[st.card, st.addCard, { width: cardW }]}
+                        activeOpacity={0.7}
+                        onPress={() => router.push('/admin/dashboard' as any)}
+                      >
+                        <Text style={st.addPlus}>+</Text>
+                        <Text style={st.addLabel}>הוסף אייקון</Text>
+                      </TouchableOpacity>
+                    )}
+                  </View>
+                )}
+              </View>
+            );
+          })()
+        ) : (
+          <View style={st.body}>
+            <Text style={[st.content, dark && { color: Colors.BACKGROUND }]}>
+              {cat.description || 'אין תוכן עדיין'}
+            </Text>
+          </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -80,15 +170,50 @@ const st = StyleSheet.create({
   emptyWrap: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 },
   emptyTxt: { fontSize: 16, color: '#999', writingDirection: 'rtl' },
 
-  hero: {
-    paddingVertical: 40, paddingHorizontal: 24, alignItems: 'center',
+  hero: { paddingVertical: 30, paddingHorizontal: 24, alignItems: 'center' },
+  heroTitle: { fontSize: 26, fontWeight: '800', color: Colors.WHITE, textAlign: 'center', writingDirection: 'rtl' },
+  heroSub: { fontSize: 14, color: Colors.WHITE, opacity: 0.85, marginTop: 4, textAlign: 'center', writingDirection: 'rtl' },
+
+  section: { paddingHorizontal: 16, marginTop: 16, marginBottom: 24 },
+  grid: { flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 10 },
+
+  card: {
+    borderRadius: 16, overflow: 'hidden', backgroundColor: Colors.WHITE,
+    shadowColor: Colors.TEXT, shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.07, shadowRadius: 8, elevation: 3, marginBottom: 4,
   },
-  heroIcon: { fontSize: 64, marginBottom: 12 },
-  heroTitle: { fontSize: 28, fontWeight: '800', color: Colors.WHITE, textAlign: 'center', writingDirection: 'rtl' },
-  heroSub: { fontSize: 15, color: Colors.WHITE, opacity: 0.8, marginTop: 6, textAlign: 'center', writingDirection: 'rtl' },
+  cardTop: { height: 100, alignItems: 'center', justifyContent: 'center' },
+  cardIcon: { fontSize: 68 },
+  cardBottom: { backgroundColor: Colors.WHITE, paddingVertical: 10, paddingHorizontal: 12 },
+  cardTitle: { fontSize: 15, fontWeight: 'bold', color: '#1C2B35', textAlign: 'right', writingDirection: 'rtl' },
+  cardSub: { fontSize: 12, color: '#666', textAlign: 'right', writingDirection: 'rtl', marginTop: 2 },
+
+  addCard: {
+    backgroundColor: '#f0f2f5', borderWidth: 2, borderStyle: 'dashed',
+    borderColor: Colors.PRIMARY, alignItems: 'center', justifyContent: 'center',
+    minHeight: 150, shadowOpacity: 0,
+  },
+
+  banner: {
+    height: 100, borderRadius: 14, overflow: 'hidden', backgroundColor: Colors.WHITE,
+    flexDirection: 'row-reverse', alignItems: 'center',
+    shadowColor: Colors.TEXT, shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08, shadowRadius: 6, elevation: 2,
+  },
+  bannerImg: { width: 100, height: 100, alignItems: 'center', justifyContent: 'center' },
+  bannerImgIcon: { fontSize: 57, color: Colors.WHITE },
+  bannerText: { flex: 1, paddingHorizontal: 12, paddingVertical: 8 },
+  bannerTitle: { fontSize: 15, fontWeight: '800', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl' },
+  bannerSub: { fontSize: 12, fontWeight: '600', color: Colors.PRIMARY, textAlign: 'right', writingDirection: 'rtl', marginTop: 1 },
+  bannerSummary: { fontSize: 11, color: '#666', textAlign: 'right', writingDirection: 'rtl', marginTop: 3, lineHeight: 15 },
+  addBanner: {
+    backgroundColor: '#f0f2f5', borderWidth: 2, borderStyle: 'dashed',
+    borderColor: Colors.PRIMARY, alignItems: 'center', justifyContent: 'center',
+    shadowOpacity: 0, flexDirection: 'column',
+  },
+  addPlus: { fontSize: 40, color: Colors.PRIMARY, fontWeight: '300' },
+  addLabel: { fontSize: 13, color: Colors.PRIMARY, fontWeight: '600', marginTop: 4 },
 
   body: { padding: 24 },
-  content: {
-    fontSize: 16, color: Colors.TEXT, lineHeight: 28, textAlign: 'right', writingDirection: 'rtl',
-  },
+  content: { fontSize: 16, color: Colors.TEXT, lineHeight: 28, textAlign: 'right', writingDirection: 'rtl' },
 });

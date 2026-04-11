@@ -12,8 +12,21 @@ import { fetchContent, updateAllContent, updateSection, API_BASE } from '../../c
 type DataItem = {
   id: string; title: string; subtitle?: string; icon: string; bg: string;
   image?: string; audio?: string; lat?: string; lng?: string; address?: string;
-  summary?: string; longText?: string;
+  summary?: string; longText?: string; heroBg?: string;
+  children?: DataItem[];
 };
+
+const HERO_PALETTE = [
+  '#2D4A5E', '#F7F3ED', '#1A6B8A', '#3DA5C4', '#7ECFC0', '#F4A94E',
+];
+
+const EMOJI_LIBRARY = [
+  '🏨','🏩','🏢','🏖️','🏡','🛏️','🎡','📸','🏛️','🎧',
+  '✡️','⛪','🎶','🍺','🎤','💃','🎰','🚕','🚌','🚆',
+  '🚐','🚍','✈️','🚲','🍽️','🥂','🍔','🌭','⭐','🏥',
+  '🛡️','📱','💡','💰','🛍️','🏋️','⛷️','🇮🇱','🌤️','💱',
+  '📰','🏠','💼','📍','🌊','🏙️','🌳','🌺','☕','🍷',
+];
 
 type Section = {
   key: string; label: string; icon: string; storageKey: string;
@@ -98,17 +111,20 @@ const SECTIONS: Section[] = [
 ];
 
 const NAV_ITEMS = [
-  { key: 'texts', label: 'טקסטים וכותרות', icon: '✏️' },
+  { key: 'texts', label: 'דף הבית', icon: '✏️' },
   ...SECTIONS.map(s => ({ key: s.key, label: s.label, icon: s.icon })),
+  { key: 'media', label: 'תמונות', icon: '🖼️' },
+  { key: 'gallery', label: 'גלריית דף הבית', icon: '🎞️' },
 ];
 
 // ─── Edit Modal ────────────────────────────────────────────────
 function EditModal({
-  visible, item, section, onSave, onDelete, onClose, isWide,
+  visible, item, section, onSave, onDelete, onClose, isWide, onMoveSection,
 }: {
   visible: boolean; item: DataItem | null; section: Section | null;
   onSave: (item: DataItem) => void; onDelete: () => void; onClose: () => void;
   isWide: boolean;
+  onMoveSection?: (target: 'main' | 'extra') => void;
 }) {
   const [form, setForm] = useState<DataItem>({ id: '', title: '', icon: '', bg: '' });
 
@@ -137,6 +153,55 @@ function EditModal({
               <TextInput style={ms.input} value={form.title} onChangeText={v => set('title', v)} textAlign="right" />
             </View>
 
+            {onMoveSection && (section.key === 'main' || section.key === 'extra') && (
+              <View style={ms.fieldGroup}>
+                <Text style={ms.label}>קבוצה</Text>
+                <View style={{ flexDirection: 'row-reverse', gap: 8 }}>
+                  {(['main', 'extra'] as const).map(k => {
+                    const selected = section.key === k;
+                    return (
+                      <TouchableOpacity
+                        key={k}
+                        onPress={() => { if (!selected) onMoveSection(k); }}
+                        style={{
+                          flex: 1, paddingVertical: 10, borderRadius: 10,
+                          backgroundColor: selected ? Colors.PRIMARY : '#f0f2f5',
+                          alignItems: 'center',
+                        }}
+                      >
+                        <Text style={{
+                          fontSize: 13, fontWeight: '700',
+                          color: selected ? Colors.WHITE : '#666',
+                        }}>
+                          {k === 'main' ? 'קטגוריות ראשיות' : 'קטגוריות נוספות'}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              </View>
+            )}
+
+            <View style={ms.fieldGroup}>
+              <Text style={ms.label}>רקע הכותרת</Text>
+              <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 8 }}>
+                {HERO_PALETTE.map(c => {
+                  const selected = (form.heroBg || '') === c;
+                  return (
+                    <TouchableOpacity
+                      key={c}
+                      onPress={() => set('heroBg', c)}
+                      style={{
+                        width: 32, height: 32, borderRadius: 16, backgroundColor: c,
+                        borderWidth: selected ? 3 : 1,
+                        borderColor: selected ? Colors.TEXT : '#e8e8e8',
+                      }}
+                    />
+                  );
+                })}
+              </View>
+            </View>
+
             {section.hasSubtitle && (
               <View style={ms.fieldGroup}>
                 <Text style={ms.label}>כותרת משנה</Text>
@@ -158,17 +223,100 @@ function EditModal({
               </View>
             )}
 
-            <View style={[ms.fieldRow, isWide && { flexDirection: 'row-reverse', gap: 12 }]}>
-              <View style={[ms.fieldGroup, isWide && { flex: 1 }]}>
-                <Text style={ms.label}>אייקון (אימוג׳י)</Text>
-                <TextInput style={ms.input} value={form.icon} onChangeText={v => set('icon', v)} textAlign="center" />
+            <View style={ms.fieldGroup}>
+              <Text style={ms.label}>אייקון (תמונה)</Text>
+              <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 12 }}>
+                {form.icon && (form.icon.startsWith('data:') || form.icon.startsWith('http')) ? (
+                  React.createElement('img', {
+                    src: form.icon,
+                    style: {
+                      width: 170, height: 100, objectFit: 'cover',
+                      borderTopLeftRadius: 16, borderTopRightRadius: 16,
+                      borderBottomLeftRadius: 0, borderBottomRightRadius: 0,
+                      border: '1px solid #e8e8e8',
+                    },
+                    alt: 'icon',
+                  })
+                ) : (
+                  <View style={{
+                    width: 170, height: 100, backgroundColor: '#fafafa',
+                    borderWidth: 1, borderColor: '#e8e8e8',
+                    borderTopLeftRadius: 16, borderTopRightRadius: 16,
+                    alignItems: 'center', justifyContent: 'center',
+                  }}>
+                    <Text style={{ fontSize: 11, color: '#bbb' }}>אין תמונה</Text>
+                  </View>
+                )}
+                {Platform.OS === 'web' && React.createElement('label', {
+                  style: {
+                    backgroundColor: Colors.PRIMARY, color: '#fff', padding: '10px 16px',
+                    borderRadius: 10, fontSize: 14, fontWeight: 600, cursor: 'pointer',
+                  },
+                }, [
+                  'הוסף תמונה',
+                  React.createElement('input', {
+                    key: 'file',
+                    type: 'file',
+                    accept: 'image/*',
+                    style: { display: 'none' },
+                    onChange: (e: any) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      const reader = new FileReader();
+                      reader.onload = () => {
+                        const src = String(reader.result);
+                        const img = new (window as any).Image();
+                        img.onload = () => {
+                          const TW = 680, TH = 400; // 170:100 @ x4
+                          const canvas = (window as any).document.createElement('canvas');
+                          canvas.width = TW; canvas.height = TH;
+                          const ctx = canvas.getContext('2d');
+                          const srcRatio = img.width / img.height;
+                          const dstRatio = TW / TH;
+                          let sx = 0, sy = 0, sw = img.width, sh = img.height;
+                          if (srcRatio > dstRatio) {
+                            sw = img.height * dstRatio;
+                            sx = (img.width - sw) / 2;
+                          } else {
+                            sh = img.width / dstRatio;
+                            sy = (img.height - sh) / 2;
+                          }
+                          ctx.drawImage(img, sx, sy, sw, sh, 0, 0, TW, TH);
+                          set('icon', canvas.toDataURL('image/jpeg', 0.9));
+                        };
+                        img.src = src;
+                      };
+                      reader.readAsDataURL(file);
+                    },
+                  }),
+                ])}
               </View>
-              <View style={[ms.fieldGroup, isWide && { flex: 1 }]}>
-                <Text style={ms.label}>צבע רקע</Text>
-                <View style={ms.colorRow}>
-                  <TextInput style={[ms.input, { flex: 1 }]} value={form.bg} onChangeText={v => set('bg', v)} textAlign="left" />
-                  <View style={[ms.colorPreview, { backgroundColor: form.bg }]} />
-                </View>
+              <Text style={{ fontSize: 11, color: '#999', marginTop: 6, textAlign: 'right' }}>
+                התמונה תיחתך אוטומטית ליחס 170×100 עם פינות עליונות מעוגלות
+              </Text>
+            </View>
+
+            <View style={ms.fieldGroup}>
+              <Text style={ms.label}>או בחר אימוג׳י</Text>
+              <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 6 }}>
+                {EMOJI_LIBRARY.map(e => {
+                  const selected = form.icon === e;
+                  return (
+                    <TouchableOpacity
+                      key={e}
+                      onPress={() => set('icon', e)}
+                      style={{
+                        width: 40, height: 40, borderRadius: 8,
+                        backgroundColor: selected ? Colors.PRIMARY + '20' : '#fafafa',
+                        borderWidth: selected ? 2 : 1,
+                        borderColor: selected ? Colors.PRIMARY : '#e8e8e8',
+                        alignItems: 'center', justifyContent: 'center',
+                      }}
+                    >
+                      <Text style={{ fontSize: 22 }}>{e}</Text>
+                    </TouchableOpacity>
+                  );
+                })}
               </View>
             </View>
 
@@ -237,6 +385,30 @@ export default function AdminDashboard() {
   const [editItem, setEditItem] = useState<DataItem | null>(null);
   const [saved, setSaved] = useState(false);
   const [showMobileNav, setShowMobileNav] = useState(false);
+  const [childrenOf, setChildrenOf] = useState<DataItem | null>(null);
+  const [mediaFiles, setMediaFiles] = useState<{ filename: string; url: string }[]>([]);
+  const [galleryFiles, setGalleryFiles] = useState<{ filename: string; url: string }[]>([]);
+
+  const refreshMedia = useCallback(async () => {
+    try {
+      const res = await fetch('http://localhost:3001/api/uploads');
+      const json = await res.json();
+      if (json.success) setMediaFiles(json.files);
+    } catch {}
+  }, []);
+
+  const refreshGallery = useCallback(async () => {
+    try {
+      const res = await fetch('http://localhost:3001/api/gallery');
+      const json = await res.json();
+      if (json.success) setGalleryFiles(json.files);
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    if (activeNav === 'media') refreshMedia();
+    if (activeNav === 'gallery') refreshGallery();
+  }, [activeNav, refreshMedia, refreshGallery]);
 
   // Map section keys to API JSON keys
   const API_KEYS: Record<string, string> = {
@@ -288,19 +460,29 @@ export default function AdminDashboard() {
     flash();
   };
 
-  const saveTexts = async () => {
-    try {
-      await updateSection('texts', texts);
-    } catch {
-      // Fallback to AsyncStorage
-    }
-    await AsyncStorage.setItem('@admin_texts', JSON.stringify(texts));
-    flash();
+  const saveChildren = (newChildren: DataItem[]) => {
+    if (!childrenOf) return;
+    const items = [...(data[activeNav] || [])];
+    const pIdx = items.findIndex(i => i.id === childrenOf.id);
+    if (pIdx < 0) return;
+    const updatedParent = { ...items[pIdx], children: newChildren };
+    items[pIdx] = updatedParent;
+    saveSection(activeNav, items);
+    setChildrenOf(updatedParent);
   };
 
   const handleSaveItem = (updated: DataItem) => {
     const section = SECTIONS.find(s => s.key === activeNav);
     if (!section) return;
+    if (childrenOf) {
+      const kids = childrenOf.children || [];
+      const idx = kids.findIndex(i => i.id === updated.id);
+      const next = [...kids];
+      if (idx >= 0) next[idx] = updated; else next.push(updated);
+      saveChildren(next);
+      setEditItem(null);
+      return;
+    }
     const items = data[activeNav] || [];
     const idx = items.findIndex(i => i.id === updated.id);
     const next = [...items];
@@ -312,8 +494,13 @@ export default function AdminDashboard() {
   const handleDeleteItem = () => {
     if (!editItem) return;
     const doDelete = () => {
-      const items = (data[activeNav] || []).filter(i => i.id !== editItem.id);
-      saveSection(activeNav, items);
+      if (childrenOf) {
+        const next = (childrenOf.children || []).filter(i => i.id !== editItem.id);
+        saveChildren(next);
+      } else {
+        const items = (data[activeNav] || []).filter(i => i.id !== editItem.id);
+        saveSection(activeNav, items);
+      }
       setEditItem(null);
     };
     if (Platform.OS === 'web') {
@@ -341,15 +528,27 @@ export default function AdminDashboard() {
   };
 
   const moveItem = (idx: number, dir: -1 | 1) => {
-    const items = [...(data[activeNav] || [])];
+    const source = childrenOf ? (childrenOf.children || []) : (data[activeNav] || []);
+    const items = [...source];
     const target = idx + dir;
     if (target < 0 || target >= items.length) return;
     [items[idx], items[target]] = [items[target], items[idx]];
-    saveSection(activeNav, items);
+    if (childrenOf) saveChildren(items); else saveSection(activeNav, items);
+  };
+
+  const reorderItem = (from: number, to: number) => {
+    if (from === to || from < 0 || to < 0) return;
+    const source = childrenOf ? (childrenOf.children || []) : (data[activeNav] || []);
+    const items = [...source];
+    if (from >= items.length || to >= items.length) return;
+    const [moved] = items.splice(from, 1);
+    items.splice(to, 0, moved);
+    if (childrenOf) saveChildren(items); else saveSection(activeNav, items);
   };
 
   const currentSection = SECTIONS.find(s => s.key === activeNav) || null;
-  const currentItems = data[activeNav] || [];
+  const currentItems = childrenOf ? (childrenOf.children || []) : (data[activeNav] || []);
+  const canHaveChildren = activeNav === 'main' || activeNav === 'extra';
 
   // ─── Sidebar / Nav ──────────────────────────────────────────
   const renderNav = () => (
@@ -366,7 +565,7 @@ export default function AdminDashboard() {
           <TouchableOpacity
             key={item.key}
             style={[ns.navItem, activeNav === item.key && ns.navItemActive]}
-            onPress={() => { setActiveNav(item.key); setShowMobileNav(false); }}
+            onPress={() => { setActiveNav(item.key); setShowMobileNav(false); setChildrenOf(null); }}
           >
             <Text style={ns.navIcon}>{item.icon}</Text>
             <Text style={[ns.navLabel, activeNav === item.key && ns.navLabelActive]}>{item.label}</Text>
@@ -389,50 +588,227 @@ export default function AdminDashboard() {
     </View>
   );
 
-  // ─── Texts Editor ───────────────────────────────────────────
+  // ─── Home Preview ───────────────────────────────────────────
   const renderTexts = () => {
-    const fields = [
-      { key: 'headerTitle', label: 'כותרת ראשית' },
-      { key: 'headerSub', label: 'תת כותרת' },
-      { key: 'welcomeTitle', label: 'כותרת ברוכים הבאים' },
-      { key: 'infoTitle', label: 'כותרת פורטל המידע' },
-      { key: 'bottomTitle', label: 'כותרת באנרים תחתונים' },
-      { key: 'dropdownTitle', label: 'כותרת קטגוריות נוספות' },
-    ];
     return (
       <View style={cs.contentCard}>
-        <Text style={cs.contentTitle}>טקסטים וכותרות</Text>
-        <Text style={cs.contentSub}>עריכת כל הטקסטים והכותרות באפליקציה</Text>
-        {isWide ? (
-          <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 16, marginTop: 16 }}>
-            {fields.map(f => (
-              <View key={f.key} style={{ width: '48%', minWidth: 280 }}>
-                <Text style={cs.fieldLabel}>{f.label}</Text>
-                <TextInput
-                  style={cs.fieldInput}
-                  value={(texts as any)[f.key]}
-                  onChangeText={t => setTexts(prev => ({ ...prev, [f.key]: t }))}
-                  textAlign="right"
-                />
+        <Text style={cs.contentTitle}>דף הבית</Text>
+        <Text style={cs.contentSub}>תצוגה מקדימה של דף הבית כפי שהגולש רואה</Text>
+        {Platform.OS === 'web' && (
+          <View style={{ alignItems: 'center', marginTop: 20 }}>
+            <View style={{
+              width: 591, height: 1246, backgroundColor: '#1C2B35', borderRadius: 48,
+              padding: 14, alignItems: 'center', justifyContent: 'center',
+              shadowColor: '#000', shadowOffset: { width: 0, height: 10 },
+              shadowOpacity: 0.25, shadowRadius: 30,
+            }}>
+              <View style={{ width: 563, height: 1218, backgroundColor: '#000', borderRadius: 36, overflow: 'hidden' }}>
+                {React.createElement('iframe', {
+                  src: '/',
+                  style: {
+                    width: '375px', height: '812px', border: 0, backgroundColor: '#fff',
+                    transform: 'scale(1.5)', transformOrigin: 'top left',
+                  },
+                  title: 'home-preview',
+                })}
               </View>
-            ))}
-          </View>
-        ) : (
-          fields.map(f => (
-            <View key={f.key} style={{ marginTop: 12 }}>
-              <Text style={cs.fieldLabel}>{f.label}</Text>
-              <TextInput
-                style={cs.fieldInput}
-                value={(texts as any)[f.key]}
-                onChangeText={t => setTexts(prev => ({ ...prev, [f.key]: t }))}
-                textAlign="right"
-              />
             </View>
-          ))
+          </View>
         )}
-        <TouchableOpacity style={cs.primaryBtn} onPress={saveTexts}>
-          <Text style={cs.primaryBtnTxt}>שמור שינויים</Text>
-        </TouchableOpacity>
+      </View>
+    );
+  };
+
+  // ─── Media Library ──────────────────────────────────────────
+  const renderMedia = () => {
+    const handleUpload = async (file: File) => {
+      const fd = new FormData();
+      fd.append('file', file);
+      try {
+        await fetch('http://localhost:3001/api/upload', { method: 'POST', body: fd });
+        await refreshMedia();
+      } catch {}
+    };
+    const handleDelete = async (filename: string) => {
+      if (Platform.OS === 'web' && !confirm(`למחוק את ${filename}?`)) return;
+      try {
+        await fetch(`http://localhost:3001/api/uploads/${encodeURIComponent(filename)}`, { method: 'DELETE' });
+        await refreshMedia();
+      } catch {}
+    };
+    return (
+      <View style={cs.contentCard}>
+        <View style={cs.contentHeaderRow}>
+          <View style={{ flex: 1 }}>
+            <Text style={cs.contentTitle}>תיקיית תמונות</Text>
+            <Text style={cs.contentSub}>{mediaFiles.length} תמונות</Text>
+          </View>
+          {Platform.OS === 'web' && React.createElement('label', {
+            style: {
+              backgroundColor: Colors.PRIMARY, color: '#fff', padding: '10px 16px',
+              borderRadius: 10, fontSize: 14, fontWeight: 600, cursor: 'pointer',
+            },
+          }, [
+            '+ העלה תמונות',
+            React.createElement('input', {
+              key: 'file',
+              type: 'file',
+              accept: 'image/*',
+              multiple: true,
+              style: { display: 'none' },
+              onChange: async (e: any) => {
+                const files = Array.from(e.target.files || []) as File[];
+                for (const f of files) await handleUpload(f);
+                e.target.value = '';
+              },
+            }),
+          ])}
+        </View>
+
+        <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 12, marginTop: 16 }}>
+          {mediaFiles.map(f => (
+            <View key={f.filename} style={{ width: 160, backgroundColor: '#fafafa', borderRadius: 12, overflow: 'hidden', borderWidth: 1, borderColor: '#e8e8e8' }}>
+              {Platform.OS === 'web' && React.createElement('img', {
+                src: f.url,
+                style: { width: '100%', height: 110, objectFit: 'cover', display: 'block' },
+                alt: f.filename,
+              })}
+              <View style={{ padding: 8 }}>
+                <Text numberOfLines={1} style={{ fontSize: 11, color: '#666', textAlign: 'right', writingDirection: 'rtl', marginBottom: 6 }}>
+                  {f.filename}
+                </Text>
+                <View style={{ flexDirection: 'row-reverse', gap: 6 }}>
+                  <TouchableOpacity
+                    style={{ flex: 1, backgroundColor: '#e8f4f8', paddingVertical: 6, borderRadius: 6, alignItems: 'center' }}
+                    onPress={() => {
+                      if (Platform.OS === 'web') {
+                        (navigator as any).clipboard?.writeText(f.url);
+                      }
+                    }}
+                  >
+                    <Text style={{ fontSize: 11, color: Colors.PRIMARY, fontWeight: '600' }}>העתק URL</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={{ backgroundColor: '#fdecea', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 6 }}
+                    onPress={() => handleDelete(f.filename)}
+                  >
+                    <Text style={{ fontSize: 11, color: '#c0392b', fontWeight: '600' }}>מחק</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          ))}
+          {mediaFiles.length === 0 && (
+            <Text style={{ color: '#999', fontSize: 14, textAlign: 'right', writingDirection: 'rtl', width: '100%' }}>
+              אין תמונות עדיין — לחץ על "העלה תמונות" כדי להתחיל
+            </Text>
+          )}
+        </View>
+      </View>
+    );
+  };
+
+  // ─── Home Gallery ───────────────────────────────────────────
+  const renderGallery = () => {
+    const handleUpload = async (file: File) => {
+      const fd = new FormData();
+      fd.append('file', file);
+      try {
+        await fetch('http://localhost:3001/api/gallery', { method: 'POST', body: fd });
+        await refreshGallery();
+      } catch {}
+    };
+    const handleDelete = async (filename: string) => {
+      if (Platform.OS === 'web' && !confirm(`למחוק את ${filename}?`)) return;
+      try {
+        await fetch(`http://localhost:3001/api/gallery/${encodeURIComponent(filename)}`, { method: 'DELETE' });
+        await refreshGallery();
+      } catch {}
+    };
+    const reorder = async (from: number, to: number) => {
+      if (from === to) return;
+      const next = [...galleryFiles];
+      const [moved] = next.splice(from, 1);
+      next.splice(to, 0, moved);
+      setGalleryFiles(next);
+      await fetch('http://localhost:3001/api/gallery/order', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ order: next.map(f => f.filename) }),
+      });
+    };
+    return (
+      <View style={cs.contentCard}>
+        <View style={cs.contentHeaderRow}>
+          <View style={{ flex: 1 }}>
+            <Text style={cs.contentTitle}>גלריית דף הבית</Text>
+            <Text style={cs.contentSub}>{galleryFiles.length} תמונות — תוצג כסליידר אוטומטי בדף הבית</Text>
+          </View>
+          {Platform.OS === 'web' && React.createElement('label', {
+            style: {
+              backgroundColor: Colors.PRIMARY, color: '#fff', padding: '10px 16px',
+              borderRadius: 10, fontSize: 14, fontWeight: 600, cursor: 'pointer',
+            },
+          }, [
+            '+ העלה תמונות',
+            React.createElement('input', {
+              key: 'file',
+              type: 'file',
+              accept: 'image/*',
+              multiple: true,
+              style: { display: 'none' },
+              onChange: async (e: any) => {
+                const files = Array.from(e.target.files || []) as File[];
+                for (const f of files) await handleUpload(f);
+                e.target.value = '';
+              },
+            }),
+          ])}
+        </View>
+
+        <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 12, marginTop: 16 }}>
+          {galleryFiles.map((f, idx) => {
+            const card = (
+              <View style={{ width: 200, backgroundColor: '#fafafa', borderRadius: 12, overflow: 'hidden', borderWidth: 1, borderColor: '#e8e8e8' }}>
+                {Platform.OS === 'web' && React.createElement('img', {
+                  src: f.url,
+                  style: { width: '100%', height: 130, objectFit: 'cover', display: 'block' },
+                  alt: f.filename,
+                })}
+                <View style={{ padding: 8, flexDirection: 'row-reverse', alignItems: 'center', gap: 6 }}>
+                  <Text style={{ fontSize: 11, color: '#999', fontWeight: '600', width: 22, textAlign: 'center' }}>{idx + 1}</Text>
+                  <Text numberOfLines={1} style={{ flex: 1, fontSize: 11, color: '#666', textAlign: 'right' }}>{f.filename}</Text>
+                  <TouchableOpacity
+                    style={{ backgroundColor: '#fdecea', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 6 }}
+                    onPress={() => handleDelete(f.filename)}
+                  >
+                    <Text style={{ fontSize: 11, color: '#c0392b', fontWeight: '600' }}>מחק</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            );
+            if (Platform.OS === 'web') {
+              return React.createElement('div', {
+                key: f.filename,
+                draggable: true,
+                onDragStart: (e: any) => { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', String(idx)); },
+                onDragOver: (e: any) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; },
+                onDrop: (e: any) => {
+                  e.preventDefault();
+                  const from = parseInt(e.dataTransfer.getData('text/plain'), 10);
+                  if (!isNaN(from)) reorder(from, idx);
+                },
+                style: { cursor: 'move' },
+              }, card);
+            }
+            return <View key={f.filename}>{card}</View>;
+          })}
+          {galleryFiles.length === 0 && (
+            <Text style={{ color: '#999', fontSize: 14, textAlign: 'right', writingDirection: 'rtl', width: '100%' }}>
+              אין תמונות עדיין — לחץ על "העלה תמונות" כדי להוסיף
+            </Text>
+          )}
+        </View>
       </View>
     );
   };
@@ -442,9 +818,16 @@ export default function AdminDashboard() {
     if (!currentSection) return null;
     return (
       <View style={cs.contentCard}>
+        {childrenOf && (
+          <TouchableOpacity onPress={() => setChildrenOf(null)} style={{ marginBottom: 10, alignSelf: 'flex-end' }}>
+            <Text style={{ color: Colors.PRIMARY, fontSize: 14, fontWeight: '600' }}>→ חזרה ל{currentSection.label}</Text>
+          </TouchableOpacity>
+        )}
         <View style={cs.contentHeaderRow}>
           <View style={{ flex: 1 }}>
-            <Text style={cs.contentTitle}>{currentSection.label}</Text>
+            <Text style={cs.contentTitle}>
+              {childrenOf ? `תת-קטגוריות של ${childrenOf.title}` : currentSection.label}
+            </Text>
             <Text style={cs.contentSub}>{currentItems.length} פריטים</Text>
           </View>
           <TouchableOpacity style={cs.addBtn} onPress={addItem}>
@@ -466,47 +849,78 @@ export default function AdminDashboard() {
           </View>
         )}
 
-        {currentItems.map((item, idx) => (
-          <View key={item.id} style={[cs.itemRow, isWide && cs.itemRowWide]}>
-            {/* Order buttons */}
-            <View style={cs.orderBtns}>
-              <TouchableOpacity onPress={() => moveItem(idx, -1)} disabled={idx === 0}>
-                <Text style={[cs.orderArrow, idx === 0 && { opacity: 0.2 }]}>▲</Text>
-              </TouchableOpacity>
-              <Text style={cs.orderNum}>{idx + 1}</Text>
-              <TouchableOpacity onPress={() => moveItem(idx, 1)} disabled={idx === currentItems.length - 1}>
-                <Text style={[cs.orderArrow, idx === currentItems.length - 1 && { opacity: 0.2 }]}>▼</Text>
+        {currentItems.map((item, idx) => {
+          const rowInner = (
+            <View style={[cs.itemRow, isWide && cs.itemRowWide]}>
+              <View style={cs.orderBtns}>
+                <Text style={{ fontSize: 18, color: '#999', ...(Platform.OS === 'web' ? ({ cursor: 'grab' } as any) : {}) }}>⋮⋮</Text>
+                <Text style={cs.orderNum}>{idx + 1}</Text>
+                {Platform.OS !== 'web' && (
+                  <>
+                    <TouchableOpacity onPress={() => moveItem(idx, -1)} disabled={idx === 0}>
+                      <Text style={[cs.orderArrow, idx === 0 && { opacity: 0.2 }]}>▲</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => moveItem(idx, 1)} disabled={idx === currentItems.length - 1}>
+                      <Text style={[cs.orderArrow, idx === currentItems.length - 1 && { opacity: 0.2 }]}>▼</Text>
+                    </TouchableOpacity>
+                  </>
+                )}
+              </View>
+
+              <View style={[cs.colorBar, { backgroundColor: item.bg }]} />
+              {item.icon && (item.icon.startsWith('data:') || item.icon.startsWith('http'))
+                ? (Platform.OS === 'web'
+                    ? React.createElement('img', { src: item.icon, style: { width: 60, height: 36, objectFit: 'cover', borderRadius: 6 }, alt: '' })
+                    : null)
+                : <Text style={cs.itemIcon}>{item.icon}</Text>}
+
+              <View style={cs.itemInfo}>
+                <Text style={cs.itemTitle}>{item.title}</Text>
+                {item.subtitle ? <Text style={cs.itemSub}>{item.subtitle}</Text> : null}
+                {!isWide && item.address ? <Text style={cs.itemMeta}>📍 {item.address}</Text> : null}
+                {!isWide && item.audio ? <Text style={cs.itemMeta}>🎧 אודיו מצורף</Text> : null}
+              </View>
+
+              {isWide && currentSection.hasLocation && (
+                <Text style={[cs.itemMeta, { width: 120 }]}>{item.address || '—'}</Text>
+              )}
+              {isWide && currentSection.hasAudio && (
+                <Text style={[cs.itemMeta, { width: 80 }]}>{item.audio ? '✓' : '—'}</Text>
+              )}
+
+              {canHaveChildren && !childrenOf && (
+                <TouchableOpacity
+                  style={[cs.editBtn, { backgroundColor: '#fff3e0' }]}
+                  onPress={() => setChildrenOf(item)}
+                >
+                  <Text style={[cs.editTxt, { color: Colors.ACCENT }]}>
+                    תת-קטגוריות ({(item.children || []).length})
+                  </Text>
+                </TouchableOpacity>
+              )}
+
+              <TouchableOpacity style={cs.editBtn} onPress={() => setEditItem(item)}>
+                <Text style={cs.editTxt}>ערוך</Text>
               </TouchableOpacity>
             </View>
+          );
 
-            {/* Color bar */}
-            <View style={[cs.colorBar, { backgroundColor: item.bg }]} />
-
-            {/* Icon */}
-            <Text style={cs.itemIcon}>{item.icon}</Text>
-
-            {/* Info */}
-            <View style={cs.itemInfo}>
-              <Text style={cs.itemTitle}>{item.title}</Text>
-              {item.subtitle ? <Text style={cs.itemSub}>{item.subtitle}</Text> : null}
-              {!isWide && item.address ? <Text style={cs.itemMeta}>📍 {item.address}</Text> : null}
-              {!isWide && item.audio ? <Text style={cs.itemMeta}>🎧 אודיו מצורף</Text> : null}
-            </View>
-
-            {/* Extra columns on wide */}
-            {isWide && currentSection.hasLocation && (
-              <Text style={[cs.itemMeta, { width: 120 }]}>{item.address || '—'}</Text>
-            )}
-            {isWide && currentSection.hasAudio && (
-              <Text style={[cs.itemMeta, { width: 80 }]}>{item.audio ? '✓' : '—'}</Text>
-            )}
-
-            {/* Edit button */}
-            <TouchableOpacity style={cs.editBtn} onPress={() => setEditItem(item)}>
-              <Text style={cs.editTxt}>ערוך</Text>
-            </TouchableOpacity>
-          </View>
-        ))}
+          if (Platform.OS === 'web') {
+            return React.createElement('div', {
+              key: item.id,
+              draggable: true,
+              onDragStart: (e: any) => { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', String(idx)); },
+              onDragOver: (e: any) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; },
+              onDrop: (e: any) => {
+                e.preventDefault();
+                const from = parseInt(e.dataTransfer.getData('text/plain'), 10);
+                if (!isNaN(from)) reorderItem(from, idx);
+              },
+              style: { cursor: 'move' },
+            }, rowInner);
+          }
+          return <View key={item.id}>{rowInner}</View>;
+        })}
 
         {currentItems.length === 0 && (
           <View style={cs.emptyState}>
@@ -543,7 +957,7 @@ export default function AdminDashboard() {
         {(!showMobileNav || isWide) && (
           <ScrollView
             style={ds.content}
-            contentContainerStyle={[ds.contentInner, isDesktop && { maxWidth: 900 }]}
+            contentContainerStyle={[ds.contentInner, isDesktop && { maxWidth: 900, marginLeft: 'auto', marginRight: 0 }]}
             showsVerticalScrollIndicator={false}
           >
             {/* Saved badge on wide */}
@@ -569,7 +983,10 @@ export default function AdminDashboard() {
             </View>
 
             {/* Active section content */}
-            {activeNav === 'texts' ? renderTexts() : renderItems()}
+            {activeNav === 'texts' ? renderTexts()
+              : activeNav === 'media' ? renderMedia()
+              : activeNav === 'gallery' ? renderGallery()
+              : renderItems()}
 
             <View style={{ height: 40 }} />
           </ScrollView>
@@ -585,6 +1002,17 @@ export default function AdminDashboard() {
         onDelete={handleDeleteItem}
         onClose={() => setEditItem(null)}
         isWide={isWide}
+        onMoveSection={(target) => {
+          if (!editItem || childrenOf) return;
+          if (target === activeNav) return;
+          const fromKey = activeNav;
+          const fromItems = (data[fromKey] || []).filter(i => i.id !== editItem.id);
+          const toItems = [...(data[target] || []), editItem];
+          saveSection(fromKey, fromItems);
+          saveSection(target, toItems);
+          setActiveNav(target);
+          setEditItem(null);
+        }}
       />
     </View>
   );
@@ -645,12 +1073,13 @@ const ds = StyleSheet.create({
     backgroundColor: '#d4edda', borderRadius: 10, padding: 12, marginBottom: 16, alignItems: 'center',
   },
   savedBannerTxt: { color: '#155724', fontWeight: '600', fontSize: 14 },
-  statsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginBottom: 20 },
+  statsRow: { flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 12, marginBottom: 20 },
   statCard: {
     flex: 1, minWidth: 140, backgroundColor: Colors.WHITE, borderRadius: 14, padding: 16,
+    alignItems: 'flex-end',
     borderRightWidth: 4, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 4, elevation: 1,
   },
-  statNum: { fontSize: 28, fontWeight: '800', color: Colors.TEXT },
+  statNum: { fontSize: 28, fontWeight: '800', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl' },
   statLabel: { fontSize: 13, color: '#999', marginTop: 2, textAlign: 'right', writingDirection: 'rtl' },
 });
 
@@ -690,7 +1119,7 @@ const cs = StyleSheet.create({
   orderArrow: { fontSize: 10, color: Colors.PRIMARY, padding: 4 },
   orderNum: { fontSize: 11, color: '#999', fontWeight: '600' },
   colorBar: { width: 6, height: 40, borderRadius: 3 },
-  itemIcon: { fontSize: 28 },
+  itemIcon: { fontSize: 36 },
   itemInfo: { flex: 1 },
   itemTitle: { fontSize: 15, fontWeight: '600', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl' },
   itemSub: { fontSize: 12, color: '#999', textAlign: 'right', writingDirection: 'rtl', marginTop: 2 },
