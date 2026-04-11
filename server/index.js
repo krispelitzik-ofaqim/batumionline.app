@@ -6,11 +6,20 @@ const path = require('path');
 const multer = require('multer');
 
 const app = express();
-const PORT = 3001;
-const DB_PATH = path.join(__dirname, 'db.json');
-const UPLOADS_DIR = path.join(__dirname, 'uploads');
+const PORT = process.env.PORT || 3001;
+const DATA_DIR = process.env.DATA_DIR || __dirname;
+const DB_PATH = path.join(DATA_DIR, 'db.json');
+const UPLOADS_DIR = path.join(DATA_DIR, 'uploads');
 const GALLERY_DIR = path.join(UPLOADS_DIR, 'gallery');
 if (!fs.existsSync(GALLERY_DIR)) fs.mkdirSync(GALLERY_DIR, { recursive: true });
+if (!fs.existsSync(DB_PATH)) {
+  const seed = path.join(__dirname, 'db.json');
+  if (fs.existsSync(seed) && seed !== DB_PATH) {
+    fs.copyFileSync(seed, DB_PATH);
+  } else {
+    fs.writeFileSync(DB_PATH, '{}', 'utf-8');
+  }
+}
 
 // Middleware
 app.use(cors());
