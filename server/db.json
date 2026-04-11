@@ -448,49 +448,49 @@
       "id": "health",
       "title": "בריאות",
       "subtitle": "מידע רפואי חשוב",
-      "icon": "🏥",
+      "icon": "http://localhost:3001/uploads/info_health.jpg",
       "bg": "#3DA5C425"
     },
     {
       "id": "insurance",
       "title": "ביטוחים",
       "subtitle": "ביטוח נסיעות ובריאות",
-      "icon": "🛡️",
+      "icon": "http://localhost:3001/uploads/info_insurance.jpg",
       "bg": "#F4A94E25"
     },
     {
       "id": "telecom",
       "title": "תקשורת וסלולר",
       "subtitle": "סים מקומי וחבילות",
-      "icon": "📱",
+      "icon": "http://localhost:3001/uploads/info_telecom.jpg",
       "bg": "#1A6B8A25"
     },
     {
       "id": "tips",
       "title": "טיפים",
       "subtitle": "עצות מנוסים",
-      "icon": "💡",
+      "icon": "http://localhost:3001/uploads/info_tips.jpg",
       "bg": "#F4A94E30"
     },
     {
       "id": "tax",
       "title": "החזרי מס",
       "subtitle": "VAT ומכס",
-      "icon": "💰",
+      "icon": "http://localhost:3001/uploads/info_tax.jpg",
       "bg": "#3DA5C430"
     },
     {
       "id": "embassy",
       "title": "שגרירות ישראל",
       "subtitle": "חירום ושירותי קונסול",
-      "icon": "🇮🇱",
+      "icon": "http://localhost:3001/uploads/info_embassy.jpg",
       "bg": "#1A6B8A25"
     },
     {
       "id": "culture",
       "title": "תרבות וכשרות",
       "subtitle": "בתי כנסת ומסעדות כשרות",
-      "icon": "✡️",
+      "icon": "http://localhost:3001/uploads/info_culture.jpg",
       "bg": "#F4A94E25"
     }
   ],
@@ -533,5 +533,28 @@
       "icon": "💼",
       "bg": "#1A6B8A"
     }
-  ]
+  ],
+  "mediaTags": {
+    "1775912685744-66.jpg": [
+      "gallery"
+    ],
+    "1775912672953-364.jpg": [
+      "gallery"
+    ],
+    "1775912646740-741.jpg": [
+      "gallery"
+    ],
+    "1775912626901-944.jpg": [
+      "gallery"
+    ],
+    "1775910069886-735.jpg": [
+      "gallery"
+    ],
+    "1775910069689-689.jpg": [
+      "gallery"
+    ],
+    "1775910069562-341.jpg": [
+      "gallery"
+    ]
+  }
 }

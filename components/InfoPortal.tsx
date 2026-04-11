@@ -1,11 +1,11 @@
-import React, { useRef, useState } from 'react';
-import {
-  ScrollView, TouchableOpacity, Text, View, StyleSheet,
-  NativeSyntheticEvent, NativeScrollEvent,
-} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Image, useWindowDimensions } from 'react-native';
 import { Colors } from '../constants/colors';
+import { fetchContent } from '../constants/api';
 
-const ITEMS = [
+type Item = { id: string; title: string; subtitle?: string; icon: string; bg?: string };
+
+const INITIAL_ITEMS: Item[] = [
   { id: 'health', title: 'בריאות', subtitle: 'מידע רפואי חשוב', icon: '🏥', bg: Colors.SECONDARY + '25' },
   { id: 'insurance', title: 'ביטוחים', subtitle: 'ביטוח נסיעות ובריאות', icon: '🛡️', bg: Colors.ACCENT + '25' },
   { id: 'telecom', title: 'תקשורת וסלולר', subtitle: 'סים מקומי וחבילות', icon: '📱', bg: Colors.PRIMARY + '25' },
@@ -14,68 +14,82 @@ const ITEMS = [
 ];
 
 export default function InfoPortal() {
-  const cardW = 340;
-  const [activeIdx, setActiveIdx] = useState(0);
-  const scrollRef = useRef<ScrollView>(null);
+  const { width } = useWindowDimensions();
+  const [items, setItems] = useState<Item[]>(INITIAL_ITEMS);
+  const [idx, setIdx] = useState(0);
 
-  const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const idx = Math.round(e.nativeEvent.contentOffset.x / (cardW + 12));
-    setActiveIdx(idx);
-  };
+  useEffect(() => {
+    fetchContent().then(data => {
+      if (Array.isArray(data.infoPortal) && data.infoPortal.length) setItems(data.infoPortal);
+    }).catch(() => {});
+  }, []);
 
-  const goTo = (idx: number) => {
-    scrollRef.current?.scrollTo({ x: idx * (cardW + 12), animated: true });
-    setActiveIdx(idx);
-  };
+  const cardW = Math.min(width - 32, 340);
+  const total = items.length;
+  const wrap = (i: number) => ((i % total) + total) % total;
+  const next = () => setIdx(i => wrap(i + 1));
+  const prev = () => setIdx(i => wrap(i - 1));
+
+  if (total === 0) return null;
+  const item = items[idx];
+  const isImage = !!item.icon && (item.icon.startsWith('data:') || item.icon.startsWith('http'));
 
   return (
     <View>
       <Text style={styles.sectionTitle}>פורטל המידע</Text>
-      <ScrollView
-        ref={scrollRef}
-        horizontal
-        snapToInterval={cardW + 12}
-        decelerationRate="fast"
-        showsHorizontalScrollIndicator={false}
-        onScroll={onScroll}
-        scrollEventThrottle={16}
-        contentContainerStyle={styles.row}
-      >
-        {ITEMS.map((item) => (
-          <View key={item.id} style={[styles.card, { backgroundColor: item.bg }]}>
-            <Text style={styles.icon}>{item.icon}</Text>
-            <View style={styles.textWrap}>
-              <Text style={styles.title}>{item.title}</Text>
-              <Text style={styles.sub}>{item.subtitle}</Text>
+      <View style={styles.stage}>
+        <View style={[styles.card, { width: cardW }]}>
+          {isImage ? (
+            <Image source={{ uri: item.icon }} style={styles.imageTop} resizeMode="cover" />
+          ) : (
+            <View style={[styles.imageTop, { backgroundColor: item.bg || Colors.SECONDARY + '25', alignItems: 'center', justifyContent: 'center' }]}>
+              <Text style={styles.iconEmoji}>{item.icon}</Text>
             </View>
-            <TouchableOpacity style={[styles.arrowBtn, { right: 0 }]} onPress={() => goTo(Math.max(0, activeIdx - 1))}>
-              <Text style={styles.arrow}>›</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={[styles.arrowBtn, { left: 0 }]} onPress={() => goTo(Math.min(ITEMS.length - 1, activeIdx + 1))}>
-              <Text style={styles.arrow}>‹</Text>
-            </TouchableOpacity>
+          )}
+          <View style={styles.textBottom}>
+            <Text style={styles.title}>{item.title}</Text>
+            {item.subtitle ? <Text style={styles.sub}>{item.subtitle}</Text> : null}
           </View>
+
+          <TouchableOpacity style={[styles.arrowBtn, { right: 0 }]} onPress={prev}>
+            <Text style={styles.arrow}>›</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={[styles.arrowBtn, { left: 0 }]} onPress={next}>
+            <Text style={styles.arrow}>‹</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+      <View style={styles.dots}>
+        {items.map((_, i) => (
+          <TouchableOpacity key={i} onPress={() => setIdx(i)}>
+            <View style={[styles.dot, i === idx && styles.dotActive]} />
+          </TouchableOpacity>
         ))}
-      </ScrollView>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   sectionTitle: { fontSize: 16, fontWeight: 'normal', color: '#999999', textAlign: 'right', writingDirection: 'rtl', marginBottom: 8 },
-  row: { gap: 12 },
-  arrow: { fontSize: 28, color: Colors.WHITE, fontWeight: '700' },
-  arrowBtn: {
-    position: 'absolute', top: 0, bottom: 0, width: 36,
-    justifyContent: 'center', alignItems: 'center', zIndex: 2,
-    backgroundColor: 'transparent',
-  },
+  stage: { alignItems: 'center' },
   card: {
-    width: 340, height: 200, borderRadius: 16, overflow: 'hidden',
-    flexDirection: 'row-reverse', alignItems: 'center', padding: 18, gap: 14,
+    height: 200, borderRadius: 16, overflow: 'hidden',
+    backgroundColor: Colors.WHITE,
+    shadowColor: Colors.TEXT, shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.07, shadowRadius: 8, elevation: 2,
   },
-  icon: { fontSize: 40 },
-  textWrap: { flex: 1 },
+  imageTop: { width: '100%', height: 140 },
+  iconEmoji: { fontSize: 64 },
+  textBottom: { paddingHorizontal: 14, paddingVertical: 10 },
   title: { fontSize: 16, fontWeight: '800', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl' },
-  sub: { fontSize: 12, color: Colors.TEXT, opacity: 0.5, marginTop: 4, textAlign: 'right', writingDirection: 'rtl' },
+  sub: { fontSize: 12, color: Colors.TEXT, opacity: 0.6, marginTop: 2, textAlign: 'right', writingDirection: 'rtl' },
+  arrow: { fontSize: 32, color: Colors.TEXT, fontWeight: '700', opacity: 0.5 },
+  arrowBtn: {
+    position: 'absolute', top: 0, bottom: 0, width: 40,
+    justifyContent: 'center', alignItems: 'center', zIndex: 2,
+  },
+  dots: { flexDirection: 'row', justifyContent: 'center', gap: 6, marginTop: 10 },
+  dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#ccc' },
+  dotActive: { backgroundColor: Colors.PRIMARY, width: 18 },
 });

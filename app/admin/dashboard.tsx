@@ -114,7 +114,6 @@ const NAV_ITEMS = [
   { key: 'texts', label: 'דף הבית', icon: '✏️' },
   ...SECTIONS.map(s => ({ key: s.key, label: s.label, icon: s.icon })),
   { key: 'media', label: 'תמונות', icon: '🖼️' },
-  { key: 'gallery', label: 'גלריית דף הבית', icon: '🎞️' },
 ];
 
 // ─── Edit Modal ────────────────────────────────────────────────
@@ -386,7 +385,7 @@ export default function AdminDashboard() {
   const [saved, setSaved] = useState(false);
   const [showMobileNav, setShowMobileNav] = useState(false);
   const [childrenOf, setChildrenOf] = useState<DataItem | null>(null);
-  const [mediaFiles, setMediaFiles] = useState<{ filename: string; url: string }[]>([]);
+  const [mediaFiles, setMediaFiles] = useState<{ filename: string; url: string; tags?: string[] }[]>([]);
   const [galleryFiles, setGalleryFiles] = useState<{ filename: string; url: string }[]>([]);
 
   const refreshMedia = useCallback(async () => {
@@ -636,12 +635,24 @@ export default function AdminDashboard() {
         await refreshMedia();
       } catch {}
     };
+    const toggleTag = async (filename: string, tag: string) => {
+      const file = mediaFiles.find(f => f.filename === filename);
+      const current = file?.tags || [];
+      const next = current.includes(tag) ? current.filter(t => t !== tag) : [...current, tag];
+      setMediaFiles(prev => prev.map(f => f.filename === filename ? { ...f, tags: next } : f));
+      try {
+        await fetch(`http://localhost:3001/api/uploads/${encodeURIComponent(filename)}/tags`, {
+          method: 'PUT', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ tags: next }),
+        });
+      } catch {}
+    };
     return (
       <View style={cs.contentCard}>
         <View style={cs.contentHeaderRow}>
           <View style={{ flex: 1 }}>
             <Text style={cs.contentTitle}>תיקיית תמונות</Text>
-            <Text style={cs.contentSub}>{mediaFiles.length} תמונות</Text>
+            <Text style={cs.contentSub}>{mediaFiles.length} תמונות — סמן כל אחת לאן היא שייכת</Text>
           </View>
           {Platform.OS === 'web' && React.createElement('label', {
             style: {
@@ -674,9 +685,29 @@ export default function AdminDashboard() {
                 alt: f.filename,
               })}
               <View style={{ padding: 8 }}>
-                <Text numberOfLines={1} style={{ fontSize: 11, color: '#666', textAlign: 'right', writingDirection: 'rtl', marginBottom: 6 }}>
+                <Text numberOfLines={1} style={{ fontSize: 10, color: '#999', textAlign: 'right', writingDirection: 'rtl', marginBottom: 6 }}>
                   {f.filename}
                 </Text>
+                <View style={{ flexDirection: 'row-reverse', gap: 4, marginBottom: 6 }}>
+                  {(['gallery', 'icon'] as const).map(tag => {
+                    const active = (f.tags || []).includes(tag);
+                    return (
+                      <TouchableOpacity
+                        key={tag}
+                        onPress={() => toggleTag(f.filename, tag)}
+                        style={{
+                          flex: 1, paddingVertical: 5, borderRadius: 6, alignItems: 'center',
+                          backgroundColor: active ? Colors.PRIMARY : '#f0f2f5',
+                          borderWidth: 1, borderColor: active ? Colors.PRIMARY : '#e8e8e8',
+                        }}
+                      >
+                        <Text style={{ fontSize: 10, fontWeight: '700', color: active ? Colors.WHITE : '#666' }}>
+                          {tag === 'gallery' ? '🎞️ גלריה' : '🖼️ אייקון'}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
                 <View style={{ flexDirection: 'row-reverse', gap: 6 }}>
                   <TouchableOpacity
                     style={{ flex: 1, backgroundColor: '#e8f4f8', paddingVertical: 6, borderRadius: 6, alignItems: 'center' }}

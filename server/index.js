@@ -124,11 +124,13 @@ app.put('/api/content/:section', (req, res) => {
   }
 });
 
-// GET /api/uploads — list all uploaded files
+// GET /api/uploads — list all uploaded files with tags
 app.get('/api/uploads', (req, res) => {
   try {
+    const data = readDB();
+    const tags = data.mediaTags || {};
     const files = fs.readdirSync(UPLOADS_DIR)
-      .filter(f => !f.startsWith('.'))
+      .filter(f => !f.startsWith('.') && !fs.statSync(path.join(UPLOADS_DIR, f)).isDirectory())
       .map(f => {
         const stat = fs.statSync(path.join(UPLOADS_DIR, f));
         return {
@@ -136,12 +138,29 @@ app.get('/api/uploads', (req, res) => {
           url: `http://localhost:${PORT}/uploads/${f}`,
           size: stat.size,
           mtime: stat.mtimeMs,
+          tags: tags[f] || [],
         };
       })
       .sort((a, b) => b.mtime - a.mtime);
     res.json({ success: true, files });
   } catch (err) {
     res.status(500).json({ success: false, error: 'Failed to list uploads' });
+  }
+});
+
+// PUT /api/uploads/:filename/tags — set tags for a file
+app.put('/api/uploads/:filename/tags', (req, res) => {
+  try {
+    const filename = path.basename(req.params.filename);
+    const tags = Array.isArray(req.body.tags) ? req.body.tags : [];
+    const data = readDB();
+    if (!data.mediaTags) data.mediaTags = {};
+    if (tags.length === 0) delete data.mediaTags[filename];
+    else data.mediaTags[filename] = tags;
+    writeDB(data);
+    res.json({ success: true, tags });
+  } catch (err) {
+    res.status(500).json({ success: false, error: 'Failed to set tags' });
   }
 });
 
@@ -158,19 +177,22 @@ app.delete('/api/uploads/:filename', (req, res) => {
   }
 });
 
-// GET /api/gallery — list gallery images (ordered by db.galleryOrder if set)
+// GET /api/gallery — list files tagged 'gallery' from main uploads (ordered)
 app.get('/api/gallery', (req, res) => {
   try {
     const data = readDB();
+    const tags = data.mediaTags || {};
     const order = Array.isArray(data.galleryOrder) ? data.galleryOrder : [];
-    const onDisk = fs.readdirSync(GALLERY_DIR).filter(f => !f.startsWith('.'));
+    const onDisk = fs.readdirSync(UPLOADS_DIR)
+      .filter(f => !f.startsWith('.') && !fs.statSync(path.join(UPLOADS_DIR, f)).isDirectory())
+      .filter(f => (tags[f] || []).includes('gallery'));
     const ordered = [
       ...order.filter(f => onDisk.includes(f)),
       ...onDisk.filter(f => !order.includes(f)),
     ];
     const files = ordered.map(f => ({
       filename: f,
-      url: `http://localhost:${PORT}/uploads/gallery/${f}`,
+      url: `http://localhost:${PORT}/uploads/${f}`,
     }));
     res.json({ success: true, files });
   } catch (err) {
