@@ -11,8 +11,10 @@ import { fetchContent, updateAllContent, updateSection, API_BASE } from '../../c
 // ─── Types ─────────────────────────────────────────────────────
 type DataItem = {
   id: string; title: string; subtitle?: string; icon: string; bg: string;
-  image?: string; audio?: string; lat?: string; lng?: string; address?: string;
+  image?: string; audio?: string; video?: string; lat?: string; lng?: string; address?: string;
   summary?: string; longText?: string; heroBg?: string;
+  btnLabel?: string; btnLink?: string;
+  audios?: Array<{ title?: string; url: string }>;
   children?: DataItem[];
 };
 
@@ -68,6 +70,13 @@ const DEFAULT_INFO_PORTAL: DataItem[] = [
   { id: 'tax', title: 'החזרי מס', subtitle: 'VAT ומכס', icon: '💰', bg: '#3DA5C430', image: '' },
 ];
 
+const DEFAULT_LEGAL: DataItem[] = [
+  { id: 'about', title: 'אודותינו', icon: '👥', bg: '#1A6B8A', longText: 'Batumi Online הוא המדריך הישראלי המקיף לטיול בבטומי, גאורגיה. נולדנו מתוך אהבה לעיר היפה הזו ורצון לעזור לכל ישראלי לחוות אותה בצורה הטובה ביותר. האפליקציה מרכזת את כל המידע שתייר ישראלי צריך – מלונות, מסעדות, אטרקציות, תחבורה, פורטל נדל"ן ועסקים, סיורים קוליים בעברית ועוד.' },
+  { id: 'terms', title: 'תקנון', icon: '🪪', bg: '#3DA5C4', longText: 'השימוש באפליקציית Batumi Online כפוף לתנאים הבאים:\n\n1. כל התוכן באפליקציה מיועד למטרות מידע בלבד.\n2. איננו אחראים לדיוק המחירים, זמינות השירותים או פרטי הקשר המוצגים.\n3. המידע מתעדכן מעת לעת אך ייתכנו שינויים שאינם תחת שליטתנו.\n4. השימוש באפליקציה הוא חופשי וללא תשלום.\n5. בעת לחיצה על קישורים חיצוניים המשתמש עובר לאתרי צד שלישי שאין להם קשר אלינו.' },
+  { id: 'privacy', title: 'פרטיות', icon: '⚖️', bg: '#F4A94E', longText: 'אנחנו מכבדים את פרטיות המשתמשים שלנו:\n\n• אין אנו אוספים מידע אישי מזהה ללא הסכמה מפורשת.\n• שימוש באפליקציה אינו דורש הרשמה או יצירת חשבון.\n• נתוני שימוש אנונימיים נאספים לצורך שיפור האפליקציה בלבד.\n• איננו מוכרים או מעבירים מידע לצדדים שלישיים.\n• עוגיות (Cookies) – האפליקציה עלולה להשתמש בטכנולוגיות אחסון מקומיות לשמירת העדפות.' },
+  { id: 'contact', title: 'כתוב לנו', icon: '✉️', bg: '#1C2B35', longText: 'נשמח לשמוע מכם!\n\nאימייל: info@batumionline.app\nוואטסאפ: זמין דרך כפתור הוואטסאפ בסרגל התחתון\nאתר: www.batumionline.app\n\nיש לכם הצעה לשיפור? מצאתם טעות? רוצים לפרסם עסק באפליקציה? דברו איתנו!' },
+];
+
 const DEFAULT_BOTTOM_BANNERS: DataItem[] = [
   { id: 'weather', title: 'מזג אוויר', icon: '🌤️', bg: '#1A6B8A' },
   { id: 'currency', title: 'המרת מטבעות', icon: '💱', bg: '#3DA5C4' },
@@ -108,6 +117,21 @@ const SECTIONS: Section[] = [
   { key: 'side', label: 'באנרים צדדיים', icon: '📌', storageKey: '@admin_side_banners', hasSubtitle: false, hasImage: false, hasAudio: false, hasLocation: false, hasSummary: false, hasLongText: false, defaults: DEFAULT_SIDE_BANNERS },
   { key: 'locations', label: 'מיקומים ומפה', icon: '📍', storageKey: '@admin_locations', hasSubtitle: true, hasImage: false, hasAudio: false, hasLocation: true, hasSummary: false, hasLongText: false, defaults: DEFAULT_LOCATIONS },
   { key: 'audio', label: 'קבצי אודיו', icon: '🎧', storageKey: '@admin_audio', hasSubtitle: true, hasImage: false, hasAudio: true, hasLocation: false, hasSummary: false, hasLongText: false, defaults: DEFAULT_AUDIO },
+  { key: 'legal', label: 'מידע חובה', icon: '📜', storageKey: '@admin_legal', hasSubtitle: false, hasImage: false, hasAudio: false, hasLocation: false, hasSummary: false, hasLongText: true, defaults: DEFAULT_LEGAL },
+];
+
+const TAG_OPTIONS: { key: string; label: string }[] = [
+  { key: 'gallery',    label: '🎞️ גלריה' },
+  { key: 'icon',       label: '🖼️ אייקון' },
+  { key: 'main',       label: '📂 ראשיות' },
+  { key: 'extra',      label: '📁 נוספות' },
+  { key: 'welcome',    label: '👋 ברוכים' },
+  { key: 'info',       label: '📋 פורטל מידע' },
+  { key: 'realestate', label: '🏠 נדל״ן' },
+  { key: 'business',   label: '💼 עסקים' },
+  { key: 'locations',  label: '📍 מיקומים' },
+  { key: 'audio',      label: '🎧 אודיו' },
+  { key: 'legal',      label: '📜 מידע חובה' },
 ];
 
 const NAV_ITEMS = [
@@ -115,6 +139,71 @@ const NAV_ITEMS = [
   ...SECTIONS.map(s => ({ key: s.key, label: s.label, icon: s.icon })),
   { key: 'media', label: 'תמונות', icon: '🖼️' },
 ];
+
+// ─── Rich Text Editor (web) ────────────────────────────────────
+function RichEditor({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const ref = React.useRef<any>(null);
+
+  React.useEffect(() => {
+    if (ref.current && ref.current.innerHTML !== value) {
+      ref.current.innerHTML = value || '';
+    }
+  }, [value]);
+
+  const exec = (cmd: string, arg?: string) => {
+    (window as any).document.execCommand(cmd, false, arg);
+    if (ref.current) onChange(ref.current.innerHTML);
+  };
+
+  const btn = (label: string, cmd: string, arg?: string) =>
+    React.createElement('button', {
+      type: 'button',
+      key: label + cmd,
+      onClick: () => exec(cmd, arg),
+      style: {
+        padding: '6px 10px', border: '1px solid #e0e0e0', borderRadius: 6,
+        background: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 600, color: '#1A6B8A',
+      },
+    }, label);
+
+  const promptLink = () => {
+    const url = (window as any).prompt('הכנס קישור:');
+    if (url) exec('createLink', url);
+  };
+
+  return React.createElement('div', { style: { direction: 'rtl' } }, [
+    React.createElement('div', {
+      key: 'toolbar',
+      style: { display: 'flex', flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 6, marginBottom: 8 },
+    }, [
+      btn('B', 'bold'), btn('I', 'italic'), btn('U', 'underline'),
+      btn('• רשימה', 'insertUnorderedList'),
+      btn('1. רשימה', 'insertOrderedList'),
+      btn('H2', 'formatBlock', 'H2'),
+      btn('H3', 'formatBlock', 'H3'),
+      btn('פסקה', 'formatBlock', 'P'),
+      btn('🔗 קישור', 'createLink', undefined),
+      React.createElement('button', {
+        type: 'button', key: 'linkbtn', onClick: promptLink,
+        style: { padding: '6px 10px', border: '1px solid #e0e0e0', borderRadius: 6, background: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 600, color: '#1A6B8A' },
+      }, '🔗'),
+      btn('ניקוי', 'removeFormat'),
+    ]),
+    React.createElement('div', {
+      key: 'editor',
+      ref,
+      contentEditable: true,
+      suppressContentEditableWarning: true,
+      onInput: (e: any) => onChange(e.currentTarget.innerHTML),
+      style: {
+        minHeight: 160, maxHeight: 340, overflowY: 'auto',
+        border: '1px solid #e0e0e0', borderRadius: 10, padding: 12,
+        fontSize: 14, lineHeight: '22px', outline: 'none', background: '#fafafa',
+        direction: 'rtl', textAlign: 'right',
+      },
+    }),
+  ]);
+}
 
 // ─── Edit Modal ────────────────────────────────────────────────
 function EditModal({
@@ -215,12 +304,14 @@ function EditModal({
               </View>
             )}
 
-            {section.hasLongText && (
-              <View style={ms.fieldGroup}>
-                <Text style={ms.label}>טקסט מפורט</Text>
-                <TextInput style={[ms.input, ms.textAreaLong]} value={form.longText || ''} onChangeText={v => set('longText', v)} textAlign="right" multiline numberOfLines={8} placeholder="תוכן מלא שיופיע בדף הקטגוריה..." placeholderTextColor="#bbb" />
-              </View>
-            )}
+            <View style={ms.fieldGroup}>
+              <Text style={ms.label}>טקסט מפורט</Text>
+              {Platform.OS === 'web' ? (
+                <RichEditor value={form.longText || ''} onChange={(v) => set('longText', v)} />
+              ) : (
+                <TextInput style={[ms.input, ms.textAreaLong]} value={form.longText || ''} onChangeText={v => set('longText', v)} textAlign="right" multiline numberOfLines={8} placeholder="תוכן מלא..." placeholderTextColor="#bbb" />
+              )}
+            </View>
 
             <View style={ms.fieldGroup}>
               <Text style={ms.label}>אייקון (תמונה)</Text>
@@ -326,12 +417,73 @@ function EditModal({
               </View>
             )}
 
-            {section.hasAudio && (
-              <View style={ms.fieldGroup}>
-                <Text style={ms.label}>קובץ אודיו (URL / נתיב MP3)</Text>
-                <TextInput style={ms.input} value={form.audio || ''} onChangeText={v => set('audio', v)} textAlign="left" placeholder="https://... או assets/audio/..." placeholderTextColor="#bbb" />
+            <View style={ms.fieldGroup}>
+              <Text style={ms.label}>נגני אודיו</Text>
+              {(form.audios || []).map((a, idx) => (
+                <View key={idx} style={{ flexDirection: 'row-reverse', gap: 8, marginBottom: 8 }}>
+                  <TextInput
+                    style={[ms.input, { flex: 1 }]}
+                    value={a.title || ''}
+                    onChangeText={(v) => {
+                      const next = [...(form.audios || [])];
+                      next[idx] = { ...next[idx], title: v };
+                      setForm((p) => ({ ...p, audios: next }));
+                    }}
+                    placeholder="שם"
+                    placeholderTextColor="#bbb"
+                    textAlign="right"
+                  />
+                  <TextInput
+                    style={[ms.input, { flex: 2 }]}
+                    value={a.url}
+                    onChangeText={(v) => {
+                      const next = [...(form.audios || [])];
+                      next[idx] = { ...next[idx], url: v };
+                      setForm((p) => ({ ...p, audios: next }));
+                    }}
+                    placeholder="URL"
+                    placeholderTextColor="#bbb"
+                    textAlign="left"
+                  />
+                  <TouchableOpacity
+                    onPress={() => {
+                      const next = (form.audios || []).filter((_, i) => i !== idx);
+                      setForm((p) => ({ ...p, audios: next }));
+                    }}
+                    style={{ padding: 10, backgroundColor: '#fee', borderRadius: 8, justifyContent: 'center' }}
+                  >
+                    <Text style={{ color: '#c33', fontWeight: '800' }}>✕</Text>
+                  </TouchableOpacity>
+                </View>
+              ))}
+              <TouchableOpacity
+                onPress={() => setForm((p) => ({ ...p, audios: [...(p.audios || []), { title: '', url: '' }] }))}
+                style={{ backgroundColor: Colors.PRIMARY, borderRadius: 10, paddingVertical: 10, alignItems: 'center', marginTop: 4 }}
+              >
+                <Text style={{ color: Colors.WHITE, fontWeight: '800' }}>+ הוסף נגן אודיו</Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={ms.fieldGroup}>
+              <Text style={ms.label}>אודיו ראשי (ישן — URL יחיד, אופציונלי)</Text>
+              <TextInput style={ms.input} value={form.audio || ''} onChangeText={v => set('audio', v)} textAlign="left" placeholder="https://... או assets/audio/..." placeholderTextColor="#bbb" />
+            </View>
+
+            <View style={ms.fieldGroup}>
+              <Text style={ms.label}>וידאו (URL — YouTube / MP4)</Text>
+              <TextInput style={ms.input} value={form.video || ''} onChangeText={v => set('video', v)} textAlign="left" placeholder="https://youtube.com/..." placeholderTextColor="#bbb" />
+            </View>
+
+            <View style={[ms.fieldRow, isWide && { flexDirection: 'row-reverse', gap: 12 }]}>
+              <View style={[ms.fieldGroup, isWide && { flex: 1 }]}>
+                <Text style={ms.label}>טקסט הכפתור</Text>
+                <TextInput style={ms.input} value={form.btnLabel || ''} onChangeText={v => set('btnLabel', v)} textAlign="right" placeholder="לחץ כאן" placeholderTextColor="#bbb" />
               </View>
-            )}
+              <View style={[ms.fieldGroup, isWide && { flex: 1 }]}>
+                <Text style={ms.label}>קישור הכפתור</Text>
+                <TextInput style={ms.input} value={form.btnLink || ''} onChangeText={v => set('btnLink', v)} textAlign="left" placeholder="https://..." placeholderTextColor="#bbb" />
+              </View>
+            </View>
 
             {section.hasLocation && (
               <>
@@ -415,6 +567,7 @@ export default function AdminDashboard() {
     welcome: 'welcome', info: 'infoPortal',
     bottom: 'bottomBanners', side: 'sideBanners',
     locations: 'locations', audio: 'audio',
+    legal: 'legal',
   };
 
   useEffect(() => {
@@ -647,6 +800,16 @@ export default function AdminDashboard() {
         });
       } catch {}
     };
+    const setTagSingle = async (filename: string, tag: string) => {
+      const next = tag ? [tag] : [];
+      setMediaFiles(prev => prev.map(f => f.filename === filename ? { ...f, tags: next } : f));
+      try {
+        await fetch(`http://localhost:3001/api/uploads/${encodeURIComponent(filename)}/tags`, {
+          method: 'PUT', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ tags: next }),
+        });
+      } catch {}
+    };
     return (
       <View style={cs.contentCard}>
         <View style={cs.contentHeaderRow}>
@@ -688,25 +851,28 @@ export default function AdminDashboard() {
                 <Text numberOfLines={1} style={{ fontSize: 10, color: '#999', textAlign: 'right', writingDirection: 'rtl', marginBottom: 6 }}>
                   {f.filename}
                 </Text>
-                <View style={{ flexDirection: 'row-reverse', gap: 4, marginBottom: 6 }}>
-                  {(['gallery', 'icon'] as const).map(tag => {
-                    const active = (f.tags || []).includes(tag);
-                    return (
-                      <TouchableOpacity
-                        key={tag}
-                        onPress={() => toggleTag(f.filename, tag)}
-                        style={{
-                          flex: 1, paddingVertical: 5, borderRadius: 6, alignItems: 'center',
-                          backgroundColor: active ? Colors.PRIMARY : '#f0f2f5',
-                          borderWidth: 1, borderColor: active ? Colors.PRIMARY : '#e8e8e8',
-                        }}
-                      >
-                        <Text style={{ fontSize: 10, fontWeight: '700', color: active ? Colors.WHITE : '#666' }}>
-                          {tag === 'gallery' ? '🎞️ גלריה' : '🖼️ אייקון'}
-                        </Text>
-                      </TouchableOpacity>
-                    );
-                  })}
+                <View style={{ marginBottom: 6 }}>
+                  {Platform.OS === 'web' && React.createElement('select', {
+                    value: (f.tags || []).find((t) => TAG_OPTIONS.some((o) => o.key === t)) || '',
+                    onChange: (e: any) => setTagSingle(f.filename, e.target.value),
+                    style: {
+                      width: '100%',
+                      padding: '6px 8px',
+                      borderRadius: 6,
+                      border: '1px solid #e8e8e8',
+                      fontSize: 11,
+                      fontWeight: 700,
+                      color: (f.tags || []).length ? Colors.WHITE : '#666',
+                      backgroundColor: (f.tags || []).length ? Colors.PRIMARY : '#f0f2f5',
+                      direction: 'rtl',
+                      cursor: 'pointer',
+                    },
+                  }, [
+                    React.createElement('option', { key: '', value: '' }, '— ללא קטגוריה —'),
+                    ...TAG_OPTIONS.map(({ key, label }) =>
+                      React.createElement('option', { key, value: key, style: { backgroundColor: '#fff', color: '#222' } }, label)
+                    ),
+                  ])}
                 </View>
                 <View style={{ flexDirection: 'row-reverse', gap: 6 }}>
                   <TouchableOpacity

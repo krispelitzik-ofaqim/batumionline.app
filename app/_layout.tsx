@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Text, TextInput, useWindowDimensions } from 'react-native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -39,13 +39,19 @@ export default function RootLayout() {
   const [isAdmin, setAdmin] = useState(false);
   const [previewMode, setPreviewMode] = useState<PreviewMode>(null);
   const { width: realWidth } = useWindowDimensions();
-  const [fontsLoaded] = useFonts({
+  const [fontsLoaded, fontError] = useFonts({
     Assistant_400Regular,
     Assistant_500Medium,
     Assistant_600SemiBold,
     Assistant_700Bold,
     Assistant_800ExtraBold,
   });
+  const [fontTimedOut, setFontTimedOut] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setFontTimedOut(true), 1500);
+    return () => clearTimeout(t);
+  }, []);
+  const fontsReady = fontsLoaded || fontError || fontTimedOut;
 
   const simW = previewMode ? PREVIEW_WIDTHS[previewMode] : null;
   const effectiveWidth = simW ? Math.min(simW, realWidth) : null;
@@ -56,7 +62,7 @@ export default function RootLayout() {
     simulatedWidth: effectiveWidth,
   }), [previewMode, effectiveWidth]);
 
-  if (!fontsLoaded) return null;
+  if (!fontsReady) return null;
 
   return (
     <PreviewContext.Provider value={previewCtx}>
