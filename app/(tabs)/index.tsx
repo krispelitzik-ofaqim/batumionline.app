@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   useWindowDimensions,
   Image,
+  ImageBackground,
 } from 'react-native';
 import { ThemeContext } from '../../constants/theme';
 import { AdminContext } from '../../constants/adminContext';
@@ -55,8 +56,8 @@ const EXTRA_CATEGORIES: CatItem[] = [
 // 6. באנרים רוחביים
 const BOTTOM_BANNERS = [
   { id: 'weather', title: 'מזג אוויר', icon: '🌤️', bg: Colors.PRIMARY },
-  { id: 'currency', title: 'המרת מטבעות', icon: '💱', bg: Colors.SECONDARY },
-  { id: 'news', title: 'חדשות בעברית', icon: '📰', bg: '#7ECFC0' },
+  { id: 'currency', title: 'המרת מטבעות', icon: '💰', bg: Colors.SECONDARY },
+  { id: 'news', title: 'חדשות בעברית', icon: '🗞️', bg: '#7ECFC0' },
   { id: 'flights', title: 'לוח המראות ונחיתות', icon: '✈️', bg: '#2D4A5E' },
 ];
 
@@ -206,18 +207,26 @@ export default function HomeScreen() {
           <InfoPortal />
         </View>
 
-        {/* 5. באנרים — פורטל הנדל"ן + פורטל העסקים */}
+        {/* 5. באנר — פורטל הנדל"ן והעסקים */}
         <View style={styles.section}>
-          <View style={styles.grid}>
-            <TouchableOpacity style={[styles.sideBanner, { width: cardW, backgroundColor: Colors.ACCENT }]} activeOpacity={0.7}>
-              <Text style={styles.sideBannerIcon}>🏠</Text>
-              <Text style={styles.sideBannerTitle}>פורטל הנדל״ן</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={[styles.sideBanner, { width: cardW, backgroundColor: Colors.PRIMARY }]} activeOpacity={0.7}>
-              <Text style={styles.sideBannerIcon}>💼</Text>
-              <Text style={styles.sideBannerTitle}>פורטל העסקים</Text>
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity activeOpacity={0.85} style={styles.megaBannerWrap} onPress={() => router.push('/portal/realestate')}>
+            <ImageBackground
+              source={{ uri: 'https://images.unsplash.com/photo-1519677100203-a0e668c92439?w=800&q=80' }}
+              style={styles.megaBanner}
+              imageStyle={{ borderRadius: 18 }}
+            >
+              <LinearGradient
+                colors={['rgba(26,107,138,0.25)', 'rgba(10,30,50,0.85)']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 0, y: 1 }}
+                style={styles.megaBannerOverlay}
+              >
+                <Text style={styles.megaBannerKicker}>BATUMI</Text>
+                <Text style={styles.megaBannerTitle}>פורטל הנדל״ן והעסקים</Text>
+                <Text style={styles.megaBannerSub}>כל העסקים והנכסים של בטומי במקום אחד</Text>
+              </LinearGradient>
+            </ImageBackground>
+          </TouchableOpacity>
         </View>
 
         {/* 6. באנרים רוחביים */}
@@ -279,12 +288,13 @@ const styles = StyleSheet.create({
   },
   dropdownTxt: { fontSize: 16, fontWeight: 'normal', color: '#999999', writingDirection: 'rtl' },
 
-  // Side banners (5)
-  sideBanner: {
-    height: 100, borderRadius: 16, alignItems: 'center', justifyContent: 'center', gap: 6,
-  },
-  sideBannerIcon: { fontSize: 32 },
-  sideBannerTitle: { fontSize: 14, fontWeight: '700', color: Colors.WHITE, textAlign: 'right', writingDirection: 'rtl' },
+  // Mega banner
+  megaBannerWrap: { width: '100%', height: 180, borderRadius: 18, overflow: 'hidden', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.18, shadowRadius: 12, elevation: 5 },
+  megaBanner: { width: '100%', height: '100%', justifyContent: 'flex-end' },
+  megaBannerOverlay: { flex: 1, borderRadius: 18, justifyContent: 'flex-end', padding: 16 },
+  megaBannerKicker: { fontSize: 11, fontWeight: '700', color: Colors.WHITE, opacity: 0.85, letterSpacing: 2, textAlign: 'right', writingDirection: 'rtl' },
+  megaBannerTitle: { fontSize: 20, fontWeight: '900', color: Colors.WHITE, textAlign: 'right', writingDirection: 'rtl', marginTop: 2, lineHeight: 24 },
+  megaBannerSub: { fontSize: 12, fontWeight: '500', color: Colors.WHITE, opacity: 0.85, textAlign: 'right', writingDirection: 'rtl', marginTop: 4 },
 
   // Bottom banners (6)
   bottomBanner: {
@@ -293,7 +303,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16, justifyContent: 'space-between',
   },
   bottomBannerTitle: { fontSize: 14, fontWeight: '700', color: Colors.WHITE, textAlign: 'right', writingDirection: 'rtl' },
-  bottomBannerIcon: { fontSize: 20 },
+  bottomBannerIcon: { fontSize: 32 },
   bottomSectionTitle: { fontSize: 16, fontWeight: 'normal', color: '#999999', textAlign: 'right', writingDirection: 'rtl', marginBottom: 8 },
 
 });

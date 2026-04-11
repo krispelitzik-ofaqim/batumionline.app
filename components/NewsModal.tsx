@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View, Text, Modal, TouchableOpacity, StyleSheet, ActivityIndicator, ScrollView, Linking, Image,
 } from 'react-native';
@@ -57,6 +57,8 @@ export default function NewsModal({ visible, onClose, bgColor }: { visible: bool
   const [news, setNews] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<Topic | 'all'>('all');
+  const [expanded, setExpanded] = useState<NewsItem | null>(null);
+  const chipScrollRef = useRef<ScrollView>(null);
 
   useEffect(() => {
     if (!visible) return;
@@ -156,7 +158,17 @@ export default function NewsModal({ visible, onClose, bgColor }: { visible: bool
     setLoading(false);
   };
 
-  const filtered = filter === 'all' ? news : news.filter(n => n.topic === filter);
+  const baseFiltered = filter === 'all' ? news : news.filter(n => n.topic === filter);
+  const MIN_ITEMS = 3;
+  const filtered = baseFiltered.length >= MIN_ITEMS
+    ? baseFiltered
+    : [
+        ...baseFiltered,
+        ...(filter === 'all'
+          ? FALLBACK_NEWS
+          : FALLBACK_NEWS.filter(n => n.topic === filter)
+        ).filter(f => !baseFiltered.some(b => b.title === f.title)).slice(0, MIN_ITEMS - baseFiltered.length),
+      ];
 
   return (
     <Modal visible={visible} animationType="slide" transparent={false}>
@@ -170,10 +182,13 @@ export default function NewsModal({ visible, onClose, bgColor }: { visible: bool
           <Text style={s.subtitle}>חדשות ועדכונים מבטומי וגאורגיה</Text>
 
           {/* Topic filter chips */}
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.chipRow}>
-            <TouchableOpacity style={[s.chip, filter === 'all' && s.chipActive]} onPress={() => setFilter('all')}>
-              <Text style={[s.chipTxt, filter === 'all' && s.chipTxtActive]}>הכל</Text>
-            </TouchableOpacity>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={s.chipRow}
+            ref={chipScrollRef}
+            onContentSizeChange={() => chipScrollRef.current?.scrollToEnd({ animated: false })}
+          >
             {(Object.keys(TOPIC_LABELS) as Topic[]).map(t => (
               <TouchableOpacity
                 key={t}
@@ -184,6 +199,9 @@ export default function NewsModal({ visible, onClose, bgColor }: { visible: bool
                 <Text style={[s.chipTxt, filter === t && s.chipTxtActive]}>{TOPIC_LABELS[t]}</Text>
               </TouchableOpacity>
             ))}
+            <TouchableOpacity style={[s.chip, filter === 'all' && s.chipActive]} onPress={() => setFilter('all')}>
+              <Text style={[s.chipTxt, filter === 'all' && s.chipTxtActive]}>הכל</Text>
+            </TouchableOpacity>
           </ScrollView>
 
           {loading ? (
@@ -194,7 +212,7 @@ export default function NewsModal({ visible, onClose, bgColor }: { visible: bool
                 key={i}
                 style={s.card}
                 activeOpacity={0.8}
-                onPress={() => item.link && Linking.openURL(item.link)}
+                onPress={() => setExpanded(item)}
               >
                 {/* Image */}
                 <Image
@@ -227,6 +245,37 @@ export default function NewsModal({ visible, onClose, bgColor }: { visible: bool
             </View>
           )}
         </ScrollView>
+
+        {/* Expanded article overlay */}
+        {expanded && (
+          <View style={s.expandedOverlay}>
+            <TouchableOpacity style={s.expandedClose} onPress={() => setExpanded(null)}>
+              <Text style={s.closeX}>✕</Text>
+            </TouchableOpacity>
+            <ScrollView contentContainerStyle={s.expandedContent} showsVerticalScrollIndicator={false}>
+              <Image
+                source={{ uri: expanded.image || PLACEHOLDER_IMAGES[expanded.topic] }}
+                style={s.expandedImage}
+              />
+              <View style={[s.topicTag, { backgroundColor: TOPIC_COLORS[expanded.topic], position: 'relative', alignSelf: 'flex-end', marginTop: 12, marginHorizontal: 16 }]}>
+                <Text style={s.topicTxt}>{TOPIC_LABELS[expanded.topic]}</Text>
+              </View>
+              <View style={{ padding: 16 }}>
+                <Text style={s.expandedTitle}>{expanded.title}</Text>
+                <View style={s.cardFooter}>
+                  <Text style={s.cardSource}>{expanded.source}</Text>
+                  <Text style={s.cardDate}>{expanded.date}</Text>
+                </View>
+                <Text style={s.expandedSummary}>{expanded.summary}</Text>
+                {expanded.link ? (
+                  <TouchableOpacity style={s.linkBtn} onPress={() => Linking.openURL(expanded.link)}>
+                    <Text style={s.linkBtnTxt}>המשך לכתבה המלאה באתר המקור ←</Text>
+                  </TouchableOpacity>
+                ) : null}
+              </View>
+            </ScrollView>
+          </View>
+        )}
       </View>
     </Modal>
   );
@@ -304,7 +353,7 @@ const s = StyleSheet.create({
   subtitle: { fontSize: 14, color: Colors.WHITE, opacity: 0.7, textAlign: 'center', marginBottom: 16, writingDirection: 'rtl' },
 
   // Filter chips
-  chipRow: { flexDirection: 'row-reverse', gap: 8, paddingBottom: 16, paddingHorizontal: 4 },
+  chipRow: { flexDirection: 'row', gap: 8, paddingBottom: 16, paddingHorizontal: 4 },
   chip: {
     flexDirection: 'row-reverse', alignItems: 'center', gap: 6,
     backgroundColor: 'rgba(255,255,255,0.12)', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20,
@@ -331,6 +380,32 @@ const s = StyleSheet.create({
   cardFooter: { flexDirection: 'row-reverse', justifyContent: 'space-between', marginTop: 12, paddingTop: 10, borderTopWidth: 1, borderTopColor: '#f0f0f0' },
   cardSource: { fontSize: 12, fontWeight: '600', color: '#999', writingDirection: 'rtl' },
   cardDate: { fontSize: 12, color: '#bbb' },
+
+  // Expanded article
+  expandedOverlay: {
+    position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+    backgroundColor: Colors.BACKGROUND,
+  },
+  expandedClose: {
+    position: 'absolute', top: 54, right: 20, zIndex: 20,
+    width: 40, height: 40, borderRadius: 20,
+    backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center',
+  },
+  expandedContent: { paddingBottom: 40, paddingTop: 0 },
+  expandedImage: { width: '100%', height: 240 },
+  expandedTitle: {
+    fontSize: 22, fontWeight: '800', color: Colors.TEXT,
+    textAlign: 'right', writingDirection: 'rtl', lineHeight: 30, marginBottom: 10, marginTop: 8,
+  },
+  expandedSummary: {
+    fontSize: 16, color: '#333', textAlign: 'right', writingDirection: 'rtl',
+    lineHeight: 26, marginTop: 14,
+  },
+  linkBtn: {
+    marginTop: 24, backgroundColor: Colors.PRIMARY, borderRadius: 12,
+    paddingVertical: 14, alignItems: 'center',
+  },
+  linkBtnTxt: { color: Colors.WHITE, fontSize: 15, fontWeight: '700', writingDirection: 'rtl' },
 
   // Empty
   empty: { alignItems: 'center', paddingVertical: 40 },

@@ -13,10 +13,8 @@ export default function CurrencyModal({ visible, onClose, bgColor }: { visible: 
   const [amount, setAmount] = useState('100');
   const [from, setFrom] = useState<keyof Rates>('ILS');
 
-  useEffect(() => {
-    if (!visible) return;
+  const loadRates = () => {
     setLoading(true);
-    // Free API - rates relative to USD
     fetch('https://open.er-api.com/v6/latest/USD')
       .then(r => r.json())
       .then(data => {
@@ -26,6 +24,11 @@ export default function CurrencyModal({ visible, onClose, bgColor }: { visible: 
         setLoading(false);
       })
       .catch(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    if (!visible) return;
+    loadRates();
   }, [visible]);
 
   const convert = (to: keyof Rates): string => {
@@ -37,7 +40,7 @@ export default function CurrencyModal({ visible, onClose, bgColor }: { visible: 
     return result.toFixed(2);
   };
 
-  const currencies: (keyof Rates)[] = ['ILS', 'GEL', 'USD'];
+  const currencies: (keyof Rates)[] = ['EUR', 'USD', 'GEL', 'ILS'];
   const others = currencies.filter(c => c !== from);
 
   return (
@@ -50,6 +53,14 @@ export default function CurrencyModal({ visible, onClose, bgColor }: { visible: 
         <View style={s.content}>
           <Text style={s.title}>המרת מטבעות</Text>
           <Text style={s.subtitle}>שערים מתעדכנים בזמן אמת</Text>
+          <TouchableOpacity style={s.refreshBtn} onPress={loadRates} disabled={loading}>
+            {loading ? (
+              <ActivityIndicator size="small" color={Colors.WHITE} />
+            ) : (
+              <Text style={s.refreshIcon}>🔄</Text>
+            )}
+            <Text style={s.refreshTxt}>רענן נתונים</Text>
+          </TouchableOpacity>
 
           {loading ? (
             <ActivityIndicator size="large" color={Colors.WHITE} style={{ marginTop: 40 }} />
@@ -112,22 +123,29 @@ const s = StyleSheet.create({
   container: { flex: 1, paddingTop: 60 },
   closeBtn: { position: 'absolute', top: 54, right: 20, zIndex: 10, width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(0,0,0,0.2)', justifyContent: 'center', alignItems: 'center' },
   closeX: { fontSize: 18, color: Colors.WHITE, fontWeight: '700' },
-  content: { paddingHorizontal: 24 },
+  content: { paddingHorizontal: 24, width: '100%', maxWidth: 480, alignSelf: 'center' },
   title: { fontSize: 28, fontWeight: '800', color: Colors.WHITE, textAlign: 'center', marginBottom: 4, writingDirection: 'rtl' },
-  subtitle: { fontSize: 14, color: Colors.WHITE, opacity: 0.7, textAlign: 'center', marginBottom: 28, writingDirection: 'rtl' },
+  subtitle: { fontSize: 14, color: Colors.WHITE, opacity: 0.7, textAlign: 'center', marginBottom: 12, writingDirection: 'rtl' },
+  refreshBtn: {
+    flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'center', gap: 8,
+    alignSelf: 'center', backgroundColor: 'rgba(255,255,255,0.15)',
+    paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, marginBottom: 20,
+  },
+  refreshIcon: { fontSize: 16 },
+  refreshTxt: { fontSize: 13, fontWeight: '600', color: Colors.WHITE, writingDirection: 'rtl' },
 
-  fromRow: { flexDirection: 'row', justifyContent: 'center', gap: 10, marginBottom: 24 },
-  currBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: 'rgba(255,255,255,0.15)', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 12 },
+  fromRow: { flexDirection: 'row-reverse', flexWrap: 'wrap', justifyContent: 'center', gap: 10, marginBottom: 24 },
+  currBtn: { flexDirection: 'row-reverse', alignItems: 'center', gap: 8, backgroundColor: 'rgba(255,255,255,0.15)', paddingHorizontal: 18, paddingVertical: 12, borderRadius: 14, minWidth: 110, justifyContent: 'center' },
   currBtnActive: { backgroundColor: Colors.WHITE },
   currFlag: { fontSize: 20 },
   currLabel: { fontSize: 14, fontWeight: '600', color: Colors.WHITE },
   currLabelActive: { color: Colors.TEXT },
 
-  inputCard: { backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 16, padding: 20, alignItems: 'center', marginBottom: 20 },
+  inputCard: { backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 16, paddingVertical: 10, paddingHorizontal: 20, alignItems: 'center', marginBottom: 20 },
   inputLabel: { fontSize: 14, color: Colors.WHITE, opacity: 0.7, marginBottom: 12, writingDirection: 'rtl' },
-  inputRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  inputFlag: { fontSize: 32 },
-  input: { fontSize: 40, fontWeight: '900', color: Colors.WHITE, minWidth: 140, borderBottomWidth: 2, borderBottomColor: 'rgba(255,255,255,0.3)', paddingBottom: 4 },
+  inputRow: { alignItems: 'center', justifyContent: 'center', gap: 8 },
+  inputFlag: { fontSize: 36, marginBottom: 4 },
+  input: { fontSize: 44, fontWeight: '900', color: Colors.WHITE, minWidth: 180, paddingBottom: 4, textAlign: 'center', outlineStyle: 'none' as any, borderWidth: 0 },
 
   resultCard: {
     backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 16, padding: 20, marginBottom: 12,

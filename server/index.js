@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const fs = require('fs');
@@ -278,6 +279,46 @@ app.post('/api/upload/multiple', upload.array('files', 10), (req, res) => {
   }
 });
 
+// ─── Flights proxy (AeroDataBox via RapidAPI) ────────────────
+const BUS_ICAO = 'UGSB'; // Batumi International Airport
+const flightsCache = { arrivals: null, departures: null, fetchedAt: 0 };
+const CACHE_MS = 10 * 60 * 1000; // 10 minutes
+
+app.get('/api/flights', async (req, res) => {
+  const key = process.env.AERODATABOX_KEY;
+  const host = process.env.AERODATABOX_HOST || 'aerodatabox.p.rapidapi.com';
+  if (!key) {
+    return res.status(503).json({ error: 'AERODATABOX_KEY not configured' });
+  }
+
+  if (Date.now() - flightsCache.fetchedAt < CACHE_MS && flightsCache.arrivals) {
+    return res.json({ arrivals: flightsCache.arrivals, departures: flightsCache.departures, cached: true });
+  }
+
+  try {
+    const now = new Date();
+    const end = new Date(now.getTime() + 12 * 60 * 60 * 1000);
+    const fmt = (d) => d.toISOString().slice(0, 16);
+    const url = `https://${host}/flights/airports/icao/${BUS_ICAO}/${fmt(now)}/${fmt(end)}?withLeg=true&direction=Both&withCancelled=true&withCodeshared=true&withCargo=false&withPrivate=false&withLocation=false`;
+    const response = await fetch(url, {
+      headers: {
+        'x-rapidapi-key': key,
+        'x-rapidapi-host': host,
+      },
+    });
+    if (!response.ok) {
+      return res.status(response.status).json({ error: `Upstream ${response.status}` });
+    }
+    const data = await response.json();
+    flightsCache.arrivals = data.arrivals || [];
+    flightsCache.departures = data.departures || [];
+    flightsCache.fetchedAt = Date.now();
+    res.json({ arrivals: flightsCache.arrivals, departures: flightsCache.departures, cached: false });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ─── Start server ─────────────────────────────────────────────
 
 app.listen(PORT, () => {
@@ -290,4 +331,6 @@ app.listen(PORT, () => {
   console.log(`  PUT  /api/content          — update all content`);
   console.log(`  PUT  /api/content/:section  — update section`);
   console.log(`  POST /api/upload           — upload file`);
+  console.log(`  GET  /api/flights          — flights proxy (AeroDataBox)`);
+  if (process.env.AERODATABOX_KEY) console.log(`🛫 AeroDataBox key loaded`);
 });

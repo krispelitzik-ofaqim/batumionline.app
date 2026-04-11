@@ -504,13 +504,13 @@
     {
       "id": "currency",
       "title": "המרת מטבעות",
-      "icon": "💱",
+      "icon": "💰",
       "bg": "#3DA5C4"
     },
     {
       "id": "news",
       "title": "חדשות בעברית",
-      "icon": "📰",
+      "icon": "🗞️",
       "bg": "#7ECFC0"
     },
     {
