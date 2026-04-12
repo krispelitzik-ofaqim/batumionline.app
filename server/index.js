@@ -332,8 +332,8 @@ app.get('/api/flights', async (req, res) => {
 const WEB_DIST = path.join(__dirname, '..', 'dist');
 if (fs.existsSync(WEB_DIST)) {
   app.use(express.static(WEB_DIST));
-  app.get('*', (req, res, next) => {
-    if (req.path.startsWith('/api/') || req.path.startsWith('/uploads/')) return next();
+  app.use((req, res, next) => {
+    if (req.method !== 'GET' || req.path.startsWith('/api/') || req.path.startsWith('/uploads/')) return next();
     res.sendFile(path.join(WEB_DIST, 'index.html'));
   });
 }
