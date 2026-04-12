@@ -328,6 +328,16 @@ app.get('/api/flights', async (req, res) => {
   }
 });
 
+// ─── Serve Expo web build ─────────────────────────────────────
+const WEB_DIST = path.join(__dirname, '..', 'dist');
+if (fs.existsSync(WEB_DIST)) {
+  app.use(express.static(WEB_DIST));
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api/') || req.path.startsWith('/uploads/')) return next();
+    res.sendFile(path.join(WEB_DIST, 'index.html'));
+  });
+}
+
 // ─── Start server ─────────────────────────────────────────────
 
 app.listen(PORT, () => {

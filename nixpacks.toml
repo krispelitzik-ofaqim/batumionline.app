@@ -2,10 +2,10 @@
 nixPkgs = ["nodejs_20"]
 
 [phases.install]
-cmds = ["cd server && npm install"]
+cmds = ["npm install && cd server && npm install"]
 
 [phases.build]
-cmds = ["echo 'no build step'"]
+cmds = ["npx expo export --platform web"]
 
 [start]
 cmd = "cd server && node index.js"
