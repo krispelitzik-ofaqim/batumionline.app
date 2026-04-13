@@ -75,11 +75,16 @@ export default function RealEstatePortal() {
     }
   }, []);
 
+  const [realEstateImage, setRealEstateImage] = useState('');
+
   useEffect(() => {
     fetchContent()
       .then(data => {
         if (data?.realEstate?.topButtons?.length) setTopButtons(data.realEstate.topButtons);
         if (data?.realEstate?.news?.length) setNews(data.realEstate.news);
+        const side = data?.sideBanners || [];
+        const re = side.find((b: any) => b.id === 'realestate');
+        if (re?.icon?.startsWith('http')) setRealEstateImage(re.icon);
       })
       .catch(() => {});
 
@@ -95,7 +100,7 @@ export default function RealEstatePortal() {
       .catch(() => {});
   }, []);
 
-  const heroUri = galleryImages[0] || 'https://images.unsplash.com/photo-1519677100203-a0e668c92439?w=1200&q=80';
+  const heroUri = realEstateImage || galleryImages[0] || 'https://images.unsplash.com/photo-1519677100203-a0e668c92439?w=1200&q=80';
 
   return (
     <View style={s.container}>

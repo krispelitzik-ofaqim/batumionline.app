@@ -114,7 +114,7 @@ export default function CategoryScreen() {
                         key={ch.id}
                         item={ch}
                         width={bannerW}
-                        onPress={() => router.push(`/category/${ch.id}` as any)}
+                        onPress={() => router.push(cat.id === '3' ? `/tour/${ch.id}` as any : `/category/${ch.id}` as any)}
                       />
                     ))}
                     {isAdmin && (

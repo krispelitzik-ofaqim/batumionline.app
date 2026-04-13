@@ -103,6 +103,7 @@ export default function HomeScreen() {
   const [editMainCats, setEditMainCats] = useState(MAIN_CATEGORIES);
   const [editExtraCats, setEditExtraCats] = useState(EXTRA_CATEGORIES);
   const [editBottomBanners, setEditBottomBanners] = useState(BOTTOM_BANNERS);
+  const [realEstateImg, setRealEstateImg] = useState('');
   const { simulatedWidth } = useContext(PreviewContext);
   const w = simulatedWidth ? Math.min(simulatedWidth, screenW) : screenW;
   const cardW = (w - 48) / 2;
@@ -121,6 +122,9 @@ export default function HomeScreen() {
         if (data.mainCategories) setEditMainCats(data.mainCategories);
         if (data.extraCategories) setEditExtraCats(data.extraCategories);
         if (data.bottomBanners) setEditBottomBanners(data.bottomBanners);
+        const side = data.sideBanners || [];
+        const re = side.find((b: any) => b.id === 'realestate');
+        if (re?.icon?.startsWith('http')) setRealEstateImg(re.icon);
       })
       .catch(() => {
         // Fallback to hardcoded data — already set as defaults
@@ -211,7 +215,7 @@ export default function HomeScreen() {
         <View style={styles.section}>
           <TouchableOpacity activeOpacity={0.85} style={styles.megaBannerWrap} onPress={() => router.push('/portal/realestate')}>
             <ImageBackground
-              source={{ uri: 'https://images.unsplash.com/photo-1519677100203-a0e668c92439?w=800&q=80' }}
+              source={{ uri: realEstateImg || 'https://images.unsplash.com/photo-1519677100203-a0e668c92439?w=800&q=80' }}
               style={styles.megaBanner}
               imageStyle={{ borderRadius: 18 }}
             >

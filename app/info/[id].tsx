@@ -1,16 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, Linking, Alert, Platform } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, Linking, Alert, Platform, Image } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Colors } from '../../constants/colors';
 import { fetchContent } from '../../constants/api';
-import AudioPlayer from '../../components/AudioPlayer';
 
-const DEMO_TRACKS = [
-  { title: 'סיור העיר העתיקה', url: 'https://www2.cs.uic.edu/~i101/SoundFiles/CantinaBand3.wav' },
-  { title: 'סיור הטיילת', url: 'https://www2.cs.uic.edu/~i101/SoundFiles/ImperialMarch60.wav' },
-  { title: 'היסטוריה יהודית', url: 'https://www2.cs.uic.edu/~i101/SoundFiles/StarWars3.wav' },
-];
+
 
 type TabId = 'about' | 'terms' | 'privacy' | 'contact';
 type Tab = { id: TabId; title: string; icon: string; body: string };
@@ -23,15 +18,18 @@ const DEFAULTS: Tab[] = [
 ];
 
 const EMAIL = 'info@batumionline.app';
-const WHATSAPP = '972500000000';
+const WHATSAPP = '972502844867';
 const SITE = 'https://www.batumionline.app';
 
 export default function InfoPage() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const [tabs, setTabs] = useState<Tab[]>(DEFAULTS);
+  const [portalItem, setPortalItem] = useState<{ title: string; body: string; image?: string } | null>(null);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
+
+  const isLegal = DEFAULTS.some((d) => d.id === id);
 
   useEffect(() => {
     fetchContent()
@@ -43,9 +41,66 @@ export default function InfoPage() {
           });
           setTabs(merged);
         }
+        if (!isLegal && data.infoPortal && Array.isArray(data.infoPortal)) {
+          const found = data.infoPortal.find((x: any) => x.id === id);
+          if (found) setPortalItem({ title: found.title, body: found.longText || found.subtitle || '', image: found.icon });
+        }
       })
       .catch(() => {});
-  }, []);
+  }, [id]);
+
+  if (!isLegal && portalItem) {
+    const hasImage = portalItem.image && portalItem.image.startsWith('http');
+    return (
+      <View style={styles.container}>
+        <TouchableOpacity style={{ position: 'absolute', top: 16, right: 16, zIndex: 10, width: 38, height: 38, borderRadius: 19, backgroundColor: 'rgba(0,0,0,0.4)', alignItems: 'center', justifyContent: 'center' }} onPress={() => router.back()}>
+          <Text style={{ fontSize: 26, color: '#fff', fontWeight: '800', marginTop: -2 }}>‹</Text>
+        </TouchableOpacity>
+        <ScrollView contentContainerStyle={{ paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
+          {hasImage ? (
+            <View style={{ height: 200, position: 'relative' }}>
+              {Platform.OS === 'web' ? (
+                React.createElement('img', {
+                  src: portalItem.image,
+                  style: { width: '100%', height: 200, objectFit: 'cover', display: 'block' },
+                  alt: portalItem.title,
+                })
+              ) : (
+                <Image source={{ uri: portalItem.image }} style={{ width: '100%', height: 200 }} resizeMode="cover" />
+              )}
+              <LinearGradient colors={['transparent', 'rgba(0,0,0,0.7)']} style={{ position: 'absolute', bottom: 0, left: 0, right: 0, paddingHorizontal: 20, paddingBottom: 16, paddingTop: 40 }}>
+                <Text style={{ fontSize: 22, fontWeight: '900', color: '#fff', textAlign: 'right', writingDirection: 'rtl' }}>{portalItem.title}</Text>
+              </LinearGradient>
+            </View>
+          ) : (
+            <LinearGradient colors={['#1A6B8A', '#3DA5C4']} style={{ padding: 26, alignItems: 'center' }}>
+              <Text style={{ fontSize: 22, fontWeight: '900', color: '#fff', textAlign: 'center', writingDirection: 'rtl' }}>{portalItem.title}</Text>
+            </LinearGradient>
+          )}
+          <View style={styles.bodyWrap}>
+            {Platform.OS === 'web' && portalItem.body.includes('<') ? (
+              React.createElement('div', {
+                dangerouslySetInnerHTML: { __html: portalItem.body },
+                style: { fontSize: 14, color: '#444', textAlign: 'right', direction: 'rtl', lineHeight: '24px' },
+              })
+            ) : (
+              <View style={styles.card}>
+                <Text style={styles.cardBody}>{portalItem.body || 'תוכן יתווסף בקרוב'}</Text>
+              </View>
+            )}
+          </View>
+        </ScrollView>
+      </View>
+    );
+  }
+
+  if (!isLegal && !portalItem) {
+    return (
+      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+        <Text style={{ fontSize: 16, color: '#999' }}>טוען...</Text>
+      </View>
+    );
+  }
 
   const current = (tabs.find((t) => t.id === id) || tabs[0]) as Tab;
 
@@ -125,18 +180,17 @@ export default function InfoPage() {
           <View>
             <View style={styles.card}>
               <Text style={styles.cardTitle}>{current.title}</Text>
-              <Text style={styles.cardBody}>{current.body}</Text>
+              {Platform.OS === 'web' && current.body.includes('<') ? (
+                React.createElement('div', {
+                  dangerouslySetInnerHTML: { __html: current.body },
+                  style: { fontSize: 14, color: '#444', textAlign: 'right', direction: 'rtl', lineHeight: '24px' },
+                })
+              ) : (
+                <Text style={styles.cardBody}>{current.body}</Text>
+              )}
             </View>
-            {current.id === 'about' && (
-              <>
-                <View style={{ marginTop: 14 }}>
-                  <AudioPlayer tracks={[DEMO_TRACKS[0]]} compact />
-                </View>
-                <View style={{ marginTop: 14 }}>
-                  <AudioPlayer tracks={DEMO_TRACKS} title="רשימת נגנים" />
-                </View>
-              </>
-            )}
+
+
           </View>
         )}
       </ScrollView>

@@ -2,7 +2,7 @@
   "expo": {
     "name": "Batumionline",
     "slug": "batumionline-app",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -15,7 +15,8 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.batumionline.app"
+      "bundleIdentifier": "com.batumionline.app",
+      "buildNumber": "1"
     },
     "android": {
       "adaptiveIcon": {
@@ -23,11 +24,18 @@
         "backgroundColor": "#F7F3ED"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.batumionline.app"
+      "package": "com.batumionline.batumi"
     },
     "plugins": [
       "expo-router",
       "expo-font"
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "09ed4232-19dd-41d6-8b2b-4ddb7e25cee5"
+      }
+    },
+    "owner": "krispel"
   }
 }

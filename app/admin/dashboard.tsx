@@ -141,67 +141,140 @@ const NAV_ITEMS = [
 ];
 
 // ─── Rich Text Editor (web) ────────────────────────────────────
+const FONTS = ['Assistant', 'Arial', 'David', 'Tahoma', 'Verdana', 'Georgia', 'Courier New'];
+const FONT_SIZES = [
+  { label: '10', val: '1' }, { label: '12', val: '2' }, { label: '14', val: '3' },
+  { label: '18', val: '4' }, { label: '24', val: '5' }, { label: '32', val: '6' }, { label: '48', val: '7' },
+];
+const COLORS_PALETTE = ['#000000','#333333','#666666','#999999','#ffffff','#004a99','#1A6B8A','#3DA5C4','#F4A94E','#c0392b','#27ae60','#8e44ad','#e67e22','#2c3e50'];
+
 function RichEditor({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   const ref = React.useRef<any>(null);
+  const [showCode, setShowCode] = React.useState(false);
 
   React.useEffect(() => {
-    if (ref.current && ref.current.innerHTML !== value) {
+    if (ref.current && !showCode && ref.current.innerHTML !== value) {
       ref.current.innerHTML = value || '';
     }
-  }, [value]);
+  }, [value, showCode]);
 
   const exec = (cmd: string, arg?: string) => {
     (window as any).document.execCommand(cmd, false, arg);
     if (ref.current) onChange(ref.current.innerHTML);
   };
 
+  const btnStyle: any = {
+    padding: '6px 10px', border: '1px solid #e0e0e0', borderRadius: 6,
+    background: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 600, color: '#1A6B8A',
+  };
+
   const btn = (label: string, cmd: string, arg?: string) =>
     React.createElement('button', {
-      type: 'button',
-      key: label + cmd,
-      onClick: () => exec(cmd, arg),
-      style: {
-        padding: '6px 10px', border: '1px solid #e0e0e0', borderRadius: 6,
-        background: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 600, color: '#1A6B8A',
-      },
+      type: 'button', key: label + cmd,
+      onClick: () => exec(cmd, arg), style: btnStyle,
     }, label);
+
+  const selectEl = (key: string, options: { label: string; val: string }[], cmd: string, placeholder: string) =>
+    React.createElement('select', {
+      key,
+      onChange: (e: any) => { if (e.target.value) exec(cmd, e.target.value); e.target.value = ''; },
+      defaultValue: '',
+      style: { ...btnStyle, paddingRight: 4 },
+    }, [
+      React.createElement('option', { key: 'ph', value: '', disabled: true }, placeholder),
+      ...options.map(o => React.createElement('option', { key: o.val, value: o.val }, o.label)),
+    ]);
+
+  const fontSelect = React.createElement('select', {
+    key: 'fontFamily',
+    onChange: (e: any) => { if (e.target.value) exec('fontName', e.target.value); e.target.value = ''; },
+    defaultValue: '',
+    style: { ...btnStyle, paddingRight: 4 },
+  }, [
+    React.createElement('option', { key: 'ph', value: '', disabled: true }, 'גופן'),
+    ...FONTS.map(f => React.createElement('option', { key: f, value: f, style: { fontFamily: f } }, f)),
+  ]);
+
+  const colorPicker = (key: string, cmd: string, label: string) =>
+    React.createElement('div', { key, style: { position: 'relative', display: 'inline-block' } }, [
+      React.createElement('button', {
+        key: 'btn', type: 'button',
+        onClick: () => {
+          const c = (window as any).prompt(`${label} (hex):`, '#000000');
+          if (c) exec(cmd, c);
+        },
+        style: btnStyle,
+      }, label),
+    ]);
 
   const promptLink = () => {
     const url = (window as any).prompt('הכנס קישור:');
     if (url) exec('createLink', url);
   };
 
+  const toggleCode = () => {
+    if (showCode && ref.current) {
+      ref.current.innerHTML = value || '';
+    }
+    setShowCode(!showCode);
+  };
+
   return React.createElement('div', { style: { direction: 'rtl' } }, [
     React.createElement('div', {
       key: 'toolbar',
-      style: { display: 'flex', flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 6, marginBottom: 8 },
+      style: { display: 'flex', flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 5, marginBottom: 8 },
     }, [
       btn('B', 'bold'), btn('I', 'italic'), btn('U', 'underline'),
+      btn('S', 'strikeThrough'),
+      fontSelect,
+      selectEl('fontSize', FONT_SIZES, 'fontSize', 'גודל'),
+      colorPicker('fgColor', 'foreColor', '🎨 צבע'),
+      colorPicker('bgColor', 'hiliteColor', '🖌️ רקע'),
       btn('• רשימה', 'insertUnorderedList'),
       btn('1. רשימה', 'insertOrderedList'),
+      btn('H1', 'formatBlock', 'H1'),
       btn('H2', 'formatBlock', 'H2'),
       btn('H3', 'formatBlock', 'H3'),
       btn('פסקה', 'formatBlock', 'P'),
-      btn('🔗 קישור', 'createLink', undefined),
+      btn('ימין', 'justifyRight'),
+      btn('מרכז', 'justifyCenter'),
+      btn('שמאל', 'justifyLeft'),
       React.createElement('button', {
-        type: 'button', key: 'linkbtn', onClick: promptLink,
-        style: { padding: '6px 10px', border: '1px solid #e0e0e0', borderRadius: 6, background: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 600, color: '#1A6B8A' },
-      }, '🔗'),
+        type: 'button', key: 'linkbtn', onClick: promptLink, style: btnStyle,
+      }, '🔗 קישור'),
+      btn('הסר קישור', 'unlink'),
+      btn('קו אופקי', 'insertHorizontalRule'),
+      React.createElement('button', {
+        type: 'button', key: 'codebtn', onClick: toggleCode,
+        style: { ...btnStyle, background: showCode ? '#1A6B8A' : '#fff', color: showCode ? '#fff' : '#1A6B8A' },
+      }, showCode ? 'תצוגה' : '</> קוד'),
       btn('ניקוי', 'removeFormat'),
     ]),
-    React.createElement('div', {
-      key: 'editor',
-      ref,
-      contentEditable: true,
-      suppressContentEditableWarning: true,
-      onInput: (e: any) => onChange(e.currentTarget.innerHTML),
-      style: {
-        minHeight: 160, maxHeight: 340, overflowY: 'auto',
-        border: '1px solid #e0e0e0', borderRadius: 10, padding: 12,
-        fontSize: 14, lineHeight: '22px', outline: 'none', background: '#fafafa',
-        direction: 'rtl', textAlign: 'right',
-      },
-    }),
+    showCode
+      ? React.createElement('textarea', {
+          key: 'codeEditor',
+          value: value || '',
+          onChange: (e: any) => onChange(e.target.value),
+          style: {
+            width: '100%', minHeight: 200, maxHeight: 400, border: '1px solid #e0e0e0',
+            borderRadius: 10, padding: 12, fontSize: 13, fontFamily: 'monospace',
+            lineHeight: '20px', outline: 'none', background: '#1e1e1e', color: '#d4d4d4',
+            direction: 'ltr', textAlign: 'left', resize: 'vertical',
+          },
+        })
+      : React.createElement('div', {
+          key: 'editor',
+          ref,
+          contentEditable: true,
+          suppressContentEditableWarning: true,
+          onInput: (e: any) => onChange(e.currentTarget.innerHTML),
+          style: {
+            minHeight: 200, maxHeight: 400, overflowY: 'auto',
+            border: '1px solid #e0e0e0', borderRadius: 10, padding: 12,
+            fontSize: 14, lineHeight: '22px', outline: 'none', background: '#fafafa',
+            direction: 'rtl', textAlign: 'right',
+          },
+        }),
   ]);
 }
 
@@ -445,6 +518,36 @@ function EditModal({
                     placeholderTextColor="#bbb"
                     textAlign="left"
                   />
+                  {Platform.OS === 'web' && React.createElement('label', {
+                    key: `upload-${idx}`,
+                    style: {
+                      backgroundColor: Colors.SECONDARY, color: '#fff', padding: '10px 12px',
+                      borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap',
+                    },
+                  }, [
+                    '📁 העלה',
+                    React.createElement('input', {
+                      key: 'file',
+                      type: 'file',
+                      accept: 'audio/*,.mp3,.wav,.m4a,.aac',
+                      style: { display: 'none' },
+                      onChange: async (e: any) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        const fd = new FormData();
+                        fd.append('file', file);
+                        try {
+                          const res = await fetch(`${API_BASE}/api/upload`, { method: 'POST', body: fd });
+                          const json = await res.json();
+                          if (json.success) {
+                            const next = [...(form.audios || [])];
+                            next[idx] = { ...next[idx], url: json.url, title: next[idx].title || file.name.replace(/\.[^.]+$/, '') };
+                            setForm((p) => ({ ...p, audios: next }));
+                          }
+                        } catch {}
+                      },
+                    }),
+                  ])}
                   <TouchableOpacity
                     onPress={() => {
                       const next = (form.audios || []).filter((_, i) => i !== idx);

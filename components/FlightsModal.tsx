@@ -48,15 +48,13 @@ export default function FlightsModal({ visible, onClose, bgColor }: { visible: b
     : '--:--';
   const ledAnim = useRef(new Animated.Value(1)).current;
 
-  // Batumi clock UTC+4
+  // Batumi clock (Asia/Tbilisi, UTC+4)
   useEffect(() => {
     if (!visible) return;
     const update = () => {
       const now = new Date();
-      const batumi = new Date(now.getTime() + (4 * 60 - now.getTimezoneOffset()) * 60000);
-      const h = batumi.getUTCHours().toString().padStart(2, '0');
-      const m = batumi.getUTCMinutes().toString().padStart(2, '0');
-      setBatumiTime(`${h}:${m}`);
+      const t = now.toLocaleTimeString('he-IL', { timeZone: 'Asia/Tbilisi', hour: '2-digit', minute: '2-digit', hour12: false });
+      setBatumiTime(t);
     };
     update();
     const interval = setInterval(update, 1000);
@@ -298,7 +296,7 @@ export default function FlightsModal({ visible, onClose, bgColor }: { visible: b
             </View>
           </View>
 
-          <Text style={s.code}>TLV ✈ BUS  •  {new Date().toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</Text>
+          <Text style={s.code}>TLV — BUS  •  {new Date().toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</Text>
 
           {/* Tabs */}
           <View style={s.tabRow}>
