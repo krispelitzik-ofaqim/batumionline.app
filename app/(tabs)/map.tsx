@@ -1,5 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { useLocalSearchParams } from 'expo-router';
 import { Colors } from '../../constants/colors';
 import { ThemeContext } from '../../constants/theme';
 
@@ -10,6 +11,11 @@ export default function MapScreen() {
   const { dark } = useContext(ThemeContext);
   const [active, setActive] = useState('הכל');
   const bg = dark ? Colors.TEXT : Colors.BACKGROUND;
+  const { lat, lng, name } = useLocalSearchParams<{ lat?: string; lng?: string; name?: string }>();
+
+  const mapSrc = lat && lng
+    ? `https://www.google.com/maps?q=${lat},${lng}${name ? `(${encodeURIComponent(name)})` : ''}&hl=iw&z=16&output=embed`
+    : 'https://www.google.com/maps?q=Batumi,Georgia&hl=iw&z=13&output=embed';
 
   return (
     <View style={[styles.container, { backgroundColor: bg }]}>
@@ -33,7 +39,7 @@ export default function MapScreen() {
       </ScrollView>
       <iframe
         title="batumi-map"
-        src="https://www.google.com/maps?q=Batumi,Georgia&hl=iw&z=13&output=embed"
+        src={mapSrc}
         style={{ flex: 1, border: 0 } as any}
       />
     </View>

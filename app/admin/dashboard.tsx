@@ -15,6 +15,12 @@ type HotelBlock = {
   coords?: { lat: number; lng: number };
   visible?: boolean;
 };
+type TourBlock = {
+  id: string; title: string; subtitle?: string; text: string; color: string;
+  images: string[]; audios: Array<{ title?: string; url: string; coords?: { lat: number; lng: number } }>;
+  visible?: boolean;
+  coords?: { lat: number; lng: number };
+};
 type DataItem = {
   id: string; title: string; subtitle?: string; icon: string; bg: string;
   image?: string; audio?: string; video?: string; lat?: string; lng?: string; address?: string;
@@ -23,6 +29,7 @@ type DataItem = {
   audios?: Array<{ title?: string; url: string }>;
   children?: DataItem[];
   hotels?: HotelBlock[];
+  tours?: TourBlock[];
 };
 
 const HERO_PALETTE = [
@@ -676,7 +683,7 @@ function EditModal({
                     <Text style={ms.label}>📄 טקסט תיאור</Text>
                     <TextInput style={[ms.input, ms.textArea, { marginBottom: 8 }]} value={hb.text} onChangeText={v => { const n=[...(form.hotels||[])]; n[idx]={...n[idx],text:v}; setForm(p=>({...p,hotels:n})); }} placeholder="תיאור המלון" placeholderTextColor="#bbb" textAlign="right" multiline numberOfLines={4} />
 
-                    <Text style={ms.label}>🔗 כפתור "לדף המלון" — לינק חיצוני</Text>
+                    <Text style={ms.label}>🔗 כפתור מידע נוסף / לדף המלון — לינק חיצוני</Text>
                     <TextInput style={[ms.input, { marginBottom: 8 }]} value={hb.pageUrl || ''} onChangeText={v => { const n=[...(form.hotels||[])]; n[idx]={...n[idx],pageUrl:v}; setForm(p=>({...p,hotels:n})); }} placeholder="https://..." placeholderTextColor="#bbb" textAlign="left" />
 
                     <Text style={ms.label}>🧭 כפתור "נווט למקום" — לינק Google Maps</Text>
@@ -698,6 +705,114 @@ function EditModal({
                 >
                   <Text style={{ color: Colors.WHITE, fontWeight: '700' }}>+ הוסף בלוק</Text>
                 </TouchableOpacity>
+              </View>
+            )}
+
+            {form.tours && (
+              <View style={ms.fieldGroup}>
+                <Text style={[ms.label, { fontSize: 16, marginBottom: 10 }]}>בלוקי סיורים קוליים ({form.tours.length})</Text>
+                {form.tours.map((tb, idx) => (
+                  <View key={tb.id} style={{ borderWidth: 1, borderColor: '#e8e8e8', borderRadius: 12, padding: 12, marginBottom: 12, backgroundColor: tb.color || '#f9f9f9' }}>
+                    <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                      <Text style={{ fontSize: 13, fontWeight: '800', color: Colors.TEXT }}>בלוק {idx + 1}</Text>
+                      <View style={{ flexDirection: 'row-reverse', gap: 10, alignItems: 'center' }}>
+                        <TouchableOpacity
+                          onPress={() => { const n=[...(form.tours||[])]; n[idx]={...n[idx],visible:!(n[idx].visible!==false)}; setForm(p=>({...p,tours:n})); }}
+                          style={{ paddingVertical: 4, paddingHorizontal: 10, borderRadius: 12, backgroundColor: (tb.visible !== false) ? '#10b981' : '#9ca3af' }}
+                        >
+                          <Text style={{ color: Colors.WHITE, fontSize: 11, fontWeight: '800' }}>{(tb.visible !== false) ? '👁 מוצג' : '🚫 מוסתר'}</Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+
+                    <Text style={ms.label}>🎨 צבע רקע</Text>
+                    <TextInput
+                      style={[ms.input, { marginBottom: 8 }]}
+                      value={tb.color || ''}
+                      onChangeText={v => { const n=[...(form.tours||[])]; n[idx]={...n[idx],color:v}; setForm(p=>({...p,tours:n})); }}
+                      placeholder="#B8E6C1"
+                      placeholderTextColor="#bbb"
+                      textAlign="left"
+                    />
+
+                    <Text style={ms.label}>📝 כותרת</Text>
+                    <TextInput style={[ms.input, { marginBottom: 8 }]} value={tb.title} onChangeText={v => { const n=[...(form.tours||[])]; n[idx]={...n[idx],title:v}; setForm(p=>({...p,tours:n})); }} placeholder="שם הסיור" placeholderTextColor="#bbb" textAlign="right" />
+
+                    <Text style={ms.label}>📋 כותרת משנה</Text>
+                    <TextInput style={[ms.input, { marginBottom: 8 }]} value={tb.subtitle || ''} onChangeText={v => { const n=[...(form.tours||[])]; n[idx]={...n[idx],subtitle:v}; setForm(p=>({...p,tours:n})); }} placeholder="כותרת משנה" placeholderTextColor="#bbb" textAlign="right" />
+
+                    <Text style={ms.label}>📄 טקסט תיאור</Text>
+                    <TextInput style={[ms.input, ms.textArea, { marginBottom: 8 }]} value={tb.text} onChangeText={v => { const n=[...(form.tours||[])]; n[idx]={...n[idx],text:v}; setForm(p=>({...p,tours:n})); }} placeholder="תיאור" placeholderTextColor="#bbb" textAlign="right" multiline numberOfLines={4} />
+
+                    <Text style={ms.label}>🖼 תמונות לסליידר (URL בכל שורה)</Text>
+                    <TextInput
+                      style={[ms.input, ms.textArea, { marginBottom: 8 }]}
+                      value={(tb.images || []).join('\n')}
+                      onChangeText={v => { const n=[...(form.tours||[])]; n[idx]={...n[idx],images:v.split('\n').map(s=>s.trim()).filter(Boolean)}; setForm(p=>({...p,tours:n})); }}
+                      placeholder="http://localhost:3001/uploads/...&#10;http://localhost:3001/uploads/..."
+                      placeholderTextColor="#bbb"
+                      textAlign="left"
+                      multiline
+                      numberOfLines={4}
+                    />
+
+                    <Text style={ms.label}>🎧 נגנים ({(tb.audios || []).length})</Text>
+                    {(tb.audios || []).map((au, aIdx) => (
+                      <View key={aIdx} style={{ borderWidth: 1, borderColor: '#d1d5db', borderRadius: 10, padding: 8, marginBottom: 8, backgroundColor: 'rgba(255,255,255,0.6)' }}>
+                        <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                          <Text style={{ fontSize: 12, fontWeight: '800', color: Colors.TEXT }}>תחנה {aIdx + 1}</Text>
+                          <TouchableOpacity
+                            onPress={() => { const n=[...(form.tours||[])]; const a=(n[idx].audios||[]).filter((_,i)=>i!==aIdx); n[idx]={...n[idx],audios:a}; setForm(p=>({...p,tours:n})); }}
+                          >
+                            <Text style={{ color: '#dc2626', fontSize: 16 }}>🗑</Text>
+                          </TouchableOpacity>
+                        </View>
+                        <TextInput
+                          style={[ms.input, { marginBottom: 4 }]}
+                          value={au.title || ''}
+                          onChangeText={v => { const n=[...(form.tours||[])]; const a=[...(n[idx].audios||[])]; a[aIdx]={...a[aIdx],title:v}; n[idx]={...n[idx],audios:a}; setForm(p=>({...p,tours:n})); }}
+                          placeholder="שם תחנה"
+                          placeholderTextColor="#bbb"
+                          textAlign="right"
+                        />
+                        <TextInput
+                          style={[ms.input, { marginBottom: 4 }]}
+                          value={au.url}
+                          onChangeText={v => { const n=[...(form.tours||[])]; const a=[...(n[idx].audios||[])]; a[aIdx]={...a[aIdx],url:v}; n[idx]={...n[idx],audios:a}; setForm(p=>({...p,tours:n})); }}
+                          placeholder="URL אודיו"
+                          placeholderTextColor="#bbb"
+                          textAlign="left"
+                        />
+                        <View style={{ flexDirection: 'row-reverse', gap: 6 }}>
+                          <TextInput
+                            style={[ms.input, { flex: 1 }]}
+                            value={String(au.coords?.lat ?? '')}
+                            onChangeText={v => { const n=[...(form.tours||[])]; const a=[...(n[idx].audios||[])]; a[aIdx]={...a[aIdx],coords:{lat:parseFloat(v)||0,lng:a[aIdx].coords?.lng||0}}; n[idx]={...n[idx],audios:a}; setForm(p=>({...p,tours:n})); }}
+                            placeholder="Lat"
+                            placeholderTextColor="#bbb"
+                            textAlign="left"
+                            keyboardType="numeric"
+                          />
+                          <TextInput
+                            style={[ms.input, { flex: 1 }]}
+                            value={String(au.coords?.lng ?? '')}
+                            onChangeText={v => { const n=[...(form.tours||[])]; const a=[...(n[idx].audios||[])]; a[aIdx]={...a[aIdx],coords:{lat:a[aIdx].coords?.lat||0,lng:parseFloat(v)||0}}; n[idx]={...n[idx],audios:a}; setForm(p=>({...p,tours:n})); }}
+                            placeholder="Lng"
+                            placeholderTextColor="#bbb"
+                            textAlign="left"
+                            keyboardType="numeric"
+                          />
+                        </View>
+                      </View>
+                    ))}
+                    <TouchableOpacity
+                      style={{ paddingVertical: 8, borderRadius: 8, backgroundColor: Colors.SECONDARY, alignItems: 'center' }}
+                      onPress={() => { const n=[...(form.tours||[])]; const a=[...(n[idx].audios||[]),{title:'',url:''}]; n[idx]={...n[idx],audios:a}; setForm(p=>({...p,tours:n})); }}
+                    >
+                      <Text style={{ color: Colors.WHITE, fontWeight: '700', fontSize: 13 }}>+ הוסף נגן</Text>
+                    </TouchableOpacity>
+                  </View>
+                ))}
               </View>
             )}
 
@@ -823,7 +938,25 @@ export default function AdminDashboard() {
   const handleSaveItem = (updated: DataItem) => {
     const section = SECTIONS.find(s => s.key === activeNav);
     if (!section) return;
-    if (childrenOf) {
+    // Tour block single-edit path
+    if (updated.id && updated.id.startsWith('__tour__') && childrenOf && updated.tours && updated.tours.length === 1) {
+      const parts = updated.id.split('__');
+      const tourIdx = parseInt(parts[3], 10);
+      const items = [...(data[activeNav] || [])];
+      const pIdx = items.findIndex(i => i.id === childrenOf.id);
+      if (pIdx >= 0) {
+        const parent = items[pIdx];
+        const newTours = [...(parent.tours || [])];
+        newTours[tourIdx] = updated.tours[0];
+        const newParent = { ...parent, tours: newTours };
+        items[pIdx] = newParent;
+        saveSection(activeNav, items);
+        setChildrenOf(newParent);
+      }
+      setEditItem(null);
+      return;
+    }
+    if (childrenOf && !toursMode) {
       const kids = childrenOf.children || [];
       const idx = kids.findIndex(i => i.id === updated.id);
       const next = [...kids];
@@ -896,7 +1029,19 @@ export default function AdminDashboard() {
   };
 
   const currentSection = SECTIONS.find(s => s.key === activeNav) || null;
-  const currentItems = childrenOf ? (childrenOf.children || []) : (data[activeNav] || []);
+  const toursMode = !!(childrenOf && childrenOf.tours && childrenOf.tours.length > 0);
+  const currentItems: DataItem[] = toursMode
+    ? (childrenOf!.tours!.map((t, i) => ({
+        id: t.id,
+        title: t.title || `בלוק ${i + 1}`,
+        subtitle: t.text ? t.text.slice(0, 60) : '',
+        icon: '🎧',
+        bg: t.color,
+        _tourIdx: i,
+      } as DataItem & { _tourIdx: number })))
+    : childrenOf
+      ? (childrenOf.children || [])
+      : (data[activeNav] || []);
   const canHaveChildren = activeNav === 'main' || activeNav === 'extra';
 
   // ─── Sidebar / Nav ──────────────────────────────────────────
@@ -1220,9 +1365,9 @@ export default function AdminDashboard() {
         <View style={cs.contentHeaderRow}>
           <View style={{ flex: 1 }}>
             <Text style={cs.contentTitle}>
-              {childrenOf ? `תת-קטגוריות של ${childrenOf.title}` : currentSection.label}
+              {toursMode ? `בלוקי סיורים — ${childrenOf!.title}` : childrenOf ? `תת-קטגוריות של ${childrenOf.title}` : currentSection.label}
             </Text>
-            <Text style={cs.contentSub}>{currentItems.length} פריטים</Text>
+            <Text style={cs.contentSub}>{currentItems.length} {toursMode ? 'בלוקים' : 'פריטים'}</Text>
           </View>
           <TouchableOpacity style={cs.addBtn} onPress={addItem}>
             <Text style={cs.addBtnTxt}>+ הוסף פריט</Text>
@@ -1288,12 +1433,32 @@ export default function AdminDashboard() {
                   onPress={() => setChildrenOf(item)}
                 >
                   <Text style={[cs.editTxt, { color: Colors.ACCENT }]}>
-                    תת-קטגוריות ({(item.children || []).length})
+                    {item.tours && item.tours.length > 0
+                      ? `בלוקי סיורים (${item.tours.length})`
+                      : `תת-קטגוריות (${(item.children || []).length})`}
                   </Text>
                 </TouchableOpacity>
               )}
 
-              <TouchableOpacity style={cs.editBtn} onPress={() => setEditItem(item)}>
+              <TouchableOpacity
+                style={cs.editBtn}
+                onPress={() => {
+                  if (toursMode && childrenOf) {
+                    const ti = (item as any)._tourIdx as number;
+                    const tour = childrenOf.tours![ti];
+                    setEditItem({
+                      id: `__tour__${childrenOf.id}__${ti}`,
+                      title: tour.title || '',
+                      subtitle: '',
+                      icon: '🎧',
+                      bg: tour.color,
+                      tours: [tour],
+                    } as DataItem);
+                  } else {
+                    setEditItem(item);
+                  }
+                }}
+              >
                 <Text style={cs.editTxt}>ערוך</Text>
               </TouchableOpacity>
             </View>

@@ -328,6 +328,36 @@ app.get('/api/flights', async (req, res) => {
   }
 });
 
+// ─── Ratings ──────────────────────────────────────────────────
+app.get('/api/ratings', (req, res) => {
+  try {
+    const db = readDB();
+    res.json({ success: true, data: db.ratings || {} });
+  } catch (e) {
+    res.status(500).json({ success: false, error: e.message });
+  }
+});
+
+app.post('/api/ratings/:id', (req, res) => {
+  try {
+    const { id } = req.params;
+    const score = parseInt(req.body.score, 10);
+    if (!id || !score || score < 1 || score > 5) {
+      return res.status(400).json({ success: false, error: 'invalid input' });
+    }
+    const db = readDB();
+    if (!db.ratings) db.ratings = {};
+    const cur = db.ratings[id] || { sum: 0, count: 0 };
+    cur.sum += score;
+    cur.count += 1;
+    db.ratings[id] = cur;
+    writeDB(db);
+    res.json({ success: true, data: { sum: cur.sum, count: cur.count, avg: cur.sum / cur.count } });
+  } catch (e) {
+    res.status(500).json({ success: false, error: e.message });
+  }
+});
+
 // ─── Serve Expo web build ─────────────────────────────────────
 const WEB_DIST = path.join(__dirname, '..', 'dist');
 if (fs.existsSync(WEB_DIST)) {

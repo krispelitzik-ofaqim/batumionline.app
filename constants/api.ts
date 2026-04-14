@@ -14,6 +14,24 @@ export async function fetchContent() {
   return json.data;
 }
 
+export async function fetchRatings() {
+  const res = await fetch(`${API_BASE}/api/ratings`);
+  const json = await res.json();
+  if (!json.success) throw new Error(json.error);
+  return json.data as Record<string, { sum: number; count: number }>;
+}
+
+export async function submitRating(id: string, score: number) {
+  const res = await fetch(`${API_BASE}/api/ratings/${encodeURIComponent(id)}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ score }),
+  });
+  const json = await res.json();
+  if (!json.success) throw new Error(json.error);
+  return json.data as { sum: number; count: number; avg: number };
+}
+
 export async function updateSection(section: string, data: any) {
   const res = await fetch(`${API_BASE}/api/content/${section}`, {
     method: 'PUT',

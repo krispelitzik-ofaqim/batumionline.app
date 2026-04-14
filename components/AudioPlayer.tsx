@@ -3,8 +3,8 @@ import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native
 import { Audio } from 'expo-av';
 import { Colors } from '../constants/colors';
 
-type Track = { title?: string; url: string };
-type Props = { tracks: Track[]; title?: string; compact?: boolean };
+type Track = { title?: string; url: string; coords?: { lat: number; lng: number } };
+type Props = { tracks: Track[]; title?: string; compact?: boolean; onNavigate?: (coords: { lat: number; lng: number }) => void; tint?: string; onActiveChange?: (idx: number, track: Track) => void };
 
 function fmt(ms: number) {
   const s = Math.max(0, Math.floor(ms / 1000));
@@ -13,13 +13,37 @@ function fmt(ms: number) {
   return `${m}:${r.toString().padStart(2, '0')}`;
 }
 
-export default function AudioPlayer({ tracks, title, compact }: Props) {
+function darken(hex: string, amount = 0.45): string {
+  const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex || '');
+  if (!m) return '#555';
+  const r = Math.max(0, Math.floor(parseInt(m[1], 16) * (1 - amount)));
+  const g = Math.max(0, Math.floor(parseInt(m[2], 16) * (1 - amount)));
+  const b = Math.max(0, Math.floor(parseInt(m[3], 16) * (1 - amount)));
+  return `rgb(${r},${g},${b})`;
+}
+
+export default function AudioPlayer({ tracks: initialTracks, title, compact, onNavigate, tint, onActiveChange }: Props) {
+  const [tracks, setTracks] = useState(initialTracks);
   const [activeIdx, setActiveIdx] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [pos, setPos] = useState(0);
   const [dur, setDur] = useState(0);
+  const [dragIdx, setDragIdx] = useState<number | null>(null);
   const soundRef = useRef<any>(null);
   const audioElRef = useRef<any>(null);
+
+  useEffect(() => { setTracks(initialTracks); }, [initialTracks]);
+
+  const moveTrack = (from: number, to: number) => {
+    if (from === to) return;
+    const arr = [...tracks];
+    const [moved] = arr.splice(from, 1);
+    arr.splice(to, 0, moved);
+    setTracks(arr);
+    if (activeIdx === from) setActiveIdx(to);
+    else if (from < activeIdx && to >= activeIdx) setActiveIdx(activeIdx - 1);
+    else if (from > activeIdx && to <= activeIdx) setActiveIdx(activeIdx + 1);
+  };
 
   useEffect(() => {
     return () => {
@@ -85,6 +109,7 @@ export default function AudioPlayer({ tracks, title, compact }: Props) {
     setPlaying(false);
     setPos(0);
     setDur(0);
+    onActiveChange?.(i, tracks[i]);
   };
 
   const pct = dur > 0 ? (pos / dur) * 100 : 0;
@@ -92,7 +117,7 @@ export default function AudioPlayer({ tracks, title, compact }: Props) {
   if (!tracks || tracks.length === 0) return null;
 
   return (
-    <View style={[styles.card, compact && styles.cardCompact]}>
+    <View style={[styles.card, compact && styles.cardCompact, tint && { backgroundColor: tint, borderColor: 'rgba(0,0,0,0.1)' }]}>
       {title && <Text style={styles.header}>{title}</Text>}
       <Text style={[styles.nowTitle, compact && styles.nowTitleCompact]}>{current?.title || `שיר ${activeIdx + 1}`}</Text>
 
@@ -113,18 +138,61 @@ export default function AudioPlayer({ tracks, title, compact }: Props) {
 
       {tracks.length > 1 && (
         <View style={styles.list}>
-          {tracks.map((t, i) => (
-            <TouchableOpacity
-              key={i}
-              onPress={() => pickTrack(i)}
-              style={[styles.listItem, i === activeIdx && styles.listItemActive]}
-            >
-              <Text style={styles.listIcon}>🎧</Text>
-              <Text style={[styles.listTxt, i === activeIdx && styles.listTxtActive]}>
-                {t.title || `שיר ${i + 1}`}
-              </Text>
-            </TouchableOpacity>
-          ))}
+          {tracks.map((t, i) => {
+            const inner = (
+              <>
+                <Text style={styles.dragHandle}>≡</Text>
+                <Text style={styles.listIcon}>🎧</Text>
+                <Text style={[styles.listTxt, i === activeIdx && styles.listTxtActive]}>
+                  {t.title || `שיר ${i + 1}`}
+                </Text>
+                {t.coords && onNavigate && (
+                  <>
+                    <View style={styles.navSpacer} />
+                    <TouchableOpacity
+                      onPress={(e: any) => { e.stopPropagation?.(); onNavigate(t.coords!); }}
+                      style={[styles.navBtn, { backgroundColor: tint ? darken(tint, 0.5) : '#555' }]}
+                      activeOpacity={0.7}
+                    >
+                      <Text style={styles.navBtnTxt}>נווט{'\n'}למקום</Text>
+                    </TouchableOpacity>
+                  </>
+                )}
+              </>
+            );
+            if (Platform.OS === 'web') {
+              return React.createElement(
+                'div',
+                {
+                  key: i,
+                  draggable: true,
+                  onDragStart: (e: any) => { setDragIdx(i); e.dataTransfer.effectAllowed = 'move'; },
+                  onDragOver: (e: any) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; },
+                  onDrop: (e: any) => { e.preventDefault(); if (dragIdx !== null) moveTrack(dragIdx, i); setDragIdx(null); },
+                  onDragEnd: () => setDragIdx(null),
+                  onClick: () => pickTrack(i),
+                  style: {
+                    display: 'flex', flexDirection: 'row-reverse', alignItems: 'center', gap: 10,
+                    padding: '10px 12px', borderRadius: 10,
+                    background: i === activeIdx ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.35)',
+                    border: `1px solid ${i === activeIdx ? 'rgba(0,0,0,0.15)' : 'transparent'}`,
+                    cursor: 'grab',
+                    opacity: dragIdx === i ? 0.4 : 1,
+                  },
+                },
+                <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 10, flex: 1, pointerEvents: 'none' } as any}>{inner}</View>
+              );
+            }
+            return (
+              <TouchableOpacity
+                key={i}
+                onPress={() => pickTrack(i)}
+                style={[styles.listItem, i === activeIdx && styles.listItemActive]}
+              >
+                {inner}
+              </TouchableOpacity>
+            );
+          })}
         </View>
       )}
     </View>
@@ -176,6 +244,13 @@ const styles = StyleSheet.create({
   },
   listItemActive: { backgroundColor: Colors.SECONDARY + '20', borderColor: Colors.SECONDARY + '60' },
   listIcon: { fontSize: 16 },
+  dragHandle: { fontSize: 20, color: '#999', fontWeight: '700', paddingHorizontal: 4 },
+  navSpacer: { width: 10 },
+  navBtn: {
+    paddingHorizontal: 12, paddingVertical: 6, borderRadius: 10,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  navBtnTxt: { fontSize: 11, color: Colors.WHITE, fontWeight: '800', textAlign: 'center', lineHeight: 13 },
   listTxt: { fontSize: 13, color: Colors.TEXT, fontWeight: '600', writingDirection: 'rtl', flex: 1, textAlign: 'right' },
   listTxtActive: { color: Colors.PRIMARY, fontWeight: '800' },
 });

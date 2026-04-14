@@ -941,14 +941,200 @@
           "title": "אטרקציות",
           "subtitle": "כיף לכל המשפחה",
           "icon": "🎡",
-          "bg": "#F4A94E"
+          "bg": "#F4A94E",
+          "hotels": [
+            {
+              "id": "a1_1",
+              "title": "הטיילת החדשה",
+              "text": "Batumi New Boulevard - הטיילת הארוכה לאורך חוף הים, עם גינות, אומנות, פסלים וכיסאות נדנדה. לב פועם של העיר, מושלמת להליכה ולרכיבה על אופניים",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a1_2",
+              "title": "הגלגל הענק",
+              "text": "Panoramic Wheel - ממוקם בקצה הצפוני של הטיילת במתחם \"מיראקל פארק\". האייקון של העיר, מציע תצפית 360° מדהימה על הים, ההרים והעיר",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a1_3",
+              "title": "פסל עלי ונינו",
+              "text": "Ali and Nino - פסל מתכת ענק בגובה 8 מטר שזז לאט ומתמזג/מתפרק כל 10 דקות. מבוסס על רומן אהבה מ-1937. אייקון רומנטי של בטומי בחוף הים",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a1_4",
+              "title": "מגדל האלפבית",
+              "text": "Alphabet Tower - מגדל בגובה 130 מטר עם 33 אותיות של האלפבית הגאורגי המפוזרות לאורכו. כולל מעלית שקופה ומסעדה מסתובבת בפסגה",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a1_5",
+              "title": "מגדל צ׳ה צ׳ה",
+              "text": "Chacha Tower - מגדל שעון בסגנון עות׳מני. בכל יום ב-19:00, למשך 10 דקות, המגדל מזרים חינם צ׳ה צ׳ה (משקה אלכוהולי גאורגי מסורתי) מהברזים",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a1_6",
+              "title": "לונה פארק",
+              "text": "Batumi Lunapark - פארק שעשועים גדול עם מתקנים לכל הגילים, הסמוך לדולפינריום ולאגם. אטרקציה מרכזית לבילוי משפחתי",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a1_7",
+              "title": "אגם ארדגני",
+              "text": "Ardagani Lake - אגם מלאכותי גדול עם סירות, מזרקות מוסיקליות, טיילת והופעות מים. פינה ירוקה נעימה בלב העיר",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a1_8",
+              "title": "הדולפינריום",
+              "text": "Batumi Dolphinarium - מופעי דולפינים יומיים, אחד הוותיקים באזור. מומלץ במיוחד למשפחות עם ילדים",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "mapUrl": "",
+              "pageUrl": "https://dolphinarium.ge/en/home/",
+              "visible": true
+            },
+            {
+              "id": "a1_9",
+              "title": "כיכר אירופה",
+              "text": "Europe Square - הכיכר המרכזית של העיר העתיקה עם מבנים בסגנון נאו-בארוק. פסל מדיאה הזהובה ניצב במרכז. לב התיירות הלילית",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a1_10",
+              "title": "פארק 6 במאי",
+              "text": "6 May Park - פארק עירוני היסטורי עם אגם, גן חיות, גני שעשועים, יער של עצי מג׳ליקה ומונומנטים. אחת האטרקציות הירוקות הגדולות בעיר",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            }
+          ],
+          "pageBtnLabel": "מידע נוסף"
         },
         {
           "id": "a2",
           "title": "אתרים פופולריים",
           "subtitle": "חובה לראות",
           "icon": "📸",
-          "bg": "#5BC0DE"
+          "bg": "#5BC0DE",
+          "hotels": [
+            {
+              "id": "a2_1",
+              "title": "כיכר בטומי",
+              "text": "Batumi Piazza - כיכר בסגנון ונציאני באמצע העיר העתיקה, עם פסיפס רצפה, מגדל שעון נאו-מורי, בתי קפה, מסעדות ומופעים חיים בערב. לב התיירות הלילית",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a2_2",
+              "title": "כיכר אירופה",
+              "text": "Europe Square - כיכר מרכזית שוחזרה למראות המאה ה-18. במרכזה פסל מדיאה עם גיזת הזהב. מוקפת במבנים אירופאים ומסעדות",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a2_3",
+              "title": "טיילת בולווארד",
+              "text": "Boulevard Promenade - הטיילת הוותיקה של בטומי, 7 ק\"מ של גינות, מסעדות, פסלים ואומנות לאורך חוף הים. לב העיר",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a2_4",
+              "title": "המרינה ומגדל השעון",
+              "text": "Marina & Clock Tower - אזור המרינה עם יאכטות, המזח הארוך ומגדל השעון הקלאסי של העיר. נקודת צילום פופולרית",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a2_5",
+              "title": "הרובע היהודי ההיסטורי",
+              "text": "Historic Jewish Quarter - הרחובות שבין בית הכנסת העתיק לבית חב\"ד, אזור היסטורי חשוב עם מורשת הקהילה היהודית בבטומי",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a2_6",
+              "title": "בית הכנסת הגדול",
+              "text": "Great Synagogue of Batumi - בית הכנסת המרכזי של הקהילה היהודית בעיר, בניין היסטורי ופעיל עד היום עם מניין קבוע",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a2_7",
+              "title": "בית חב״ד בטומי",
+              "text": "Chabad Batumi - מרכז הקהילה היהודית, מתפקד כבית כנסת, מסעדה כשרה ומרכז שירותים לתיירים הישראלים",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "mapUrl": "",
+              "pageUrl": "http://chabadbatumi.ge/",
+              "visible": true
+            },
+            {
+              "id": "a2_8",
+              "title": "קתדרלת האם הקדושה",
+              "text": "Mother of God Cathedral - קתדרלה נוצרית גדולה מתחילת המאה ה-20 (1898-1903), הוקמה במקור כבית תפילה קתולי והפכה לכנסייה אורתודוקסית",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a2_9",
+              "title": "כנסיית סנט ניקולס",
+              "text": "St. Nicholas Church - כנסייה אורתודוקסית היסטורית ברובע העתיק, מוקד חשוב של הנצרות הגאורגית, בעלת אדריכלות קלאסית",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a2_10",
+              "title": "הכנסייה הארמנית",
+              "text": "Armenian Church - כנסייה היסטורית של הקהילה הארמנית בבטומי, סמל למגוון הדתי והתרבותי של העיר",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            }
+          ],
+          "pageBtnLabel": "מידע נוסף"
         },
         {
           "id": "a3",
@@ -990,63 +1176,487 @@
       "bg": "#2D4A5E",
       "bgDark": "#1A6B8A",
       "image": "",
-      "children": [
+      "children": [],
+      "heroBg": "#2D4A5E",
+      "tours": [
         {
-          "id": "s1",
-          "title": "סיור העיר העתיקה",
-          "subtitle": "רחובות, כיכרות וסיפורים",
-          "summary": "סיור קולי של שעה בין המבנים העתיקים ביותר של בטומי.",
-          "icon": "🏛️",
-          "bg": "#1A6B8A",
-          "layout": "banner"
+          "id": "t_1",
+          "title": "העיר העתיקה",
+          "text": "סיור מרתק ברובע העתיק של בטומי, בין הכיכרות, בתי הקפה והבניינים ההיסטוריים. תגלו את הסיפורים מאחורי כל פינה, את המיזוג בין התרבויות ואת האווירה הייחודית של העיר.",
+          "color": "#B8E6C1",
+          "images": [
+            "http://localhost:3001/uploads/1775910069485-6.jpg",
+            "http://localhost:3001/uploads/1775910069497-754.jpg",
+            "http://localhost:3001/uploads/1775910069506-223.jpg"
+          ],
+          "audios": [
+            {
+              "title": "1. כיכר אירופה",
+              "url": "http://localhost:3001/uploads/1776002188513-612.mp3",
+              "coords": {
+                "lat": 41.6533,
+                "lng": 41.6355
+              }
+            },
+            {
+              "title": "2. פסל עלי ונינו",
+              "url": "http://localhost:3001/uploads/1776002215391-967.mp3",
+              "coords": {
+                "lat": 41.6488,
+                "lng": 41.6398
+              }
+            },
+            {
+              "title": "3. מגדל האלפבית",
+              "url": "http://localhost:3001/uploads/1776002237090-835.mp3",
+              "coords": {
+                "lat": 41.6527,
+                "lng": 41.6386
+              }
+            },
+            {
+              "title": "4. הטיילת",
+              "url": "http://localhost:3001/uploads/1776002253481-93.mp3",
+              "coords": {
+                "lat": 41.6463,
+                "lng": 41.6367
+              }
+            }
+          ],
+          "visible": true,
+          "subtitle": "סיור הליכה ברובע העתיק"
         },
         {
-          "id": "s2",
+          "id": "t_2",
           "title": "סיור הטיילת",
-          "subtitle": "בולבר בטומי ופסלי ים",
-          "summary": "הליכה מרגיעה לאורך 7 ק״מ של חוף ואמנות רחוב.",
-          "icon": "🌊",
-          "bg": "#3DA5C4",
-          "layout": "banner"
+          "text": "הליכה לאורך הטיילת המפורסמת של בטומי - מהמרינה עד הגלגל הענק. תגלו את הפסלים, הגנים והמונומנטים לאורך הדרך, תוך האזנה לסיפורים על הארכיטקטורה המודרנית של העיר.",
+          "color": "#FADADD",
+          "images": [
+            "http://localhost:3001/uploads/1775910069516-30.jpg",
+            "http://localhost:3001/uploads/1775910069526-255.jpg"
+          ],
+          "audios": [
+            {
+              "title": "1. כיכר אירופה",
+              "url": "http://localhost:3001/uploads/1776002270866-146.mp3",
+              "coords": {
+                "lat": 41.6543,
+                "lng": 41.6365
+              }
+            },
+            {
+              "title": "2. פסל עלי ונינו",
+              "url": "http://localhost:3001/uploads/1776002287224-652.mp3",
+              "coords": {
+                "lat": 41.6498,
+                "lng": 41.6408
+              }
+            },
+            {
+              "title": "3. מגדל האלפבית",
+              "url": "http://localhost:3001/uploads/1776003051932-39.mp3",
+              "coords": {
+                "lat": 41.6537,
+                "lng": 41.639599999999994
+              }
+            },
+            {
+              "title": "4. הטיילת",
+              "url": "http://localhost:3001/uploads/1776004810011-62.mp3",
+              "coords": {
+                "lat": 41.647299999999994,
+                "lng": 41.637699999999995
+              }
+            }
+          ],
+          "visible": true,
+          "subtitle": "לאורך חוף הים"
         },
         {
-          "id": "s3",
-          "title": "סיור אדריכלות מודרנית",
-          "subtitle": "מגדלים וגגות",
-          "summary": "הכירו את המבנים החדשניים שעיצבו מחדש את בטומי.",
-          "icon": "🏙️",
-          "bg": "#2E8BA8",
-          "layout": "banner"
+          "id": "t_3",
+          "title": "אדריכלות מודרנית",
+          "text": "בטומי היא מעבדת אדריכלות חיה - בניינים פוטוריסטיים, מגדלים מעוצבים ומבני נוף. הסיור יוביל אתכם בין הבולטים שבהם, עם הסבר על הסיפור מאחורי כל מבנה.",
+          "color": "#C7E6F5",
+          "images": [
+            "http://localhost:3001/uploads/1775910069535-937.jpg",
+            "http://localhost:3001/uploads/1775910069548-933.jpg",
+            "http://localhost:3001/uploads/1775910069562-341.jpg",
+            "http://localhost:3001/uploads/1775910069573-698.jpg"
+          ],
+          "audios": [
+            {
+              "title": "1. כיכר אירופה",
+              "url": "http://localhost:3001/uploads/1776004835623-813.mp3",
+              "coords": {
+                "lat": 41.655300000000004,
+                "lng": 41.6375
+              }
+            },
+            {
+              "title": "2. פסל עלי ונינו",
+              "url": "http://localhost:3001/uploads/1776004855237-413.mp3",
+              "coords": {
+                "lat": 41.650800000000004,
+                "lng": 41.6418
+              }
+            },
+            {
+              "title": "3. מגדל האלפבית",
+              "url": "http://localhost:3001/uploads/1776004878847-105.mp3",
+              "coords": {
+                "lat": 41.654700000000005,
+                "lng": 41.6406
+              }
+            },
+            {
+              "title": "4. הטיילת",
+              "url": "http://localhost:3001/uploads/1776005085649-506.mp3",
+              "coords": {
+                "lat": 41.6483,
+                "lng": 41.6387
+              }
+            }
+          ],
+          "visible": true,
+          "subtitle": "מהגלגל הענק למגדל האלפבית"
         },
         {
-          "id": "s4",
-          "title": "סיור היסטוריה יהודית",
-          "subtitle": "קהילה ומורשת",
-          "summary": "עקבות הקהילה היהודית בעיר: בית כנסת, שוק ומקומות זיכרון.",
-          "icon": "✡️",
-          "bg": "#F4A94E",
-          "layout": "banner"
+          "id": "t_4",
+          "title": "סיור יהודי",
+          "text": "",
+          "color": "#FFF5B1",
+          "images": [
+            "http://localhost:3001/uploads/1775910069627-459.jpg",
+            "http://localhost:3001/uploads/1775910069643-44.jpg",
+            "http://localhost:3001/uploads/1775910069656-446.jpg",
+            "http://localhost:3001/uploads/1775910069672-831.jpg"
+          ],
+          "audios": [
+            {
+              "title": "1. כיכר אירופה",
+              "url": "http://localhost:3001/uploads/1776005106931-992.mp3",
+              "coords": {
+                "lat": 41.6563,
+                "lng": 41.6385
+              }
+            },
+            {
+              "title": "2. פסל עלי ונינו",
+              "url": "http://localhost:3001/uploads/1776002188513-612.mp3",
+              "coords": {
+                "lat": 41.6518,
+                "lng": 41.6428
+              }
+            },
+            {
+              "title": "3. מגדל האלפבית",
+              "url": "http://localhost:3001/uploads/1776002215391-967.mp3",
+              "coords": {
+                "lat": 41.6557,
+                "lng": 41.6416
+              }
+            },
+            {
+              "title": "4. הטיילת",
+              "url": "http://localhost:3001/uploads/1776002237090-835.mp3",
+              "coords": {
+                "lat": 41.6493,
+                "lng": 41.6397
+              }
+            }
+          ],
+          "visible": true,
+          "subtitle": "מורשת יהודית בבטומי"
         },
         {
-          "id": "s5",
-          "title": "סיור גנים ופארקים",
-          "subtitle": "טבע בעיר",
-          "summary": "הגן הבוטני, פארק 6 במאי ומרחבים ירוקים מרהיבים.",
-          "icon": "🌳",
-          "bg": "#7ECFC0",
-          "layout": "banner"
+          "id": "t_5",
+          "title": "סיור גנים",
+          "text": "",
+          "color": "#FFD1A9",
+          "images": [
+            "http://localhost:3001/uploads/1775910069689-689.jpg",
+            "http://localhost:3001/uploads/1775910069707-877.jpg",
+            "http://localhost:3001/uploads/1775910069718-813.jpg",
+            "http://localhost:3001/uploads/1775910069727-542.jpg"
+          ],
+          "audios": [
+            {
+              "title": "1. כיכר אירופה",
+              "url": "http://localhost:3001/uploads/1776002253481-93.mp3",
+              "coords": {
+                "lat": 41.6573,
+                "lng": 41.6395
+              }
+            },
+            {
+              "title": "2. פסל עלי ונינו",
+              "url": "http://localhost:3001/uploads/1776002270866-146.mp3",
+              "coords": {
+                "lat": 41.6528,
+                "lng": 41.6438
+              }
+            },
+            {
+              "title": "3. מגדל האלפבית",
+              "url": "http://localhost:3001/uploads/1776002287224-652.mp3",
+              "coords": {
+                "lat": 41.6567,
+                "lng": 41.642599999999995
+              }
+            },
+            {
+              "title": "4. הטיילת",
+              "url": "http://localhost:3001/uploads/1776003051932-39.mp3",
+              "coords": {
+                "lat": 41.650299999999994,
+                "lng": 41.640699999999995
+              }
+            }
+          ],
+          "visible": true,
+          "subtitle": "גנים, פארקים ופינות ירוקות"
         },
         {
-          "id": "s6",
-          "title": "סיור קולינארי",
-          "subtitle": "מסעדות ושווקים",
-          "summary": "טעמי המטבח האג׳ארי — מהשוק המרכזי ועד מסעדות שף.",
-          "icon": "🍽️",
-          "bg": "#5BC0DE",
-          "layout": "banner"
+          "id": "t_6",
+          "title": "סיור קולינרי",
+          "text": "",
+          "color": "#DCC6FC",
+          "images": [
+            "http://localhost:3001/uploads/1775910069741-591.jpg",
+            "http://localhost:3001/uploads/1775910069754-713.jpg",
+            "http://localhost:3001/uploads/1775910069774-994.jpg",
+            "http://localhost:3001/uploads/1775910069789-35.jpg"
+          ],
+          "audios": [
+            {
+              "title": "1. כיכר אירופה",
+              "url": "http://localhost:3001/uploads/1776004810011-62.mp3",
+              "coords": {
+                "lat": 41.658300000000004,
+                "lng": 41.6405
+              }
+            },
+            {
+              "title": "2. פסל עלי ונינו",
+              "url": "http://localhost:3001/uploads/1776004835623-813.mp3",
+              "coords": {
+                "lat": 41.653800000000004,
+                "lng": 41.644800000000004
+              }
+            },
+            {
+              "title": "3. מגדל האלפבית",
+              "url": "http://localhost:3001/uploads/1776004855237-413.mp3",
+              "coords": {
+                "lat": 41.657700000000006,
+                "lng": 41.6436
+              }
+            },
+            {
+              "title": "4. הטיילת",
+              "url": "http://localhost:3001/uploads/1776004878847-105.mp3",
+              "coords": {
+                "lat": 41.6513,
+                "lng": 41.6417
+              }
+            }
+          ],
+          "visible": true,
+          "subtitle": "טעמים מקומיים ובתי קפה"
+        },
+        {
+          "id": "t_7",
+          "title": "סיור שוק",
+          "text": "",
+          "color": "#A3D9B1",
+          "images": [
+            "http://localhost:3001/uploads/1775910069804-487.jpg",
+            "http://localhost:3001/uploads/1775910069817-888.jpg",
+            "http://localhost:3001/uploads/1775910069828-261.jpg",
+            "http://localhost:3001/uploads/1775910069848-396.jpg"
+          ],
+          "audios": [
+            {
+              "title": "1. כיכר אירופה",
+              "url": "http://localhost:3001/uploads/1776005085649-506.mp3",
+              "coords": {
+                "lat": 41.6593,
+                "lng": 41.6415
+              }
+            },
+            {
+              "title": "2. פסל עלי ונינו",
+              "url": "http://localhost:3001/uploads/1776005106931-992.mp3",
+              "coords": {
+                "lat": 41.6548,
+                "lng": 41.6458
+              }
+            },
+            {
+              "title": "3. מגדל האלפבית",
+              "url": "http://localhost:3001/uploads/1776002188513-612.mp3",
+              "coords": {
+                "lat": 41.6587,
+                "lng": 41.6446
+              }
+            },
+            {
+              "title": "4. הטיילת",
+              "url": "http://localhost:3001/uploads/1776002215391-967.mp3",
+              "coords": {
+                "lat": 41.6523,
+                "lng": 41.6427
+              }
+            }
+          ],
+          "visible": true,
+          "subtitle": "שווקים, דוכנים וקניות"
+        },
+        {
+          "id": "t_8",
+          "title": "סיור בטבע",
+          "text": "",
+          "color": "#B5EAE5",
+          "images": [
+            "http://localhost:3001/uploads/1775910069856-849.jpg",
+            "http://localhost:3001/uploads/1775910069871-73.jpg",
+            "http://localhost:3001/uploads/1775910069886-735.jpg",
+            "http://localhost:3001/uploads/1775910069905-986.jpg"
+          ],
+          "audios": [
+            {
+              "title": "1. כיכר אירופה",
+              "url": "http://localhost:3001/uploads/1776002237090-835.mp3",
+              "coords": {
+                "lat": 41.6603,
+                "lng": 41.6425
+              }
+            },
+            {
+              "title": "2. פסל עלי ונינו",
+              "url": "http://localhost:3001/uploads/1776002253481-93.mp3",
+              "coords": {
+                "lat": 41.6558,
+                "lng": 41.6468
+              }
+            },
+            {
+              "title": "3. מגדל האלפבית",
+              "url": "http://localhost:3001/uploads/1776002270866-146.mp3",
+              "coords": {
+                "lat": 41.6597,
+                "lng": 41.645599999999995
+              }
+            },
+            {
+              "title": "4. הטיילת",
+              "url": "http://localhost:3001/uploads/1776002287224-652.mp3",
+              "coords": {
+                "lat": 41.653299999999994,
+                "lng": 41.643699999999995
+              }
+            }
+          ],
+          "visible": true,
+          "subtitle": "יציאה אל הטבע הקרוב"
+        },
+        {
+          "id": "t_9",
+          "title": "סיור כנסיות",
+          "text": "",
+          "color": "#D3DCE3",
+          "images": [
+            "http://localhost:3001/uploads/1775910069920-177.jpg",
+            "http://localhost:3001/uploads/1775910069932-509.jpg",
+            "http://localhost:3001/uploads/1775910069944-981.jpg",
+            "http://localhost:3001/uploads/1775910069968-962.jpg"
+          ],
+          "audios": [
+            {
+              "title": "1. כיכר אירופה",
+              "url": "http://localhost:3001/uploads/1776003051932-39.mp3",
+              "coords": {
+                "lat": 41.661300000000004,
+                "lng": 41.6435
+              }
+            },
+            {
+              "title": "2. פסל עלי ונינו",
+              "url": "http://localhost:3001/uploads/1776004810011-62.mp3",
+              "coords": {
+                "lat": 41.656800000000004,
+                "lng": 41.647800000000004
+              }
+            },
+            {
+              "title": "3. מגדל האלפבית",
+              "url": "http://localhost:3001/uploads/1776004835623-813.mp3",
+              "coords": {
+                "lat": 41.660700000000006,
+                "lng": 41.6466
+              }
+            },
+            {
+              "title": "4. הטיילת",
+              "url": "http://localhost:3001/uploads/1776004855237-413.mp3",
+              "coords": {
+                "lat": 41.6543,
+                "lng": 41.6447
+              }
+            }
+          ],
+          "visible": true,
+          "subtitle": "כנסיות ומקומות תפילה"
+        },
+        {
+          "id": "t_10",
+          "title": "סיור חוף",
+          "text": "",
+          "color": "#88D8C0",
+          "images": [
+            "http://localhost:3001/uploads/1775910069983-380.jpg",
+            "http://localhost:3001/uploads/1775910069996-282.jpg",
+            "http://localhost:3001/uploads/1775910070037-277.jpg",
+            "http://localhost:3001/uploads/1775910070062-191.jpg"
+          ],
+          "audios": [
+            {
+              "title": "1. כיכר אירופה",
+              "url": "http://localhost:3001/uploads/1776004878847-105.mp3",
+              "coords": {
+                "lat": 41.6623,
+                "lng": 41.6445
+              }
+            },
+            {
+              "title": "2. פסל עלי ונינו",
+              "url": "http://localhost:3001/uploads/1776005085649-506.mp3",
+              "coords": {
+                "lat": 41.6578,
+                "lng": 41.6488
+              }
+            },
+            {
+              "title": "3. מגדל האלפבית",
+              "url": "http://localhost:3001/uploads/1776005106931-992.mp3",
+              "coords": {
+                "lat": 41.6617,
+                "lng": 41.6476
+              }
+            },
+            {
+              "title": "4. הטיילת",
+              "url": "http://localhost:3001/uploads/1776002188513-612.mp3",
+              "coords": {
+                "lat": 41.6553,
+                "lng": 41.6457
+              }
+            }
+          ],
+          "visible": true,
+          "subtitle": "חופים וסגנון ים תיכוני"
         }
-      ],
-      "heroBg": "#2D4A5E"
+      ]
     },
     {
       "id": "4",
