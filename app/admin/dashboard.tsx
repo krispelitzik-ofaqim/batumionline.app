@@ -9,6 +9,12 @@ import { Colors } from '../../constants/colors';
 import { fetchContent, updateAllContent, updateSection, API_BASE } from '../../constants/api';
 
 // ─── Types ─────────────────────────────────────────────────────
+type HotelBlock = {
+  id: string; title: string; text: string; image: string;
+  mapUrl?: string; pageUrl?: string;
+  coords?: { lat: number; lng: number };
+  visible?: boolean;
+};
 type DataItem = {
   id: string; title: string; subtitle?: string; icon: string; bg: string;
   image?: string; audio?: string; video?: string; lat?: string; lng?: string; address?: string;
@@ -16,6 +22,7 @@ type DataItem = {
   btnLabel?: string; btnLink?: string;
   audios?: Array<{ title?: string; url: string }>;
   children?: DataItem[];
+  hotels?: HotelBlock[];
 };
 
 const HERO_PALETTE = [
@@ -605,6 +612,93 @@ function EditModal({
                   <TextInput style={ms.input} value={form.address || ''} onChangeText={v => set('address', v)} textAlign="right" />
                 </View>
               </>
+            )}
+
+            {form.hotels && (
+              <View style={ms.fieldGroup}>
+                <Text style={[ms.label, { fontSize: 16, marginBottom: 10 }]}>בלוקי מלונות ({form.hotels.length})</Text>
+                {form.hotels.map((hb, idx) => (
+                  <View key={hb.id} style={{ borderWidth: 1, borderColor: '#e8e8e8', borderRadius: 12, padding: 12, marginBottom: 12, backgroundColor: '#fafafa' }}>
+                    <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                      <View style={{ flexDirection: 'row-reverse', gap: 8, alignItems: 'center' }}>
+                        <Text style={{ fontSize: 13, fontWeight: '800', color: Colors.PRIMARY }}>מיקום</Text>
+                        <TextInput
+                          style={{ width: 50, borderWidth: 1, borderColor: '#d1d5db', borderRadius: 8, paddingHorizontal: 8, paddingVertical: 6, textAlign: 'center', fontSize: 14, fontWeight: '700', backgroundColor: Colors.WHITE }}
+                          value={String(idx + 1)}
+                          keyboardType="numeric"
+                          onSubmitEditing={(e) => {
+                            const target = parseInt(e.nativeEvent.text, 10);
+                            if (!target || target < 1 || target > (form.hotels || []).length) return;
+                            const arr = [...(form.hotels || [])];
+                            const [moved] = arr.splice(idx, 1);
+                            arr.splice(target - 1, 0, moved);
+                            setForm(p => ({ ...p, hotels: arr }));
+                          }}
+                          onBlur={(e) => {
+                            const target = parseInt((e.nativeEvent as any).text, 10);
+                            if (!target || target < 1 || target > (form.hotels || []).length || target === idx + 1) return;
+                            const arr = [...(form.hotels || [])];
+                            const [moved] = arr.splice(idx, 1);
+                            arr.splice(target - 1, 0, moved);
+                            setForm(p => ({ ...p, hotels: arr }));
+                          }}
+                        />
+                        <Text style={{ fontSize: 12, color: '#888' }}>/ {(form.hotels || []).length}</Text>
+                      </View>
+                      <View style={{ flexDirection: 'row-reverse', gap: 10, alignItems: 'center' }}>
+                        <TouchableOpacity
+                          onPress={() => { const n=[...(form.hotels||[])]; n[idx]={...n[idx],visible:!(n[idx].visible!==false)}; setForm(p=>({...p,hotels:n})); }}
+                          style={{ paddingVertical: 4, paddingHorizontal: 10, borderRadius: 12, backgroundColor: (hb.visible !== false) ? '#10b981' : '#9ca3af' }}
+                        >
+                          <Text style={{ color: Colors.WHITE, fontSize: 11, fontWeight: '800' }}>{(hb.visible !== false) ? '👁 מוצג' : '🚫 מוסתר'}</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => {
+                          const next = (form.hotels || []).filter((_, i) => i !== idx);
+                          setForm(p => ({ ...p, hotels: next }));
+                        }}>
+                          <Text style={{ fontSize: 16, color: '#dc2626' }}>🗑</Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                    {hb.image && (hb.image.startsWith('http') || hb.image.startsWith('data:')) ? (
+                      React.createElement('img', { src: hb.image, style: { width: '100%', height: 120, objectFit: 'cover', borderRadius: 8, marginBottom: 8 }, alt: '' })
+                    ) : (
+                      <View style={{ width: '100%', height: 120, backgroundColor: '#fee2e2', borderRadius: 8, marginBottom: 8, alignItems: 'center', justifyContent: 'center' }}>
+                        <Text style={{ color: '#dc2626', fontWeight: '800' }}>פנוי</Text>
+                      </View>
+                    )}
+                    <Text style={ms.label}>🖼 תמונה (URL)</Text>
+                    <TextInput style={[ms.input, { marginBottom: 8 }]} value={hb.image} onChangeText={v => { const n=[...(form.hotels||[])]; n[idx]={...n[idx],image:v}; setForm(p=>({...p,hotels:n})); }} placeholder="http://localhost:3001/uploads/..." placeholderTextColor="#bbb" textAlign="left" />
+
+                    <Text style={ms.label}>📝 כותרת</Text>
+                    <TextInput style={[ms.input, { marginBottom: 8 }]} value={hb.title} onChangeText={v => { const n=[...(form.hotels||[])]; n[idx]={...n[idx],title:v}; setForm(p=>({...p,hotels:n})); }} placeholder="שם המלון" placeholderTextColor="#bbb" textAlign="right" />
+
+                    <Text style={ms.label}>📄 טקסט תיאור</Text>
+                    <TextInput style={[ms.input, ms.textArea, { marginBottom: 8 }]} value={hb.text} onChangeText={v => { const n=[...(form.hotels||[])]; n[idx]={...n[idx],text:v}; setForm(p=>({...p,hotels:n})); }} placeholder="תיאור המלון" placeholderTextColor="#bbb" textAlign="right" multiline numberOfLines={4} />
+
+                    <Text style={ms.label}>🔗 כפתור "לדף המלון" — לינק חיצוני</Text>
+                    <TextInput style={[ms.input, { marginBottom: 8 }]} value={hb.pageUrl || ''} onChangeText={v => { const n=[...(form.hotels||[])]; n[idx]={...n[idx],pageUrl:v}; setForm(p=>({...p,hotels:n})); }} placeholder="https://..." placeholderTextColor="#bbb" textAlign="left" />
+
+                    <Text style={ms.label}>🧭 כפתור "נווט למקום" — לינק Google Maps</Text>
+                    <TextInput style={[ms.input, { marginBottom: 8 }]} value={hb.mapUrl || ''} onChangeText={v => { const n=[...(form.hotels||[])]; n[idx]={...n[idx],mapUrl:v}; setForm(p=>({...p,hotels:n})); }} placeholder="https://www.google.com/maps/..." placeholderTextColor="#bbb" textAlign="left" />
+
+                    <Text style={ms.label}>📍 כפתור "איפה זה" — קואורדינטות (מפה מוטבעת)</Text>
+                    <View style={{ flexDirection: 'row-reverse', gap: 8 }}>
+                      <TextInput style={[ms.input, { flex: 1 }]} value={String(hb.coords?.lat ?? '')} onChangeText={v => { const n=[...(form.hotels||[])]; n[idx]={...n[idx],coords:{lat:parseFloat(v)||0,lng:n[idx].coords?.lng||0}}; setForm(p=>({...p,hotels:n})); }} placeholder="Lat (קו רוחב)" placeholderTextColor="#bbb" textAlign="left" keyboardType="numeric" />
+                      <TextInput style={[ms.input, { flex: 1 }]} value={String(hb.coords?.lng ?? '')} onChangeText={v => { const n=[...(form.hotels||[])]; n[idx]={...n[idx],coords:{lat:n[idx].coords?.lat||0,lng:parseFloat(v)||0}}; setForm(p=>({...p,hotels:n})); }} placeholder="Lng (קו אורך)" placeholderTextColor="#bbb" textAlign="left" keyboardType="numeric" />
+                    </View>
+                  </View>
+                ))}
+                <TouchableOpacity
+                  style={{ paddingVertical: 12, borderRadius: 10, backgroundColor: Colors.PRIMARY, alignItems: 'center' }}
+                  onPress={() => {
+                    const n = [...(form.hotels || []), { id: `hb_${Date.now()}`, title: '', text: '', image: '', pageUrl: '', mapUrl: '' }];
+                    setForm(p => ({ ...p, hotels: n }));
+                  }}
+                >
+                  <Text style={{ color: Colors.WHITE, fontWeight: '700' }}>+ הוסף בלוק</Text>
+                </TouchableOpacity>
+              </View>
             )}
 
             <View style={ms.btnRow}>

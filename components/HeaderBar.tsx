@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { router, usePathname } from 'expo-router';
 import { Colors } from '../constants/colors';
@@ -34,10 +34,16 @@ export default function HeaderBar() {
 
   return (
     <View style={[styles.bar, { backgroundColor: bg, borderBottomColor: dark ? Colors.PRIMARY : Colors.SECONDARY + '30' }]}>
-      {/* LEFT — back arrow ‹ */}
-      <TouchableOpacity style={styles.btn} onPress={() => router.back()} disabled={isHome}>
-        <Text style={{ fontSize: 28, color: isHome ? bg : fg, fontWeight: '300' }}>‹</Text>
-      </TouchableOpacity>
+      {/* LEFT — back arrow ‹ (or logo on home) */}
+      {isHome ? (
+        <View style={styles.btn}>
+          <Image source={require('../assets/images/batumi_icon.png')} style={styles.logo} resizeMode="contain" />
+        </View>
+      ) : (
+        <TouchableOpacity style={styles.btn} onPress={() => router.back()}>
+          <Text style={{ fontSize: 28, color: fg, fontWeight: '300' }}>‹</Text>
+        </TouchableOpacity>
+      )}
 
       {/* CENTER — clock */}
       <Text style={[styles.clock, { color: fg }]}>{time}</Text>
@@ -68,5 +74,9 @@ const styles = StyleSheet.create({
   clock: {
     fontSize: 18,
     fontWeight: '800',
+  },
+  logo: {
+    width: 36,
+    height: 36,
   },
 });
