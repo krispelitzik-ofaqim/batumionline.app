@@ -3656,28 +3656,888 @@
           "title": "מועדוני לילה",
           "subtitle": "ריקוד עד הבוקר",
           "icon": "🎶",
-          "bg": "#1A6B8A"
+          "bg": "#1A6B8A",
+          "hotels": [
+            {
+              "id": "n1_1",
+              "title": "מועדון סקטור 26",
+              "titleEn": "Sector 26",
+              "text": "מועדון לילה פופולרי במרכז העיר עם DJ-ים מובילים ואווירה בינלאומית",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [
+                "http://localhost:3001/uploads/1775910070109-574.jpg",
+                "http://localhost:3001/uploads/1775910070124-950.jpg",
+                "http://localhost:3001/uploads/1775910070138-826.jpg",
+                "http://localhost:3001/uploads/1775910070157-641.jpg",
+                "http://localhost:3001/uploads/1775910070176-889.jpg",
+                "http://localhost:3001/uploads/1775910070221-937.jpg",
+                "http://localhost:3001/uploads/1775910070239-832.jpg",
+                "http://localhost:3001/uploads/1775910070274-35.jpg",
+                "http://localhost:3001/uploads/1775910070300-113.jpg"
+              ],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "n1_2",
+              "title": "Seven Sins",
+              "titleEn": "Seven Sins Club",
+              "text": "מועדון יוקרתי עם עיצוב מרהיב, מוזיקה אלקטרונית ומסיבות עד אור הבוקר",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [
+                "http://localhost:3001/uploads/1775910070328-92.jpg",
+                "http://localhost:3001/uploads/1775910070374-216.jpg",
+                "http://localhost:3001/uploads/1775910070408-889.jpg",
+                "http://localhost:3001/uploads/1775910070425-205.jpg",
+                "http://localhost:3001/uploads/1775910070458-970.jpg",
+                "http://localhost:3001/uploads/1775910070476-345.jpg",
+                "http://localhost:3001/uploads/1775910070494-597.jpg",
+                "http://localhost:3001/uploads/1775910070508-159.jpg",
+                "http://localhost:3001/uploads/1775910070572-696.jpg"
+              ],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "n1_3",
+              "title": "Palms Club",
+              "titleEn": "Palms Club",
+              "text": "מועדון גדול עם רחבת ריקודים ענקית ומופעי אורחים מפורסמים",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [
+                "http://localhost:3001/uploads/1775910070621-489.jpg",
+                "http://localhost:3001/uploads/1775910070660-822.jpg",
+                "http://localhost:3001/uploads/1775910070713-406.jpg",
+                "http://localhost:3001/uploads/1775910070743-855.jpg",
+                "http://localhost:3001/uploads/1775910070763-495.jpg",
+                "http://localhost:3001/uploads/1775910070779-308.jpg",
+                "http://localhost:3001/uploads/1775910070804-219.jpg",
+                "http://localhost:3001/uploads/1775910070843-322.jpg",
+                "http://localhost:3001/uploads/1775910070868-452.jpg"
+              ],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "n1_4",
+              "title": "בייקר סטריט",
+              "titleEn": "Baker Street Club",
+              "text": "מועדון בסגנון בריטי עם אווירה חמה ואלכוהול איכותי",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [
+                "http://localhost:3001/uploads/1775910070891-592.jpg",
+                "http://localhost:3001/uploads/1775912626901-944.jpg",
+                "http://localhost:3001/uploads/1775912646740-741.jpg",
+                "http://localhost:3001/uploads/1775912672953-364.jpg",
+                "http://localhost:3001/uploads/1775912685744-66.jpg",
+                "http://localhost:3001/uploads/1776169557752-173.jpg",
+                "http://localhost:3001/uploads/city.jpg",
+                "http://localhost:3001/uploads/info_culture.jpg",
+                "http://localhost:3001/uploads/info_embassy.jpg"
+              ],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "n1_5",
+              "title": "Cafe Fabrika",
+              "titleEn": "Cafe Fabrika",
+              "text": "מרחב בילוי היברידי - בית קפה ביום ומועדון בלילה",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [
+                "http://localhost:3001/uploads/info_health.jpg",
+                "http://localhost:3001/uploads/info_insurance.jpg",
+                "http://localhost:3001/uploads/info_tax.jpg",
+                "http://localhost:3001/uploads/info_telecom.jpg",
+                "http://localhost:3001/uploads/info_tips.jpg",
+                "http://localhost:3001/uploads/synagogue.jpg",
+                "http://localhost:3001/uploads/welcome_app.jpg",
+                "http://localhost:3001/uploads/1775910069485-6.jpg",
+                "http://localhost:3001/uploads/1775910069497-754.jpg"
+              ],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "n1_6",
+              "title": "Vintage 22",
+              "titleEn": "Vintage 22",
+              "text": "מועדון רטרו-מודרני בעיצוב ייחודי עם מוזיקת ההיטים",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [
+                "http://localhost:3001/uploads/1775910069506-223.jpg",
+                "http://localhost:3001/uploads/1775910069516-30.jpg",
+                "http://localhost:3001/uploads/1775910069526-255.jpg",
+                "http://localhost:3001/uploads/1775910069535-937.jpg",
+                "http://localhost:3001/uploads/1775910069548-933.jpg",
+                "http://localhost:3001/uploads/1775910069562-341.jpg",
+                "http://localhost:3001/uploads/1775910069573-698.jpg",
+                "http://localhost:3001/uploads/1775910069590-365.jpg",
+                "http://localhost:3001/uploads/1775910069604-188.jpg"
+              ],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "n1_7",
+              "title": "Gallery Club",
+              "titleEn": "Gallery Club",
+              "text": "מועדון אקסקלוסיבי עם מוזיקת האוס וטק עמוק",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [
+                "http://localhost:3001/uploads/1775910069616-946.jpg",
+                "http://localhost:3001/uploads/1775910069627-459.jpg",
+                "http://localhost:3001/uploads/1775910069643-44.jpg",
+                "http://localhost:3001/uploads/1775910069656-446.jpg",
+                "http://localhost:3001/uploads/1775910069672-831.jpg",
+                "http://localhost:3001/uploads/1775910069689-689.jpg",
+                "http://localhost:3001/uploads/1775910069707-877.jpg",
+                "http://localhost:3001/uploads/1775910069718-813.jpg",
+                "http://localhost:3001/uploads/1775910069727-542.jpg"
+              ],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "n1_8",
+              "title": "Deep Six",
+              "titleEn": "Deep Six",
+              "text": "מועדון תת-קרקעי אינטימי למבינים במוזיקה אלקטרונית",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [
+                "http://localhost:3001/uploads/1775910069741-591.jpg",
+                "http://localhost:3001/uploads/1775910069754-713.jpg",
+                "http://localhost:3001/uploads/1775910069774-994.jpg",
+                "http://localhost:3001/uploads/1775910069789-35.jpg",
+                "http://localhost:3001/uploads/1775910069804-487.jpg",
+                "http://localhost:3001/uploads/1775910069817-888.jpg",
+                "http://localhost:3001/uploads/1775910069828-261.jpg",
+                "http://localhost:3001/uploads/1775910069848-396.jpg",
+                "http://localhost:3001/uploads/1775910069856-849.jpg"
+              ],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "n1_9",
+              "title": "Kandinsky",
+              "titleEn": "Kandinsky Club",
+              "text": "מועדון אומנותי עם עיצוב אקסצנטרי ומוזיקה מגוונת",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [
+                "http://localhost:3001/uploads/1775910069871-73.jpg",
+                "http://localhost:3001/uploads/1775910069886-735.jpg",
+                "http://localhost:3001/uploads/1775910069905-986.jpg",
+                "http://localhost:3001/uploads/1775910069920-177.jpg",
+                "http://localhost:3001/uploads/1775910069932-509.jpg",
+                "http://localhost:3001/uploads/1775910069944-981.jpg",
+                "http://localhost:3001/uploads/1775910069968-962.jpg",
+                "http://localhost:3001/uploads/1775910069983-380.jpg",
+                "http://localhost:3001/uploads/1775910069996-282.jpg"
+              ],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "n1_10",
+              "title": "Movida",
+              "titleEn": "Movida Lounge",
+              "text": "מועדון לאונג׳ רגוע יותר עם קוקטיילים ומוזיקה נעימה",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [
+                "http://localhost:3001/uploads/1775910070037-277.jpg",
+                "http://localhost:3001/uploads/1775910070062-191.jpg",
+                "http://localhost:3001/uploads/1775910070091-127.jpg",
+                "http://localhost:3001/uploads/1775910070109-574.jpg",
+                "http://localhost:3001/uploads/1775910070124-950.jpg",
+                "http://localhost:3001/uploads/1775910070138-826.jpg",
+                "http://localhost:3001/uploads/1775910070157-641.jpg",
+                "http://localhost:3001/uploads/1775910070176-889.jpg",
+                "http://localhost:3001/uploads/1775910070221-937.jpg"
+              ],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            }
+          ],
+          "pageBtnLabel": "מה יש לי",
+          "theme": "dark",
+          "heroBg": "#0f0f1e"
         },
         {
           "id": "n2",
           "title": "פאבים",
           "subtitle": "בירה ואווירה",
           "icon": "🍺",
-          "bg": "#F4A94E"
+          "bg": "#F4A94E",
+          "hotels": [
+            {
+              "id": "n2_1",
+              "title": "Whitehall Pub",
+              "titleEn": "Whitehall Pub",
+              "text": "פאב בריטי קלאסי עם מגוון בירות מהחבית ותקריבים מסורתיים",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [
+                "http://localhost:3001/uploads/1775910070109-574.jpg",
+                "http://localhost:3001/uploads/1775910070124-950.jpg",
+                "http://localhost:3001/uploads/1775910070138-826.jpg",
+                "http://localhost:3001/uploads/1775910070157-641.jpg",
+                "http://localhost:3001/uploads/1775910070176-889.jpg",
+                "http://localhost:3001/uploads/1775910070221-937.jpg",
+                "http://localhost:3001/uploads/1775910070239-832.jpg",
+                "http://localhost:3001/uploads/1775910070274-35.jpg",
+                "http://localhost:3001/uploads/1775910070300-113.jpg"
+              ],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "n2_2",
+              "title": "Caspian Bar",
+              "titleEn": "Caspian",
+              "text": "בר ים תיכוני על הטיילת עם נוף לים וקוקטיילים איכותיים",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [
+                "http://localhost:3001/uploads/1775910070328-92.jpg",
+                "http://localhost:3001/uploads/1775910070374-216.jpg",
+                "http://localhost:3001/uploads/1775910070408-889.jpg",
+                "http://localhost:3001/uploads/1775910070425-205.jpg",
+                "http://localhost:3001/uploads/1775910070458-970.jpg",
+                "http://localhost:3001/uploads/1775910070476-345.jpg",
+                "http://localhost:3001/uploads/1775910070494-597.jpg",
+                "http://localhost:3001/uploads/1775910070508-159.jpg",
+                "http://localhost:3001/uploads/1775910070572-696.jpg"
+              ],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "n2_3",
+              "title": "Old Hills",
+              "titleEn": "Old Hills",
+              "text": "פאב עירוני עם אווירה רגועה, בירה מקומית ומוזיקה חיה",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [
+                "http://localhost:3001/uploads/1775910070621-489.jpg",
+                "http://localhost:3001/uploads/1775910070660-822.jpg",
+                "http://localhost:3001/uploads/1775910070713-406.jpg",
+                "http://localhost:3001/uploads/1775910070743-855.jpg",
+                "http://localhost:3001/uploads/1775910070763-495.jpg",
+                "http://localhost:3001/uploads/1775910070779-308.jpg",
+                "http://localhost:3001/uploads/1775910070804-219.jpg",
+                "http://localhost:3001/uploads/1775910070843-322.jpg",
+                "http://localhost:3001/uploads/1775910070868-452.jpg"
+              ],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "n2_4",
+              "title": "The Cabin",
+              "titleEn": "The Cabin",
+              "text": "פאב עץ חם ואינטימי עם מגוון רחב של ויסקי",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [
+                "http://localhost:3001/uploads/1775910070891-592.jpg",
+                "http://localhost:3001/uploads/1775912626901-944.jpg",
+                "http://localhost:3001/uploads/1775912646740-741.jpg",
+                "http://localhost:3001/uploads/1775912672953-364.jpg",
+                "http://localhost:3001/uploads/1775912685744-66.jpg",
+                "http://localhost:3001/uploads/1776169557752-173.jpg",
+                "http://localhost:3001/uploads/city.jpg",
+                "http://localhost:3001/uploads/info_culture.jpg",
+                "http://localhost:3001/uploads/info_embassy.jpg"
+              ],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "n2_5",
+              "title": "Terminal 1",
+              "titleEn": "Terminal 1",
+              "text": "בר תעופה בעיצוב שדה תעופה עם קוקטיילים חדשניים",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [
+                "http://localhost:3001/uploads/info_health.jpg",
+                "http://localhost:3001/uploads/info_insurance.jpg",
+                "http://localhost:3001/uploads/info_tax.jpg",
+                "http://localhost:3001/uploads/info_telecom.jpg",
+                "http://localhost:3001/uploads/info_tips.jpg",
+                "http://localhost:3001/uploads/synagogue.jpg",
+                "http://localhost:3001/uploads/welcome_app.jpg",
+                "http://localhost:3001/uploads/1775910069485-6.jpg",
+                "http://localhost:3001/uploads/1775910069497-754.jpg"
+              ],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "n2_6",
+              "title": "Kantina Wine Bar",
+              "titleEn": "Kantina Wine Bar",
+              "text": "בר יין מקצועי עם יינות גאורגיים מובחרים ואירועי טעימות",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [
+                "http://localhost:3001/uploads/1775910069506-223.jpg",
+                "http://localhost:3001/uploads/1775910069516-30.jpg",
+                "http://localhost:3001/uploads/1775910069526-255.jpg",
+                "http://localhost:3001/uploads/1775910069535-937.jpg",
+                "http://localhost:3001/uploads/1775910069548-933.jpg",
+                "http://localhost:3001/uploads/1775910069562-341.jpg",
+                "http://localhost:3001/uploads/1775910069573-698.jpg",
+                "http://localhost:3001/uploads/1775910069590-365.jpg",
+                "http://localhost:3001/uploads/1775910069604-188.jpg"
+              ],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "n2_7",
+              "title": "Karma Bar",
+              "titleEn": "Karma",
+              "text": "בר טרנדי עם DJ בערבים וקהל צעיר ותוסס",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [
+                "http://localhost:3001/uploads/1775910069616-946.jpg",
+                "http://localhost:3001/uploads/1775910069627-459.jpg",
+                "http://localhost:3001/uploads/1775910069643-44.jpg",
+                "http://localhost:3001/uploads/1775910069656-446.jpg",
+                "http://localhost:3001/uploads/1775910069672-831.jpg",
+                "http://localhost:3001/uploads/1775910069689-689.jpg",
+                "http://localhost:3001/uploads/1775910069707-877.jpg",
+                "http://localhost:3001/uploads/1775910069718-813.jpg",
+                "http://localhost:3001/uploads/1775910069727-542.jpg"
+              ],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "n2_8",
+              "title": "Tapas Wine Bar",
+              "titleEn": "Tapas Wine Bar",
+              "text": "בר יין וטאפאס בסגנון ספרדי עם אוירה רומנטית",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [
+                "http://localhost:3001/uploads/1775910069741-591.jpg",
+                "http://localhost:3001/uploads/1775910069754-713.jpg",
+                "http://localhost:3001/uploads/1775910069774-994.jpg",
+                "http://localhost:3001/uploads/1775910069789-35.jpg",
+                "http://localhost:3001/uploads/1775910069804-487.jpg",
+                "http://localhost:3001/uploads/1775910069817-888.jpg",
+                "http://localhost:3001/uploads/1775910069828-261.jpg",
+                "http://localhost:3001/uploads/1775910069848-396.jpg",
+                "http://localhost:3001/uploads/1775910069856-849.jpg"
+              ],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "n2_9",
+              "title": "Beer House",
+              "titleEn": "Beer House",
+              "text": "בית בירה מקומי עם מבחר רחב של בירות מלאכה",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [
+                "http://localhost:3001/uploads/1775910069871-73.jpg",
+                "http://localhost:3001/uploads/1775910069886-735.jpg",
+                "http://localhost:3001/uploads/1775910069905-986.jpg",
+                "http://localhost:3001/uploads/1775910069920-177.jpg",
+                "http://localhost:3001/uploads/1775910069932-509.jpg",
+                "http://localhost:3001/uploads/1775910069944-981.jpg",
+                "http://localhost:3001/uploads/1775910069968-962.jpg",
+                "http://localhost:3001/uploads/1775910069983-380.jpg",
+                "http://localhost:3001/uploads/1775910069996-282.jpg"
+              ],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "n2_10",
+              "title": "Mr. Shaw Pub",
+              "titleEn": "Mr. Shaw Pub",
+              "text": "פאב אירי חם ומזמין עם מוזיקה חיה בסופי שבוע",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [
+                "http://localhost:3001/uploads/1775910070037-277.jpg",
+                "http://localhost:3001/uploads/1775910070062-191.jpg",
+                "http://localhost:3001/uploads/1775910070091-127.jpg",
+                "http://localhost:3001/uploads/1775910070109-574.jpg",
+                "http://localhost:3001/uploads/1775910070124-950.jpg",
+                "http://localhost:3001/uploads/1775910070138-826.jpg",
+                "http://localhost:3001/uploads/1775910070157-641.jpg",
+                "http://localhost:3001/uploads/1775910070176-889.jpg",
+                "http://localhost:3001/uploads/1775910070221-937.jpg"
+              ],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            }
+          ],
+          "pageBtnLabel": "מה יש לי",
+          "theme": "dark",
+          "heroBg": "#2a1f14"
         },
         {
           "id": "n3",
           "title": "מסעדה עם הופעות",
           "subtitle": "ארוחה ומוזיקה חיה",
           "icon": "🎤",
-          "bg": "#5BC0DE"
+          "bg": "#5BC0DE",
+          "hotels": [
+            {
+              "id": "n3_1",
+              "title": "Alaverdi",
+              "titleEn": "Alaverdi",
+              "text": "מסעדה גאורגית מסורתית עם מופעי ריקוד ושירה לאומית מדי ערב",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [
+                "http://localhost:3001/uploads/1775910070109-574.jpg",
+                "http://localhost:3001/uploads/1775910070124-950.jpg",
+                "http://localhost:3001/uploads/1775910070138-826.jpg",
+                "http://localhost:3001/uploads/1775910070157-641.jpg",
+                "http://localhost:3001/uploads/1775910070176-889.jpg",
+                "http://localhost:3001/uploads/1775910070221-937.jpg",
+                "http://localhost:3001/uploads/1775910070239-832.jpg",
+                "http://localhost:3001/uploads/1775910070274-35.jpg",
+                "http://localhost:3001/uploads/1775910070300-113.jpg"
+              ],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "n3_2",
+              "title": "Rocky",
+              "titleEn": "Rocky Restaurant",
+              "text": "מסעדה אגדית עם מופעי פולקלור גאורגי וארוחות טעימות",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [
+                "http://localhost:3001/uploads/1775910070328-92.jpg",
+                "http://localhost:3001/uploads/1775910070374-216.jpg",
+                "http://localhost:3001/uploads/1775910070408-889.jpg",
+                "http://localhost:3001/uploads/1775910070425-205.jpg",
+                "http://localhost:3001/uploads/1775910070458-970.jpg",
+                "http://localhost:3001/uploads/1775910070476-345.jpg",
+                "http://localhost:3001/uploads/1775910070494-597.jpg",
+                "http://localhost:3001/uploads/1775910070508-159.jpg",
+                "http://localhost:3001/uploads/1775910070572-696.jpg"
+              ],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "n3_3",
+              "title": "Adjara Hall",
+              "titleEn": "Adjara Hall",
+              "text": "אולם אירועים עם מופעי מסורת אדז׳ריים ומטבח מקומי",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [
+                "http://localhost:3001/uploads/1775910070621-489.jpg",
+                "http://localhost:3001/uploads/1775910070660-822.jpg",
+                "http://localhost:3001/uploads/1775910070713-406.jpg",
+                "http://localhost:3001/uploads/1775910070743-855.jpg",
+                "http://localhost:3001/uploads/1775910070763-495.jpg",
+                "http://localhost:3001/uploads/1775910070779-308.jpg",
+                "http://localhost:3001/uploads/1775910070804-219.jpg",
+                "http://localhost:3001/uploads/1775910070843-322.jpg",
+                "http://localhost:3001/uploads/1775910070868-452.jpg"
+              ],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "n3_4",
+              "title": "Sapraza",
+              "titleEn": "Sapraza",
+              "text": "חוויית ערב גאורגית אותנטית עם מופעי שירה ומוזיקה חיה",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [
+                "http://localhost:3001/uploads/1775910070891-592.jpg",
+                "http://localhost:3001/uploads/1775912626901-944.jpg",
+                "http://localhost:3001/uploads/1775912646740-741.jpg",
+                "http://localhost:3001/uploads/1775912672953-364.jpg",
+                "http://localhost:3001/uploads/1775912685744-66.jpg",
+                "http://localhost:3001/uploads/1776169557752-173.jpg",
+                "http://localhost:3001/uploads/city.jpg",
+                "http://localhost:3001/uploads/info_culture.jpg",
+                "http://localhost:3001/uploads/info_embassy.jpg"
+              ],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "n3_5",
+              "title": "Sokhino",
+              "titleEn": "Sokhino",
+              "text": "מסעדה יוקרתית עם מופעי פיוז׳ן ומטבח גאורגי-אירופאי",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [
+                "http://localhost:3001/uploads/info_health.jpg",
+                "http://localhost:3001/uploads/info_insurance.jpg",
+                "http://localhost:3001/uploads/info_tax.jpg",
+                "http://localhost:3001/uploads/info_telecom.jpg",
+                "http://localhost:3001/uploads/info_tips.jpg",
+                "http://localhost:3001/uploads/synagogue.jpg",
+                "http://localhost:3001/uploads/welcome_app.jpg",
+                "http://localhost:3001/uploads/1775910069485-6.jpg",
+                "http://localhost:3001/uploads/1775910069497-754.jpg"
+              ],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "n3_6",
+              "title": "Marani",
+              "titleEn": "Marani Wine Cellar",
+              "text": "מרתף יין עם מופעי מוזיקה אקוסטית והרמת כוסית",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [
+                "http://localhost:3001/uploads/1775910069506-223.jpg",
+                "http://localhost:3001/uploads/1775910069516-30.jpg",
+                "http://localhost:3001/uploads/1775910069526-255.jpg",
+                "http://localhost:3001/uploads/1775910069535-937.jpg",
+                "http://localhost:3001/uploads/1775910069548-933.jpg",
+                "http://localhost:3001/uploads/1775910069562-341.jpg",
+                "http://localhost:3001/uploads/1775910069573-698.jpg",
+                "http://localhost:3001/uploads/1775910069590-365.jpg",
+                "http://localhost:3001/uploads/1775910069604-188.jpg"
+              ],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "n3_7",
+              "title": "Café Literaturuli",
+              "titleEn": "Café Literaturuli",
+              "text": "בית קפה ספרותי עם ערבי שירה ומוזיקה חיה",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [
+                "http://localhost:3001/uploads/1775910069616-946.jpg",
+                "http://localhost:3001/uploads/1775910069627-459.jpg",
+                "http://localhost:3001/uploads/1775910069643-44.jpg",
+                "http://localhost:3001/uploads/1775910069656-446.jpg",
+                "http://localhost:3001/uploads/1775910069672-831.jpg",
+                "http://localhost:3001/uploads/1775910069689-689.jpg",
+                "http://localhost:3001/uploads/1775910069707-877.jpg",
+                "http://localhost:3001/uploads/1775910069718-813.jpg",
+                "http://localhost:3001/uploads/1775910069727-542.jpg"
+              ],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "n3_8",
+              "title": "Chakrulo",
+              "titleEn": "Chakrulo",
+              "text": "מסעדה גאורגית עם מקהלות מסורתיות וערב חוויתי",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [
+                "http://localhost:3001/uploads/1775910069741-591.jpg",
+                "http://localhost:3001/uploads/1775910069754-713.jpg",
+                "http://localhost:3001/uploads/1775910069774-994.jpg",
+                "http://localhost:3001/uploads/1775910069789-35.jpg",
+                "http://localhost:3001/uploads/1775910069804-487.jpg",
+                "http://localhost:3001/uploads/1775910069817-888.jpg",
+                "http://localhost:3001/uploads/1775910069828-261.jpg",
+                "http://localhost:3001/uploads/1775910069848-396.jpg",
+                "http://localhost:3001/uploads/1775910069856-849.jpg"
+              ],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "n3_9",
+              "title": "Iveria Restaurant",
+              "titleEn": "Iveria Restaurant",
+              "text": "מסעדה יוקרתית במלון איבריה עם מופעים בשעות הערב",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [
+                "http://localhost:3001/uploads/1775910069871-73.jpg",
+                "http://localhost:3001/uploads/1775910069886-735.jpg",
+                "http://localhost:3001/uploads/1775910069905-986.jpg",
+                "http://localhost:3001/uploads/1775910069920-177.jpg",
+                "http://localhost:3001/uploads/1775910069932-509.jpg",
+                "http://localhost:3001/uploads/1775910069944-981.jpg",
+                "http://localhost:3001/uploads/1775910069968-962.jpg",
+                "http://localhost:3001/uploads/1775910069983-380.jpg",
+                "http://localhost:3001/uploads/1775910069996-282.jpg"
+              ],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "n3_10",
+              "title": "Dining Show",
+              "titleEn": "Dining Show",
+              "text": "מופע מוזיקלי מלא עם ארוחת ערב של 3 מנות",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [
+                "http://localhost:3001/uploads/1775910070037-277.jpg",
+                "http://localhost:3001/uploads/1775910070062-191.jpg",
+                "http://localhost:3001/uploads/1775910070091-127.jpg",
+                "http://localhost:3001/uploads/1775910070109-574.jpg",
+                "http://localhost:3001/uploads/1775910070124-950.jpg",
+                "http://localhost:3001/uploads/1775910070138-826.jpg",
+                "http://localhost:3001/uploads/1775910070157-641.jpg",
+                "http://localhost:3001/uploads/1775910070176-889.jpg",
+                "http://localhost:3001/uploads/1775910070221-937.jpg"
+              ],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            }
+          ],
+          "pageBtnLabel": "מה יש לי",
+          "theme": "dark",
+          "heroBg": "#1a0f2a"
         },
         {
           "id": "n4",
           "title": "מועדוני חשפנות",
           "subtitle": "בילוי למבוגרים",
           "icon": "💃",
-          "bg": "#2E8BA8"
+          "bg": "#2E8BA8",
+          "hotels": [
+            {
+              "id": "n4_1",
+              "title": "Club VIP",
+              "titleEn": "Club VIP",
+              "text": "מועדון יוקרתי למבוגרים בלבד",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [
+                "http://localhost:3001/uploads/1775910070109-574.jpg",
+                "http://localhost:3001/uploads/1775910070124-950.jpg",
+                "http://localhost:3001/uploads/1775910070138-826.jpg",
+                "http://localhost:3001/uploads/1775910070157-641.jpg",
+                "http://localhost:3001/uploads/1775910070176-889.jpg",
+                "http://localhost:3001/uploads/1775910070221-937.jpg",
+                "http://localhost:3001/uploads/1775910070239-832.jpg",
+                "http://localhost:3001/uploads/1775910070274-35.jpg",
+                "http://localhost:3001/uploads/1775910070300-113.jpg"
+              ],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "n4_2",
+              "title": "Night Fever",
+              "titleEn": "Night Fever",
+              "text": "מועדון לילה עם מופעי בידור",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [
+                "http://localhost:3001/uploads/1775910070328-92.jpg",
+                "http://localhost:3001/uploads/1775910070374-216.jpg",
+                "http://localhost:3001/uploads/1775910070408-889.jpg",
+                "http://localhost:3001/uploads/1775910070425-205.jpg",
+                "http://localhost:3001/uploads/1775910070458-970.jpg",
+                "http://localhost:3001/uploads/1775910070476-345.jpg",
+                "http://localhost:3001/uploads/1775910070494-597.jpg",
+                "http://localhost:3001/uploads/1775910070508-159.jpg",
+                "http://localhost:3001/uploads/1775910070572-696.jpg"
+              ],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "n4_3",
+              "title": "Platinum Club",
+              "titleEn": "Platinum Club",
+              "text": "מועדון אקסקלוסיבי עם חדרי VIP",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [
+                "http://localhost:3001/uploads/1775910070621-489.jpg",
+                "http://localhost:3001/uploads/1775910070660-822.jpg",
+                "http://localhost:3001/uploads/1775910070713-406.jpg",
+                "http://localhost:3001/uploads/1775910070743-855.jpg",
+                "http://localhost:3001/uploads/1775910070763-495.jpg",
+                "http://localhost:3001/uploads/1775910070779-308.jpg",
+                "http://localhost:3001/uploads/1775910070804-219.jpg",
+                "http://localhost:3001/uploads/1775910070843-322.jpg",
+                "http://localhost:3001/uploads/1775910070868-452.jpg"
+              ],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "n4_4",
+              "title": "Red Room",
+              "titleEn": "Red Room",
+              "text": "מועדון בסגנון בורדו חם",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [
+                "http://localhost:3001/uploads/1775910070891-592.jpg",
+                "http://localhost:3001/uploads/1775912626901-944.jpg",
+                "http://localhost:3001/uploads/1775912646740-741.jpg",
+                "http://localhost:3001/uploads/1775912672953-364.jpg",
+                "http://localhost:3001/uploads/1775912685744-66.jpg",
+                "http://localhost:3001/uploads/1776169557752-173.jpg",
+                "http://localhost:3001/uploads/city.jpg",
+                "http://localhost:3001/uploads/info_culture.jpg",
+                "http://localhost:3001/uploads/info_embassy.jpg"
+              ],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "n4_5",
+              "title": "Diamond",
+              "titleEn": "Diamond Club",
+              "text": "מועדון יוקרתי עם בר מלא",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [
+                "http://localhost:3001/uploads/info_health.jpg",
+                "http://localhost:3001/uploads/info_insurance.jpg",
+                "http://localhost:3001/uploads/info_tax.jpg",
+                "http://localhost:3001/uploads/info_telecom.jpg",
+                "http://localhost:3001/uploads/info_tips.jpg",
+                "http://localhost:3001/uploads/synagogue.jpg",
+                "http://localhost:3001/uploads/welcome_app.jpg",
+                "http://localhost:3001/uploads/1775910069485-6.jpg",
+                "http://localhost:3001/uploads/1775910069497-754.jpg"
+              ],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "n4_6",
+              "title": "Gold Star",
+              "titleEn": "Gold Star",
+              "text": "מועדון בידור עם מופעים יומיים",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [
+                "http://localhost:3001/uploads/1775910069506-223.jpg",
+                "http://localhost:3001/uploads/1775910069516-30.jpg",
+                "http://localhost:3001/uploads/1775910069526-255.jpg",
+                "http://localhost:3001/uploads/1775910069535-937.jpg",
+                "http://localhost:3001/uploads/1775910069548-933.jpg",
+                "http://localhost:3001/uploads/1775910069562-341.jpg",
+                "http://localhost:3001/uploads/1775910069573-698.jpg",
+                "http://localhost:3001/uploads/1775910069590-365.jpg",
+                "http://localhost:3001/uploads/1775910069604-188.jpg"
+              ],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "n4_7",
+              "title": "Velvet",
+              "titleEn": "Velvet",
+              "text": "מועדון בעיצוב אלגנטי",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [
+                "http://localhost:3001/uploads/1775910069616-946.jpg",
+                "http://localhost:3001/uploads/1775910069627-459.jpg",
+                "http://localhost:3001/uploads/1775910069643-44.jpg",
+                "http://localhost:3001/uploads/1775910069656-446.jpg",
+                "http://localhost:3001/uploads/1775910069672-831.jpg",
+                "http://localhost:3001/uploads/1775910069689-689.jpg",
+                "http://localhost:3001/uploads/1775910069707-877.jpg",
+                "http://localhost:3001/uploads/1775910069718-813.jpg",
+                "http://localhost:3001/uploads/1775910069727-542.jpg"
+              ],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "n4_8",
+              "title": "Moonlight",
+              "titleEn": "Moonlight",
+              "text": "מועדון לילה שקט יחסית",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [
+                "http://localhost:3001/uploads/1775910069741-591.jpg",
+                "http://localhost:3001/uploads/1775910069754-713.jpg",
+                "http://localhost:3001/uploads/1775910069774-994.jpg",
+                "http://localhost:3001/uploads/1775910069789-35.jpg",
+                "http://localhost:3001/uploads/1775910069804-487.jpg",
+                "http://localhost:3001/uploads/1775910069817-888.jpg",
+                "http://localhost:3001/uploads/1775910069828-261.jpg",
+                "http://localhost:3001/uploads/1775910069848-396.jpg",
+                "http://localhost:3001/uploads/1775910069856-849.jpg"
+              ],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "n4_9",
+              "title": "Royal",
+              "titleEn": "Royal Club",
+              "text": "מועדון למבוגרים עם שירות VIP",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [
+                "http://localhost:3001/uploads/1775910069871-73.jpg",
+                "http://localhost:3001/uploads/1775910069886-735.jpg",
+                "http://localhost:3001/uploads/1775910069905-986.jpg",
+                "http://localhost:3001/uploads/1775910069920-177.jpg",
+                "http://localhost:3001/uploads/1775910069932-509.jpg",
+                "http://localhost:3001/uploads/1775910069944-981.jpg",
+                "http://localhost:3001/uploads/1775910069968-962.jpg",
+                "http://localhost:3001/uploads/1775910069983-380.jpg",
+                "http://localhost:3001/uploads/1775910069996-282.jpg"
+              ],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "n4_10",
+              "title": "Paradise",
+              "titleEn": "Paradise",
+              "text": "מועדון בידור מפואר",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [
+                "http://localhost:3001/uploads/1775910070037-277.jpg",
+                "http://localhost:3001/uploads/1775910070062-191.jpg",
+                "http://localhost:3001/uploads/1775910070091-127.jpg",
+                "http://localhost:3001/uploads/1775910070109-574.jpg",
+                "http://localhost:3001/uploads/1775910070124-950.jpg",
+                "http://localhost:3001/uploads/1775910070138-826.jpg",
+                "http://localhost:3001/uploads/1775910070157-641.jpg",
+                "http://localhost:3001/uploads/1775910070176-889.jpg",
+                "http://localhost:3001/uploads/1775910070221-937.jpg"
+              ],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            }
+          ],
+          "pageBtnLabel": "מה יש לי",
+          "theme": "dark",
+          "heroBg": "#2a0f14"
         }
       ],
       "heroBg": "#3DA5C4"

@@ -352,11 +352,11 @@ export default function CategoryScreen() {
   const darkCat = cat.theme === 'dark' || dark;
 
   return (
-    <SafeAreaView style={[st.safe, darkCat && { backgroundColor: '#0f1419' }]}>
+    <SafeAreaView style={[st.safe, darkCat && { backgroundColor: cat.heroBg || '#0f1419' }]}>
       <Stack.Screen options={{ headerShown: true, title: cat.title, headerBackTitle: 'חזרה' }} />
       <DevicePreviewBar />
       <ScrollView showsVerticalScrollIndicator={false} style={{ maxWidth: w, alignSelf: 'center', width: '100%' }}>
-        <View style={[st.hero, { backgroundColor: darkCat ? '#1a1a2e' : (cat.heroBg || cat.bg || '#3DA5C4') }]}>
+        <View style={[st.hero, { backgroundColor: cat.heroBg || cat.bg || (darkCat ? '#1a1a2e' : '#3DA5C4') }]}>
           <Text style={[st.heroTitle, darkCat && { color: '#F4A94E' }]}>{cat.title}</Text>
           {cat.subtitle ? <Text style={[st.heroSub, darkCat && { color: '#d4af37' }]}>{cat.subtitle}</Text> : null}
         </View>
