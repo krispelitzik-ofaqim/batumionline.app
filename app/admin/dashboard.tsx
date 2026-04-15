@@ -10,10 +10,11 @@ import { fetchContent, updateAllContent, updateSection, API_BASE } from '../../c
 
 // ─── Types ─────────────────────────────────────────────────────
 type HotelBlock = {
-  id: string; title: string; text: string; image: string;
+  id: string; title: string; titleEn?: string; text: string; image: string;
   mapUrl?: string; pageUrl?: string;
   coords?: { lat: number; lng: number };
   visible?: boolean;
+  images?: string[];
 };
 type TourBlock = {
   id: string; title: string; subtitle?: string; text: string; color: string;
@@ -30,6 +31,7 @@ type DataItem = {
   children?: DataItem[];
   hotels?: HotelBlock[];
   tours?: TourBlock[];
+  pageBtnLabel?: string;
 };
 
 const HERO_PALETTE = [
@@ -680,14 +682,70 @@ function EditModal({
                     <Text style={ms.label}>📝 כותרת</Text>
                     <TextInput style={[ms.input, { marginBottom: 8 }]} value={hb.title} onChangeText={v => { const n=[...(form.hotels||[])]; n[idx]={...n[idx],title:v}; setForm(p=>({...p,hotels:n})); }} placeholder="שם המלון" placeholderTextColor="#bbb" textAlign="right" />
 
+                    <Text style={ms.label}>🔤 שם באנגלית (מוצג על התמונה)</Text>
+                    <TextInput style={[ms.input, { marginBottom: 8 }]} value={hb.titleEn || ''} onChangeText={v => { const n=[...(form.hotels||[])]; n[idx]={...n[idx],titleEn:v}; setForm(p=>({...p,hotels:n})); }} placeholder="English name" placeholderTextColor="#bbb" textAlign="left" />
+
                     <Text style={ms.label}>📄 טקסט תיאור</Text>
                     <TextInput style={[ms.input, ms.textArea, { marginBottom: 8 }]} value={hb.text} onChangeText={v => { const n=[...(form.hotels||[])]; n[idx]={...n[idx],text:v}; setForm(p=>({...p,hotels:n})); }} placeholder="תיאור המלון" placeholderTextColor="#bbb" textAlign="right" multiline numberOfLines={4} />
 
-                    <Text style={ms.label}>🔗 כפתור מידע נוסף / לדף המלון — לינק חיצוני</Text>
+                    <Text style={ms.label}>🔗 כפתור "{form.pageBtnLabel || 'לדף המלון'}" — לינק חיצוני</Text>
                     <TextInput style={[ms.input, { marginBottom: 8 }]} value={hb.pageUrl || ''} onChangeText={v => { const n=[...(form.hotels||[])]; n[idx]={...n[idx],pageUrl:v}; setForm(p=>({...p,hotels:n})); }} placeholder="https://..." placeholderTextColor="#bbb" textAlign="left" />
 
                     <Text style={ms.label}>🧭 כפתור "נווט למקום" — לינק Google Maps</Text>
                     <TextInput style={[ms.input, { marginBottom: 8 }]} value={hb.mapUrl || ''} onChangeText={v => { const n=[...(form.hotels||[])]; n[idx]={...n[idx],mapUrl:v}; setForm(p=>({...p,hotels:n})); }} placeholder="https://www.google.com/maps/..." placeholderTextColor="#bbb" textAlign="left" />
+
+                    <Text style={ms.label}>🖼 גלריית "מה אוכלים" ({(hb.images || []).length}/9)</Text>
+                    {(hb.images || []).length > 0 && (
+                      <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 6, marginBottom: 6 }}>
+                        {(hb.images || []).map((src, gi) => (
+                          <View key={gi} style={{ position: 'relative' }}>
+                            {Platform.OS === 'web' && React.createElement('img', { src, style: { width: 64, height: 64, objectFit: 'cover', borderRadius: 6, border: '1px solid #e5e7eb' }, alt: '' })}
+                            <TouchableOpacity
+                              onPress={() => { const n=[...(form.hotels||[])]; n[idx]={...n[idx],images:(n[idx].images||[]).filter((_,i)=>i!==gi)}; setForm(p=>({...p,hotels:n})); }}
+                              style={{ position: 'absolute', top: -6, left: -6, width: 20, height: 20, borderRadius: 10, backgroundColor: '#dc2626', alignItems: 'center', justifyContent: 'center' }}
+                            >
+                              <Text style={{ color: Colors.WHITE, fontSize: 11, fontWeight: '900' }}>✕</Text>
+                            </TouchableOpacity>
+                          </View>
+                        ))}
+                      </View>
+                    )}
+                    {Platform.OS === 'web' && (hb.images || []).length < 9 && React.createElement('label', {
+                      style: {
+                        display: 'inline-block', backgroundColor: Colors.SECONDARY, color: '#fff',
+                        padding: '8px 14px', borderRadius: 8, fontSize: 13, fontWeight: 700,
+                        cursor: 'pointer', marginBottom: 8, alignSelf: 'flex-start',
+                      },
+                    }, [
+                      '📁 העלה תמונות מהמחשב',
+                      React.createElement('input', {
+                        key: 'file',
+                        type: 'file',
+                        accept: 'image/*',
+                        multiple: true,
+                        style: { display: 'none' },
+                        onChange: async (e: any) => {
+                          const files: File[] = Array.from(e.target.files || []);
+                          if (!files.length) return;
+                          const remaining = 9 - (hb.images || []).length;
+                          const slice = files.slice(0, remaining);
+                          const uploaded: string[] = [];
+                          for (const f of slice) {
+                            const fd = new FormData();
+                            fd.append('file', f);
+                            try {
+                              const res = await fetch('http://localhost:3001/api/upload', { method: 'POST', body: fd });
+                              const json = await res.json();
+                              if (json.success && json.url) uploaded.push(json.url);
+                            } catch {}
+                          }
+                          const n=[...(form.hotels||[])];
+                          n[idx]={...n[idx],images:[...(n[idx].images||[]),...uploaded].slice(0,9)};
+                          setForm(p=>({...p,hotels:n}));
+                          e.target.value='';
+                        },
+                      }),
+                    ])}
 
                     <Text style={ms.label}>📍 כפתור "איפה זה" — קואורדינטות (מפה מוטבעת)</Text>
                     <View style={{ flexDirection: 'row-reverse', gap: 8 }}>
@@ -849,6 +907,7 @@ export default function AdminDashboard() {
   const [saved, setSaved] = useState(false);
   const [showMobileNav, setShowMobileNav] = useState(false);
   const [childrenOf, setChildrenOf] = useState<DataItem | null>(null);
+  const [extraGroupVisible, setExtraGroupVisible] = useState(true);
   const [mediaFiles, setMediaFiles] = useState<{ filename: string; url: string; tags?: string[] }[]>([]);
   const [galleryFiles, setGalleryFiles] = useState<{ filename: string; url: string }[]>([]);
 
@@ -894,6 +953,7 @@ export default function AdminDashboard() {
         }
         setData(loaded);
         if (apiData.texts) setTexts(apiData.texts);
+        if (typeof apiData.extraGroupVisible === 'boolean') setExtraGroupVisible(apiData.extraGroupVisible);
       } catch {
         // Fallback to AsyncStorage
         const loaded: Record<string, DataItem[]> = {};
@@ -1369,6 +1429,20 @@ export default function AdminDashboard() {
             </Text>
             <Text style={cs.contentSub}>{currentItems.length} {toursMode ? 'בלוקים' : 'פריטים'}</Text>
           </View>
+          {activeNav === 'extra' && !childrenOf && (
+            <TouchableOpacity
+              style={{ paddingHorizontal: 14, paddingVertical: 10, borderRadius: 10, backgroundColor: extraGroupVisible ? '#10b981' : '#9ca3af', marginLeft: 8 }}
+              onPress={async () => {
+                const next = !extraGroupVisible;
+                setExtraGroupVisible(next);
+                try { await fetch(`${API_BASE}/api/content/extraGroupVisible`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(next) }); } catch {}
+              }}
+            >
+              <Text style={{ color: Colors.WHITE, fontWeight: '800', fontSize: 13 }}>
+                {extraGroupVisible ? '👁 הקבוצה גלויה' : '🚫 הקבוצה חבויה'}
+              </Text>
+            </TouchableOpacity>
+          )}
           <TouchableOpacity style={cs.addBtn} onPress={addItem}>
             <Text style={cs.addBtnTxt}>+ הוסף פריט</Text>
           </TouchableOpacity>

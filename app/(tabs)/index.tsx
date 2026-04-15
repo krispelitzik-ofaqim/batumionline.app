@@ -40,7 +40,7 @@ const MAIN_CATEGORIES: CatItem[] = [
   { id: '1', title: 'אירוח ולינה', subtitle: 'מלונות, דירות ואכסניות', description: 'מצאו את מקום הלינה המושלם בבטומי — ממלונות יוקרה על חוף הים, דרך דירות Airbnb מרווחות, ועד אכסניות בתקציב נוח. כולל המלצות לפי אזורים, מחירים וביקורות אמיתיות.', icon: '🏨', bg: '#5BC0DE', bgDark: '#3DA5C4' },
   { id: '2', title: 'אתרים ואטרקציות', subtitle: 'גלה מקומות וחוויות', description: 'גלו את האתרים המרהיבים של בטומי — מהגנים הבוטניים ועד כיכר פיאצה, הטיילת לאורך הים, ומוזיאונים מרתקים. אטרקציות לכל המשפחה בכל עונה.', icon: '🎡', bg: '#F7BE68', bgDark: '#F4A94E' },
   { id: '3', title: 'סיורים קוליים', subtitle: 'מסלולים מודרכים', description: 'טיילו בבטומי עם מדריך אישי באוזן! סיורים קוליים בעברית לאורך מסלולים מרכזיים בעיר. היסטוריה, ארכיטקטורה, ותרבות — הכל בקצב שלכם.', icon: '🎧', bg: '#2E8BA8', bgDark: '#1A6B8A' },
-  { id: '4', title: 'בילוי, פנאי וחיי לילה', subtitle: 'בידור והנאה', description: 'חיי הלילה של בטומי תוססים ומגוונים. ברים על חוף הים, מועדוני לילה, קזינו, הופעות חיות ועוד. המדריך המלא לבילוי בכל שעה.', icon: '🎰', bg: '#2E8BA8', bgDark: '#1A6B8A' },
+  { id: '4', title: 'בילוי, פנאי וחיי לילה', subtitle: 'בידור והנאה', description: 'חיי הלילה של בטומי תוססים ומגוונים. ברים על חוף הים, מועדוני לילה, קזינו, הופעות חיות ועוד. המדריך המלא לבילוי בכל שעה.', icon: '🍻', bg: '#2E8BA8', bgDark: '#1A6B8A' },
   { id: '5', title: 'תחבורה', subtitle: 'מוניות ותחבורה ציבורית', description: 'כל מה שצריך לדעת על תחבורה בבטומי — מוניות, אוטובוסים, השכרת רכב, ואפליקציות מומלצות. טיפים לחיסכון ומסלולי נסיעה מומלצים.', icon: '🚕', bg: '#F7BE68', bgDark: '#F4A94E' },
   { id: '6', title: 'מסעדות ואוכל', subtitle: 'מטבח מקומי ואוכל משובח', description: 'המטבח הגאורגי הוא חוויה בפני עצמה. חצ׳פורי, חינקלי, שש״ק ויין מעולה. המלצות למסעדות הטובות ביותר בבטומי, כולל מחירים ותפריטים.', icon: '🍽️', bg: '#5BC0DE', bgDark: '#3DA5C4' },
 ];
@@ -96,6 +96,7 @@ function CatCard({ item, width }: { item: CatItem; width: number }) {
 export default function HomeScreen() {
   const { width: screenW } = useWindowDimensions();
   const [showExtra, setShowExtra] = useState(false);
+  const [extraGroupVisible, setExtraGroupVisible] = useState(true);
   const [editMode, setEditMode] = useState(false);
   const [activeModal, setActiveModal] = useState<string | null>(null);
   const [editHeaderTitle, setEditHeaderTitle] = useState('Batumi Online');
@@ -121,6 +122,7 @@ export default function HomeScreen() {
         }
         if (data.mainCategories) setEditMainCats(data.mainCategories);
         if (data.extraCategories) setEditExtraCats(data.extraCategories);
+        if (typeof data.extraGroupVisible === 'boolean') setExtraGroupVisible(data.extraGroupVisible);
         if (data.bottomBanners) setEditBottomBanners(data.bottomBanners);
         const side = data.sideBanners || [];
         const re = side.find((b: any) => b.id === 'realestate');
@@ -188,18 +190,20 @@ export default function HomeScreen() {
         </View>
 
         {/* 2. קטגוריות נוספות — דרופדאון */}
-        <View style={styles.section}>
-          <TouchableOpacity style={styles.dropdownBtn} onPress={() => setShowExtra(!showExtra)}>
-            <Text style={styles.dropdownTxt}>{showExtra ? '▲' : '▼'} קטגוריות נוספות</Text>
-          </TouchableOpacity>
-          {showExtra && (
-            <View style={styles.grid}>
-              {editExtraCats.map((cat) => (
-                <CatCard key={cat.id} item={cat} width={cardW} />
-              ))}
-            </View>
-          )}
-        </View>
+        {extraGroupVisible && (
+          <View style={styles.section}>
+            <TouchableOpacity style={styles.dropdownBtn} onPress={() => setShowExtra(!showExtra)}>
+              <Text style={styles.dropdownTxt}>{showExtra ? '▲' : '▼'} קטגוריות נוספות</Text>
+            </TouchableOpacity>
+            {showExtra && (
+              <View style={styles.grid}>
+                {editExtraCats.map((cat) => (
+                  <CatCard key={cat.id} item={cat} width={cardW} />
+                ))}
+              </View>
+            )}
+          </View>
+        )}
 
         {/* 3. סליידר ברוכים הבאים */}
         <View style={styles.section}>

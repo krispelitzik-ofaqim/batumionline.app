@@ -11,15 +11,16 @@ import DevicePreviewBar from '../../components/DevicePreviewBar';
 import { fetchContent, fetchRatings, submitRating } from '../../constants/api';
 import AudioPlayer from '../../components/AudioPlayer';
 
-type Hotel = { id: string; title: string; text: string; image: string; mapUrl?: string; pageUrl?: string; coords?: { lat: number; lng: number }; visible?: boolean };
+type Hotel = { id: string; title: string; titleEn?: string; text: string; image: string; mapUrl?: string; pageUrl?: string; coords?: { lat: number; lng: number }; visible?: boolean; images?: string[] };
 type TourBlock = { id: string; title: string; subtitle?: string; text: string; color: string; images: string[]; audios: { title?: string; url: string }[]; visible?: boolean; coords?: { lat: number; lng: number } };
 type Item = {
   id: string; title: string; subtitle?: string; icon: string; bg?: string;
   bgDark?: string; description?: string; summary?: string; heroBg?: string;
   layout?: 'card' | 'banner'; children?: Item[]; hotels?: Hotel[]; tours?: TourBlock[]; pageBtnLabel?: string;
+  theme?: 'dark' | 'light';
 };
 
-function HotelImage({ uri }: { uri?: string }) {
+function HotelImage({ uri, titleEn }: { uri?: string; titleEn?: string }) {
   const [failed, setFailed] = useState(!uri);
   if (failed) {
     return (
@@ -28,7 +29,16 @@ function HotelImage({ uri }: { uri?: string }) {
       </View>
     );
   }
-  return <Image source={{ uri }} style={st.hotelImg} resizeMode="cover" onError={() => setFailed(true)} />;
+  return (
+    <View style={st.hotelImg}>
+      <Image source={{ uri }} style={{ width: '100%', height: '100%' }} resizeMode="cover" onError={() => setFailed(true)} />
+      {titleEn ? (
+        <View style={st.enBadge}>
+          <Text style={st.enBadgeTxt}>{titleEn}</Text>
+        </View>
+      ) : null}
+    </View>
+  );
 }
 
 function TourCard({ t, onRate }: { t: TourBlock; onRate: (id: string, score: number) => void }) {
@@ -150,6 +160,9 @@ function TourCard({ t, onRate }: { t: TourBlock; onRate: (id: string, score: num
 
 function HotelCard({ h, dark, pageBtnLabel }: { h: Hotel; dark: boolean; pageBtnLabel: string }) {
   const [showMap, setShowMap] = useState(false);
+  const [showGallery, setShowGallery] = useState(false);
+  const hasGallery = !!(h.images && h.images.length > 0);
+  const btnEnabled = hasGallery || !!h.pageUrl;
   if (showMap && h.coords) {
     return (
       <View style={[st.hotelCard, st.hotelCardExpanded, dark && { backgroundColor: '#2a3942' }]}>
@@ -157,20 +170,39 @@ function HotelCard({ h, dark, pageBtnLabel }: { h: Hotel; dark: boolean; pageBtn
       </View>
     );
   }
+  if (showGallery && hasGallery) {
+    return (
+      <View style={[st.hotelCard, st.hotelCardExpanded, dark && { backgroundColor: '#2a3942' }]}>
+        <View style={st.galleryWrap}>
+          <TouchableOpacity style={st.mapClose} onPress={() => setShowGallery(false)}>
+            <Text style={st.mapCloseX}>✕</Text>
+          </TouchableOpacity>
+          <View style={st.galleryGrid}>
+            {h.images!.slice(0, 9).map((src, i) => (
+              <Image key={i} source={{ uri: src }} style={st.galleryImg} resizeMode="cover" />
+            ))}
+          </View>
+        </View>
+      </View>
+    );
+  }
   return (
     <View style={[st.hotelCard, dark && { backgroundColor: '#2a3942' }]}>
-      <HotelImage uri={h.image} />
+      <HotelImage uri={h.image} titleEn={h.titleEn} />
       <View style={st.hotelBody}>
         <Text style={[st.hotelTitle, dark && { color: Colors.BACKGROUND }]}>{h.title}</Text>
         <Text style={[st.hotelText, dark && { color: '#cbd5e1' }]}>{h.text}</Text>
         <View style={st.hotelBtnRow}>
           <TouchableOpacity
-            style={[st.hotelBtn, st.hotelBtnPrimary, !h.pageUrl && st.hotelBtnDisabled]}
-            activeOpacity={h.pageUrl ? 0.7 : 1}
-            onPress={() => h.pageUrl && Linking.openURL(h.pageUrl)}
-            disabled={!h.pageUrl}
+            style={[st.hotelBtn, st.hotelBtnPrimary, !btnEnabled && st.hotelBtnDisabled]}
+            activeOpacity={btnEnabled ? 0.7 : 1}
+            onPress={() => {
+              if (hasGallery) setShowGallery(true);
+              else if (h.pageUrl) Linking.openURL(h.pageUrl);
+            }}
+            disabled={!btnEnabled}
           >
-            <Text style={[st.hotelBtnTxt, !h.pageUrl && st.hotelBtnTxtDisabled]}>{pageBtnLabel}</Text>
+            <Text style={[st.hotelBtnTxt, !btnEnabled && st.hotelBtnTxtDisabled]}>{pageBtnLabel}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[st.hotelBtn, st.hotelBtnAccent, !h.coords && st.hotelBtnDisabled]}
@@ -296,7 +328,11 @@ export default function CategoryScreen() {
         }
         return undefined;
       };
-      const found = findDeep(all);
+      const ALIASES: Record<string, string> = { a4: '3' };
+      const aliased = ALIASES[id as string];
+      const found = aliased
+        ? all.find((c: Item) => c.id === aliased)
+        : findDeep(all);
       if (found) setCat(found);
     }).catch(() => {});
   }, [id]);
@@ -313,15 +349,16 @@ export default function CategoryScreen() {
   }
 
   const children = cat.children || [];
+  const darkCat = cat.theme === 'dark' || dark;
 
   return (
-    <SafeAreaView style={[st.safe, dark && { backgroundColor: Colors.TEXT }]}>
+    <SafeAreaView style={[st.safe, darkCat && { backgroundColor: '#0f1419' }]}>
       <Stack.Screen options={{ headerShown: true, title: cat.title, headerBackTitle: 'חזרה' }} />
       <DevicePreviewBar />
       <ScrollView showsVerticalScrollIndicator={false} style={{ maxWidth: w, alignSelf: 'center', width: '100%' }}>
-        <View style={[st.hero, { backgroundColor: cat.heroBg || cat.bg || '#3DA5C4' }]}>
-          <Text style={st.heroTitle}>{cat.title}</Text>
-          {cat.subtitle ? <Text style={st.heroSub}>{cat.subtitle}</Text> : null}
+        <View style={[st.hero, { backgroundColor: darkCat ? '#1a1a2e' : (cat.heroBg || cat.bg || '#3DA5C4') }]}>
+          <Text style={[st.heroTitle, darkCat && { color: '#F4A94E' }]}>{cat.title}</Text>
+          {cat.subtitle ? <Text style={[st.heroSub, darkCat && { color: '#d4af37' }]}>{cat.subtitle}</Text> : null}
         </View>
 
         {cat.tours && cat.tours.length > 0 ? (
@@ -409,7 +446,7 @@ export default function CategoryScreen() {
         ) : cat.hotels && cat.hotels.length > 0 ? (
           <View style={st.hotelList}>
             {cat.hotels.filter(h => h.visible !== false).map(h => (
-              <HotelCard key={h.id} h={h} dark={dark} pageBtnLabel={cat.pageBtnLabel || 'לדף המלון'} />
+              <HotelCard key={h.id} h={h} dark={darkCat} pageBtnLabel={cat.pageBtnLabel || 'לדף המלון'} />
             ))}
           </View>
         ) : (
@@ -482,8 +519,16 @@ const st = StyleSheet.create({
     shadowColor: Colors.TEXT, shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08, shadowRadius: 8, elevation: 3,
   },
-  hotelImg: { width: '100%', height: 200, position: 'relative' },
+  hotelImg: { width: '100%', height: 200, position: 'relative', overflow: 'hidden' },
+  enBadge: {
+    position: 'absolute', bottom: 12, left: 12, backgroundColor: 'rgba(0,0,0,0.7)',
+    paddingHorizontal: 14, paddingVertical: 7, borderRadius: 8,
+  },
+  enBadgeTxt: { color: Colors.WHITE, fontSize: 15, fontWeight: '800', letterSpacing: 0.3 },
   hotelCardExpanded: { minHeight: 420 },
+  galleryWrap: { flex: 1, padding: 10, position: 'relative' },
+  galleryGrid: { flex: 1, flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 4 },
+  galleryImg: { width: '32%', aspectRatio: 1, borderRadius: 6 },
   mapClose: {
     position: 'absolute', top: 8, right: 8, width: 32, height: 32, borderRadius: 16,
     backgroundColor: 'rgba(0,0,0,0.6)', alignItems: 'center', justifyContent: 'center', zIndex: 10,

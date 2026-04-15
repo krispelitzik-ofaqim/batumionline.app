@@ -9,13 +9,13 @@ function useBatumiClock() {
   const [time, setTime] = useState('');
 
   useEffect(() => {
-    const update = () => {
-      const now = new Date();
-      const batumi = new Date(now.getTime() + (4 * 60 - now.getTimezoneOffset()) * 60000);
-      const h = batumi.getUTCHours().toString().padStart(2, '0');
-      const m = batumi.getUTCMinutes().toString().padStart(2, '0');
-      setTime(`${h}:${m}`);
-    };
+    const fmt = new Intl.DateTimeFormat('en-GB', {
+      timeZone: 'Asia/Tbilisi',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    });
+    const update = () => setTime(fmt.format(new Date()));
     update();
     const interval = setInterval(update, 10000);
     return () => clearInterval(interval);
