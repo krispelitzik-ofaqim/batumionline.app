@@ -140,6 +140,7 @@ const SECTIONS: Section[] = [
 
 const TAG_OPTIONS: { key: string; label: string }[] = [
   { key: 'gallery',    label: '🎞️ גלריה' },
+  { key: 'home',       label: '🏠 גלריית בית' },
   { key: 'icon',       label: '🖼️ אייקון' },
   { key: 'main',       label: '📂 ראשיות' },
   { key: 'extra',      label: '📁 נוספות' },
@@ -149,6 +150,7 @@ const TAG_OPTIONS: { key: string; label: string }[] = [
   { key: 'business',   label: '💼 עסקים' },
   { key: 'locations',  label: '📍 מיקומים' },
   { key: 'audio',      label: '🎧 אודיו' },
+  { key: 'player',     label: '🎵 נגן' },
   { key: 'legal',      label: '📜 מידע חובה' },
 ];
 
@@ -938,6 +940,7 @@ export default function AdminDashboard() {
   const [extraGroupVisible, setExtraGroupVisible] = useState(true);
   const [mediaFiles, setMediaFiles] = useState<{ filename: string; url: string; tags?: string[] }[]>([]);
   const [galleryFiles, setGalleryFiles] = useState<{ filename: string; url: string }[]>([]);
+  const [mediaFilter, setMediaFilter] = useState<string>('');
 
   const refreshMedia = useCallback(async () => {
     try {
@@ -1274,14 +1277,49 @@ export default function AdminDashboard() {
           ])}
         </View>
 
-        <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 12, marginTop: 16 }}>
-          {mediaFiles.map(f => (
+        {Platform.OS === 'web' && (
+          <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 10, paddingVertical: 10 }}>
+            <Text style={{ fontSize: 14, fontWeight: '800', color: Colors.TEXT, writingDirection: 'rtl' }}>מיין לפי:</Text>
+            {React.createElement('select', {
+              value: mediaFilter,
+              onChange: (e: any) => setMediaFilter(e.target.value),
+              style: {
+                flex: 1, padding: '8px 12px', borderRadius: 8, border: '1px solid #d1d5db',
+                fontSize: 13, fontWeight: 600, direction: 'rtl', cursor: 'pointer', backgroundColor: '#fff',
+              },
+            }, [
+              React.createElement('option', { key: '', value: '' }, `הכל (${mediaFiles.length})`),
+              React.createElement('option', { key: '__none', value: '__none' }, `ללא קטגוריה (${mediaFiles.filter(f => !(f.tags || []).length).length})`),
+              ...TAG_OPTIONS.map(t =>
+                React.createElement('option', { key: t.key, value: t.key }, `${t.label} (${mediaFiles.filter(f => (f.tags || []).includes(t.key)).length})`)
+              ),
+            ])}
+            <TouchableOpacity
+              style={{ backgroundColor: Colors.PRIMARY, paddingHorizontal: 16, paddingVertical: 8, borderRadius: 8 }}
+              onPress={() => setMediaFilter(mediaFilter)}
+            >
+              <Text style={{ color: Colors.WHITE, fontWeight: '800', fontSize: 13 }}>מיין</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
+        <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 12, marginTop: 8 }}>
+          {mediaFiles.filter(f => {
+            if (mediaFilter === '') return true;
+            if (mediaFilter === '__none') return !(f.tags || []).length;
+            return (f.tags || []).includes(mediaFilter);
+          }).map(f => (
             <View key={f.filename} style={{ width: 160, backgroundColor: '#fafafa', borderRadius: 12, overflow: 'hidden', borderWidth: 1, borderColor: '#e8e8e8' }}>
-              {Platform.OS === 'web' && React.createElement('img', {
-                src: f.url,
-                style: { width: '100%', height: 110, objectFit: 'cover', display: 'block' },
-                alt: f.filename,
-              })}
+              {Platform.OS === 'web' && (/\.(mp3|wav|m4a|aac)$/i.test(f.filename)
+                ? React.createElement('div', {
+                    style: { width: '100%', height: 110, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#1e293b', fontSize: 40 },
+                  }, '🎵')
+                : React.createElement('img', {
+                    src: f.url,
+                    style: { width: '100%', height: 110, objectFit: 'cover', display: 'block' },
+                    alt: f.filename,
+                  })
+              )}
               <View style={{ padding: 8 }}>
                 <Text numberOfLines={1} style={{ fontSize: 10, color: '#999', textAlign: 'right', writingDirection: 'rtl', marginBottom: 6 }}>
                   {f.filename}
