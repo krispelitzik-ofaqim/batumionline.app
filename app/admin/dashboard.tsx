@@ -736,7 +736,7 @@ function EditModal({
                             const fd = new FormData();
                             fd.append('file', f);
                             try {
-                              const res = await fetch('http://localhost:3001/api/upload', { method: 'POST', body: fd });
+                              const res = await fetch('/api/upload', { method: 'POST', body: fd });
                               const json = await res.json();
                               if (json.success && json.url) uploaded.push(json.url);
                             } catch {}
@@ -941,7 +941,7 @@ export default function AdminDashboard() {
 
   const refreshMedia = useCallback(async () => {
     try {
-      const res = await fetch('http://localhost:3001/api/uploads');
+      const res = await fetch(`${API_BASE}/api/uploads`);
       const json = await res.json();
       if (json.success) setMediaFiles(json.files);
     } catch {}
@@ -949,10 +949,14 @@ export default function AdminDashboard() {
 
   const refreshGallery = useCallback(async () => {
     try {
-      const res = await fetch('http://localhost:3001/api/gallery');
+      const res = await fetch(`${API_BASE}/api/gallery`);
       const json = await res.json();
       if (json.success) setGalleryFiles(json.files);
     } catch {}
+  }, []);
+
+  useEffect(() => {
+    refreshMedia();
   }, []);
 
   useEffect(() => {
@@ -982,12 +986,13 @@ export default function AdminDashboard() {
         setData(loaded);
         if (apiData.texts) setTexts(apiData.texts);
         if (typeof apiData.extraGroupVisible === 'boolean') setExtraGroupVisible(apiData.extraGroupVisible);
+        // Clear stale AsyncStorage
+        for (const s of SECTIONS) await AsyncStorage.removeItem(s.storageKey).catch(() => {});
       } catch {
-        // Fallback to AsyncStorage
+        // API failed - show defaults only, no stale cache
         const loaded: Record<string, DataItem[]> = {};
         for (const s of SECTIONS) {
-          const raw = await AsyncStorage.getItem(s.storageKey);
-          loaded[s.key] = raw ? JSON.parse(raw) : s.defaults;
+          loaded[s.key] = s.defaults;
         }
         setData(loaded);
         const rawTexts = await AsyncStorage.getItem('@admin_texts');
@@ -1152,7 +1157,7 @@ export default function AdminDashboard() {
             <Text style={ns.navIcon}>{item.icon}</Text>
             <Text style={[ns.navLabel, activeNav === item.key && ns.navLabelActive]}>{item.label}</Text>
             {item.key !== 'texts' && (
-              <Text style={ns.navBadge}>{(data[item.key] || []).length}</Text>
+              <Text style={ns.navBadge}>{item.key === 'media' ? mediaFiles.length : item.key === 'gallery' ? galleryFiles.length : (data[item.key] || []).length}</Text>
             )}
           </TouchableOpacity>
         ))}
@@ -1207,14 +1212,14 @@ export default function AdminDashboard() {
       const fd = new FormData();
       fd.append('file', file);
       try {
-        await fetch('http://localhost:3001/api/upload', { method: 'POST', body: fd });
+        await fetch(`${API_BASE}/api/upload`, { method: 'POST', body: fd });
         await refreshMedia();
       } catch {}
     };
     const handleDelete = async (filename: string) => {
       if (Platform.OS === 'web' && !confirm(`למחוק את ${filename}?`)) return;
       try {
-        await fetch(`http://localhost:3001/api/uploads/${encodeURIComponent(filename)}`, { method: 'DELETE' });
+        await fetch(`/api/uploads/${encodeURIComponent(filename)}`, { method: 'DELETE' });
         await refreshMedia();
       } catch {}
     };
@@ -1224,7 +1229,7 @@ export default function AdminDashboard() {
       const next = current.includes(tag) ? current.filter(t => t !== tag) : [...current, tag];
       setMediaFiles(prev => prev.map(f => f.filename === filename ? { ...f, tags: next } : f));
       try {
-        await fetch(`http://localhost:3001/api/uploads/${encodeURIComponent(filename)}/tags`, {
+        await fetch(`/api/uploads/${encodeURIComponent(filename)}/tags`, {
           method: 'PUT', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ tags: next }),
         });
@@ -1234,7 +1239,7 @@ export default function AdminDashboard() {
       const next = tag ? [tag] : [];
       setMediaFiles(prev => prev.map(f => f.filename === filename ? { ...f, tags: next } : f));
       try {
-        await fetch(`http://localhost:3001/api/uploads/${encodeURIComponent(filename)}/tags`, {
+        await fetch(`/api/uploads/${encodeURIComponent(filename)}/tags`, {
           method: 'PUT', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ tags: next }),
         });
@@ -1341,14 +1346,14 @@ export default function AdminDashboard() {
       const fd = new FormData();
       fd.append('file', file);
       try {
-        await fetch('http://localhost:3001/api/gallery', { method: 'POST', body: fd });
+        await fetch('/api/gallery', { method: 'POST', body: fd });
         await refreshGallery();
       } catch {}
     };
     const handleDelete = async (filename: string) => {
       if (Platform.OS === 'web' && !confirm(`למחוק את ${filename}?`)) return;
       try {
-        await fetch(`http://localhost:3001/api/gallery/${encodeURIComponent(filename)}`, { method: 'DELETE' });
+        await fetch(`/api/gallery/${encodeURIComponent(filename)}`, { method: 'DELETE' });
         await refreshGallery();
       } catch {}
     };
@@ -1358,7 +1363,7 @@ export default function AdminDashboard() {
       const [moved] = next.splice(from, 1);
       next.splice(to, 0, moved);
       setGalleryFiles(next);
-      await fetch('http://localhost:3001/api/gallery/order', {
+      await fetch('/api/gallery/order', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ order: next.map(f => f.filename) }),
@@ -1633,7 +1638,7 @@ export default function AdminDashboard() {
               {[
                 { label: 'קטגוריות', count: (data.main?.length || 0) + (data.extra?.length || 0), color: Colors.PRIMARY },
                 { label: 'באנרים', count: (data.bottom?.length || 0) + (data.side?.length || 0), color: Colors.ACCENT },
-                { label: 'מיקומים', count: data.locations?.length || 0, color: Colors.SECONDARY },
+                { label: 'תמונות', count: mediaFiles.length, color: Colors.SECONDARY },
                 { label: 'אודיו', count: data.audio?.length || 0, color: '#1C2B35' },
               ].map(stat => (
                 <View key={stat.label} style={[ds.statCard, { borderRightColor: stat.color }]}>
