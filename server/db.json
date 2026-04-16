@@ -6865,7 +6865,7 @@
           "id": "sp7",
           "title": "סטודיו לריקוד",
           "subtitle": "",
-          "icon": "💃",
+          "icon": "🩰",
           "bg": "#FFE0B2",
           "hotels": [
             {
@@ -7467,7 +7467,7 @@
               "visible": true,
               "coords": {
                 "lat": 41.72,
-                "lng": 42.0
+                "lng": 42
               }
             },
             {
@@ -7987,7 +7987,7 @@
               "visible": true,
               "coords": {
                 "lat": 41.72,
-                "lng": 42.0
+                "lng": 42
               }
             },
             {
@@ -8794,6 +8794,78 @@
     ],
     "1776169557728-202.png": [
       "icon"
+    ],
+    "info_culture.jpg": [
+      "info"
+    ],
+    "1776002253481-93.mp3": [
+      "player"
+    ],
+    "1776004878847-105.mp3": [
+      "player"
+    ],
+    "1776002237090-835.mp3": [
+      "player"
+    ],
+    "1776002287224-652.mp3": [
+      "player"
+    ],
+    "theater.webp": [
+      "welcome"
+    ],
+    "1776004810011-62.mp3": [
+      "player"
+    ],
+    "city.jpg": [
+      "welcome"
+    ],
+    "1776005085649-506.mp3": [
+      "player"
+    ],
+    "1776003051932-39.mp3": [
+      "player"
+    ],
+    "1776002188513-612.mp3": [
+      "player"
+    ],
+    "info_telecom.jpg": [
+      "info"
+    ],
+    "1776004835623-813.mp3": [
+      "player"
+    ],
+    "synagogue.jpg": [
+      "welcome"
+    ],
+    "1776002270866-146.mp3": [
+      "player"
+    ],
+    "1776005106931-992.mp3": [
+      "player"
+    ],
+    "1776002215391-967.mp3": [
+      "player"
+    ],
+    "info_health.jpg": [
+      "info"
+    ],
+    "info_embassy.jpg": [
+      "info"
+    ],
+    "1776004855237-413.mp3": [
+      "player"
+    ],
+    "welcome_app.jpg": [
+      "welcome"
+    ],
+    "info_tips.jpg": [
+      "info"
+    ],
+    "info_insurance.jpg": [
+      "info"
+    ],
+    "info_tax.jpg": [
+      "info"
     ]
   },
   "legal": [

@@ -41,11 +41,32 @@ const HERO_PALETTE = [
 ];
 
 const EMOJI_LIBRARY = [
-  '🏨','🏩','🏢','🏖️','🏡','🛏️','🎡','📸','🏛️','🎧',
-  '✡️','⛪','🎶','🍺','🎤','💃','🎰','🚕','🚌','🚆',
-  '🚐','🚍','✈️','🚲','🍽️','🥂','🍔','🌭','⭐','🏥',
-  '🛡️','📱','💡','💰','🛍️','🏋️','⛷️','🇮🇱','🌤️','💱',
-  '📰','🏠','💼','📍','🌊','🏙️','🌳','🌺','☕','🍷',
+  // לינה ואירוח
+  '🏨','🏩','🏢','🏖️','🏡','🛏️','🏘️','🛎️','🔑','🧳',
+  // אטרקציות ואתרים
+  '🎡','📸','🏛️','🗿','🏰','⛲','🎭','🖼️','🏺','🗺️',
+  // סיורים ואודיו
+  '🎧','🎶','🎤','🎵','🎙️','📻','🔊','🎼',
+  // דת והיסטוריה
+  '✡️','⛪','🕌','🕍','✝️','☪️','🕎','📜',
+  // מסעדות ואוכל
+  '🍽️','🥂','🍔','🌭','🍕','🍣','🥘','🧀','🍷','☕','🍺','🥐','🍰',
+  // בילוי וחיי לילה
+  '🎰','💃','🎤','🍸','🪩','🎪','🎬','🎯',
+  // תחבורה
+  '🚕','🚌','🚆','🚐','🚍','✈️','🚲','🚗','🛵','⛽','🚢','🚁',
+  // קניות
+  '🛍️','🛒','💳','🏪','🎁','💎',
+  // ספורט ובריאות
+  '🏋️','⛷️','🏊','🧘','🏃','🚣','🤿','🐴','🎾','⚽','🏀','🎿',
+  // ספא ורווחה
+  '💆','🧖','♨️','💅',
+  // טבע ומזג אוויר
+  '🌊','🌳','🌺','🌤️','🌈','🏔️','🌿','🦋',
+  // כללי
+  '📱','💡','💰','📰','🏠','💼','📍','🏙️','⭐','🏥','🛡️','💱','🇮🇱','🇬🇪',
+  // מדריכים ושירותים
+  '🛂','🧭','📞','💬','👤','🤝','📋','🔒',
 ];
 
 type Section = {
@@ -480,27 +501,48 @@ function EditModal({
             </View>
 
             <View style={ms.fieldGroup}>
-              <Text style={ms.label}>או בחר אימוג׳י</Text>
-              <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 6 }}>
-                {EMOJI_LIBRARY.map(e => {
-                  const selected = form.icon === e;
-                  return (
-                    <TouchableOpacity
-                      key={e}
-                      onPress={() => set('icon', e)}
-                      style={{
-                        width: 40, height: 40, borderRadius: 8,
-                        backgroundColor: selected ? Colors.PRIMARY + '20' : '#fafafa',
-                        borderWidth: selected ? 2 : 1,
-                        borderColor: selected ? Colors.PRIMARY : '#e8e8e8',
-                        alignItems: 'center', justifyContent: 'center',
-                      }}
-                    >
-                      <Text style={{ fontSize: 22 }}>{e}</Text>
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
+              <TouchableOpacity
+                onPress={() => setForm(prev => ({ ...prev, _emojiOpen: !prev._emojiOpen } as any))}
+                style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 6 }}
+              >
+                <Text style={ms.label}>או בחר אימוג׳י ({EMOJI_LIBRARY.length})</Text>
+                <Text style={{ fontSize: 14, color: Colors.PRIMARY }}>{(form as any)._emojiOpen ? '▲' : '▼'}</Text>
+              </TouchableOpacity>
+              {(form as any)._emojiOpen && (() => {
+                const usedEmojis = new Set<string>();
+                for (const k of Object.keys(data)) {
+                  for (const item of (data[k] || [])) {
+                    if (item.icon && !item.icon.startsWith('http') && !item.icon.startsWith('data:')) usedEmojis.add(item.icon);
+                    for (const ch of (item.children || [])) {
+                      if (ch.icon && !ch.icon.startsWith('http') && !ch.icon.startsWith('data:')) usedEmojis.add(ch.icon);
+                    }
+                  }
+                }
+                return (
+                  <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 6, marginTop: 8 }}>
+                    {EMOJI_LIBRARY.map((e, i) => {
+                      const selected = form.icon === e;
+                      const used = usedEmojis.has(e) && form.icon !== e;
+                      return (
+                        <TouchableOpacity
+                          key={`${e}-${i}`}
+                          onPress={() => set('icon', e)}
+                          style={{
+                            width: 40, height: 40, borderRadius: 8,
+                            backgroundColor: selected ? Colors.PRIMARY + '20' : used ? '#2a2a2a' : '#fafafa',
+                            borderWidth: selected ? 2 : 1,
+                            borderColor: selected ? Colors.PRIMARY : used ? '#555' : '#e8e8e8',
+                            alignItems: 'center', justifyContent: 'center',
+                            opacity: used ? 0.4 : 1,
+                          }}
+                        >
+                          <Text style={{ fontSize: 22 }}>{e}</Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
+                );
+              })()}
             </View>
 
             {section.hasImage && (
