@@ -159,21 +159,32 @@ const SECTIONS: Section[] = [
   { key: 'legal', label: 'מידע חובה', icon: '📜', storageKey: '@admin_legal', hasSubtitle: false, hasImage: false, hasAudio: false, hasLocation: false, hasSummary: false, hasLongText: true, defaults: DEFAULT_LEGAL },
 ];
 
-const TAG_OPTIONS: { key: string; label: string }[] = [
-  { key: 'gallery',    label: '🎞️ גלריה' },
-  { key: 'home',       label: '🏠 גלריית בית' },
-  { key: 'icon',       label: '🖼️ אייקון' },
-  { key: 'main',       label: '📂 ראשיות' },
-  { key: 'extra',      label: '📁 נוספות' },
-  { key: 'welcome',    label: '👋 ברוכים' },
-  { key: 'info',       label: '📋 פורטל מידע' },
-  { key: 'realestate', label: '🏠 נדל״ן' },
-  { key: 'business',   label: '💼 עסקים' },
-  { key: 'locations',  label: '📍 מיקומים' },
-  { key: 'audio',      label: '🎧 אודיו' },
-  { key: 'player',     label: '🎵 נגן' },
-  { key: 'legal',      label: '📜 מידע חובה' },
+const TAG_GROUPS: { group: string; icon: string; tags: { key: string; label: string }[] }[] = [
+  { group: 'קטגוריות ראשיות', icon: '📂', tags: [
+    { key: 'h1', label: 'מלונות יוקרה' },{ key: 'h2', label: 'מלונות 3-4' },{ key: 'h3', label: 'דירות נופש' },{ key: 'h4', label: 'כפרי נופש' },{ key: 'h5', label: 'ווילות' },{ key: 'h6', label: 'אכסניות' },
+    { key: 'a1', label: 'אטרקציות' },{ key: 'a2', label: 'אתרים פופולריים' },{ key: 'a3', label: 'היסטוריים' },{ key: 'a5', label: 'יהדות' },{ key: 'a6', label: 'נצרות' },{ key: 'a7', label: 'אוטובוס' },{ key: 'a8', label: 'נסיעות פרטיות' },
+    { key: 'tours', label: 'סיורים קוליים' },
+    { key: 'r1', label: 'מסעדות פופולריות' },{ key: 'r2', label: 'מסעדות יוקרה' },{ key: 'r4', label: 'כשרות' },{ key: 'r3', label: 'רשתות' },{ key: 'r5', label: 'מהיר' },{ key: 'r6', label: 'שווה להכיר' },
+    { key: 'n1', label: 'מועדונים' },{ key: 'n2', label: 'פאבים' },{ key: 'n3', label: 'הופעות' },{ key: 'n4', label: 'חשפנות' },
+    { key: 't1', label: 'מוניות' },{ key: 't2', label: 'ציבורית' },{ key: 't3', label: 'רכבות' },{ key: 't4', label: 'רכב' },{ key: 't5', label: 'אופניים' },{ key: 't6', label: 'טיסות' },
+  ]},
+  { group: 'קטגוריות נוספות', icon: '📁', tags: [
+    { key: 'sh1', label: 'שופינג' },{ key: 'sh2', label: 'סופרמרקטים' },{ key: 'sh3', label: 'החזרי מס' },
+    { key: 'sp1', label: 'כושר' },{ key: 'sp2', label: 'ספא' },{ key: 'sp3', label: 'בריכות' },{ key: 'sp4', label: 'חוף' },{ key: 'sp5', label: 'ריצה' },{ key: 'sp6', label: 'יוגה' },{ key: 'sp7', label: 'ריקוד' },{ key: 'sp8', label: 'מגרשים' },
+    { key: 'ex1', label: 'סקי' },{ key: 'ex2', label: 'ג׳יפים' },{ key: 'ex3', label: 'טרקטורונים' },{ key: 'ex4', label: 'פרגליידינג' },{ key: 'ex5', label: 'רפטינג' },{ key: 'ex6', label: 'קניונינג' },{ key: 'ex7', label: 'סוסים' },{ key: 'ex8', label: 'צלילה' },
+    { key: 'guides', label: 'מדריכים' },{ key: 'casino', label: 'קזינו' },
+  ]},
+  { group: 'סליידר ברוכים הבאים', icon: '👋', tags: [{ key: 'welcome', label: 'ברוכים הבאים' }] },
+  { group: 'פורטל המידע', icon: '📋', tags: [{ key: 'info', label: 'פורטל מידע' }] },
+  { group: 'באנרים תחתונים', icon: '🏷️', tags: [{ key: 'bottom', label: 'באנרים תחתונים' }] },
+  { group: 'באנרים צדדיים', icon: '📌', tags: [{ key: 'realestate', label: 'נדל״ן' },{ key: 'business', label: 'עסקים' }] },
+  { group: 'מיקומים ומפה', icon: '📍', tags: [{ key: 'locations', label: 'מיקומים' }] },
+  { group: 'קבצי אודיו', icon: '🎧', tags: [{ key: 'player', label: 'נגן' },{ key: 'audio', label: 'אודיו' }] },
+  { group: 'מידע חובה', icon: '📜', tags: [{ key: 'legal', label: 'מידע חובה' }] },
+  { group: 'תמונות', icon: '🖼️', tags: [{ key: 'icon', label: 'אייקון' },{ key: 'gallery', label: 'גלריה' },{ key: 'home', label: 'גלריית בית' }] },
+  { group: 'גלריה', icon: '🎞️', tags: [{ key: 'gallery_main', label: 'גלריה ראשית' }] },
 ];
+const TAG_OPTIONS = TAG_GROUPS.flatMap(g => g.tags);
 
 const NAV_ITEMS = [
   { key: 'texts', label: 'דף הבית', icon: '✏️' },
@@ -508,21 +519,11 @@ function EditModal({
                 <Text style={ms.label}>או בחר אימוג׳י ({EMOJI_LIBRARY.length})</Text>
                 <Text style={{ fontSize: 14, color: Colors.PRIMARY }}>{(form as any)._emojiOpen ? '▲' : '▼'}</Text>
               </TouchableOpacity>
-              {(form as any)._emojiOpen && (() => {
-                const usedEmojis = new Set<string>();
-                for (const k of Object.keys(data)) {
-                  for (const item of (data[k] || [])) {
-                    if (item.icon && !item.icon.startsWith('http') && !item.icon.startsWith('data:')) usedEmojis.add(item.icon);
-                    for (const ch of (item.children || [])) {
-                      if (ch.icon && !ch.icon.startsWith('http') && !ch.icon.startsWith('data:')) usedEmojis.add(ch.icon);
-                    }
-                  }
-                }
-                return (
+              {(form as any)._emojiOpen && (
                   <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 6, marginTop: 8 }}>
                     {EMOJI_LIBRARY.map((e, i) => {
                       const selected = form.icon === e;
-                      const used = usedEmojis.has(e) && form.icon !== e;
+                      const used = false;
                       return (
                         <TouchableOpacity
                           key={`${e}-${i}`}
@@ -541,8 +542,7 @@ function EditModal({
                       );
                     })}
                   </View>
-                );
-              })()}
+              )}
             </View>
 
             {section.hasImage && (
@@ -983,6 +983,7 @@ export default function AdminDashboard() {
   const [mediaFiles, setMediaFiles] = useState<{ filename: string; url: string; tags?: string[] }[]>([]);
   const [galleryFiles, setGalleryFiles] = useState<{ filename: string; url: string }[]>([]);
   const [mediaFilter, setMediaFilter] = useState<string>('');
+  const [mediaFolder, setMediaFolder] = useState<string>('');
 
   const refreshMedia = useCallback(async () => {
     try {
@@ -1290,130 +1291,118 @@ export default function AdminDashboard() {
         });
       } catch {}
     };
+    const FOLDERS = TAG_GROUPS.map(g => ({
+      ...g,
+      count: mediaFiles.filter(f => g.tags.some(t => (f.tags || []).includes(t.key))).length,
+    }));
+    const untaggedCount = mediaFiles.filter(f => !(f.tags || []).length).length;
+    const activeGrp = TAG_GROUPS.find(g => g.group === mediaFolder);
+    const filteredFiles = mediaFiles.filter(f => {
+      if (!mediaFolder) return true;
+      if (mediaFolder === '__none') return !(f.tags || []).length;
+      if (mediaFilter && mediaFilter !== '__none') return (f.tags || []).includes(mediaFilter);
+      return activeGrp ? activeGrp.tags.some(t => (f.tags || []).includes(t.key)) : false;
+    });
+
+    if (!mediaFolder) {
+      return (
+        <View style={cs.contentCard}>
+          <Text style={{ fontSize: 20, fontWeight: '900', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl', marginBottom: 4 }}>📁 תיקיות תמונות</Text>
+          <Text style={{ fontSize: 13, color: '#888', textAlign: 'right', writingDirection: 'rtl', marginBottom: 16 }}>{mediaFiles.length} תמונות בסה״כ</Text>
+          <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 12 }}>
+            {FOLDERS.map(g => (
+              <TouchableOpacity key={g.group} onPress={() => { setMediaFolder(g.group); setMediaFilter(''); }} activeOpacity={0.7}
+                style={{ width: 130, height: 110, borderRadius: 16, backgroundColor: '#f8fafc', borderWidth: 1, borderColor: '#e2e8f0', alignItems: 'center', justifyContent: 'center' }}>
+                <Text style={{ fontSize: 32 }}>{g.icon}</Text>
+                <Text style={{ fontSize: 12, fontWeight: '800', color: Colors.TEXT, textAlign: 'center', writingDirection: 'rtl', marginTop: 4 }}>{g.group.replace(/^[^\s]+\s/, '')}</Text>
+                <Text style={{ fontSize: 10, color: '#888', marginTop: 2 }}>{g.count}</Text>
+              </TouchableOpacity>
+            ))}
+            <TouchableOpacity onPress={() => { setMediaFolder('__none'); setMediaFilter('__none'); }} activeOpacity={0.7}
+              style={{ width: 130, height: 110, borderRadius: 16, backgroundColor: '#fef2f2', borderWidth: 1, borderColor: '#fecaca', alignItems: 'center', justifyContent: 'center' }}>
+              <Text style={{ fontSize: 32 }}>❓</Text>
+              <Text style={{ fontSize: 12, fontWeight: '800', color: '#dc2626', textAlign: 'center', marginTop: 4 }}>ללא קטגוריה</Text>
+              <Text style={{ fontSize: 10, color: '#888', marginTop: 2 }}>{untaggedCount}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      );
+    }
+
     return (
       <View style={cs.contentCard}>
-        <View style={cs.contentHeaderRow}>
+        <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+          <TouchableOpacity onPress={() => { setMediaFolder(''); setMediaFilter(''); }}>
+            <Text style={{ fontSize: 24, color: Colors.PRIMARY, fontWeight: '700' }}>→</Text>
+          </TouchableOpacity>
           <View style={{ flex: 1 }}>
-            <Text style={cs.contentTitle}>תיקיית תמונות</Text>
-            <Text style={cs.contentSub}>{mediaFiles.length} תמונות — סמן כל אחת לאן היא שייכת</Text>
+            <Text style={{ fontSize: 18, fontWeight: '900', color: Colors.TEXT, writingDirection: 'rtl' }}>{mediaFolder === '__none' ? '❓ ללא קטגוריה' : mediaFolder}</Text>
+            <Text style={{ fontSize: 12, color: '#888', writingDirection: 'rtl' }}>{filteredFiles.length} תמונות</Text>
           </View>
-          {Platform.OS === 'web' && React.createElement('label', {
-            style: {
-              backgroundColor: Colors.PRIMARY, color: '#fff', padding: '10px 16px',
-              borderRadius: 10, fontSize: 14, fontWeight: 600, cursor: 'pointer',
-            },
+          {activeGrp && activeGrp.tags.length > 1 && Platform.OS === 'web' && React.createElement('select', {
+            value: mediaFilter,
+            onChange: (e: any) => setMediaFilter(e.target.value),
+            style: { padding: '8px 12px', borderRadius: 8, border: '1px solid #d1d5db', fontSize: 13, fontWeight: 700, direction: 'rtl', cursor: 'pointer' },
           }, [
-            '+ העלה תמונות',
+            React.createElement('option', { key: '', value: '' }, 'הכל'),
+            ...activeGrp.tags.map(t => React.createElement('option', { key: t.key, value: t.key }, `${t.label} (${mediaFiles.filter(f => (f.tags || []).includes(t.key)).length})`)),
+          ])}
+          {Platform.OS === 'web' && React.createElement('label', {
+            style: { backgroundColor: '#10b981', color: '#fff', padding: '10px 18px', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer' },
+          }, [
+            '📁 העלה לתיקייה',
             React.createElement('input', {
-              key: 'file',
-              type: 'file',
-              accept: 'image/*',
-              multiple: true,
-              style: { display: 'none' },
+              key: 'file', type: 'file', accept: 'image/*,audio/*', multiple: true, style: { display: 'none' },
               onChange: async (e: any) => {
                 const files = Array.from(e.target.files || []) as File[];
+                const tag = mediaFilter || (activeGrp?.tags[0]?.key) || '';
                 for (const f of files) await handleUpload(f);
+                if (tag) {
+                  await refreshMedia();
+                  const latest = await fetch(`${API_BASE}/api/uploads`).then(r => r.json());
+                  for (const f of files) {
+                    const match = (latest.files || []).find((x: any) => x.filename.includes(f.name.split('.')[0]));
+                    if (match) await fetch(`${API_BASE}/api/uploads/${encodeURIComponent(match.filename)}/tags`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tags: [tag] }) }).catch(() => {});
+                  }
+                  await refreshMedia();
+                }
                 e.target.value = '';
               },
             }),
           ])}
         </View>
-
-        {Platform.OS === 'web' && (
-          <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 10, paddingVertical: 10 }}>
-            <Text style={{ fontSize: 14, fontWeight: '800', color: Colors.TEXT, writingDirection: 'rtl' }}>מיין לפי:</Text>
-            {React.createElement('select', {
-              value: mediaFilter,
-              onChange: (e: any) => setMediaFilter(e.target.value),
-              style: {
-                flex: 1, padding: '8px 12px', borderRadius: 8, border: '1px solid #d1d5db',
-                fontSize: 13, fontWeight: 600, direction: 'rtl', cursor: 'pointer', backgroundColor: '#fff',
-              },
-            }, [
-              React.createElement('option', { key: '', value: '' }, `הכל (${mediaFiles.length})`),
-              React.createElement('option', { key: '__none', value: '__none' }, `ללא קטגוריה (${mediaFiles.filter(f => !(f.tags || []).length).length})`),
-              ...TAG_OPTIONS.map(t =>
-                React.createElement('option', { key: t.key, value: t.key }, `${t.label} (${mediaFiles.filter(f => (f.tags || []).includes(t.key)).length})`)
-              ),
-            ])}
-            <TouchableOpacity
-              style={{ backgroundColor: Colors.PRIMARY, paddingHorizontal: 16, paddingVertical: 8, borderRadius: 8 }}
-              onPress={() => setMediaFilter(mediaFilter)}
-            >
-              <Text style={{ color: Colors.WHITE, fontWeight: '800', fontSize: 13 }}>מיין</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-
-        <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 12, marginTop: 8 }}>
-          {mediaFiles.filter(f => {
-            if (mediaFilter === '') return true;
-            if (mediaFilter === '__none') return !(f.tags || []).length;
-            return (f.tags || []).includes(mediaFilter);
-          }).map(f => (
+        <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 12 }}>
+          {filteredFiles.map(f => (
             <View key={f.filename} style={{ width: 160, backgroundColor: '#fafafa', borderRadius: 12, overflow: 'hidden', borderWidth: 1, borderColor: '#e8e8e8' }}>
               {Platform.OS === 'web' && (/\.(mp3|wav|m4a|aac)$/i.test(f.filename)
-                ? React.createElement('div', {
-                    style: { width: '100%', height: 110, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#1e293b', fontSize: 40 },
-                  }, '🎵')
-                : React.createElement('img', {
-                    src: f.url,
-                    style: { width: '100%', height: 110, objectFit: 'cover', display: 'block' },
-                    alt: f.filename,
-                  })
+                ? React.createElement('div', { style: { width: '100%', height: 110, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#1e293b', fontSize: 40 } }, '🎵')
+                : React.createElement('img', { src: f.url, style: { width: '100%', height: 110, objectFit: 'cover', display: 'block' }, alt: f.filename })
               )}
               <View style={{ padding: 8 }}>
-                <Text numberOfLines={1} style={{ fontSize: 10, color: '#999', textAlign: 'right', writingDirection: 'rtl', marginBottom: 6 }}>
-                  {f.filename}
-                </Text>
+                <Text numberOfLines={1} style={{ fontSize: 10, color: '#999', textAlign: 'right', writingDirection: 'rtl', marginBottom: 6 }}>{f.filename}</Text>
                 <View style={{ marginBottom: 6 }}>
                   {Platform.OS === 'web' && React.createElement('select', {
-                    value: (f.tags || []).find((t) => TAG_OPTIONS.some((o) => o.key === t)) || '',
+                    value: (f.tags || []).find((t: string) => TAG_OPTIONS.some((o) => o.key === t)) || '',
                     onChange: (e: any) => setTagSingle(f.filename, e.target.value),
-                    style: {
-                      width: '100%',
-                      padding: '6px 8px',
-                      borderRadius: 6,
-                      border: '1px solid #e8e8e8',
-                      fontSize: 11,
-                      fontWeight: 700,
-                      color: (f.tags || []).length ? Colors.WHITE : '#666',
-                      backgroundColor: (f.tags || []).length ? Colors.PRIMARY : '#f0f2f5',
-                      direction: 'rtl',
-                      cursor: 'pointer',
-                    },
+                    style: { width: '100%', padding: '6px 8px', borderRadius: 6, border: '1px solid #e8e8e8', fontSize: 11, fontWeight: 700, color: (f.tags || []).length ? Colors.WHITE : '#666', backgroundColor: (f.tags || []).length ? Colors.PRIMARY : '#f0f2f5', direction: 'rtl', cursor: 'pointer' },
                   }, [
-                    React.createElement('option', { key: '', value: '' }, '— ללא קטגוריה —'),
-                    ...TAG_OPTIONS.map(({ key, label }) =>
-                      React.createElement('option', { key, value: key, style: { backgroundColor: '#fff', color: '#222' } }, label)
-                    ),
+                    React.createElement('option', { key: '', value: '' }, '— ללא —'),
+                    ...TAG_GROUPS.map(g => React.createElement('optgroup', { key: g.group, label: g.group }, g.tags.map(t => React.createElement('option', { key: t.key, value: t.key, style: { backgroundColor: '#fff', color: '#222' } }, t.label)))),
                   ])}
                 </View>
                 <View style={{ flexDirection: 'row-reverse', gap: 6 }}>
-                  <TouchableOpacity
-                    style={{ flex: 1, backgroundColor: '#e8f4f8', paddingVertical: 6, borderRadius: 6, alignItems: 'center' }}
-                    onPress={() => {
-                      if (Platform.OS === 'web') {
-                        (navigator as any).clipboard?.writeText(f.url);
-                      }
-                    }}
-                  >
+                  <TouchableOpacity style={{ flex: 1, backgroundColor: '#e8f4f8', paddingVertical: 6, borderRadius: 6, alignItems: 'center' }} onPress={() => { if (Platform.OS === 'web') (navigator as any).clipboard?.writeText(f.url); }}>
                     <Text style={{ fontSize: 11, color: Colors.PRIMARY, fontWeight: '600' }}>העתק URL</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity
-                    style={{ backgroundColor: '#fdecea', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 6 }}
-                    onPress={() => handleDelete(f.filename)}
-                  >
+                  <TouchableOpacity style={{ backgroundColor: '#fdecea', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 6 }} onPress={() => handleDelete(f.filename)}>
                     <Text style={{ fontSize: 11, color: '#c0392b', fontWeight: '600' }}>מחק</Text>
                   </TouchableOpacity>
                 </View>
               </View>
             </View>
           ))}
-          {mediaFiles.length === 0 && (
-            <Text style={{ color: '#999', fontSize: 14, textAlign: 'right', writingDirection: 'rtl', width: '100%' }}>
-              אין תמונות עדיין — לחץ על "העלה תמונות" כדי להתחיל
-            </Text>
+          {filteredFiles.length === 0 && (
+            <Text style={{ color: '#999', fontSize: 14, textAlign: 'right', writingDirection: 'rtl', width: '100%' }}>אין תמונות בתיקייה זו</Text>
           )}
         </View>
       </View>
