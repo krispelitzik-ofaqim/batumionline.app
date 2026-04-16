@@ -1156,7 +1156,140 @@
           "title": "אתרים היסטוריים",
           "subtitle": "סיפורה של העיר",
           "icon": "🏛️",
-          "bg": "#1A6B8A"
+          "bg": "#1A6B8A",
+          "hotels": [
+            {
+              "id": "a3_1",
+              "title": "מבצר גוניו",
+              "titleEn": "Gonio Fortress",
+              "text": "מבצר רומי בן 2000 שנה, מהמבצרים העתיקים ביותר בגאורגיה. ממוקם 15 דק׳ מבטומי",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.573,41.575",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.573,
+                "lng": 41.575
+              }
+            },
+            {
+              "id": "a3_2",
+              "title": "מבצר פטרה",
+              "titleEn": "Petra Fortress",
+              "text": "שרידי מבצר ביזנטי מהמאה ה-6 על גבעה מעל הים",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.76,41.74",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.76,
+                "lng": 41.74
+              }
+            },
+            {
+              "id": "a3_3",
+              "title": "כנסיית סנט אנדרו",
+              "titleEn": "St. Andrew Church",
+              "text": "כנסייה עתיקה מהמאה ה-9, אחד המבנים הדתיים הוותיקים באזור",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.651,41.637",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.651,
+                "lng": 41.637
+              }
+            },
+            {
+              "id": "a3_4",
+              "title": "גשר מכמחורי",
+              "titleEn": "Makhuntseti Bridge",
+              "text": "גשר קשתות מאבן מהמאה ה-12, פלא הנדסי מעל נהר אדג׳ריסצקאלי",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.75,42.78",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.75,
+                "lng": 42.78
+              }
+            },
+            {
+              "id": "a3_5",
+              "title": "מוזיאון אדג׳רה",
+              "titleEn": "Adjara Museum",
+              "text": "מוזיאון ההיסטוריה של אדג׳רה עם ממצאים ארכיאולוגיים מכל התקופות",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.65,41.636",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.65,
+                "lng": 41.636
+              }
+            },
+            {
+              "id": "a3_6",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a3_7",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a3_8",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a3_9",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a3_10",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            }
+          ],
+          "pageBtnLabel": "מידע נוסף"
         },
         {
           "id": "a4",
@@ -1170,14 +1303,280 @@
           "title": "היסטוריה יהודית",
           "subtitle": "קהילה ומורשת",
           "icon": "✡️",
-          "bg": "#7ECFC0"
+          "bg": "#7ECFC0",
+          "hotels": [
+            {
+              "id": "a5_1",
+              "title": "בית הכנסת הגדול",
+              "titleEn": "Great Synagogue",
+              "text": "בית הכנסת המרכזי של בטומי, נבנה ב-1904. פעיל עד היום עם מניין קבוע",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6508,41.6365",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.6508,
+                "lng": 41.6365
+              }
+            },
+            {
+              "id": "a5_2",
+              "title": "בית חב״ד בטומי",
+              "titleEn": "Chabad Batumi",
+              "text": "מרכז הקהילה היהודית - בית כנסת, מסעדה כשרה, שירותים לתיירים",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6505,41.636",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.6505,
+                "lng": 41.636
+              }
+            },
+            {
+              "id": "a5_3",
+              "title": "הרובע היהודי",
+              "titleEn": "Jewish Quarter",
+              "text": "הרחובות ההיסטוריים בין בית הכנסת לבית חב״ד, מורשת קהילה עשירה",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6506,41.6362",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.6506,
+                "lng": 41.6362
+              }
+            },
+            {
+              "id": "a5_4",
+              "title": "בית העלמין היהודי",
+              "titleEn": "Jewish Cemetery",
+              "text": "בית קברות היסטורי עם מצבות מהמאה ה-19",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.655,41.64",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.655,
+                "lng": 41.64
+              }
+            },
+            {
+              "id": "a5_5",
+              "title": "מוזיאון הקהילה",
+              "titleEn": "Community Museum",
+              "text": "תערוכה על תולדות היהודים בגאורגיה מאז ימי בית ראשון",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6508,41.6365",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.6508,
+                "lng": 41.6365
+              }
+            },
+            {
+              "id": "a5_6",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a5_7",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a5_8",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a5_9",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a5_10",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            }
+          ],
+          "pageBtnLabel": "מידע נוסף"
         },
         {
           "id": "a6",
           "title": "היסטוריה נוצרית",
           "subtitle": "כנסיות ומנזרים",
           "icon": "⛪",
-          "bg": "#3DA5C4"
+          "bg": "#3DA5C4",
+          "hotels": [
+            {
+              "id": "a6_1",
+              "title": "קתדרלת האם הקדושה",
+              "titleEn": "Mother of God Cathedral",
+              "text": "קתדרלה מרשימה מ-1903, במקור קתולית, כיום אורתודוקסית",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6495,41.6375",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.6495,
+                "lng": 41.6375
+              }
+            },
+            {
+              "id": "a6_2",
+              "title": "כנסיית סנט ניקולס",
+              "titleEn": "St. Nicholas Church",
+              "text": "כנסייה אורתודוקסית היסטורית ברובע העתיק, אדריכלות קלאסית",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.651,41.637",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.651,
+                "lng": 41.637
+              }
+            },
+            {
+              "id": "a6_3",
+              "title": "הכנסייה הארמנית",
+              "titleEn": "Armenian Church",
+              "text": "כנסייה היסטורית של הקהילה הארמנית, סמל למגוון הדתי של העיר",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6515,41.6368",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.6515,
+                "lng": 41.6368
+              }
+            },
+            {
+              "id": "a6_4",
+              "title": "כנסייה קתולית",
+              "titleEn": "Catholic Church",
+              "text": "כנסייה קתולית קטנה ויפה ברובע העתיק",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.65,41.6358",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.65,
+                "lng": 41.6358
+              }
+            },
+            {
+              "id": "a6_5",
+              "title": "מנזר שיו-מגוימה",
+              "titleEn": "Shio-Mgvime",
+              "text": "מנזר מערות עתיק מהמאה ה-6, טיול יום מבטומי",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.84,44.62",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.84,
+                "lng": 44.62
+              }
+            },
+            {
+              "id": "a6_6",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a6_7",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a6_8",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a6_9",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a6_10",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            }
+          ],
+          "pageBtnLabel": "מידע נוסף"
         },
         {
           "id": "a7",
@@ -6741,7 +7140,1069 @@
       "bg": "#7ECFC0",
       "bgDark": "#F4A94E",
       "image": "",
-      "heroBg": "#7ECFC0"
+      "heroBg": "#7ECFC0",
+      "children": [
+        {
+          "id": "ex1",
+          "title": "סקי בגודרזי",
+          "subtitle": "",
+          "icon": "⛷️",
+          "bg": "#CCE5FF",
+          "hotels": [
+            {
+              "id": "ex1_1",
+              "title": "אתר סקי גודרזי",
+              "titleEn": "Goderdzi Ski Resort",
+              "text": "אתר הסקי הקרוב ביותר לבטומי, 2 שעות נסיעה. מסלולים למתחילים ומתקדמים, שלג טבעי מצוין",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.64,42.51",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.64,
+                "lng": 42.51
+              }
+            },
+            {
+              "id": "ex1_2",
+              "title": "השכרת ציוד סקי",
+              "titleEn": "Ski Equipment Rental",
+              "text": "השכרת ציוד מלא באתר - סקי, מגפיים, מקלות",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.64,42.51",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.64,
+                "lng": 42.51
+              }
+            },
+            {
+              "id": "ex1_3",
+              "title": "שיעורי סקי",
+              "titleEn": "Ski Lessons",
+              "text": "מדריכים מקצועיים, שיעורים פרטיים וקבוצתיים",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.64,42.51",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.64,
+                "lng": 42.51
+              }
+            },
+            {
+              "id": "ex1_4",
+              "title": "לינה בגודרזי",
+              "titleEn": "Goderdzi Lodge",
+              "text": "אפשרויות לינה באתר ובכפרים הסמוכים",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.64,42.51",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.64,
+                "lng": 42.51
+              }
+            },
+            {
+              "id": "ex1_5",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "ex1_6",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "ex1_7",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "ex1_8",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "ex1_9",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "ex1_10",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            }
+          ],
+          "pageBtnLabel": "מידע נוסף"
+        },
+        {
+          "id": "ex2",
+          "title": "טיולי ג׳יפים",
+          "subtitle": "",
+          "icon": "🚙",
+          "bg": "#FFE0B2",
+          "hotels": [
+            {
+              "id": "ex2_1",
+              "title": "ג׳יפ למפלי מירבטי",
+              "titleEn": "Mirveti Waterfalls Jeep",
+              "text": "טיול יום מרהיב למפלים נסתרים בהרים",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.72,42.03",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.72,
+                "lng": 42.03
+              }
+            },
+            {
+              "id": "ex2_2",
+              "title": "ג׳יפ לקניון מרטוילי",
+              "titleEn": "Martvili Canyon Jeep",
+              "text": "שייט בקניון + נסיעת שטח דרמטית",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=42.46,42.38",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 42.46,
+                "lng": 42.38
+              }
+            },
+            {
+              "id": "ex2_3",
+              "title": "ג׳יפ להרי אדג׳רה",
+              "titleEn": "Adjara Mountains",
+              "text": "מסלול הרים עם נופים פנורמיים ונקודות תצפית",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.7,42.8",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.7,
+                "lng": 42.8
+              }
+            },
+            {
+              "id": "ex2_4",
+              "title": "ג׳יפ למכמחורי",
+              "titleEn": "Makhuntseti Jeep",
+              "text": "גשר קשתות עתיק + מפל מרהיב",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.75,42.78",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.75,
+                "lng": 42.78
+              }
+            },
+            {
+              "id": "ex2_5",
+              "title": "ג׳יפ ללגודחי",
+              "titleEn": "Lagodekhi Jeep",
+              "text": "שמורת טבע עם יערות ומפלים",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.83,46.28",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.83,
+                "lng": 46.28
+              }
+            },
+            {
+              "id": "ex2_6",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "ex2_7",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "ex2_8",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "ex2_9",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "ex2_10",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            }
+          ],
+          "pageBtnLabel": "מידע נוסף"
+        },
+        {
+          "id": "ex3",
+          "title": "טרקטורונים (ATV)",
+          "subtitle": "",
+          "icon": "🏍️",
+          "bg": "#FFF3CD",
+          "hotels": [
+            {
+              "id": "ex3_1",
+              "title": "ATV בהרי אדג׳רה",
+              "titleEn": "Adjara ATV",
+              "text": "מסלולי שטח מאתגרים בהרים מעל בטומי",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.7,42.8",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.7,
+                "lng": 42.8
+              }
+            },
+            {
+              "id": "ex3_2",
+              "title": "טרקטורון על החוף",
+              "titleEn": "Beach ATV",
+              "text": "רכיבה על חול לאורך חופי בטומי",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.64,41.63",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.64,
+                "lng": 41.63
+              }
+            },
+            {
+              "id": "ex3_3",
+              "title": "מסלול יער",
+              "titleEn": "Forest ATV Trail",
+              "text": "רכיבה ביער עם נקודות תצפית",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.72,42.0",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.72,
+                "lng": 42.0
+              }
+            },
+            {
+              "id": "ex3_4",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "ex3_5",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "ex3_6",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "ex3_7",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "ex3_8",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "ex3_9",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "ex3_10",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            }
+          ],
+          "pageBtnLabel": "מידע נוסף"
+        },
+        {
+          "id": "ex4",
+          "title": "פרגליידינג",
+          "subtitle": "",
+          "icon": "🪂",
+          "bg": "#E8F5E9",
+          "hotels": [
+            {
+              "id": "ex4_1",
+              "title": "טיסת טנדם",
+              "titleEn": "Tandem Paragliding",
+              "text": "טיסה עם מדריך מנוסה, נוף לים השחור מלמעלה",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.66,41.62",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.66,
+                "lng": 41.62
+              }
+            },
+            {
+              "id": "ex4_2",
+              "title": "קורס פרגליידינג",
+              "titleEn": "Paragliding Course",
+              "text": "קורס בסיסי 3-5 ימים לטיסה עצמאית",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.66,41.62",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.66,
+                "lng": 41.62
+              }
+            },
+            {
+              "id": "ex4_3",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "ex4_4",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "ex4_5",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "ex4_6",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "ex4_7",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "ex4_8",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "ex4_9",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "ex4_10",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            }
+          ],
+          "pageBtnLabel": "מידע נוסף"
+        },
+        {
+          "id": "ex5",
+          "title": "רפטינג",
+          "subtitle": "",
+          "icon": "🚣",
+          "bg": "#D4EDDA",
+          "hotels": [
+            {
+              "id": "ex5_1",
+              "title": "רפטינג נהר אדג׳ריסצקאלי",
+              "titleEn": "Adjaristskali Rafting",
+              "text": "שייט מים לבנים ברמות קושי שונות, חוויה אדרנלינית",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.75,42.7",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.75,
+                "lng": 42.7
+              }
+            },
+            {
+              "id": "ex5_2",
+              "title": "רפטינג למשפחות",
+              "titleEn": "Family Rafting",
+              "text": "מסלול קל יותר, מתאים לילדים מגיל 8+",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.75,42.7",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.75,
+                "lng": 42.7
+              }
+            },
+            {
+              "id": "ex5_3",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "ex5_4",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "ex5_5",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "ex5_6",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "ex5_7",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "ex5_8",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "ex5_9",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "ex5_10",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            }
+          ],
+          "pageBtnLabel": "מידע נוסף"
+        },
+        {
+          "id": "ex6",
+          "title": "קניונינג",
+          "subtitle": "",
+          "icon": "🏔️",
+          "bg": "#E0F2FE",
+          "hotels": [
+            {
+              "id": "ex6_1",
+              "title": "קניון מרטוילי",
+              "titleEn": "Martvili Canyon",
+              "text": "שייט בסירה בקניון צר עם קירות סלע גבוהים ומפלים",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=42.46,42.38",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 42.46,
+                "lng": 42.38
+              }
+            },
+            {
+              "id": "ex6_2",
+              "title": "קניון אוקטסה",
+              "titleEn": "Okatse Canyon",
+              "text": "גשר תלוי מעל קניון עמוק - לא למי שמפחד מגובה",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=42.42,42.45",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 42.42,
+                "lng": 42.45
+              }
+            },
+            {
+              "id": "ex6_3",
+              "title": "קניון אגורה",
+              "titleEn": "Agura Canyon",
+              "text": "קניון פחות מוכר אך מרהיב עם מפלים",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.78,42.1",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.78,
+                "lng": 42.1
+              }
+            },
+            {
+              "id": "ex6_4",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "ex6_5",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "ex6_6",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "ex6_7",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "ex6_8",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "ex6_9",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "ex6_10",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            }
+          ],
+          "pageBtnLabel": "מידע נוסף"
+        },
+        {
+          "id": "ex7",
+          "title": "רכיבת סוסים",
+          "subtitle": "",
+          "icon": "🐴",
+          "bg": "#FADADD",
+          "hotels": [
+            {
+              "id": "ex7_1",
+              "title": "רכיבה בהרים",
+              "titleEn": "Mountain Horse Ride",
+              "text": "מסלול רכיבה בהרי אדג׳רה עם נופים מדהימים",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.7,42.8",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.7,
+                "lng": 42.8
+              }
+            },
+            {
+              "id": "ex7_2",
+              "title": "רכיבה על החוף",
+              "titleEn": "Beach Horse Ride",
+              "text": "רכיבה לאורך חוף הים בשקיעה",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.64,41.63",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.64,
+                "lng": 41.63
+              }
+            },
+            {
+              "id": "ex7_3",
+              "title": "חוות סוסים",
+              "titleEn": "Horse Farm",
+              "text": "ביקור בחווה + שיעור רכיבה למתחילים",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.72,42.0",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.72,
+                "lng": 42.0
+              }
+            },
+            {
+              "id": "ex7_4",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "ex7_5",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "ex7_6",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "ex7_7",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "ex7_8",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "ex7_9",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "ex7_10",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            }
+          ],
+          "pageBtnLabel": "מידע נוסף"
+        },
+        {
+          "id": "ex8",
+          "title": "צלילה",
+          "subtitle": "",
+          "icon": "🤿",
+          "bg": "#CCE5FF",
+          "hotels": [
+            {
+              "id": "ex8_1",
+              "title": "צלילה בים השחור",
+              "titleEn": "Black Sea Diving",
+              "text": "צלילת היכרות + צלילה לצוללנים מוסמכים",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.645,41.635",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.645,
+                "lng": 41.635
+              }
+            },
+            {
+              "id": "ex8_2",
+              "title": "קורס צלילה PADI",
+              "titleEn": "PADI Course",
+              "text": "קורס Open Water בים השחור",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.645,41.635",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.645,
+                "lng": 41.635
+              }
+            },
+            {
+              "id": "ex8_3",
+              "title": "שנורקלינג",
+              "titleEn": "Snorkeling",
+              "text": "שנורקלינג לאורך החוף - ציוד להשכרה",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.646,41.636",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.646,
+                "lng": 41.636
+              }
+            },
+            {
+              "id": "ex8_4",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "ex8_5",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "ex8_6",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "ex8_7",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "ex8_8",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "ex8_9",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "ex8_10",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            }
+          ],
+          "pageBtnLabel": "מידע נוסף"
+        }
+      ]
     },
     {
       "id": "10",
@@ -6749,10 +8210,135 @@
       "subtitle": "ליווי אישי בעברית",
       "description": "מדריכים ישראלים מקומיים שמכירים כל פינה בבטומי. סוכני נסיעות, ליווי אישי, סיורים פרטיים.",
       "icon": "🇮🇱",
-      "bg": "#1A6B8A",
+      "bg": "#87CEEB",
       "bgDark": "#1A6B8A",
       "image": "",
-      "heroBg": "#1A6B8A"
+      "heroBg": "#87CEEB",
+      "hotels": [
+        {
+          "id": "gd_1",
+          "title": "דוד כהן",
+          "titleEn": "David Cohen",
+          "text": "🎯 סיורים בעיר העתיקה והיסטוריה יהודית\n\nמדריך ישראלי ותיק בבטומי מזה 5 שנים. מתמחה בהיסטוריה, תרבות ואוכל מקומי",
+          "image": "http://localhost:3001/uploads/city.jpg",
+          "images": [],
+          "mapUrl": "https://wa.me/972501234567",
+          "pageUrl": "",
+          "visible": true,
+          "phone": "972501234567"
+        },
+        {
+          "id": "gd_2",
+          "title": "נטלי לוי",
+          "titleEn": "Natali Levi",
+          "text": "🎯 טיולי טבע, הרים וקניונים\n\nמדריכת טיולים מוסמכת, מתמחה במסלולי הרים ואקסטרים באדג׳רה",
+          "image": "http://localhost:3001/uploads/city.jpg",
+          "images": [],
+          "mapUrl": "https://wa.me/972502345678",
+          "pageUrl": "",
+          "visible": true,
+          "phone": "972502345678"
+        },
+        {
+          "id": "gd_3",
+          "title": "גיורגי",
+          "titleEn": "Giorgi",
+          "text": "🎯 סיורי יין, קולינריה וכפרים\n\nמדריך מקומי דובר עברית. מכיר כל פינה בגאורגיה, מתמחה ביין ואוכל",
+          "image": "http://localhost:3001/uploads/city.jpg",
+          "images": [],
+          "mapUrl": "https://wa.me/995591234567",
+          "pageUrl": "",
+          "visible": true,
+          "phone": "995591234567"
+        },
+        {
+          "id": "gd_4",
+          "title": "אלכס ברקוביץ׳",
+          "titleEn": "Alex Berkovich",
+          "text": "🎯 נדל\"ן, השקעות ופתיחת עסקים\n\nיועץ נדל\"ן ועסקים לישראלים בבטומי, מלווה מא׳ עד ת׳",
+          "image": "http://localhost:3001/uploads/city.jpg",
+          "images": [],
+          "mapUrl": "https://wa.me/972503456789",
+          "pageUrl": "",
+          "visible": true,
+          "phone": "972503456789"
+        },
+        {
+          "id": "gd_5",
+          "title": "מריאם",
+          "titleEn": "Mariam",
+          "text": "🎯 סיורים לקבוצות ומשפחות\n\nמדריכה מקומית דוברת עברית ואנגלית, מתמחה בסיורים מותאמים למשפחות",
+          "image": "http://localhost:3001/uploads/city.jpg",
+          "images": [],
+          "mapUrl": "https://wa.me/995592345678",
+          "pageUrl": "",
+          "visible": true,
+          "phone": "995592345678"
+        },
+        {
+          "id": "gd_6",
+          "title": "יוסי אברהם",
+          "titleEn": "Yossi Abraham",
+          "text": "🎯 טיולי ג׳יפים ואקסטרים\n\nנהג ומדריך שטח, מכיר את כל מסלולי הג׳יפים בהרי אדג׳רה",
+          "image": "http://localhost:3001/uploads/city.jpg",
+          "images": [],
+          "mapUrl": "https://wa.me/972504567890",
+          "pageUrl": "",
+          "visible": true,
+          "phone": "972504567890"
+        },
+        {
+          "id": "gd_7",
+          "title": "תמר",
+          "titleEn": "Tamar",
+          "text": "🎯 אמנות, אדריכלות ותרבות\n\nמדריכה מקומית עם תואר באמנות, מתמחה בסיורי אדריכלות ומוזיאונים",
+          "image": "http://localhost:3001/uploads/city.jpg",
+          "images": [],
+          "mapUrl": "https://wa.me/995593456789",
+          "pageUrl": "",
+          "visible": true,
+          "phone": "995593456789"
+        },
+        {
+          "id": "gd_8",
+          "title": "רון מזרחי",
+          "titleEn": "Ron Mizrahi",
+          "text": "🎯 חיי לילה, ברים וקזינו\n\nמכיר את כל הבילויים בבטומי, מארגן ערבי גיבוש וחוויות לילה",
+          "image": "http://localhost:3001/uploads/city.jpg",
+          "images": [],
+          "mapUrl": "https://wa.me/972505678901",
+          "pageUrl": "",
+          "visible": true,
+          "phone": "972505678901"
+        },
+        {
+          "id": "gd_9",
+          "title": "ניקא",
+          "titleEn": "Nika",
+          "text": "🎯 העברות משדה, נהג צמוד\n\nנהג מקומי אמין עם רכב נוח. העברות משדה התעופה וטיולי יום",
+          "image": "http://localhost:3001/uploads/city.jpg",
+          "images": [],
+          "mapUrl": "https://wa.me/995594567890",
+          "pageUrl": "",
+          "visible": true,
+          "phone": "995594567890"
+        },
+        {
+          "id": "gd_10",
+          "title": "שירה גולן",
+          "titleEn": "Shira Golan",
+          "text": "🎯 סיורים קולינריים ושיעורי בישול\n\nשפית ישראלית שחיה בבטומי, מעבירה סדנאות בישול גאורגי וסיורי אוכל",
+          "image": "http://localhost:3001/uploads/city.jpg",
+          "images": [],
+          "mapUrl": "https://wa.me/972506789012",
+          "pageUrl": "",
+          "visible": true,
+          "phone": "972506789012"
+        }
+      ],
+      "pageBtnLabel": "אתר/פייסבוק",
+      "cardStyle": "passport",
+      "theme": "light"
     },
     {
       "id": "casino",

@@ -32,6 +32,8 @@ type DataItem = {
   hotels?: HotelBlock[];
   tours?: TourBlock[];
   pageBtnLabel?: string;
+  cardStyle?: string;
+  article?: any;
 };
 
 const HERO_PALETTE = [
@@ -763,6 +765,32 @@ function EditModal({
                 >
                   <Text style={{ color: Colors.WHITE, fontWeight: '700' }}>+ הוסף בלוק</Text>
                 </TouchableOpacity>
+              </View>
+            )}
+
+            {form.article && (
+              <View style={ms.fieldGroup}>
+                <Text style={[ms.label, { fontSize: 16, marginBottom: 10 }]}>📝 עריכת מאמר</Text>
+                {(form.article.sections || []).map((sec: any, idx: number) => (
+                  <View key={idx} style={{ borderWidth: 1, borderColor: '#e8e8e8', borderRadius: 12, padding: 12, marginBottom: 12, backgroundColor: '#fafafa' }}>
+                    <Text style={{ fontSize: 13, fontWeight: '800', color: Colors.PRIMARY, marginBottom: 6 }}>סקשן {idx + 1}</Text>
+                    <TextInput style={[ms.input, { marginBottom: 6 }]} value={sec.icon || ''} onChangeText={(v: string) => { const a={...form.article}; const s=[...(a.sections||[])]; s[idx]={...s[idx],icon:v}; a.sections=s; setForm((p: any)=>({...p,article:a})); }} placeholder="אייקון" placeholderTextColor="#bbb" textAlign="right" />
+                    <TextInput style={[ms.input, { marginBottom: 6 }]} value={sec.title || ''} onChangeText={(v: string) => { const a={...form.article}; const s=[...(a.sections||[])]; s[idx]={...s[idx],title:v}; a.sections=s; setForm((p: any)=>({...p,article:a})); }} placeholder="כותרת" placeholderTextColor="#bbb" textAlign="right" />
+                    <TextInput style={[ms.input, ms.textArea, { marginBottom: 6 }]} value={sec.tip || ''} onChangeText={(v: string) => { const a={...form.article}; const s=[...(a.sections||[])]; s[idx]={...s[idx],tip:v}; a.sections=s; setForm((p: any)=>({...p,article:a})); }} placeholder="טיפים (שורה = טיפ)" placeholderTextColor="#bbb" textAlign="right" multiline numberOfLines={8} />
+                  </View>
+                ))}
+                {(form.article.apps || []).length > 0 && (
+                  <View style={{ marginBottom: 12 }}>
+                    <Text style={{ fontSize: 13, fontWeight: '800', color: Colors.PRIMARY, marginBottom: 6 }}>📲 אפליקציות</Text>
+                    {(form.article.apps || []).map((app: any, idx: number) => (
+                      <View key={idx} style={{ flexDirection: 'row-reverse', gap: 6, marginBottom: 6 }}>
+                        <TextInput style={[ms.input, { flex: 1 }]} value={app.name || ''} onChangeText={(v: string) => { const a={...form.article}; const apps=[...(a.apps||[])]; apps[idx]={...apps[idx],name:v}; a.apps=apps; setForm((p: any)=>({...p,article:a})); }} placeholder="שם" placeholderTextColor="#bbb" textAlign="right" />
+                        <TextInput style={[ms.input, { flex: 1 }]} value={app.subtitle || ''} onChangeText={(v: string) => { const a={...form.article}; const apps=[...(a.apps||[])]; apps[idx]={...apps[idx],subtitle:v}; a.apps=apps; setForm((p: any)=>({...p,article:a})); }} placeholder="תיאור" placeholderTextColor="#bbb" textAlign="right" />
+                        <TextInput style={[ms.input, { flex: 1 }]} value={app.url || ''} onChangeText={(v: string) => { const a={...form.article}; const apps=[...(a.apps||[])]; apps[idx]={...apps[idx],url:v}; a.apps=apps; setForm((p: any)=>({...p,article:a})); }} placeholder="URL" placeholderTextColor="#bbb" textAlign="left" />
+                      </View>
+                    ))}
+                  </View>
+                )}
               </View>
             )}
 

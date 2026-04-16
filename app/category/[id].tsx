@@ -17,7 +17,7 @@ type TourBlock = { id: string; title: string; subtitle?: string; text: string; c
 type Item = {
   id: string; title: string; subtitle?: string; icon: string; bg?: string;
   bgDark?: string; description?: string; summary?: string; heroBg?: string;
-  layout?: 'card' | 'banner'; children?: Item[]; hotels?: Hotel[]; tours?: TourBlock[]; pageBtnLabel?: string;
+  layout?: 'card' | 'banner'; children?: Item[]; hotels?: Hotel[]; tours?: TourBlock[]; pageBtnLabel?: string; cardStyle?: string;
   theme?: 'dark' | 'light'; modal?: string; longText?: string;
   titleEn?: string; titleGe?: string; heroImage?: string;
   article?: {
@@ -32,6 +32,86 @@ type Item = {
     terminal?: boolean;
   };
 };
+
+function PassportCard({ h, pageBtnLabel }: { h: Hotel; pageBtnLabel: string }) {
+  const [imgFailed, setImgFailed] = useState(false);
+  return (
+    <View style={passSt.card}>
+      <View style={passSt.header}>
+        <Text style={passSt.headerIcon}>🛂</Text>
+        <Text style={passSt.headerTxt}>כרטיס מדריך</Text>
+        <Text style={passSt.headerTxt}>GUIDE CARD</Text>
+      </View>
+      <View style={passSt.body}>
+        <View style={passSt.photoWrap}>
+          {h.image && !imgFailed ? (
+            <Image source={{ uri: h.image }} style={passSt.photo} resizeMode="cover" onError={() => setImgFailed(true)} />
+          ) : (
+            <View style={[passSt.photo, { backgroundColor: '#334155', alignItems: 'center', justifyContent: 'center' }]}>
+              <Text style={{ fontSize: 36 }}>👤</Text>
+            </View>
+          )}
+        </View>
+        <View style={passSt.info}>
+          <Text style={passSt.name}>{h.title}</Text>
+          {h.titleEn ? <Text style={passSt.nameEn}>{h.titleEn}</Text> : null}
+          <View style={passSt.divider} />
+          <Text style={passSt.bio}>{h.text}</Text>
+        </View>
+      </View>
+      <View style={passSt.stamp}>
+        <Text style={passSt.stampTxt}>BATUMI ✈ GEORGIA</Text>
+      </View>
+      <View style={passSt.btnRow}>
+        {h.pageUrl ? (
+          <TouchableOpacity style={[passSt.btn, { backgroundColor: '#1A6B8A' }]} onPress={() => Linking.openURL(h.pageUrl!)}>
+            <Text style={passSt.btnTxt}>{pageBtnLabel}</Text>
+          </TouchableOpacity>
+        ) : null}
+        <TouchableOpacity
+          style={[passSt.btn, { backgroundColor: '#25D366' }]}
+          onPress={() => h.mapUrl && Linking.openURL(h.mapUrl)}
+          disabled={!h.mapUrl}
+        >
+          <Text style={passSt.btnTxt}>📱 WhatsApp</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+}
+
+const passSt = StyleSheet.create({
+  card: {
+    backgroundColor: '#0f172a', borderRadius: 16, overflow: 'hidden', marginBottom: 16,
+    borderWidth: 2, borderColor: '#c9a84c',
+    shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.2, shadowRadius: 10, elevation: 5,
+  },
+  header: {
+    backgroundColor: '#1e293b', flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'center',
+    gap: 8, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#c9a84c40',
+  },
+  headerIcon: { fontSize: 18 },
+  headerTxt: { fontSize: 12, fontWeight: '800', color: '#c9a84c', letterSpacing: 1 },
+  body: { flexDirection: 'row-reverse', padding: 16, gap: 14 },
+  photoWrap: {
+    width: 100, height: 120, borderRadius: 8, overflow: 'hidden',
+    borderWidth: 2, borderColor: '#c9a84c60',
+  },
+  photo: { width: '100%', height: '100%' },
+  info: { flex: 1 },
+  name: { fontSize: 20, fontWeight: '900', color: '#f8fafc', textAlign: 'right', writingDirection: 'rtl' },
+  nameEn: { fontSize: 13, fontWeight: '600', color: '#94a3b8', textAlign: 'right', marginTop: 2 },
+  divider: { height: 1, backgroundColor: '#c9a84c40', marginVertical: 8 },
+  bio: { fontSize: 13, color: '#cbd5e1', lineHeight: 20, textAlign: 'right', writingDirection: 'rtl' },
+  stamp: {
+    alignSelf: 'center', marginBottom: 12, paddingHorizontal: 16, paddingVertical: 4,
+    borderWidth: 1, borderColor: '#c9a84c40', borderRadius: 20,
+  },
+  stampTxt: { fontSize: 10, color: '#c9a84c80', letterSpacing: 2, fontWeight: '700' },
+  btnRow: { flexDirection: 'row-reverse', gap: 8, padding: 12, paddingTop: 0 },
+  btn: { flex: 1, paddingVertical: 11, borderRadius: 10, alignItems: 'center' },
+  btnTxt: { color: '#fff', fontWeight: '800', fontSize: 13 },
+});
 
 function HotelImage({ uri, titleEn }: { uri?: string; titleEn?: string }) {
   const [failed, setFailed] = useState(!uri);
@@ -231,7 +311,7 @@ function HotelCard({ h, dark, pageBtnLabel }: { h: Hotel; dark: boolean; pageBtn
             onPress={() => h.mapUrl && Linking.openURL(h.mapUrl)}
             disabled={!h.mapUrl}
           >
-            <Text style={[st.hotelBtnTxt, !h.mapUrl && st.hotelBtnTxtDisabled]}>נווט למקום</Text>
+            <Text style={[st.hotelBtnTxt, !h.mapUrl && st.hotelBtnTxtDisabled]}>{h.mapUrl && h.mapUrl.includes('wa.me') ? 'WhatsApp' : 'נווט למקום'}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -479,7 +559,9 @@ export default function CategoryScreen() {
         ) : cat.hotels && cat.hotels.length > 0 ? (
           <View style={st.hotelList}>
             {cat.hotels.filter(h => h.visible !== false).map(h => (
-              <HotelCard key={h.id} h={h} dark={darkCat} pageBtnLabel={cat.pageBtnLabel || 'לדף המלון'} />
+              cat.cardStyle === 'passport'
+                ? <PassportCard key={h.id} h={h} pageBtnLabel={cat.pageBtnLabel || 'אתר/פייסבוק'} />
+                : <HotelCard key={h.id} h={h} dark={darkCat} pageBtnLabel={cat.pageBtnLabel || 'לדף המלון'} />
             ))}
           </View>
         ) : cat.article ? (
