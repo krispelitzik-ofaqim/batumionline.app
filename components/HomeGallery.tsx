@@ -10,9 +10,14 @@ export default function HomeGallery() {
   const timer = useRef<any>(null);
 
   useEffect(() => {
-    fetch('http://localhost:3001/api/gallery')
+    fetch('/api/uploads')
       .then(r => r.json())
-      .then(j => { if (j.success) setFiles(j.files); })
+      .then(j => {
+        if (j.success) {
+          const galleryFiles = (j.files || []).filter((f: any) => (f.tags || []).includes('gallery_main'));
+          setFiles(galleryFiles);
+        }
+      })
       .catch(() => {});
   }, []);
 
