@@ -5093,28 +5093,50 @@
           "bg": "#FFE0B2",
           "description": "למי שרוצה לצאת מהעיר ולגלות את גיאורגיה האמיתית",
           "article": {
-            "heroImage": "http://localhost:3001/uploads/city.jpg",
             "color": "#FFE0B2",
             "sections": [
               {
-                "icon": "📋",
-                "title": "דרישות",
-                "tip": "רישיון בינלאומי + כרטיס אשראי"
+                "icon": "💡",
+                "title": "טיפים להשכרת רכב בבטומי",
+                "tip": "• רישיון נהיגה בינלאומי נדרש (או רישיון ישראלי + תרגום נוטריוני)\n• כרטיס אשראי חובה - חלק מהחברות דורשות פיקדון\n• הדרך הכי משתלמת: הזמנה מראש באינטרנט\n• מחירים: החל מ-80-120 לארי ליום (כ-120-180 ₪)\n• דלק זול יחסית - בנזין כ-2.5 לארי לליטר\n• הנהיגה בגאורגיה פראית יותר מישראל - הישארו ערניים בהרים\n• בעיר עצמה מוניות זולות יותר - רכב שווה רק ליציאות מחוץ לעיר\n• אל תחנו בלי לשלם! חפשו מכשירי פארקומט\n• ביטוח מלא (CDW + Theft) מומלץ מאוד\n• לטיולי יום (מפלי מירבטי, קניון מרטוילי, קובולתי) - רכב שכור = חופש מוחלט"
+              }
+            ],
+            "apps": [
+              {
+                "name": "Localrent",
+                "subtitle": "הזמנה מקומית ללא פיקדון, מחירים טובים",
+                "logo": "http://localhost:3001/uploads/city.jpg",
+                "url": "https://localrent.com/"
               },
               {
-                "icon": "🏢",
-                "title": "חברות השכרה",
-                "tip": "חברות מקומיות ובינלאומיות זמינות בשדה התעופה ובעיר"
+                "name": "MyRentaCar",
+                "subtitle": "השוואת מחירים מחברות מקומיות",
+                "logo": "http://localhost:3001/uploads/city.jpg",
+                "url": "https://myrentacar.com/"
               },
               {
-                "icon": "⛽",
-                "title": "דלק",
-                "tip": "מחירי הדלק בגאורגיה נמוכים יחסית"
+                "name": "Rentalcars",
+                "subtitle": "חברות בינלאומיות - Hertz, Avis, Europcar",
+                "logo": "http://localhost:3001/uploads/city.jpg",
+                "url": "https://www.rentalcars.com/"
+              }
+            ],
+            "buttons": [
+              {
+                "label": "השכרה בשדה התעופה",
+                "type": "map",
+                "coords": {
+                  "lat": 41.6102,
+                  "lng": 41.5997
+                }
               },
               {
-                "icon": "🛣️",
-                "title": "כבישים",
-                "tip": "הכבישים בין הערים באיכות טובה, שימו לב לנהיגה מקומית"
+                "label": "נווט לשדה",
+                "type": "navigate",
+                "coords": {
+                  "lat": 41.6102,
+                  "lng": 41.5997
+                }
               }
             ]
           },
@@ -5130,28 +5152,50 @@
           "bg": "#E8F5E9",
           "description": "בלוקים של פרוצדורה - ברור וגדול",
           "article": {
-            "heroImage": "http://localhost:3001/uploads/city.jpg",
             "color": "#E8F5E9",
             "sections": [
               {
-                "icon": "🚲",
-                "title": "תחנות שיתוף",
-                "tip": "תחנות אופניים לשיתוף פזורות לאורך הטיילת"
+                "icon": "💡",
+                "title": "טיפים להשכרת אופניים בבטומי",
+                "tip": "• שביל אופניים מסודר לאורך כל הטיילת - 7 ק\"מ על חוף הים\n• תחנות שיתוף אופניים פזורות לאורך הטיילת - פתיחה באפליקציה\n• מחירים: כ-5 לארי לשעה, 15-20 לארי ליום\n• חנויות השכרה פרטיות ליד הטיילת - אופניים וקורקינטים\n• Bolt מציעה גם קורקינטים חשמליים בעיר\n• קסדה לא חובה חוקית אבל מומלצת מאוד\n• הימנעו מרכיבה בכבישים הראשיים - השתמשו בשביל הטיילת\n• שעות מומלצות: בוקר מוקדם או שקיעה (פחות חום, יותר יפה)\n• נעילה: בהשכרה פרטית תקבלו מנעול, בשיתוף - מנעול אלקטרוני\n• המסלול שטוח לחלוטין - מתאים לכל הגילים ורמות הכושר"
+              }
+            ],
+            "apps": [
+              {
+                "name": "BatumVelo",
+                "subtitle": "שיתוף אופניים רשמי של בטומי",
+                "logo": "http://localhost:3001/uploads/city.jpg",
+                "url": "https://www.tripadvisor.com/Attraction_Review-g297576-d8126781-Reviews-BatumVelo-Batumi_Adjara_Region.html"
               },
               {
-                "icon": "📱",
-                "title": "אפליקציה",
-                "tip": "הורידו את האפליקציה לפתיחת מנעול האופניים"
+                "name": "Batumi Bike",
+                "subtitle": "השכרת אופניים בעיר - iOS ואנדרואיד",
+                "logo": "http://localhost:3001/uploads/city.jpg",
+                "url": "https://batumi.org.il/"
               },
               {
-                "icon": "🛤️",
-                "title": "מסלולים",
-                "tip": "שביל אופניים לאורך כל הטיילת - 7 ק\"מ של רכיבה על חוף הים"
+                "name": "Bolt (קורקינטים)",
+                "subtitle": "קורקינטים חשמליים בכל רחבי העיר",
+                "logo": "http://localhost:3001/uploads/bolt_logo.png",
+                "url": "https://bolt.eu/"
+              }
+            ],
+            "buttons": [
+              {
+                "label": "תחנת אופניים מרכזית",
+                "type": "map",
+                "coords": {
+                  "lat": 41.6488,
+                  "lng": 41.637
+                }
               },
               {
-                "icon": "💰",
-                "title": "מחירים",
-                "tip": "כ-5 לארי לשעה, 15 לארי ליום"
+                "label": "נווט לטיילת",
+                "type": "navigate",
+                "coords": {
+                  "lat": 41.6488,
+                  "lng": 41.637
+                }
               }
             ]
           },
@@ -5259,7 +5303,341 @@
       "bg": "#2D4A5E",
       "bgDark": "#1A6B8A",
       "image": "",
-      "heroBg": "#2D4A5E"
+      "heroBg": "#2D4A5E",
+      "children": [
+        {
+          "id": "sh1",
+          "title": "קניות ושופינג",
+          "subtitle": "קניונים, שווקים ורחובות",
+          "icon": "🛍️",
+          "bg": "#E8D5F0",
+          "hotels": [
+            {
+              "id": "sh_1",
+              "title": "קניון מטרו סיטי",
+              "titleEn": "Metro City Mall",
+              "text": "מרכז הקניות הגדול והחדיש ביותר בבטומי. מותגים בינלאומיים, מקדונלדס, קולנוע, באולינג, סופרמרקט ואזורי משחקים. חוויית קנייה בסטנדרט בינלאומי",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6434,41.6367",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.6434,
+                "lng": 41.6367
+              }
+            },
+            {
+              "id": "sh_2",
+              "title": "באטומי מול",
+              "titleEn": "Batumi Mall",
+              "text": "קניון על קו החוף עם מותגים, מתחם מזון, בית קולנוע ומרפסת עם נוף לים. ידידותי למשפחות",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.638,41.629",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.638,
+                "lng": 41.629
+              }
+            },
+            {
+              "id": "sh_3",
+              "title": "שוק הפשפשים",
+              "titleEn": "Old Bazaar",
+              "text": "השוק המקומי הגדול והאותנטי ביותר. בגדים, נעליים, תבלינים, גבינות, פירות, מזכרות - הכל במחירים זולים. חוויה גאורגית אמיתית",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6453,41.6401",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.6453,
+                "lng": 41.6401
+              }
+            },
+            {
+              "id": "sh_4",
+              "title": "באטומי מול - גודוויל",
+              "titleEn": "Goodwill Supermarket",
+              "text": "סופרמרקט גדול ברחוב גורגילדזה, מצוין להצטיידות יומיומית. גם המרת מטבע ושירותים נוספים",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6445,41.6378",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.6445,
+                "lng": 41.6378
+              }
+            },
+            {
+              "id": "sh_5",
+              "title": "רחוב גמסחורדיה",
+              "titleEn": "Gamsakhurdia St.",
+              "text": "רחוב מרכזי בעיר העתיקה עם אדריכלות אירופאית, חנויות קטנות, גלריות אמנות וחנויות יין גאורגי",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.651,41.637",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.651,
+                "lng": 41.637
+              }
+            },
+            {
+              "id": "sh_6",
+              "title": "רחוב אבאשידזה",
+              "titleEn": "Abashidze St.",
+              "text": "הרחוב היוקרתי של בטומי. בניינים משוחזרים מהמאות ה-19-20, חנויות אופנה אלגנטיות, בתי קפה ומסעדות",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6505,41.6355",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.6505,
+                "lng": 41.6355
+              }
+            },
+            {
+              "id": "sh_7",
+              "title": "רחוב גורגילדזה",
+              "titleEn": "Gorgiladze St.",
+              "text": "עורק חיים ראשי - שופינג יומיומי, חנויות אלקטרוניקה, צעצועים, ביגוד. הרחוב הטוב ביותר לשופינג אמיתי",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.647,41.6385",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.647,
+                "lng": 41.6385
+              }
+            },
+            {
+              "id": "sh_8",
+              "title": "שוק הדגים",
+              "titleEn": "Fish Market",
+              "text": "חוויה קולינרית ליד הנמל. דגים ופירות ים טריים, אפשר לקנות ולאכול במקום. שוק קטן ואותנטי",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.652,41.6405",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.652,
+                "lng": 41.6405
+              }
+            },
+            {
+              "id": "sh_9",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "sh_10",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            }
+          ],
+          "pageBtnLabel": "מידע נוסף"
+        },
+        {
+          "id": "sh2",
+          "title": "סופרמרקטים",
+          "subtitle": "הצטיידות יומיומית",
+          "icon": "🛒",
+          "bg": "#D4EDDA",
+          "hotels": [
+            {
+              "id": "sm_1",
+              "title": "גודוויל (Goodwill)",
+              "titleEn": "Goodwill",
+              "text": "הסופר המוכר והנוח ביותר לישראלים. סניף ענק, מבחר רחב, מחירים הוגנים. מבחר עצום של יינות גאורגיים במחירים משתלמים",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6445,41.6378",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.6445,
+                "lng": 41.6378
+              }
+            },
+            {
+              "id": "sm_2",
+              "title": "קרפור (Carrefour)",
+              "titleEn": "Carrefour",
+              "text": "חוויית קנייה ברמה גבוהה. מוצרים טריים, גבינות מקומיות ואוכל מוכן איכותי. מחלקת אוכל מוכן מעולה (עוף צלוי, מאפים וסלטים)",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6434,41.6367",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.6434,
+                "lng": 41.6367
+              }
+            },
+            {
+              "id": "sm_3",
+              "title": "אגרוהאב (Agrohub)",
+              "titleEn": "Agrohub",
+              "text": "מחלקת אוכל מוכן מצוינת במחירים זולים. מבחר מוצרים מקומיים ומיובאים",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6490,41.6360",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.649,
+                "lng": 41.636
+              }
+            },
+            {
+              "id": "sm_4",
+              "title": "ניקורה (Nikora)",
+              "titleEn": "Nikora",
+              "text": "רשת נוחות פופולרית. נוח לקניות ליליות באזור המלונות. פתוח שעות ארוכות",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6505,41.6355",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.6505,
+                "lng": 41.6355
+              }
+            },
+            {
+              "id": "sm_5",
+              "title": "סמארט (Smart)",
+              "titleEn": "Smart",
+              "text": "סופרמרקט בינוני עם מחירים תחרותיים ומבחר טוב",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6470,41.6390",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.647,
+                "lng": 41.639
+              }
+            },
+            {
+              "id": "sm_6",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "sm_7",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "sm_8",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "sm_9",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "sm_10",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            }
+          ],
+          "pageBtnLabel": "מידע נוסף"
+        },
+        {
+          "id": "sh3",
+          "title": "החזרי מס",
+          "subtitle": "Tax Free",
+          "icon": "💰",
+          "bg": "#F59E0B",
+          "article": {
+            "color": "#F59E0B",
+            "sections": [
+              {
+                "icon": "💡",
+                "title": "Tax Free - החזרי מס בגאורגיה",
+                "tip": "• Tax Free הוא החזר על קניות שעשיתם בתוך העיר\n• רכישה מעל 200 לארי בחשבונית אחת - בקשו טופס החזר מס מהמוכר\n• בשדה התעופה: ניגשים לדלפק המכס (באולם היוצאים מצד ימין)\n• הציגו דרכון, טפסים ואת המוצרים (חדשים באריזה)\n• הפקיד יחתים את הטופס\n• אחרי ביקורת דרכונים: ניגשים לדלפק הבנק ומקבלים החזר (כ-13%)\n• שמרו את כל הקבלות המקוריות!\n• הגיעו מוקדם - התור בדלפק המכס יכול להיות ארוך"
+              },
+              {
+                "icon": "🛒",
+                "title": "Duty Free בשדה התעופה",
+                "tip": "• הקנייה ב-Duty Free נעשית בתוך שדה התעופה עצמו\n• המחירים כבר פטורים ממס - אין צורך בטפסים\n• בשמים, מותגי יוקרה, אלכוהול בינלאומי ויינות גאורגיים\n• מארזים יפים של שוקולדים ומזכרות מקומיות\n• הדיוטי פרי בבטומי קטן - אל תבנו עליו, קנו בעיר"
+              }
+            ],
+            "buttons": [
+              {
+                "label": "דלפק מכס בשדה",
+                "type": "map",
+                "coords": {
+                  "lat": 41.6102,
+                  "lng": 41.5997
+                }
+              },
+              {
+                "label": "נווט לשדה",
+                "type": "navigate",
+                "coords": {
+                  "lat": 41.6102,
+                  "lng": 41.5997
+                }
+              }
+            ]
+          }
+        }
+      ]
     },
     {
       "id": "8",
@@ -5270,7 +5648,1089 @@
       "bg": "#3DA5C4",
       "bgDark": "#3DA5C4",
       "image": "",
-      "heroBg": "#3DA5C4"
+      "heroBg": "#3DA5C4",
+      "children": [
+        {
+          "id": "sp1",
+          "title": "חדרי כושר במלונות",
+          "subtitle": "",
+          "icon": "🏋️",
+          "bg": "#E8D5F0",
+          "hotels": [
+            {
+              "id": "sp1_1",
+              "title": "חדר כושר הילטון",
+              "titleEn": "Hilton Gym",
+              "text": "חדר כושר מאובזר במלון הילטון, פתוח לאורחי המלון 24/7",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.649,41.6257",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.649,
+                "lng": 41.6257
+              }
+            },
+            {
+              "id": "sp1_2",
+              "title": "חדר כושר רדיסון",
+              "titleEn": "Radisson Gym",
+              "text": "ציוד מודרני, נוף לים, פתוח לאורחים",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6536,41.6375",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.6536,
+                "lng": 41.6375
+              }
+            },
+            {
+              "id": "sp1_3",
+              "title": "חדר כושר שרתון",
+              "titleEn": "Sheraton Gym",
+              "text": "מתקנים ברמה גבוהה + בריכה",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6489,41.6398",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.6489,
+                "lng": 41.6398
+              }
+            },
+            {
+              "id": "sp1_4",
+              "title": "חדר כושר ווינדהם",
+              "titleEn": "Wyndham Gym",
+              "text": "חדר כושר גדול עם ציוד Technogym",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6501,41.6361",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.6501,
+                "lng": 41.6361
+              }
+            },
+            {
+              "id": "sp1_5",
+              "title": "חדר כושר מריוט",
+              "titleEn": "Marriott Gym",
+              "text": "חדר כושר + סאונה, פתוח לאורחים",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6417,41.6157",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.6417,
+                "lng": 41.6157
+              }
+            },
+            {
+              "id": "sp1_6",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "sp1_7",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "sp1_8",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "sp1_9",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "sp1_10",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            }
+          ],
+          "pageBtnLabel": "מידע נוסף"
+        },
+        {
+          "id": "sp2",
+          "title": "ספא ועיסוי",
+          "subtitle": "",
+          "icon": "💆",
+          "bg": "#FADADD",
+          "hotels": [
+            {
+              "id": "sp2_1",
+              "title": "ספא הילטון",
+              "titleEn": "Hilton Spa",
+              "text": "מתחם ספא יוקרתי עם בריכה מקורה, סאונה, חמאם ועיסויים",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.649,41.6257",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.649,
+                "lng": 41.6257
+              }
+            },
+            {
+              "id": "sp2_2",
+              "title": "ספא רדיסון",
+              "titleEn": "Radisson Spa",
+              "text": "טיפולי פנים וגוף, ג׳קוזי ונוף פנורמי",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6536,41.6375",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.6536,
+                "lng": 41.6375
+              }
+            },
+            {
+              "id": "sp2_3",
+              "title": "חמאם טורקי",
+              "titleEn": "Turkish Hammam",
+              "text": "חוויית חמאם מסורתית בלב העיר",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.651,41.6365",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.651,
+                "lng": 41.6365
+              }
+            },
+            {
+              "id": "sp2_4",
+              "title": "עיסוי תאילנדי",
+              "titleEn": "Thai Massage",
+              "text": "סטודיו לעיסוי תאילנדי מקצועי",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.648,41.637",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.648,
+                "lng": 41.637
+              }
+            },
+            {
+              "id": "sp2_5",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "sp2_6",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "sp2_7",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "sp2_8",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "sp2_9",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "sp2_10",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            }
+          ],
+          "pageBtnLabel": "מידע נוסף"
+        },
+        {
+          "id": "sp3",
+          "title": "בריכות שחייה",
+          "subtitle": "",
+          "icon": "🏊",
+          "bg": "#CCE5FF",
+          "hotels": [
+            {
+              "id": "sp3_1",
+              "title": "בריכת הילטון",
+              "titleEn": "Hilton Pool",
+              "text": "בריכה חיצונית מחוממת עם נוף לים",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.649,41.6257",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.649,
+                "lng": 41.6257
+              }
+            },
+            {
+              "id": "sp3_2",
+              "title": "בריכת קולוסיאום",
+              "titleEn": "Colosseum Pool",
+              "text": "בריכה חיצונית גדולה על חוף הים",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6375,41.6093",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.6375,
+                "lng": 41.6093
+              }
+            },
+            {
+              "id": "sp3_3",
+              "title": "בריכת רדיסון",
+              "titleEn": "Radisson Pool",
+              "text": "בריכה פנימית מחוממת + חיצונית",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6536,41.6375",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.6536,
+                "lng": 41.6375
+              }
+            },
+            {
+              "id": "sp3_4",
+              "title": "בריכה עירונית",
+              "titleEn": "City Pool",
+              "text": "בריכה ציבורית במחיר נגיש",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.645,41.638",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.645,
+                "lng": 41.638
+              }
+            },
+            {
+              "id": "sp3_5",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "sp3_6",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "sp3_7",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "sp3_8",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "sp3_9",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "sp3_10",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            }
+          ],
+          "pageBtnLabel": "מידע נוסף"
+        },
+        {
+          "id": "sp4",
+          "title": "ספורט חוף",
+          "subtitle": "",
+          "icon": "🏖️",
+          "bg": "#FFF3CD",
+          "hotels": [
+            {
+              "id": "sp4_1",
+              "title": "כדורעף חופים",
+              "titleEn": "Beach Volleyball",
+              "text": "מגרשי כדורעף חופשיים על החוף המרכזי",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6463,41.6367",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.6463,
+                "lng": 41.6367
+              }
+            },
+            {
+              "id": "sp4_2",
+              "title": "ג׳ט סקי",
+              "titleEn": "Jet Ski",
+              "text": "השכרת ג׳ט סקי על החוף - הפעלה עצמאית או עם מדריך",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.645,41.636",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.645,
+                "lng": 41.636
+              }
+            },
+            {
+              "id": "sp4_3",
+              "title": "שייט קייאק",
+              "titleEn": "Kayak",
+              "text": "השכרת קייאקים ו-SUP על חוף הים",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.647,41.6365",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.647,
+                "lng": 41.6365
+              }
+            },
+            {
+              "id": "sp4_4",
+              "title": "כדורגל חופים",
+              "titleEn": "Beach Soccer",
+              "text": "מגרשים חופשיים לאורך החוף",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6455,41.6363",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.6455,
+                "lng": 41.6363
+              }
+            },
+            {
+              "id": "sp4_5",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "sp4_6",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "sp4_7",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "sp4_8",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "sp4_9",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "sp4_10",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            }
+          ],
+          "pageBtnLabel": "מידע נוסף"
+        },
+        {
+          "id": "sp5",
+          "title": "ריצה והליכה",
+          "subtitle": "",
+          "icon": "🏃",
+          "bg": "#E8F5E9",
+          "hotels": [
+            {
+              "id": "sp5_1",
+              "title": "טיילת הבולוואר",
+              "titleEn": "Boulevard Run",
+              "text": "7 ק\"מ שטוחים לאורך חוף הים - המסלול המושלם",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6488,41.637",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.6488,
+                "lng": 41.637
+              }
+            },
+            {
+              "id": "sp5_2",
+              "title": "פארק 6 במאי",
+              "titleEn": "6 May Park",
+              "text": "מסלול ריצה בפארק ירוק עם אגם ושבילים מוצלים",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.652,41.635",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.652,
+                "lng": 41.635
+              }
+            },
+            {
+              "id": "sp5_3",
+              "title": "טיילת דרומית",
+              "titleEn": "South Boulevard",
+              "text": "מסלול שקט יותר לכיוון שדה התעופה",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.638,41.625",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.638,
+                "lng": 41.625
+              }
+            },
+            {
+              "id": "sp5_4",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "sp5_5",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "sp5_6",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "sp5_7",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "sp5_8",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "sp5_9",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "sp5_10",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            }
+          ],
+          "pageBtnLabel": "מידע נוסף"
+        },
+        {
+          "id": "sp6",
+          "title": "יוגה ופילאטיס",
+          "subtitle": "",
+          "icon": "🧘",
+          "bg": "#F0E6FF",
+          "hotels": [
+            {
+              "id": "sp6_1",
+              "title": "יוגה על החוף",
+              "titleEn": "Beach Yoga",
+              "text": "שיעורי יוגה בוקר על חוף הים (עונתי)",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6463,41.6367",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.6463,
+                "lng": 41.6367
+              }
+            },
+            {
+              "id": "sp6_2",
+              "title": "סטודיו יוגה בטומי",
+              "titleEn": "Batumi Yoga Studio",
+              "text": "שיעורים יומיים, כל הרמות",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.65,41.637",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.65,
+                "lng": 41.637
+              }
+            },
+            {
+              "id": "sp6_3",
+              "title": "פילאטיס סנטר",
+              "titleEn": "Pilates Center",
+              "text": "סטודיו מקצועי עם מכשירים",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.649,41.6365",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.649,
+                "lng": 41.6365
+              }
+            },
+            {
+              "id": "sp6_4",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "sp6_5",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "sp6_6",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "sp6_7",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "sp6_8",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "sp6_9",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "sp6_10",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            }
+          ],
+          "pageBtnLabel": "מידע נוסף"
+        },
+        {
+          "id": "sp7",
+          "title": "סטודיו לריקוד",
+          "subtitle": "",
+          "icon": "💃",
+          "bg": "#FFE0B2",
+          "hotels": [
+            {
+              "id": "sp7_1",
+              "title": "ריקודים גאורגיים",
+              "titleEn": "Georgian Dance",
+              "text": "למדו ריקודים מסורתיים - חוויה בלתי נשכחת",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.651,41.636",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.651,
+                "lng": 41.636
+              }
+            },
+            {
+              "id": "sp7_2",
+              "title": "סלסה בטומי",
+              "titleEn": "Salsa Batumi",
+              "text": "ערבי סלסה ובכאטה, מתחילים ומתקדמים",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6495,41.6375",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.6495,
+                "lng": 41.6375
+              }
+            },
+            {
+              "id": "sp7_3",
+              "title": "סטודיו מחול",
+              "titleEn": "Dance Studio",
+              "text": "שיעורי מחול מודרני, היפ הופ וג׳אז",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6485,41.6368",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.6485,
+                "lng": 41.6368
+              }
+            },
+            {
+              "id": "sp7_4",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "sp7_5",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "sp7_6",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "sp7_7",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "sp7_8",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "sp7_9",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "sp7_10",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            }
+          ],
+          "pageBtnLabel": "מידע נוסף"
+        },
+        {
+          "id": "sp8",
+          "title": "מגרשי ספורט",
+          "subtitle": "",
+          "icon": "🎾",
+          "bg": "#D4EDDA",
+          "hotels": [
+            {
+              "id": "sp8_1",
+              "title": "מגרשי טניס",
+              "titleEn": "Tennis Courts",
+              "text": "מגרשי טניס להשכרה ליד פארק 6 במאי",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.652,41.6345",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.652,
+                "lng": 41.6345
+              }
+            },
+            {
+              "id": "sp8_2",
+              "title": "מגרש כדורסל",
+              "titleEn": "Basketball Court",
+              "text": "מגרשים ציבוריים חופשיים",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.651,41.6355",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.651,
+                "lng": 41.6355
+              }
+            },
+            {
+              "id": "sp8_3",
+              "title": "מתחם כדורגל",
+              "titleEn": "Football Pitch",
+              "text": "מגרשי כדורגל סינתטיים להשכרה",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.653,41.634",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.653,
+                "lng": 41.634
+              }
+            },
+            {
+              "id": "sp8_4",
+              "title": "באולינג",
+              "titleEn": "Bowling",
+              "text": "מסלולי באולינג בקניון מטרו סיטי",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6434,41.6367",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.6434,
+                "lng": 41.6367
+              }
+            },
+            {
+              "id": "sp8_5",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "sp8_6",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "sp8_7",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "sp8_8",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "sp8_9",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "sp8_10",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            }
+          ],
+          "pageBtnLabel": "מידע נוסף"
+        }
+      ]
     },
     {
       "id": "9",
