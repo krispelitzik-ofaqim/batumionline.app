@@ -1,11 +1,12 @@
 import { Platform } from 'react-native';
 
-// In development, iOS simulator uses localhost, Android emulator uses 10.0.2.2
 const DEV_HOST = Platform.OS === 'android' ? '10.0.2.2' : 'localhost';
 
-export const API_BASE = __DEV__
-  ? `http://${DEV_HOST}:3001`
-  : 'https://www.batumionline.app';
+export const API_BASE = Platform.OS === 'web'
+  ? ''
+  : __DEV__
+    ? `http://${DEV_HOST}:3001`
+    : 'https://www.batumionline.app';
 
 export async function fetchContent() {
   const res = await fetch(`${API_BASE}/api/content`);

@@ -10,6 +10,7 @@ import { AdminContext } from '../../constants/adminContext';
 import DevicePreviewBar from '../../components/DevicePreviewBar';
 import { fetchContent, fetchRatings, submitRating } from '../../constants/api';
 import AudioPlayer from '../../components/AudioPlayer';
+import FlightsModal from '../../components/FlightsModal';
 
 type Hotel = { id: string; title: string; titleEn?: string; text: string; image: string; mapUrl?: string; pageUrl?: string; coords?: { lat: number; lng: number }; visible?: boolean; images?: string[] };
 type TourBlock = { id: string; title: string; subtitle?: string; text: string; color: string; images: string[]; audios: { title?: string; url: string }[]; visible?: boolean; coords?: { lat: number; lng: number } };
@@ -17,7 +18,19 @@ type Item = {
   id: string; title: string; subtitle?: string; icon: string; bg?: string;
   bgDark?: string; description?: string; summary?: string; heroBg?: string;
   layout?: 'card' | 'banner'; children?: Item[]; hotels?: Hotel[]; tours?: TourBlock[]; pageBtnLabel?: string;
-  theme?: 'dark' | 'light';
+  theme?: 'dark' | 'light'; modal?: string; longText?: string;
+  titleEn?: string; titleGe?: string; heroImage?: string;
+  article?: {
+    heroImage?: string; color?: string;
+    sections: { icon: string; title: string; tip: string; image?: string; actionLabel?: string; actionUrl?: string }[];
+    buttons?: { label: string; type: 'map' | 'navigate' | 'link' | 'ticket'; coords?: { lat: number; lng: number }; url?: string }[];
+    apps?: { name: string; subtitle: string; logo: string; url: string }[];
+    timetable?: {
+      title?: string; source?: string;
+      tabs: { label: string; icon: string; rows: { depart: string; arrive: string; duration: string; price: string; note?: string }[] }[];
+    };
+    terminal?: boolean;
+  };
 };
 
 function HotelImage({ uri, titleEn }: { uri?: string; titleEn?: string }) {
@@ -351,15 +364,35 @@ export default function CategoryScreen() {
   const children = cat.children || [];
   const darkCat = cat.theme === 'dark' || dark;
 
+  if (cat.modal === 'flights') {
+    return (
+      <SafeAreaView style={[st.safe, darkCat && { backgroundColor: cat.heroBg || '#0f1419' }]}>
+        <Stack.Screen options={{ headerShown: true, title: cat.title, headerBackTitle: 'חזרה' }} />
+        <FlightsModal visible={true} onClose={() => router.back()} bgColor={cat.bg || '#2D4A5E'} />
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={[st.safe, darkCat && { backgroundColor: cat.heroBg || '#0f1419' }]}>
       <Stack.Screen options={{ headerShown: true, title: cat.title, headerBackTitle: 'חזרה' }} />
       <DevicePreviewBar />
       <ScrollView showsVerticalScrollIndicator={false} style={{ maxWidth: w, alignSelf: 'center', width: '100%' }}>
-        <View style={[st.hero, { backgroundColor: cat.heroBg || cat.bg || (darkCat ? '#1a1a2e' : '#3DA5C4') }]}>
-          <Text style={[st.heroTitle, darkCat && { color: '#F4A94E' }]}>{cat.title}</Text>
-          {cat.subtitle ? <Text style={[st.heroSub, darkCat && { color: '#d4af37' }]}>{cat.subtitle}</Text> : null}
-        </View>
+        {cat.heroImage ? (
+          <View style={st.heroImgWrap}>
+            <Image source={{ uri: cat.heroImage }} style={st.heroImgBg} resizeMode="cover" />
+            <View style={st.heroImgBottomBar}>
+              <Text style={st.heroImgBarTxt}>{cat.titleEn || ''}</Text>
+              <Text style={st.heroImgBarTxt}>{cat.titleGe || ''}</Text>
+              <Text style={st.heroImgBarTxt}>{cat.title}</Text>
+            </View>
+          </View>
+        ) : (
+          <View style={[st.hero, { backgroundColor: cat.heroBg || cat.bg || (darkCat ? '#1a1a2e' : '#3DA5C4') }]}>
+            <Text style={[st.heroTitle, darkCat && { color: '#F4A94E' }]}>{cat.title}</Text>
+            {cat.subtitle ? <Text style={[st.heroSub, darkCat && { color: '#d4af37' }]}>{cat.subtitle}</Text> : null}
+          </View>
+        )}
 
         {cat.tours && cat.tours.length > 0 ? (
           selectedTour ? (
@@ -449,9 +482,24 @@ export default function CategoryScreen() {
               <HotelCard key={h.id} h={h} dark={darkCat} pageBtnLabel={cat.pageBtnLabel || 'לדף המלון'} />
             ))}
           </View>
+        ) : cat.article ? (
+          <ArticleView cat={cat} darkCat={darkCat} />
+        ) : cat.longText ? (
+          <View style={st.body}>
+            {Platform.OS === 'web' ? (
+              React.createElement('div', {
+                dangerouslySetInnerHTML: { __html: cat.longText },
+                style: { direction: 'rtl', textAlign: 'right', color: darkCat ? '#e2e8f0' : Colors.TEXT, lineHeight: 1.8, fontSize: 15 },
+              })
+            ) : (
+              <Text style={[st.content, darkCat && { color: Colors.BACKGROUND }]}>
+                {cat.description || ''}
+              </Text>
+            )}
+          </View>
         ) : (
           <View style={st.body}>
-            <Text style={[st.content, dark && { color: Colors.BACKGROUND }]}>
+            <Text style={[st.content, darkCat && { color: Colors.BACKGROUND }]}>
               {cat.description || 'אין תוכן עדיין'}
             </Text>
           </View>
@@ -469,6 +517,18 @@ const st = StyleSheet.create({
   hero: { paddingVertical: 30, paddingHorizontal: 24, alignItems: 'center' },
   heroTitle: { fontSize: 26, fontWeight: '800', color: Colors.WHITE, textAlign: 'center', writingDirection: 'rtl' },
   heroSub: { fontSize: 14, color: Colors.WHITE, opacity: 0.85, marginTop: 4, textAlign: 'center', writingDirection: 'rtl' },
+  heroImgWrap: { width: '100%', height: 180, position: 'relative' },
+  heroImgBg: { width: '100%', height: '100%' },
+  heroImgOverlay: {
+    ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.55)',
+    justifyContent: 'center', alignItems: 'center', padding: 16,
+  },
+  heroImgBottomBar: {
+    position: 'absolute', bottom: 0, left: 0, right: 0,
+    backgroundColor: 'rgba(0,0,0,0.35)', paddingVertical: 8, paddingHorizontal: 12,
+    flexDirection: 'row', justifyContent: 'space-between',
+  },
+  heroImgBarTxt: { color: Colors.WHITE, fontSize: 13, fontWeight: '700' },
 
   section: { paddingHorizontal: 16, marginTop: 16, marginBottom: 24 },
   grid: { flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 10 },
@@ -566,6 +626,273 @@ const st = StyleSheet.create({
     alignSelf: 'flex-start', padding: 10, marginBottom: 8,
   },
   tourBackTxt: { fontSize: 15, fontWeight: '700', color: Colors.PRIMARY, writingDirection: 'rtl' },
+});
+
+function TerminalClock() {
+  const [time, setTime] = useState('');
+  const [blink, setBlink] = useState(true);
+  useEffect(() => {
+    const fmt = new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Tbilisi', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+    const update = () => { setTime(fmt.format(new Date())); setBlink(v => !v); };
+    update();
+    const iv = setInterval(update, 1000);
+    return () => clearInterval(iv);
+  }, []);
+  return (
+    <View style={termSt.clockWrap}>
+      <Text style={termSt.clockLabel}>🕐 זמן בטומי</Text>
+      <Text style={termSt.clock}>{time.replace(/:/g, blink ? ':' : ' ')}</Text>
+    </View>
+  );
+}
+
+function BlinkDot() {
+  const [on, setOn] = useState(true);
+  useEffect(() => {
+    const iv = setInterval(() => setOn(v => !v), 800);
+    return () => clearInterval(iv);
+  }, []);
+  return <View style={[termSt.liveDot, { opacity: on ? 1 : 0.2 }]} />;
+}
+
+function TimetableTabs({ timetable, color, terminal }: { timetable: { title?: string; source?: string; tabs: { label: string; icon: string; rows: { depart: string; arrive: string; duration: string; price: string; note?: string }[] }[] }; color?: string; terminal?: boolean }) {
+  const [activeTab, setActiveTab] = useState(0);
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [selectedDay, setSelectedDay] = useState(0);
+  const tab = timetable.tabs[activeTab];
+  const dark = !!terminal;
+
+  const days = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date();
+    d.setDate(d.getDate() + i);
+    const dayNames = ['יום א׳', 'יום ב׳', 'יום ג׳', 'יום ד׳', 'יום ה׳', 'יום ו׳', 'שבת'];
+    const label = i === 0 ? 'היום' : i === 1 ? 'מחר' : dayNames[d.getDay()];
+    const date = `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`;
+    return { label, date };
+  });
+
+  return (
+    <View style={[dark ? termSt.card : artSt.card, !dark && { backgroundColor: '#f8fafc' }]}>
+      {dark && (
+        <View style={termSt.headerRow}>
+          <View style={termSt.liveRow}>
+            <BlinkDot />
+            <Text style={termSt.liveText}>LIVE</Text>
+          </View>
+          <TerminalClock />
+          <TouchableOpacity onPress={() => setRefreshKey(k => k + 1)} style={termSt.refreshBtn}>
+            <Text style={termSt.refreshTxt}>🔄 רענן</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+      <View style={[artSt.cardHeader, dark && { marginBottom: 4 }]}>
+        <Text style={[artSt.cardIcon, { fontSize: dark ? 22 : 28 }]}>{dark ? '🚆' : '🚌'}</Text>
+        <Text style={[artSt.cardTitle, dark && { color: '#4ade80' }]}>{timetable.title || 'לוח זמנים'}</Text>
+      </View>
+      {timetable.source ? (
+        <Text style={{ fontSize: 11, color: dark ? '#6b7280' : '#888', textAlign: 'center', writingDirection: 'rtl', marginBottom: 10 }}>{timetable.source}</Text>
+      ) : null}
+
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 6, paddingBottom: 10 }}>
+        {days.map((d, i) => (
+          <TouchableOpacity
+            key={i}
+            style={[termSt.dayBtn, selectedDay === i && { backgroundColor: dark ? '#86efac' : (color || Colors.PRIMARY) }]}
+            onPress={() => setSelectedDay(i)}
+          >
+            <Text style={[termSt.dayLabel, selectedDay === i && { color: dark ? '#0f172a' : Colors.WHITE }]}>{d.label}</Text>
+            <Text style={[termSt.dayDate, selectedDay === i && { color: dark ? '#0f172a' : Colors.WHITE }]}>{d.date}</Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+
+      <View style={artSt.tabRow}>
+        {timetable.tabs.map((t, i) => (
+          <TouchableOpacity
+            key={i}
+            style={[artSt.tab, { backgroundColor: dark ? '#1e293b' : '#e2e8f0' }, activeTab === i && { backgroundColor: dark ? '#4ade80' : (color || Colors.PRIMARY) }]}
+            onPress={() => setActiveTab(i)}
+          >
+            <Text style={[artSt.tabTxt, { color: dark ? '#94a3b8' : Colors.TEXT }, activeTab === i && { color: dark ? '#0f172a' : Colors.WHITE }]}>{t.label}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+      <View style={[artSt.tableHeader, dark && { borderBottomColor: '#334155' }]}>
+        <Text style={[artSt.tableCell, artSt.tableBold, dark && { color: '#94a3b8' }]}>יציאה</Text>
+        <Text style={[artSt.tableCell, artSt.tableBold, dark && { color: '#94a3b8' }]}>הגעה</Text>
+        <Text style={[artSt.tableCell, artSt.tableBold, dark && { color: '#94a3b8' }]}>משך</Text>
+        <Text style={[artSt.tableCell, artSt.tableBold, dark && { color: '#94a3b8' }]}>מחיר</Text>
+      </View>
+      {tab.rows.map((row, i) => (
+        <View key={`${refreshKey}-${i}`}>
+          {row.note && <Text style={{ fontSize: 11, color: dark ? '#6b7280' : '#666', textAlign: 'right', writingDirection: 'rtl', paddingTop: 6, paddingHorizontal: 4 }}>{row.note}</Text>}
+          <View style={[artSt.tableRow, { backgroundColor: dark ? (i % 2 === 0 ? '#1e293b' : '#0f172a') : (i % 2 === 0 ? '#f0f4f8' : 'transparent') }]}>
+            <Text style={[artSt.tableCell, dark && { color: '#e2e8f0', fontWeight: '700' }]}>{row.depart}</Text>
+            <Text style={[artSt.tableCell, dark && { color: '#e2e8f0' }]}>{row.arrive}</Text>
+            <Text style={[artSt.tableCell, dark && { color: '#94a3b8' }]}>{row.duration}</Text>
+            <Text style={[artSt.tableCell, dark && { color: '#4ade80', fontWeight: '700' }]}>{row.price}</Text>
+          </View>
+        </View>
+      ))}
+      <View style={termSt.countRow}>
+        <Text style={[termSt.countTxt, !dark && { color: Colors.PRIMARY }]}>
+          {dark ? '🚆' : '🚌'} {tab.rows.length} {dark ? 'רכבות' : 'קווים'} — {days[selectedDay].label} ({days[selectedDay].date}) — {tab.label}
+        </Text>
+      </View>
+    </View>
+  );
+}
+
+const termSt = StyleSheet.create({
+  card: {
+    backgroundColor: '#0f172a', borderRadius: 16, padding: 16,
+    borderWidth: 1, borderColor: '#1e293b',
+    shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 12, elevation: 5,
+  },
+  headerRow: { flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
+  liveRow: { flexDirection: 'row-reverse', alignItems: 'center', gap: 6 },
+  liveDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#4ade80' },
+  liveText: { fontSize: 12, fontWeight: '900', color: '#ffffff', letterSpacing: 1 },
+  clockWrap: { alignItems: 'center' },
+  clockLabel: { fontSize: 9, color: '#6b7280', marginBottom: 2 },
+  clock: { fontSize: 24, fontWeight: '900', color: '#f8fafc', fontVariant: ['tabular-nums'], letterSpacing: 2, fontFamily: 'Courier' },
+  refreshBtn: { backgroundColor: '#1e293b', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8 },
+  refreshTxt: { fontSize: 12, color: '#94a3b8', fontWeight: '700' },
+  dayBtn: { backgroundColor: '#1e293b', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 10, alignItems: 'center', minWidth: 60 },
+  dayBtnActive: { backgroundColor: '#22c55e' },
+  dayLabel: { fontSize: 12, fontWeight: '800', color: '#94a3b8' },
+  dayDate: { fontSize: 9, color: '#6b7280', marginTop: 2, fontWeight: '400' },
+  countRow: { marginTop: 12, paddingVertical: 10, borderTopWidth: 1, borderTopColor: '#1e293b' },
+  countTxt: { fontSize: 11, fontWeight: '400', color: '#4ade80', textAlign: 'center', writingDirection: 'rtl' },
+});
+
+function ArticleView({ cat, darkCat }: { cat: Item; darkCat: boolean }) {
+  const [showMap, setShowMap] = useState<{ lat: number; lng: number } | null>(null);
+  const art = cat.article!;
+  return (
+    <View style={artSt.wrap}>
+      {art.timetable && art.timetable.tabs && (
+        <TimetableTabs timetable={art.timetable} color={art.color} terminal={art.terminal} />
+      )}
+
+      {showMap && (
+        <View style={[artSt.card, { backgroundColor: '#f8fafc', minHeight: 300, position: 'relative' }]}>
+          {Platform.OS === 'web' ? (
+            // @ts-ignore
+            <iframe
+              src={`https://www.google.com/maps?q=${showMap.lat},${showMap.lng}&z=15&output=embed`}
+              style={{ width: '100%', height: 280, border: 0, borderRadius: 12 }}
+            />
+          ) : null}
+          <TouchableOpacity
+            style={{ position: 'absolute', top: 10, right: 10, width: 32, height: 32, borderRadius: 16, backgroundColor: 'rgba(0,0,0,0.6)', alignItems: 'center', justifyContent: 'center' }}
+            onPress={() => setShowMap(null)}
+          >
+            <Text style={{ color: Colors.WHITE, fontSize: 16, fontWeight: '700' }}>✕</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {art.buttons && art.buttons.length > 0 && (
+        <View style={artSt.btnRow}>
+          {art.buttons.map((btn, i) => (
+            <TouchableOpacity
+              key={i}
+              style={[artSt.actionBtn, {
+                backgroundColor: btn.type === 'map' ? '#F4A94E' : btn.type === 'navigate' ? '#3DA5C4' : btn.type === 'ticket' ? '#10b981' : '#1A6B8A',
+              }]}
+              onPress={() => {
+                if (btn.type === 'link' && btn.url) Linking.openURL(btn.url);
+                else if (btn.type === 'navigate' && btn.coords)
+                  Linking.openURL(`https://www.google.com/maps/dir/?api=1&destination=${btn.coords.lat},${btn.coords.lng}`);
+                else if ((btn.type === 'map' || btn.type === 'ticket') && btn.coords)
+                  setShowMap(showMap ? null : btn.coords);
+              }}
+            >
+              <Text style={artSt.actionBtnTxt}>{btn.type === 'map' && showMap ? 'סגור מפה' : btn.label}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      )}
+
+      {art.apps && art.apps.length > 0 && (
+        <View style={artSt.appsCard}>
+          <Text style={artSt.appsTitle}>📲 אפליקציות מומלצות להורדה</Text>
+          {art.apps.map((app, i) => (
+            <TouchableOpacity key={i} style={artSt.appRow} onPress={() => Linking.openURL(app.url)} activeOpacity={0.7}>
+              <Image source={{ uri: app.logo }} style={artSt.appLogo} resizeMode="contain" />
+              <View style={artSt.appInfo}>
+                <Text style={artSt.appName}>{app.name}</Text>
+                <Text style={artSt.appSub}>{app.subtitle}</Text>
+              </View>
+              <Text style={artSt.appArrow}>←</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      )}
+
+      {art.sections.map((sec, i) => (
+        <View key={i} style={[artSt.card, { backgroundColor: (art.color || '#f0f4f8') + '60' }]}>
+          <View style={artSt.cardHeader}>
+            <Text style={artSt.cardIcon}>{sec.icon}</Text>
+            <Text style={artSt.cardTitle}>{sec.title}</Text>
+          </View>
+          <Text style={artSt.cardTip}>{sec.tip}</Text>
+          {sec.image ? <Image source={{ uri: sec.image }} style={artSt.cardImg} resizeMode="cover" /> : null}
+          {sec.actionLabel && sec.actionUrl ? (
+            <TouchableOpacity style={[artSt.cardBtn, { backgroundColor: art.color || Colors.PRIMARY }]} onPress={() => Linking.openURL(sec.actionUrl!)}>
+              <Text style={artSt.cardBtnTxt}>{sec.actionLabel}</Text>
+            </TouchableOpacity>
+          ) : null}
+        </View>
+      ))}
+    </View>
+  );
+}
+
+const artSt = StyleSheet.create({
+  wrap: { padding: 16, gap: 14 },
+  heroWrap: { borderRadius: 16, overflow: 'hidden', position: 'relative' },
+  hero: { width: '100%', height: 180 },
+  heroBottomBar: { position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: 'rgba(0,0,0,0.35)', paddingVertical: 8, paddingHorizontal: 12, flexDirection: 'row', justifyContent: 'space-between' },
+  heroBottomTxt: { color: Colors.WHITE, fontSize: 13, fontWeight: '700' },
+  card: {
+    borderRadius: 16, padding: 16,
+    shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.06, shadowRadius: 6, elevation: 2,
+  },
+  cardHeader: { flexDirection: 'row-reverse', alignItems: 'center', gap: 10, marginBottom: 10 },
+  cardIcon: { fontSize: 28 },
+  cardTitle: { fontSize: 17, fontWeight: '900', color: Colors.TEXT, writingDirection: 'rtl', flex: 1, textAlign: 'right' },
+  cardTip: { fontSize: 14, color: '#444', lineHeight: 22, writingDirection: 'rtl', textAlign: 'right' },
+  cardImg: { width: '100%', height: 140, borderRadius: 12, marginTop: 12 },
+  cardBtn: {
+    marginTop: 12, paddingVertical: 10, borderRadius: 10, alignItems: 'center',
+  },
+  cardBtnTxt: { color: Colors.WHITE, fontWeight: '800', fontSize: 14 },
+  appsCard: {
+    backgroundColor: Colors.WHITE, borderRadius: 16, padding: 16,
+    shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.08, shadowRadius: 6, elevation: 2,
+  },
+  appsTitle: { fontSize: 16, fontWeight: '900', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl', marginBottom: 14 },
+  appRow: {
+    flexDirection: 'row-reverse', alignItems: 'center', gap: 12,
+    paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#f0f0f0',
+  },
+  appLogo: { width: 50, height: 50, borderRadius: 12 },
+  appInfo: { flex: 1 },
+  appName: { fontSize: 16, fontWeight: '800', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl' },
+  appSub: { fontSize: 12, color: '#666', textAlign: 'right', writingDirection: 'rtl', marginTop: 2 },
+  appArrow: { fontSize: 18, color: Colors.PRIMARY, fontWeight: '700' },
+  tabRow: { flexDirection: 'row-reverse', gap: 6, marginBottom: 12, flexWrap: 'wrap' },
+  tab: { flex: 1, minWidth: 90, paddingVertical: 10, borderRadius: 10, backgroundColor: '#e2e8f0', alignItems: 'center' },
+  tabTxt: { fontSize: 12, fontWeight: '800', color: Colors.TEXT, textAlign: 'center', writingDirection: 'rtl' },
+  btnRow: { flexDirection: 'row-reverse', gap: 8, flexWrap: 'wrap' },
+  actionBtn: { flex: 1, minWidth: 100, paddingVertical: 12, borderRadius: 10, alignItems: 'center' },
+  actionBtnTxt: { color: Colors.WHITE, fontWeight: '800', fontSize: 13 },
+  tableHeader: { flexDirection: 'row-reverse', borderBottomWidth: 2, borderBottomColor: '#cbd5e1', paddingBottom: 8, marginBottom: 4 },
+  tableRow: { flexDirection: 'row-reverse', paddingVertical: 8, borderRadius: 6 },
+  tableCell: { flex: 1, fontSize: 12, color: '#334155', textAlign: 'center', writingDirection: 'rtl' },
+  tableBold: { fontWeight: '800', color: Colors.TEXT },
 });
 
 const tourSt = StyleSheet.create({

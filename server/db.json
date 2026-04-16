@@ -1132,6 +1132,21 @@
               "mapUrl": "",
               "pageUrl": "",
               "visible": true
+            },
+            {
+              "id": "a2_11",
+              "title": "שוק הפשפשים",
+              "titleEn": "Old Bazaar",
+              "text": "שוק מקומי אותנטי עם תבלינים, פירות, גבינות, ממתקים וחרצ׳ו. חוויה תרבותית חובה - מחירים מקומיים, מיקוח מקובל. ממוקם ליד התחנה המרכזית ופופולרי מאוד בקרב תיירים ומקומיים",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "coords": {
+                "lat": 41.6453,
+                "lng": 41.6401
+              },
+              "visible": true
             }
           ],
           "pageBtnLabel": "מידע נוסף"
@@ -1163,6 +1178,246 @@
           "subtitle": "כנסיות ומנזרים",
           "icon": "⛪",
           "bg": "#3DA5C4"
+        },
+        {
+          "id": "a7",
+          "title": "אוטובוס תיירים",
+          "subtitle": "",
+          "icon": "🚌",
+          "bg": "#3DA5C425",
+          "hotels": [
+            {
+              "id": "a7_1",
+              "title": "הדרך הקלה והמהירה להכיר את כל באטומי בסיבוב אחד",
+              "titleEn": "",
+              "text": "הדרך הקלה והמהירה להכיר את כל באטומי בסיבוב אחד",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a7_2",
+              "title": "האוטובוס הדו-קומתי מאפשר לכם לראות את כל נקודות הצ",
+              "titleEn": "",
+              "text": "האוטובוס הדו-קומתי מאפשר לכם לראות את כל נקודות הציון המרכזיות של העיר עם הדרכה קולית. ניתן לרדת ולעלות בחופשיות (",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a7_3",
+              "title": "כ-40-50 לארי למבוגר (תקף ל-24 שעות)",
+              "titleEn": "",
+              "text": "כ-40-50 לארי למבוגר (תקף ל-24 שעות)",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a7_4",
+              "title": "זמין באנגלית, רוסית ושפות נוספות",
+              "titleEn": "",
+              "text": "זמין באנגלית, רוסית ושפות נוספות",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a7_5",
+              "title": "מומלץ לשבת בקומה השנייה לצילומים פנורמיים של קו הח",
+              "titleEn": "",
+              "text": "מומלץ לשבת בקומה השנייה לצילומים פנורמיים של קו החוף!",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a7_6",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a7_7",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a7_8",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a7_9",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a7_10",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            }
+          ],
+          "pageBtnLabel": "מידע נוסף"
+        },
+        {
+          "id": "a8",
+          "title": "נסיעות פרטיות",
+          "subtitle": "",
+          "icon": "🚐",
+          "bg": "#3DA5C425",
+          "hotels": [
+            {
+              "id": "a8_1",
+              "title": "סוכנים ומדריכים ישראלים בבטומי\n\"",
+              "titleEn": "",
+              "text": "סוכנים ומדריכים ישראלים בבטומי\n\"",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a8_2",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a8_3",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a8_4",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a8_5",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a8_6",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a8_7",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a8_8",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a8_9",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a8_10",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            }
+          ],
+          "pageBtnLabel": "מידע נוסף"
         }
       ],
       "heroBg": "#F4A94E"
@@ -4555,58 +4810,440 @@
         {
           "id": "t1",
           "title": "מוניות",
-          "subtitle": "Bolt ומוניות מקומיות",
+          "subtitle": "",
           "icon": "🚕",
-          "bg": "#F4A94E"
+          "bg": "#FFF3CD",
+          "description": "הדרך הבטוחה והזולה להתנייד בעיר",
+          "article": {
+            "color": "#FFF3CD",
+            "sections": [
+              {
+                "icon": "💡",
+                "title": "טיפים חשובים למוניות בבטומי",
+                "tip": "• השתמשו אך ורק באפליקציות - המחיר ידוע מראש והנהג מבוקר\n• נהגי מוניות ברחוב יבקשו מחיר גבוה פי 2 או 3\n• המחיר למרכז העיר כ-10-15 לארי באפליקציה\n• מומלץ לחבר כרטיס אשראי למניעת חיפושי עודף\n• בלילה המחירים עולים מעט אבל עדיין זול\n• לשדה התעופה כ-15-20 לארי מהעיר\n• Bolt זולה יותר לנסיעות קצרות, Maxim לפעמים זולה לנסיעות ארוכות\n• הראו כתובת בגאורגית - נהגים לא תמיד מבינים אנגלית\n• טיפ לא מקובל אבל מוערך\n• בשעות שיא (ערב) זמני המתנה ארוכים יותר\n• ניתן להזמין מראש ב-Bolt\n• לנסיעות ארוכות (טביליסי/קוטאיסי) שקלו BlaBlaCar\n• עקבו אחרי המסלול באפליקציה - לוודא שלא מאריכים"
+              }
+            ],
+            "apps": [
+              {
+                "name": "Bolt",
+                "subtitle": "האפליקציה המובילה בבטומי",
+                "logo": "http://localhost:3001/uploads/bolt_logo.png",
+                "url": "https://bolt.eu/"
+              },
+              {
+                "name": "Maxim",
+                "subtitle": "לעיתים זולה יותר מבולט",
+                "logo": "http://localhost:3001/uploads/maxim_logo.png",
+                "url": "https://taximaxim.com/"
+              },
+              {
+                "name": "Yandex Go",
+                "subtitle": "אלטרנטיבה עם מגוון שירותים",
+                "logo": "http://localhost:3001/uploads/yandex_logo.png",
+                "url": "https://taxi.yandex.com/"
+              }
+            ]
+          },
+          "titleEn": "Taxis",
+          "titleGe": "ტაქსი",
+          "heroImage": "http://localhost:3001/uploads/city.jpg"
         },
         {
           "id": "t2",
           "title": "תחבורה ציבורית",
-          "subtitle": "אוטובוסים עירוניים",
+          "subtitle": "",
           "icon": "🚌",
-          "bg": "#3DA5C4"
+          "bg": "#D4EDDA",
+          "description": "כל הדרכים להתנייד בעיר בקלות ובזול",
+          "article": {
+            "color": "#D4EDDA",
+            "sections": [
+              {
+                "icon": "💡",
+                "title": "טיפים לתחבורה ציבורית בבטומי",
+                "tip": "• התחבורה הציבורית מבוססת על מרשוטקות (מיניבוסים) - מספר הקו מוצג בחלון הקדמי\n• מחיר אחיד: 1 לארי לנסיעה (כ-1.5 ₪)\n• תשלום במזומן בלבד - הכינו מטבעות מראש\n• עולים מהדלת הקדמית, יורדים מהאחורית\n• אין תחנות קבועות - הניפו יד לעצור, צעקו \"გაჩერდი\" (גאצ'רדי) לרדת\n• שעות פעילות: 07:00-22:00 (תדירות נמוכה בערב)\n• Google Maps מציג חלק מהקווים בזמן אמת\n• התחנה המרכזית ליד שוק הפשפשים (Old Bazaar)\n• אין אפליקציה מקומית - השתמשו ב-Google Maps או שאלו מקומיים\n• בשבת/חגים תדירות מופחתת\n• כרטיס Metro Money חוסך 50% - נרכש בקיוסקים בתחנה המרכזית (0.5 לארי במקום 1)"
+              }
+            ],
+            "buttons": [
+              {
+                "label": "איפה התחנה?",
+                "type": "map",
+                "coords": {
+                  "lat": 41.6453,
+                  "lng": 41.6401
+                }
+              },
+              {
+                "label": "נווט לתחנה",
+                "type": "navigate",
+                "coords": {
+                  "lat": 41.6453,
+                  "lng": 41.6401
+                }
+              },
+              {
+                "label": "איפה קונים כרטיס?",
+                "type": "ticket",
+                "coords": {
+                  "lat": 41.6448,
+                  "lng": 41.6395
+                }
+              }
+            ],
+            "timetable": {
+              "tabs": [
+                {
+                  "label": "קווים לטיילת וחוף",
+                  "icon": "🏖️",
+                  "rows": [
+                    {
+                      "depart": "קו 1",
+                      "arrive": "טיילת צפונית",
+                      "duration": "15 דק'",
+                      "price": "1 ₾"
+                    },
+                    {
+                      "depart": "קו 1א",
+                      "arrive": "טיילת דרומית",
+                      "duration": "20 דק'",
+                      "price": "1 ₾"
+                    },
+                    {
+                      "depart": "קו 10",
+                      "arrive": "חוף הים",
+                      "duration": "10 דק'",
+                      "price": "1 ₾"
+                    }
+                  ]
+                },
+                {
+                  "label": "קווים למרכז ושווקים",
+                  "icon": "🏬",
+                  "rows": [
+                    {
+                      "depart": "קו 2",
+                      "arrive": "שוק הפשפשים",
+                      "duration": "10 דק'",
+                      "price": "1 ₾"
+                    },
+                    {
+                      "depart": "קו 3",
+                      "arrive": "מרכז העיר",
+                      "duration": "12 דק'",
+                      "price": "1 ₾"
+                    },
+                    {
+                      "depart": "קו 14",
+                      "arrive": "קניון מטרו",
+                      "duration": "15 דק'",
+                      "price": "1 ₾"
+                    }
+                  ]
+                },
+                {
+                  "label": "קווים לשדה התעופה",
+                  "icon": "✈️",
+                  "rows": [
+                    {
+                      "depart": "קו 16",
+                      "arrive": "שדה תעופה",
+                      "duration": "25 דק'",
+                      "price": "1 ₾"
+                    }
+                  ]
+                }
+              ],
+              "title": "קווים עיקריים",
+              "source": ""
+            }
+          },
+          "titleEn": "Public Transport",
+          "titleGe": "საზოგადოებრივი ტრანსპორტი",
+          "heroImage": "http://localhost:3001/uploads/city.jpg"
         },
         {
           "id": "t3",
-          "title": "רכבת",
-          "subtitle": "קווי פנים-ארציים",
+          "title": "רכבות",
+          "subtitle": "",
           "icon": "🚆",
-          "bg": "#1A6B8A"
+          "bg": "#CCE5FF",
+          "description": "הדרך המהירה והנוחה ביותר למעבר בין הערים",
+          "article": {
+            "heroImage": "http://localhost:3001/uploads/city.jpg",
+            "color": "#CCE5FF",
+            "sections": [
+              {
+                "icon": "🚆",
+                "title": "קו בטומי-טביליסי",
+                "tip": "הדרך המהירה והנוחה ביותר למעבר בין הערים"
+              },
+              {
+                "icon": "🎫",
+                "title": "רכישת כרטיסים",
+                "tip": "ניתן לרכוש באתר הרכבות הגאורגיות או בתחנה"
+              },
+              {
+                "icon": "⏱️",
+                "title": "זמן נסיעה",
+                "tip": "כ-5 שעות מבטומי לטביליסי"
+              },
+              {
+                "icon": "💺",
+                "title": "סוגי מחלקות",
+                "tip": "מחלקה ראשונה ושנייה, מומלץ ראשונה לנסיעות ארוכות"
+              }
+            ],
+            "buttons": [
+              {
+                "label": "איפה זה?",
+                "type": "map",
+                "coords": {
+                  "lat": 41.6417,
+                  "lng": 41.6348
+                }
+              },
+              {
+                "label": "נווט למקום",
+                "type": "navigate",
+                "coords": {
+                  "lat": 41.6417,
+                  "lng": 41.6348
+                }
+              },
+              {
+                "label": "רכשו כרטיסים",
+                "type": "link",
+                "url": "https://tkt.ge/"
+              }
+            ],
+            "timetable": {
+              "tabs": [
+                {
+                  "label": "בטומי → טביליסי",
+                  "icon": "→",
+                  "rows": [
+                    {
+                      "depart": "08:15",
+                      "arrive": "13:20",
+                      "duration": "5:05",
+                      "price": "25-45 ₾"
+                    },
+                    {
+                      "depart": "17:30",
+                      "arrive": "22:35",
+                      "duration": "5:05",
+                      "price": "25-45 ₾"
+                    }
+                  ]
+                },
+                {
+                  "label": "טביליסי → בטומי",
+                  "icon": "←",
+                  "rows": [
+                    {
+                      "depart": "08:00",
+                      "arrive": "13:05",
+                      "duration": "5:05",
+                      "price": "25-45 ₾"
+                    },
+                    {
+                      "depart": "15:45",
+                      "arrive": "20:50",
+                      "duration": "5:05",
+                      "price": "25-45 ₾"
+                    }
+                  ]
+                },
+                {
+                  "label": "בטומי ↔ קוטאיסי",
+                  "icon": "↔",
+                  "rows": [
+                    {
+                      "depart": "06:50",
+                      "arrive": "09:30",
+                      "duration": "2:40",
+                      "price": "10-20 ₾",
+                      "note": "בטומי → קוטאיסי"
+                    },
+                    {
+                      "depart": "16:00",
+                      "arrive": "18:40",
+                      "duration": "2:40",
+                      "price": "10-20 ₾",
+                      "note": "קוטאיסי → בטומי"
+                    }
+                  ]
+                }
+              ],
+              "title": "לוח זמנים — רכבות גאורגיה",
+              "source": "נתונים חיים מתוך tkt.ge | 24 שעות קרובות"
+            },
+            "terminal": true
+          },
+          "theme": "dark",
+          "titleEn": "Railways",
+          "titleGe": "მატარებელი",
+          "heroImage": "http://localhost:3001/uploads/city.jpg"
         },
         {
           "id": "t4",
-          "title": "השכרת וואן",
-          "subtitle": "להסעה קבוצתית",
-          "icon": "🚐",
-          "bg": "#2E8BA8"
+          "title": "השכרת רכב",
+          "subtitle": "",
+          "icon": "🚗",
+          "bg": "#FFE0B2",
+          "description": "למי שרוצה לצאת מהעיר ולגלות את גיאורגיה האמיתית",
+          "article": {
+            "heroImage": "http://localhost:3001/uploads/city.jpg",
+            "color": "#FFE0B2",
+            "sections": [
+              {
+                "icon": "📋",
+                "title": "דרישות",
+                "tip": "רישיון בינלאומי + כרטיס אשראי"
+              },
+              {
+                "icon": "🏢",
+                "title": "חברות השכרה",
+                "tip": "חברות מקומיות ובינלאומיות זמינות בשדה התעופה ובעיר"
+              },
+              {
+                "icon": "⛽",
+                "title": "דלק",
+                "tip": "מחירי הדלק בגאורגיה נמוכים יחסית"
+              },
+              {
+                "icon": "🛣️",
+                "title": "כבישים",
+                "tip": "הכבישים בין הערים באיכות טובה, שימו לב לנהיגה מקומית"
+              }
+            ]
+          },
+          "titleEn": "Car Rental",
+          "titleGe": "მანქანის გაქირავება",
+          "heroImage": "http://localhost:3001/uploads/city.jpg"
         },
         {
           "id": "t5",
-          "title": "אוטובוס תיירים",
-          "subtitle": "Hop-On Hop-Off",
-          "icon": "🚍",
-          "bg": "#F7BE68"
+          "title": "השכרת אופניים",
+          "subtitle": "",
+          "icon": "🚲",
+          "bg": "#E8F5E9",
+          "description": "בלוקים של פרוצדורה - ברור וגדול",
+          "article": {
+            "heroImage": "http://localhost:3001/uploads/city.jpg",
+            "color": "#E8F5E9",
+            "sections": [
+              {
+                "icon": "🚲",
+                "title": "תחנות שיתוף",
+                "tip": "תחנות אופניים לשיתוף פזורות לאורך הטיילת"
+              },
+              {
+                "icon": "📱",
+                "title": "אפליקציה",
+                "tip": "הורידו את האפליקציה לפתיחת מנעול האופניים"
+              },
+              {
+                "icon": "🛤️",
+                "title": "מסלולים",
+                "tip": "שביל אופניים לאורך כל הטיילת - 7 ק\"מ של רכיבה על חוף הים"
+              },
+              {
+                "icon": "💰",
+                "title": "מחירים",
+                "tip": "כ-5 לארי לשעה, 15 לארי ליום"
+              }
+            ]
+          },
+          "titleEn": "Bike Rental",
+          "titleGe": "ველოსიპედის გაქირავება",
+          "heroImage": "http://localhost:3001/uploads/city.jpg"
         },
         {
           "id": "t6",
-          "title": "נהג צמוד",
-          "subtitle": "ליווי אישי ביום",
-          "icon": "🧑‍✈️",
-          "bg": "#5BC0DE"
+          "title": "המראות ונחיתות",
+          "subtitle": "",
+          "icon": "✈️",
+          "bg": "#E3F2FD",
+          "description": "ניתן לגלול מהשוליים הלבנים בצדדים ובתוך הלוח",
+          "article": {
+            "heroImage": "http://localhost:3001/uploads/city.jpg",
+            "color": "#E3F2FD",
+            "sections": [
+              {
+                "icon": "🛬",
+                "title": "שדה התעופה",
+                "tip": "שדה התעופה של בטומי (BUS) קטן ונגיש"
+              },
+              {
+                "icon": "🕐",
+                "title": "הגעה מוקדמת",
+                "tip": "מומלץ להגיע 3 שעות לפני הטיסה"
+              },
+              {
+                "icon": "🚕",
+                "title": "הגעה לשדה",
+                "tip": "מונית מהעיר לשדה כ-15 דקות, 10-15 לארי"
+              },
+              {
+                "icon": "🛒",
+                "title": "דיוטי פרי",
+                "tip": "הדיוטי פרי קטן, אל תבנו עליו"
+              }
+            ]
+          },
+          "titleEn": "Departures & Arrivals",
+          "titleGe": "ფრენები",
+          "heroImage": "http://localhost:3001/uploads/city.jpg"
         },
         {
           "id": "t7",
-          "title": "טיסות",
-          "subtitle": "לוח המראות ונחיתות",
-          "icon": "✈️",
-          "bg": "#7ECFC0"
+          "title": "ביטול טיסות",
+          "subtitle": "",
+          "icon": "❌",
+          "bg": "#FFEBEE",
+          "description": "במידה ולא מצאת את טיסתכם, כנסו לאתר הרשמי של שדה התעופה בבטומי - כאן",
+          "article": {
+            "heroImage": "http://localhost:3001/uploads/city.jpg",
+            "color": "#FFEBEE",
+            "sections": [
+              {
+                "icon": "📞",
+                "title": "יצירת קשר",
+                "tip": "פנו ישירות לחברת התעופה בהקדם"
+              },
+              {
+                "icon": "💰",
+                "title": "פיצויים",
+                "tip": "בדקו זכאות לפיצוי לפי חוקי EU261 אם רלוונטי"
+              },
+              {
+                "icon": "🏨",
+                "title": "לינה",
+                "tip": "במקרה של ביטול - חברת התעופה חייבת לספק לינה"
+              },
+              {
+                "icon": "📋",
+                "title": "ביטוח",
+                "tip": "ביטוח נסיעות מכסה לרוב ביטולים והשהיות"
+              }
+            ]
+          },
+          "titleEn": "Flight Cancellation",
+          "titleGe": "ფრენის გაუქმება",
+          "heroImage": "http://localhost:3001/uploads/city.jpg"
         },
         {
           "id": "t8",
-          "title": "השכרת אופניים",
-          "subtitle": "סיור עצמאי בעיר",
-          "icon": "🚲",
-          "bg": "#F4A94E"
+          "title": "טיסות",
+          "subtitle": "",
+          "icon": "✈️",
+          "bg": "#EDE7F6",
+          "pageUrl": "https://www.tisolet.co.il",
+          "modal": "flights",
+          "titleEn": "Flights",
+          "titleGe": "ფრენები",
+          "heroImage": "http://localhost:3001/uploads/city.jpg"
         }
       ],
       "heroBg": "#F4A94E"
