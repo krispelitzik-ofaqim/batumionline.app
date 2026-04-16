@@ -160,15 +160,28 @@ const SECTIONS: Section[] = [
 ];
 
 const TAG_GROUPS: { group: string; icon: string; tags: { key: string; label: string }[] }[] = [
-  { group: 'קטגוריות ראשיות', icon: '📂', tags: [
+  { group: 'קטגוריות ראשיות', icon: '📂', subgroups: [
+    { label: '🏨 אירוח ולינה', tags: [{ key: 'h1', label: 'מלונות יוקרה' },{ key: 'h2', label: 'מלונות 3-4' },{ key: 'h3', label: 'דירות נופש' },{ key: 'h4', label: 'כפרי נופש' },{ key: 'h5', label: 'ווילות' },{ key: 'h6', label: 'אכסניות' }] },
+    { label: '🎡 אטרקציות ואתרים', tags: [{ key: 'a1', label: 'אטרקציות' },{ key: 'a2', label: 'אתרים פופולריים' },{ key: 'a3', label: 'היסטוריים' },{ key: 'a5', label: 'יהדות' },{ key: 'a6', label: 'נצרות' },{ key: 'a7', label: 'אוטובוס' },{ key: 'a8', label: 'נסיעות פרטיות' }] },
+    { label: '🎧 סיורים קוליים', tags: [{ key: 'tours', label: 'סיורים קוליים' }] },
+    { label: '🍽️ מסעדות ואוכל', tags: [{ key: 'r1', label: 'פופולריות' },{ key: 'r2', label: 'יוקרה' },{ key: 'r4', label: 'כשרות' },{ key: 'r3', label: 'רשתות' },{ key: 'r5', label: 'מהיר' },{ key: 'r6', label: 'שווה להכיר' }] },
+    { label: '🍻 בילוי וחיי לילה', tags: [{ key: 'n1', label: 'מועדונים' },{ key: 'n2', label: 'פאבים' },{ key: 'n3', label: 'הופעות' },{ key: 'n4', label: 'חשפנות' }] },
+    { label: '🚕 תחבורה', tags: [{ key: 't1', label: 'מוניות' },{ key: 't2', label: 'ציבורית' },{ key: 't3', label: 'רכבות' },{ key: 't4', label: 'רכב' },{ key: 't5', label: 'אופניים' },{ key: 't6', label: 'טיסות' }] },
+  ], tags: [
     { key: 'main_unsorted', label: '📥 לא ממויין' },{ key: 'h1', label: 'מלונות יוקרה' },{ key: 'h2', label: 'מלונות 3-4' },{ key: 'h3', label: 'דירות נופש' },{ key: 'h4', label: 'כפרי נופש' },{ key: 'h5', label: 'ווילות' },{ key: 'h6', label: 'אכסניות' },
     { key: 'a1', label: 'אטרקציות' },{ key: 'a2', label: 'אתרים פופולריים' },{ key: 'a3', label: 'היסטוריים' },{ key: 'a5', label: 'יהדות' },{ key: 'a6', label: 'נצרות' },{ key: 'a7', label: 'אוטובוס' },{ key: 'a8', label: 'נסיעות פרטיות' },
     { key: 'tours', label: 'סיורים קוליים' },
-    { key: 'r1', label: 'מסעדות פופולריות' },{ key: 'r2', label: 'מסעדות יוקרה' },{ key: 'r4', label: 'כשרות' },{ key: 'r3', label: 'רשתות' },{ key: 'r5', label: 'מהיר' },{ key: 'r6', label: 'שווה להכיר' },
+    { key: 'r1', label: 'פופולריות' },{ key: 'r2', label: 'יוקרה' },{ key: 'r4', label: 'כשרות' },{ key: 'r3', label: 'רשתות' },{ key: 'r5', label: 'מהיר' },{ key: 'r6', label: 'שווה להכיר' },
     { key: 'n1', label: 'מועדונים' },{ key: 'n2', label: 'פאבים' },{ key: 'n3', label: 'הופעות' },{ key: 'n4', label: 'חשפנות' },
     { key: 't1', label: 'מוניות' },{ key: 't2', label: 'ציבורית' },{ key: 't3', label: 'רכבות' },{ key: 't4', label: 'רכב' },{ key: 't5', label: 'אופניים' },{ key: 't6', label: 'טיסות' },
   ]},
-  { group: 'קטגוריות נוספות', icon: '📁', tags: [
+  { group: 'קטגוריות נוספות', icon: '📁', subgroups: [
+    { label: '🛍️ קניות ומתנות', tags: [{ key: 'sh1', label: 'שופינג' },{ key: 'sh2', label: 'סופרמרקטים' },{ key: 'sh3', label: 'החזרי מס' }] },
+    { label: '🏋️ ספורט', tags: [{ key: 'sp1', label: 'כושר' },{ key: 'sp2', label: 'ספא' },{ key: 'sp3', label: 'בריכות' },{ key: 'sp4', label: 'חוף' },{ key: 'sp5', label: 'ריצה' },{ key: 'sp6', label: 'יוגה' },{ key: 'sp7', label: 'ריקוד' },{ key: 'sp8', label: 'מגרשים' }] },
+    { label: '⛷️ אקסטרים', tags: [{ key: 'ex1', label: 'סקי' },{ key: 'ex2', label: 'ג׳יפים' },{ key: 'ex3', label: 'טרקטורונים' },{ key: 'ex4', label: 'פרגליידינג' },{ key: 'ex5', label: 'רפטינג' },{ key: 'ex6', label: 'קניונינג' },{ key: 'ex7', label: 'סוסים' },{ key: 'ex8', label: 'צלילה' }] },
+    { label: '🛂 מדריכים', tags: [{ key: 'guides', label: 'מדריכים' }] },
+    { label: '🎰 קזינו', tags: [{ key: 'casino', label: 'קזינו' }] },
+  ], tags: [
     { key: 'extra_unsorted', label: '📥 לא ממויין' },{ key: 'sh1', label: 'שופינג' },{ key: 'sh2', label: 'סופרמרקטים' },{ key: 'sh3', label: 'החזרי מס' },
     { key: 'sp1', label: 'כושר' },{ key: 'sp2', label: 'ספא' },{ key: 'sp3', label: 'בריכות' },{ key: 'sp4', label: 'חוף' },{ key: 'sp5', label: 'ריצה' },{ key: 'sp6', label: 'יוגה' },{ key: 'sp7', label: 'ריקוד' },{ key: 'sp8', label: 'מגרשים' },
     { key: 'ex1', label: 'סקי' },{ key: 'ex2', label: 'ג׳יפים' },{ key: 'ex3', label: 'טרקטורונים' },{ key: 'ex4', label: 'פרגליידינג' },{ key: 'ex5', label: 'רפטינג' },{ key: 'ex6', label: 'קניונינג' },{ key: 'ex7', label: 'סוסים' },{ key: 'ex8', label: 'צלילה' },
@@ -1387,11 +1400,15 @@ export default function AdminDashboard() {
                     onChange: (e: any) => setTagSingle(f.filename, e.target.value),
                     style: { width: '100%', padding: '6px 8px', borderRadius: 6, border: '1px solid #e8e8e8', fontSize: 11, fontWeight: 700, color: (f.tags || []).length ? Colors.WHITE : '#666', backgroundColor: (f.tags || []).length ? (() => { const t=(f.tags||[])[0]; const g=TAG_GROUPS.find(gr=>gr.tags.some(tt=>tt.key===t)); return g ? ({'📂':'#1A6B8A','📁':'#3DA5C4','👋':'#F4A94E','📋':'#7ECFC0','🏷️':'#2D4A5E','📌':'#F4A94E','📍':'#3DA5C4','🎧':'#1C2B35','📜':'#c0392b','🖼️':'#8e44ad','🎞️':'#e67e22'}[g.icon]||Colors.PRIMARY) : Colors.PRIMARY; })() : '#f0f2f5', direction: 'rtl', cursor: 'pointer' },
                   }, (() => {
-                    const grp = TAG_GROUPS.find(g => g.group === mediaFolder);
-                    const hasSubs = grp && grp.tags.filter(t => !t.key.includes('_unsorted')).length > 1;
+                    const grp = TAG_GROUPS.find(g => g.group === mediaFolder) as any;
+                    const subs = grp?.subgroups;
                     return [
                       React.createElement('option', { key: '', value: '' }, '— בחר —'),
-                      ...(hasSubs ? grp!.tags.map(t => React.createElement('option', { key: t.key, value: t.key, style: { backgroundColor: '#fff', color: '#222' } }, t.label)) : []),
+                      ...(subs ? subs.map((sg: any) =>
+                        React.createElement('optgroup', { key: sg.label, label: sg.label },
+                          sg.tags.map((t: any) => React.createElement('option', { key: t.key, value: t.key, style: { backgroundColor: '#fff', color: '#222' } }, t.label))
+                        )
+                      ) : grp ? grp.tags.map((t: any) => React.createElement('option', { key: t.key, value: t.key, style: { backgroundColor: '#fff', color: '#222' } }, t.label)) : []),
                       React.createElement('optgroup', { key: '_move', label: '↩ העבר לתיקייה אחרת' },
                         TAG_GROUPS.filter(g => g.group !== mediaFolder).map(g => {
                           const unsorted = g.tags.find(t => t.key.includes('_unsorted'));
