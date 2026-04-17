@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { Colors } from '../../constants/colors';
@@ -12,6 +12,7 @@ export default function MapScreen() {
   const { dark } = useContext(ThemeContext);
   const [active, setActive] = useState('הכל');
   const [layers, setLayers] = useState<MapLayer[]>([]);
+  const [focusPoint, setFocusPoint] = useState<{ lat: number; lng: number; name: string } | null>(null);
   const bg = dark ? Colors.TEXT : Colors.BACKGROUND;
   const { lat, lng, name } = useLocalSearchParams<{ lat?: string; lng?: string; name?: string }>();
 
@@ -22,17 +23,18 @@ export default function MapScreen() {
   }, []);
 
   const buildMapSrc = () => {
+    if (focusPoint) {
+      return `https://www.google.com/maps?q=${focusPoint.lat},${focusPoint.lng}(${encodeURIComponent(focusPoint.name)})&hl=iw&z=16&output=embed`;
+    }
     if (lat && lng) {
       return `https://www.google.com/maps?q=${lat},${lng}${name ? `(${encodeURIComponent(name)})` : ''}&hl=iw&z=16&output=embed`;
     }
-    if (active === 'הכל' || layers.length === 0) {
-      return 'https://www.google.com/maps/d/embed?mid=1gr51dJM54EabXWSMhPE5f8n2J3-iiyQ&ehbc=2E312F';
-    }
-    const layer = layers.find(l => l.name.includes(active));
-    if (layer && layer.points.length > 0) {
-      const markers = layer.points.map(p => `${p.lat},${p.lng}`).join('|');
-      const center = layer.points[0];
-      return `https://www.google.com/maps?q=${center.lat},${center.lng}&hl=iw&z=13&output=embed`;
+    if (active !== 'הכל') {
+      const layer = layers.find(l => l.name === active);
+      if (layer && layer.points.length > 0) {
+        const center = layer.points[0];
+        return `https://www.google.com/maps?q=${center.lat},${center.lng}(${encodeURIComponent(center.name)})&hl=iw&z=14&output=embed`;
+      }
     }
     return 'https://www.google.com/maps/d/embed?mid=1gr51dJM54EabXWSMhPE5f8n2J3-iiyQ&ehbc=2E312F';
   };
@@ -45,18 +47,20 @@ export default function MapScreen() {
         {categories.map((c) => {
           const on = c === active;
           return (
-            <TouchableOpacity key={c} onPress={() => setActive(c)} style={[styles.chip, on && styles.chipOn]}>
+            <TouchableOpacity key={c} onPress={() => { setActive(c); setFocusPoint(null); }} style={[styles.chip, on && styles.chipOn]}>
               <Text style={[styles.chipText, on && styles.chipTextOn]} numberOfLines={1}>{c}</Text>
             </TouchableOpacity>
           );
         })}
       </ScrollView>
       <View style={{ flex: 1, position: 'relative' }}>
-        <iframe
-          title="batumi-map"
-          src={buildMapSrc()}
-          style={{ width: '100%', height: '100%', border: 0 } as any}
-        />
+        <View style={{ flex: 1, overflow: 'hidden' }}>
+          <iframe
+            title="batumi-map"
+            src={buildMapSrc()}
+            style={{ width: '100%', height: 'calc(100% + 50px)', border: 0, marginTop: -50 } as any}
+          />
+        </View>
         {active !== 'הכל' && (() => {
           const layer = layers.find(l => l.name === active);
           if (!layer) return null;
@@ -66,14 +70,14 @@ export default function MapScreen() {
               <View style={styles.panelHeader}>
                 <Text style={styles.panelTitle}>{active}</Text>
                 <Text style={styles.panelCount}>{layer.points.length} מיקומים</Text>
+                <TouchableOpacity onPress={() => { setActive('הכל'); setFocusPoint(null); }} style={styles.panelClose}>
+                  <Text style={styles.panelCloseX}>✕</Text>
+                </TouchableOpacity>
               </View>
               <ScrollView style={styles.panelScroll} showsVerticalScrollIndicator={false}>
                 {layer.points.map((p, i) => (
                   <TouchableOpacity key={i} style={styles.panelItem} activeOpacity={0.7}
-                    onPress={() => {
-                      const iframe = (document as any).querySelector('iframe[title="batumi-map"]');
-                      if (iframe) iframe.src = `https://www.google.com/maps?q=${p.lat},${p.lng}(${encodeURIComponent(p.name)})&hl=iw&z=16&output=embed`;
-                    }}>
+                    onPress={() => setFocusPoint({ lat: p.lat, lng: p.lng, name: p.name })}>
                     <Text style={styles.panelIcon}>📍</Text>
                     <View style={{ flex: 1 }}>
                       <Text style={styles.panelName} numberOfLines={1}>{p.name}</Text>
@@ -119,5 +123,7 @@ const styles = StyleSheet.create({
   panelName: { fontSize: 14, fontWeight: '700', color: Colors.TEXT, writingDirection: 'rtl', textAlign: 'right' },
   panelDesc: { fontSize: 11, color: '#888', writingDirection: 'rtl', textAlign: 'right', marginTop: 2 },
   panelArrow: { fontSize: 16, color: Colors.PRIMARY, fontWeight: '700' },
+  panelClose: { width: 30, height: 30, borderRadius: 15, backgroundColor: '#f0f0f0', alignItems: 'center', justifyContent: 'center' },
+  panelCloseX: { fontSize: 16, color: '#666', fontWeight: '700' },
 });
 
