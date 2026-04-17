@@ -4,7 +4,7 @@ import { Audio } from 'expo-av';
 import { Colors } from '../constants/colors';
 
 type Track = { title?: string; url: string; coords?: { lat: number; lng: number } };
-type Props = { tracks: Track[]; title?: string; compact?: boolean; onNavigate?: (coords: { lat: number; lng: number }) => void; tint?: string; onActiveChange?: (idx: number, track: Track) => void };
+type Props = { tracks: Track[]; title?: string; compact?: boolean; onNavigate?: (coords: { lat: number; lng: number }) => void; tint?: string; onActiveChange?: (idx: number, track: Track) => void; onTimeReached?: { seconds: number; callback: () => void } };
 
 function fmt(ms: number) {
   const s = Math.max(0, Math.floor(ms / 1000));
@@ -22,13 +22,14 @@ function darken(hex: string, amount = 0.45): string {
   return `rgb(${r},${g},${b})`;
 }
 
-export default function AudioPlayer({ tracks: initialTracks, title, compact, onNavigate, tint, onActiveChange }: Props) {
+export default function AudioPlayer({ tracks: initialTracks, title, compact, onNavigate, tint, onActiveChange, onTimeReached }: Props) {
   const [tracks, setTracks] = useState(initialTracks);
   const [activeIdx, setActiveIdx] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [pos, setPos] = useState(0);
   const [dur, setDur] = useState(0);
   const [dragIdx, setDragIdx] = useState<number | null>(null);
+  const timeTriggered = useRef(false);
   const soundRef = useRef<any>(null);
   const audioElRef = useRef<any>(null);
 
@@ -111,6 +112,13 @@ export default function AudioPlayer({ tracks: initialTracks, title, compact, onN
     setDur(0);
     onActiveChange?.(i, tracks[i]);
   };
+
+  useEffect(() => {
+    if (onTimeReached && !timeTriggered.current && pos >= onTimeReached.seconds * 1000) {
+      timeTriggered.current = true;
+      onTimeReached.callback();
+    }
+  }, [pos, onTimeReached]);
 
   const pct = dur > 0 ? (pos / dur) * 100 : 0;
 

@@ -152,10 +152,10 @@ const SECTIONS: Section[] = [
   { key: 'extra', label: 'קטגוריות נוספות', icon: '📁', storageKey: '@admin_extra_categories', hasSubtitle: true, hasImage: true, hasAudio: false, hasLocation: false, hasSummary: true, hasLongText: true, defaults: DEFAULT_EXTRA_CATEGORIES },
   { key: 'welcome', label: 'סליידר ברוכים הבאים', icon: '👋', storageKey: '@admin_welcome', hasSubtitle: true, hasImage: true, hasAudio: false, hasLocation: false, hasSummary: false, hasLongText: false, defaults: DEFAULT_WELCOME },
   { key: 'info', label: 'פורטל המידע', icon: '📋', storageKey: '@admin_info_portal', hasSubtitle: true, hasImage: true, hasAudio: false, hasLocation: false, hasSummary: false, hasLongText: false, defaults: DEFAULT_INFO_PORTAL },
-  { key: 'bottom', label: 'באנרים תחתונים', icon: '🏷️', storageKey: '@admin_bottom_banners', hasSubtitle: false, hasImage: false, hasAudio: false, hasLocation: false, hasSummary: false, hasLongText: false, defaults: DEFAULT_BOTTOM_BANNERS },
+  { key: 'bottom', label: 'מידע Online', icon: '🏷️', storageKey: '@admin_bottom_banners', hasSubtitle: false, hasImage: false, hasAudio: false, hasLocation: false, hasSummary: false, hasLongText: false, defaults: DEFAULT_BOTTOM_BANNERS },
   { key: 'side', label: 'פורטל הנדל״ן', icon: '📌', storageKey: '@admin_side_banners', hasSubtitle: false, hasImage: false, hasAudio: false, hasLocation: false, hasSummary: false, hasLongText: false, defaults: DEFAULT_SIDE_BANNERS },
   { key: 'locations', label: 'מיקומים ומפה', icon: '📍', storageKey: '@admin_locations', hasSubtitle: true, hasImage: false, hasAudio: false, hasLocation: true, hasSummary: false, hasLongText: false, defaults: DEFAULT_LOCATIONS },
-  { key: 'audio', label: 'קבצי אודיו', icon: '🎧', storageKey: '@admin_audio', hasSubtitle: true, hasImage: false, hasAudio: true, hasLocation: false, hasSummary: false, hasLongText: false, defaults: DEFAULT_AUDIO },
+  // audio section removed - files managed via media folders
   { key: 'legal', label: 'מידע חובה', icon: '📜', storageKey: '@admin_legal', hasSubtitle: false, hasImage: false, hasAudio: false, hasLocation: false, hasSummary: false, hasLongText: true, defaults: DEFAULT_LEGAL },
 ];
 
@@ -189,10 +189,10 @@ const TAG_GROUPS: { group: string; icon: string; tags: { key: string; label: str
   ]},
   { group: 'סליידר ברוכים הבאים', icon: '👋', tags: [{ key: 'welcome', label: 'ברוכים הבאים' }] },
   { group: 'פורטל המידע', icon: '📋', tags: [{ key: 'info', label: 'פורטל מידע' }] },
-  { group: 'באנרים תחתונים', icon: '🏷️', tags: [{ key: 'bottom', label: 'באנרים תחתונים' }] },
+  { group: 'מידע Online', icon: '🏷️', tags: [{ key: 'bottom', label: 'מידע Online' }] },
   { group: 'פורטל הנדל״ן', icon: '📌', tags: [{ key: 'realestate', label: 'נדל״ן' },{ key: 'business', label: 'עסקים' }] },
   { group: 'מיקומים ומפה', icon: '📍', tags: [{ key: 'locations', label: 'מיקומים' }] },
-  { group: 'קבצי אודיו', icon: '🎧', tags: [{ key: 'player', label: 'נגן' },{ key: 'audio', label: 'אודיו' }] },
+  { group: 'קבצי אודיו', icon: '🎧', tags: [{ key: 'player', label: 'נגן' }] },
   { group: 'מידע חובה', icon: '📜', tags: [{ key: 'legal', label: 'מידע חובה' }] },
   { group: 'תמונות', icon: '🖼️', tags: [{ key: 'icon', label: 'אייקון' },{ key: 'gallery', label: 'גלריה' },{ key: 'home', label: 'גלריית בית' }] },
   { group: 'גלריה', icon: '🎞️', tags: [{ key: 'gallery_main', label: 'גלריה ראשית' }] },

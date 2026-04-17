@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, Platform, Image } from 'react-native';
 import { useLocalSearchParams, Stack } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -6,6 +6,36 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '../../constants/colors';
 import { fetchContent } from '../../constants/api';
 import AudioPlayer from '../../components/AudioPlayer';
+
+function fireHearts() {
+  if (Platform.OS !== 'web') return;
+  const hearts = ['❤️', '💙', '💜', '🧡', '💛', '🤍', '💗', '🇮🇱'];
+  const container = (window as any).document.createElement('div');
+  Object.assign(container.style, { position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', pointerEvents: 'none', zIndex: 99999 });
+  (window as any).document.body.appendChild(container);
+  for (let i = 0; i < 60; i++) {
+    const p = (window as any).document.createElement('div');
+    const x = Math.random() * 100;
+    const delay = Math.random() * 1.5;
+    const dur = 2 + Math.random() * 2;
+    const size = 20 + Math.random() * 20;
+    Object.assign(p.style, {
+      position: 'absolute', top: '-40px', left: `${x}%`,
+      fontSize: `${size}px`, lineHeight: '1',
+      animation: `hearts-fall-${i % 3} ${dur}s ease-in ${delay}s forwards`,
+    });
+    p.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+    container.appendChild(p);
+  }
+  const style = (window as any).document.createElement('style');
+  style.textContent = `
+    @keyframes hearts-fall-0 { 0% { top: -40px; opacity: 1; transform: scale(0.5) rotate(0deg); } 50% { opacity: 1; transform: scale(1.2) rotate(15deg); } 100% { top: 110vh; opacity: 0; transform: scale(0.8) rotate(-10deg) translateX(80px); } }
+    @keyframes hearts-fall-1 { 0% { top: -40px; opacity: 1; transform: scale(0.5) rotate(0deg); } 50% { opacity: 1; transform: scale(1) rotate(-20deg); } 100% { top: 110vh; opacity: 0; transform: scale(0.6) rotate(15deg) translateX(-60px); } }
+    @keyframes hearts-fall-2 { 0% { top: -40px; opacity: 1; transform: scale(0.5); } 50% { opacity: 1; transform: scale(1.3); } 100% { top: 110vh; opacity: 0; transform: scale(0.7) translateX(40px); } }
+  `;
+  container.appendChild(style);
+  setTimeout(() => container.remove(), 6000);
+}
 
 type WelcomeItem = {
   id: string; title: string; subtitle?: string; icon: string;
@@ -40,7 +70,7 @@ export default function WelcomeScreen() {
       <Stack.Screen options={{ headerShown: true, title: item.title, headerBackTitle: 'חזרה' }} />
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
         <View style={styles.heroWrap}>
-          {item.icon && item.icon.startsWith('http') ? (
+          {item.icon && (item.icon.startsWith('http') || item.icon.startsWith('data:')) ? (
             Platform.OS === 'web' ? (
               React.createElement('img', {
                 src: item.icon,
@@ -63,7 +93,10 @@ export default function WelcomeScreen() {
 
         {item.audios && item.audios.length > 0 && (
           <View style={{ marginTop: 16 }}>
-            <AudioPlayer tracks={item.audios} />
+            <AudioPlayer
+              tracks={item.audios}
+              onTimeReached={item.id === '5' ? { seconds: 120, callback: fireHearts } : undefined}
+            />
           </View>
         )}
 
