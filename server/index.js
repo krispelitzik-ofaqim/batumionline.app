@@ -367,6 +367,73 @@ app.post('/api/ratings/:id', (req, res) => {
   }
 });
 
+// ─── Auto-sync Google My Maps (daily) ─────────────────────────
+const https = require('https');
+const { DOMParser } = (() => { try { return require('xmldom'); } catch { return { DOMParser: null }; } })();
+
+async function syncMapData() {
+  const KML_URL = 'https://www.google.com/maps/d/kml?mid=1gr51dJM54EabXWSMhPE5f8n2J3-iiyQ&forcekml=1';
+  return new Promise((resolve) => {
+    https.get(KML_URL, (res) => {
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => {
+        try {
+          const layers = [];
+          const folderRegex = /<Folder>([\s\S]*?)<\/Folder>/g;
+          let folderMatch;
+          while ((folderMatch = folderRegex.exec(data)) !== null) {
+            const folderContent = folderMatch[1];
+            const nameMatch = folderContent.match(/<name>(.*?)<\/name>/);
+            const fname = nameMatch ? nameMatch[1].trim() : 'unknown';
+            const points = [];
+            const pmRegex = /<Placemark>([\s\S]*?)<\/Placemark>/g;
+            let pmMatch;
+            while ((pmMatch = pmRegex.exec(folderContent)) !== null) {
+              const pm = pmMatch[1];
+              const pnameMatch = pm.match(/<name>(.*?)<\/name>/);
+              const coordsMatch = pm.match(/<coordinates>([\s\S]*?)<\/coordinates>/);
+              const descMatch = pm.match(/<description><!\[CDATA\[([\s\S]*?)\]\]><\/description>/);
+              if (pnameMatch && coordsMatch) {
+                const c = coordsMatch[1].trim().split(',');
+                points.push({
+                  name: pnameMatch[1].trim(),
+                  lat: parseFloat(c[1]),
+                  lng: parseFloat(c[0]),
+                  description: descMatch ? descMatch[1].trim() : '',
+                });
+              }
+            }
+            if (points.length > 0) layers.push({ name: fname, points });
+          }
+          if (layers.length > 0) {
+            const db = readDB();
+            db.mapLayers = layers;
+            writeDB(db);
+            console.log(`🗺️ Map synced: ${layers.length} layers, ${layers.reduce((s,l) => s + l.points.length, 0)} points`);
+          }
+          resolve(true);
+        } catch (e) {
+          console.error('Map sync error:', e.message);
+          resolve(false);
+        }
+      });
+    }).on('error', (e) => { console.error('Map fetch error:', e.message); resolve(false); });
+  });
+}
+
+// Sync on startup + every 24 hours
+syncMapData();
+setInterval(syncMapData, 24 * 60 * 60 * 1000);
+
+// Manual sync endpoint
+app.get('/api/sync-map', async (req, res) => {
+  await syncMapData();
+  const db = readDB();
+  const layers = db.mapLayers || [];
+  res.json({ success: true, layers: layers.length, points: layers.reduce((s, l) => s + l.points.length, 0) });
+});
+
 // ─── Serve Expo web build ─────────────────────────────────────
 const WEB_DIST = path.join(__dirname, '..', 'dist');
 if (fs.existsSync(WEB_DIST)) {
