@@ -32,13 +32,6 @@ export default function MapScreen() {
     if (lat && lng) {
       return `https://www.google.com/maps?q=${lat},${lng}${name ? `(${encodeURIComponent(name)})` : ''}&hl=iw&z=16&output=embed`;
     }
-    if (active !== 'הכל') {
-      const layer = layers.find(l => l.name === active);
-      if (layer && layer.points.length > 0) {
-        const center = layer.points[0];
-        return `https://www.google.com/maps?q=${center.lat},${center.lng}(${encodeURIComponent(center.name)})&hl=iw&z=14&output=embed`;
-      }
-    }
     return 'https://www.google.com/maps/d/embed?mid=1gr51dJM54EabXWSMhPE5f8n2J3-iiyQ&ehbc=2E312F';
   };
 
@@ -99,7 +92,7 @@ export default function MapScreen() {
           const layer = layers.find(l => l.name === active);
           if (!layer) return null;
           return (
-            <View style={styles.panel}>
+            <View style={[styles.panel, { backgroundColor: (layer as any).color || '#fff' }]}>
               <View style={styles.panelHandle} />
               <View style={styles.panelHeader}>
                 <Text style={styles.panelTitle}>{active}</Text>
@@ -140,25 +133,25 @@ const styles = StyleSheet.create({
   chipTextOn: { color: Colors.WHITE },
   panel: {
     position: 'absolute', bottom: 0, left: 0, right: 0, maxHeight: '45%',
-    backgroundColor: Colors.WHITE, borderTopLeftRadius: 20, borderTopRightRadius: 20,
+    borderTopLeftRadius: 20, borderTopRightRadius: 20,
     shadowColor: '#000', shadowOffset: { width: 0, height: -3 }, shadowOpacity: 0.15, shadowRadius: 10, elevation: 10,
     paddingHorizontal: 14,
   },
-  panelHandle: { width: 40, height: 4, backgroundColor: '#d1d5db', borderRadius: 2, alignSelf: 'center', marginTop: 10, marginBottom: 8 },
+  panelHandle: { width: 40, height: 4, backgroundColor: 'rgba(255,255,255,0.5)', borderRadius: 2, alignSelf: 'center', marginTop: 10, marginBottom: 8 },
   panelHeader: { flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10, paddingHorizontal: 4 },
-  panelTitle: { fontSize: 16, fontWeight: '900', color: Colors.TEXT, writingDirection: 'rtl' },
-  panelCount: { fontSize: 12, color: '#888', fontWeight: '600' },
+  panelTitle: { fontSize: 16, fontWeight: '900', color: '#fff', writingDirection: 'rtl' },
+  panelCount: { fontSize: 12, color: 'rgba(255,255,255,0.8)', fontWeight: '600' },
   panelScroll: { paddingBottom: 20 },
   panelItem: {
     flexDirection: 'row-reverse', alignItems: 'center', gap: 10,
     paddingVertical: 12, paddingHorizontal: 8, borderBottomWidth: 1, borderBottomColor: '#f0f0f0',
   },
   panelIcon: { fontSize: 18 },
-  panelName: { fontSize: 14, fontWeight: '700', color: Colors.TEXT, writingDirection: 'rtl', textAlign: 'right' },
-  panelDesc: { fontSize: 11, color: '#888', writingDirection: 'rtl', textAlign: 'right', marginTop: 2 },
-  panelArrow: { fontSize: 16, color: Colors.PRIMARY, fontWeight: '700' },
-  panelClose: { width: 30, height: 30, borderRadius: 15, backgroundColor: '#f0f0f0', alignItems: 'center', justifyContent: 'center' },
-  panelCloseX: { fontSize: 16, color: '#666', fontWeight: '700' },
+  panelName: { fontSize: 14, fontWeight: '700', color: '#fff', writingDirection: 'rtl', textAlign: 'right' },
+  panelDesc: { fontSize: 11, color: 'rgba(255,255,255,0.7)', writingDirection: 'rtl', textAlign: 'right', marginTop: 2 },
+  panelArrow: { fontSize: 16, color: '#fff', fontWeight: '700' },
+  panelClose: { width: 30, height: 30, borderRadius: 15, backgroundColor: 'rgba(255,255,255,0.3)', alignItems: 'center', justifyContent: 'center' },
+  panelCloseX: { fontSize: 16, color: '#fff', fontWeight: '700' },
   layerGrid: { flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 4, padding: 8 },
   layerChip: { backgroundColor: '#f0f4f8', borderRadius: 10, paddingVertical: 10, paddingHorizontal: 12, minHeight: 40, alignItems: 'center', justifyContent: 'center' },
   layerChipOn: { backgroundColor: Colors.PRIMARY },

@@ -927,6 +927,901 @@
       "heroBg": "#1A6B8A"
     },
     {
+      "id": "2",
+      "title": "אטרקציות ואתרים",
+      "subtitle": "גלה מקומות וחוויות",
+      "description": "גלו את האתרים המרהיבים של בטומי — מהגנים הבוטניים ועד כיכר פיאצה, הטיילת לאורך הים, ומוזיאונים מרתקים.",
+      "icon": "🎡",
+      "bg": "#F4A94E",
+      "bgDark": "#F4A94E",
+      "image": "",
+      "children": [
+        {
+          "id": "a1",
+          "title": "אטרקציות",
+          "subtitle": "כיף לכל המשפחה",
+          "icon": "🎡",
+          "bg": "#F4A94E",
+          "hotels": [
+            {
+              "id": "a1_1",
+              "title": "הטיילת החדשה",
+              "text": "Batumi New Boulevard - הטיילת הארוכה לאורך חוף הים, עם גינות, אומנות, פסלים וכיסאות נדנדה. לב פועם של העיר, מושלמת להליכה ולרכיבה על אופניים",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a1_2",
+              "title": "הגלגל הענק",
+              "text": "Panoramic Wheel - ממוקם בקצה הצפוני של הטיילת במתחם \"מיראקל פארק\". האייקון של העיר, מציע תצפית 360° מדהימה על הים, ההרים והעיר",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a1_3",
+              "title": "פסל עלי ונינו",
+              "text": "Ali and Nino - פסל מתכת ענק בגובה 8 מטר שזז לאט ומתמזג/מתפרק כל 10 דקות. מבוסס על רומן אהבה מ-1937. אייקון רומנטי של בטומי בחוף הים",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a1_4",
+              "title": "מגדל האלפבית",
+              "text": "Alphabet Tower - מגדל בגובה 130 מטר עם 33 אותיות של האלפבית הגאורגי המפוזרות לאורכו. כולל מעלית שקופה ומסעדה מסתובבת בפסגה",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a1_5",
+              "title": "מגדל צ׳ה צ׳ה",
+              "text": "Chacha Tower - מגדל שעון בסגנון עות׳מני. בכל יום ב-19:00, למשך 10 דקות, המגדל מזרים חינם צ׳ה צ׳ה (משקה אלכוהולי גאורגי מסורתי) מהברזים",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a1_6",
+              "title": "לונה פארק",
+              "text": "Batumi Lunapark - פארק שעשועים גדול עם מתקנים לכל הגילים, הסמוך לדולפינריום ולאגם. אטרקציה מרכזית לבילוי משפחתי",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a1_7",
+              "title": "אגם ארדגני",
+              "text": "Ardagani Lake - אגם מלאכותי גדול עם סירות, מזרקות מוסיקליות, טיילת והופעות מים. פינה ירוקה נעימה בלב העיר",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a1_8",
+              "title": "הדולפינריום",
+              "text": "Batumi Dolphinarium - מופעי דולפינים יומיים, אחד הוותיקים באזור. מומלץ במיוחד למשפחות עם ילדים",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "mapUrl": "",
+              "pageUrl": "https://dolphinarium.ge/en/home/",
+              "visible": true
+            },
+            {
+              "id": "a1_9",
+              "title": "כיכר אירופה",
+              "text": "Europe Square - הכיכר המרכזית של העיר העתיקה עם מבנים בסגנון נאו-בארוק. פסל מדיאה הזהובה ניצב במרכז. לב התיירות הלילית",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a1_10",
+              "title": "פארק 6 במאי",
+              "text": "6 May Park - פארק עירוני היסטורי עם אגם, גן חיות, גני שעשועים, יער של עצי מג׳ליקה ומונומנטים. אחת האטרקציות הירוקות הגדולות בעיר",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            }
+          ],
+          "pageBtnLabel": "מידע נוסף"
+        },
+        {
+          "id": "a2",
+          "title": "אתרים פופולריים",
+          "subtitle": "חובה לראות",
+          "icon": "📸",
+          "bg": "#5BC0DE",
+          "hotels": [
+            {
+              "id": "a2_1",
+              "title": "כיכר בטומי",
+              "text": "Batumi Piazza - כיכר בסגנון ונציאני באמצע העיר העתיקה, עם פסיפס רצפה, מגדל שעון נאו-מורי, בתי קפה, מסעדות ומופעים חיים בערב. לב התיירות הלילית",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a2_2",
+              "title": "כיכר אירופה",
+              "text": "Europe Square - כיכר מרכזית שוחזרה למראות המאה ה-18. במרכזה פסל מדיאה עם גיזת הזהב. מוקפת במבנים אירופאים ומסעדות",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a2_3",
+              "title": "טיילת בולווארד",
+              "text": "Boulevard Promenade - הטיילת הוותיקה של בטומי, 7 ק\"מ של גינות, מסעדות, פסלים ואומנות לאורך חוף הים. לב העיר",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a2_4",
+              "title": "המרינה ומגדל השעון",
+              "text": "Marina & Clock Tower - אזור המרינה עם יאכטות, המזח הארוך ומגדל השעון הקלאסי של העיר. נקודת צילום פופולרית",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a2_5",
+              "title": "הרובע היהודי ההיסטורי",
+              "text": "Historic Jewish Quarter - הרחובות שבין בית הכנסת העתיק לבית חב\"ד, אזור היסטורי חשוב עם מורשת הקהילה היהודית בבטומי",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a2_6",
+              "title": "בית הכנסת הגדול",
+              "text": "Great Synagogue of Batumi - בית הכנסת המרכזי של הקהילה היהודית בעיר, בניין היסטורי ופעיל עד היום עם מניין קבוע",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a2_7",
+              "title": "בית חב״ד בטומי",
+              "text": "Chabad Batumi - מרכז הקהילה היהודית, מתפקד כבית כנסת, מסעדה כשרה ומרכז שירותים לתיירים הישראלים",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "mapUrl": "",
+              "pageUrl": "http://chabadbatumi.ge/",
+              "visible": true
+            },
+            {
+              "id": "a2_8",
+              "title": "קתדרלת האם הקדושה",
+              "text": "Mother of God Cathedral - קתדרלה נוצרית גדולה מתחילת המאה ה-20 (1898-1903), הוקמה במקור כבית תפילה קתולי והפכה לכנסייה אורתודוקסית",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a2_9",
+              "title": "כנסיית סנט ניקולס",
+              "text": "St. Nicholas Church - כנסייה אורתודוקסית היסטורית ברובע העתיק, מוקד חשוב של הנצרות הגאורגית, בעלת אדריכלות קלאסית",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a2_10",
+              "title": "הכנסייה הארמנית",
+              "text": "Armenian Church - כנסייה היסטורית של הקהילה הארמנית בבטומי, סמל למגוון הדתי והתרבותי של העיר",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a2_11",
+              "title": "שוק הפשפשים",
+              "titleEn": "Old Bazaar",
+              "text": "שוק מקומי אותנטי עם תבלינים, פירות, גבינות, ממתקים וחרצ׳ו. חוויה תרבותית חובה - מחירים מקומיים, מיקוח מקובל. ממוקם ליד התחנה המרכזית ופופולרי מאוד בקרב תיירים ומקומיים",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "coords": {
+                "lat": 41.6453,
+                "lng": 41.6401
+              },
+              "visible": true
+            }
+          ],
+          "pageBtnLabel": "מידע נוסף"
+        },
+        {
+          "id": "a3",
+          "title": "אתרים היסטוריים",
+          "subtitle": "סיפורה של העיר",
+          "icon": "🏛️",
+          "bg": "#1A6B8A",
+          "hotels": [
+            {
+              "id": "a3_1",
+              "title": "מבצר גוניו",
+              "titleEn": "Gonio Fortress",
+              "text": "מבצר רומי בן 2000 שנה, מהמבצרים העתיקים ביותר בגאורגיה. ממוקם 15 דק׳ מבטומי",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.573,41.575",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.573,
+                "lng": 41.575
+              }
+            },
+            {
+              "id": "a3_2",
+              "title": "מבצר פטרה",
+              "titleEn": "Petra Fortress",
+              "text": "שרידי מבצר ביזנטי מהמאה ה-6 על גבעה מעל הים",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.76,41.74",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.76,
+                "lng": 41.74
+              }
+            },
+            {
+              "id": "a3_3",
+              "title": "כנסיית סנט אנדרו",
+              "titleEn": "St. Andrew Church",
+              "text": "כנסייה עתיקה מהמאה ה-9, אחד המבנים הדתיים הוותיקים באזור",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.651,41.637",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.651,
+                "lng": 41.637
+              }
+            },
+            {
+              "id": "a3_4",
+              "title": "גשר מכמחורי",
+              "titleEn": "Makhuntseti Bridge",
+              "text": "גשר קשתות מאבן מהמאה ה-12, פלא הנדסי מעל נהר אדג׳ריסצקאלי",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.75,42.78",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.75,
+                "lng": 42.78
+              }
+            },
+            {
+              "id": "a3_5",
+              "title": "מוזיאון אדג׳רה",
+              "titleEn": "Adjara Museum",
+              "text": "מוזיאון ההיסטוריה של אדג׳רה עם ממצאים ארכיאולוגיים מכל התקופות",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.65,41.636",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.65,
+                "lng": 41.636
+              }
+            },
+            {
+              "id": "a3_6",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a3_7",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a3_8",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a3_9",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a3_10",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            }
+          ],
+          "pageBtnLabel": "מידע נוסף"
+        },
+        {
+          "id": "a4",
+          "title": "סיורים קוליים",
+          "subtitle": "מסלולים מודרכים",
+          "icon": "🎧",
+          "bg": "#2E8BA8"
+        },
+        {
+          "id": "a5",
+          "title": "היסטוריה יהודית",
+          "subtitle": "קהילה ומורשת",
+          "icon": "✡️",
+          "bg": "#7ECFC0",
+          "hotels": [
+            {
+              "id": "a5_1",
+              "title": "בית הכנסת הגדול",
+              "titleEn": "Great Synagogue",
+              "text": "בית הכנסת המרכזי של בטומי, נבנה ב-1904. פעיל עד היום עם מניין קבוע",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6508,41.6365",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.6508,
+                "lng": 41.6365
+              }
+            },
+            {
+              "id": "a5_2",
+              "title": "בית חב״ד בטומי",
+              "titleEn": "Chabad Batumi",
+              "text": "מרכז הקהילה היהודית - בית כנסת, מסעדה כשרה, שירותים לתיירים",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6505,41.636",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.6505,
+                "lng": 41.636
+              }
+            },
+            {
+              "id": "a5_3",
+              "title": "הרובע היהודי",
+              "titleEn": "Jewish Quarter",
+              "text": "הרחובות ההיסטוריים בין בית הכנסת לבית חב״ד, מורשת קהילה עשירה",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6506,41.6362",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.6506,
+                "lng": 41.6362
+              }
+            },
+            {
+              "id": "a5_4",
+              "title": "בית העלמין היהודי",
+              "titleEn": "Jewish Cemetery",
+              "text": "בית קברות היסטורי עם מצבות מהמאה ה-19",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.655,41.64",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.655,
+                "lng": 41.64
+              }
+            },
+            {
+              "id": "a5_5",
+              "title": "מוזיאון הקהילה",
+              "titleEn": "Community Museum",
+              "text": "תערוכה על תולדות היהודים בגאורגיה מאז ימי בית ראשון",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6508,41.6365",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.6508,
+                "lng": 41.6365
+              }
+            },
+            {
+              "id": "a5_6",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a5_7",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a5_8",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a5_9",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a5_10",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            }
+          ],
+          "pageBtnLabel": "מידע נוסף"
+        },
+        {
+          "id": "a6",
+          "title": "היסטוריה נוצרית",
+          "subtitle": "כנסיות ומנזרים",
+          "icon": "⛪",
+          "bg": "#3DA5C4",
+          "hotels": [
+            {
+              "id": "a6_1",
+              "title": "קתדרלת האם הקדושה",
+              "titleEn": "Mother of God Cathedral",
+              "text": "קתדרלה מרשימה מ-1903, במקור קתולית, כיום אורתודוקסית",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6495,41.6375",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.6495,
+                "lng": 41.6375
+              }
+            },
+            {
+              "id": "a6_2",
+              "title": "כנסיית סנט ניקולס",
+              "titleEn": "St. Nicholas Church",
+              "text": "כנסייה אורתודוקסית היסטורית ברובע העתיק, אדריכלות קלאסית",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.651,41.637",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.651,
+                "lng": 41.637
+              }
+            },
+            {
+              "id": "a6_3",
+              "title": "הכנסייה הארמנית",
+              "titleEn": "Armenian Church",
+              "text": "כנסייה היסטורית של הקהילה הארמנית, סמל למגוון הדתי של העיר",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6515,41.6368",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.6515,
+                "lng": 41.6368
+              }
+            },
+            {
+              "id": "a6_4",
+              "title": "כנסייה קתולית",
+              "titleEn": "Catholic Church",
+              "text": "כנסייה קתולית קטנה ויפה ברובע העתיק",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.65,41.6358",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.65,
+                "lng": 41.6358
+              }
+            },
+            {
+              "id": "a6_5",
+              "title": "מנזר שיו-מגוימה",
+              "titleEn": "Shio-Mgvime",
+              "text": "מנזר מערות עתיק מהמאה ה-6, טיול יום מבטומי",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.84,44.62",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.84,
+                "lng": 44.62
+              }
+            },
+            {
+              "id": "a6_6",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a6_7",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a6_8",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a6_9",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a6_10",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            }
+          ],
+          "pageBtnLabel": "מידע נוסף"
+        },
+        {
+          "id": "a7",
+          "title": "אוטובוס תיירים",
+          "subtitle": "",
+          "icon": "🚌",
+          "bg": "#3DA5C425",
+          "hotels": [
+            {
+              "id": "a7_1",
+              "title": "הדרך הקלה והמהירה להכיר את כל באטומי בסיבוב אחד",
+              "titleEn": "",
+              "text": "הדרך הקלה והמהירה להכיר את כל באטומי בסיבוב אחד",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a7_2",
+              "title": "האוטובוס הדו-קומתי מאפשר לכם לראות את כל נקודות הצ",
+              "titleEn": "",
+              "text": "האוטובוס הדו-קומתי מאפשר לכם לראות את כל נקודות הציון המרכזיות של העיר עם הדרכה קולית. ניתן לרדת ולעלות בחופשיות (",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a7_3",
+              "title": "כ-40-50 לארי למבוגר (תקף ל-24 שעות)",
+              "titleEn": "",
+              "text": "כ-40-50 לארי למבוגר (תקף ל-24 שעות)",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a7_4",
+              "title": "זמין באנגלית, רוסית ושפות נוספות",
+              "titleEn": "",
+              "text": "זמין באנגלית, רוסית ושפות נוספות",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a7_5",
+              "title": "מומלץ לשבת בקומה השנייה לצילומים פנורמיים של קו הח",
+              "titleEn": "",
+              "text": "מומלץ לשבת בקומה השנייה לצילומים פנורמיים של קו החוף!",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a7_6",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a7_7",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a7_8",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a7_9",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a7_10",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            }
+          ],
+          "pageBtnLabel": "מידע נוסף"
+        },
+        {
+          "id": "a8",
+          "title": "נסיעות פרטיות",
+          "subtitle": "",
+          "icon": "🚐",
+          "bg": "#3DA5C425",
+          "hotels": [
+            {
+              "id": "a8_1",
+              "title": "סוכנים ומדריכים ישראלים בבטומי\n\"",
+              "titleEn": "",
+              "text": "סוכנים ומדריכים ישראלים בבטומי\n\"",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a8_2",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a8_3",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a8_4",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a8_5",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a8_6",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a8_7",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a8_8",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a8_9",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a8_10",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            }
+          ],
+          "pageBtnLabel": "מידע נוסף"
+        }
+      ],
+      "heroBg": "#F4A94E"
+    },
+    {
       "id": "6",
       "title": "מסעדות ואוכל",
       "subtitle": "מטבח מקומי ואוכל משובח",
@@ -3399,901 +4294,6 @@
           "subtitle": "חופים וסגנון ים תיכוני"
         }
       ]
-    },
-    {
-      "id": "2",
-      "title": "אטרקציות ואתרים",
-      "subtitle": "גלה מקומות וחוויות",
-      "description": "גלו את האתרים המרהיבים של בטומי — מהגנים הבוטניים ועד כיכר פיאצה, הטיילת לאורך הים, ומוזיאונים מרתקים.",
-      "icon": "🎡",
-      "bg": "#F4A94E",
-      "bgDark": "#F4A94E",
-      "image": "",
-      "children": [
-        {
-          "id": "a1",
-          "title": "אטרקציות",
-          "subtitle": "כיף לכל המשפחה",
-          "icon": "🎡",
-          "bg": "#F4A94E",
-          "hotels": [
-            {
-              "id": "a1_1",
-              "title": "הטיילת החדשה",
-              "text": "Batumi New Boulevard - הטיילת הארוכה לאורך חוף הים, עם גינות, אומנות, פסלים וכיסאות נדנדה. לב פועם של העיר, מושלמת להליכה ולרכיבה על אופניים",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": true
-            },
-            {
-              "id": "a1_2",
-              "title": "הגלגל הענק",
-              "text": "Panoramic Wheel - ממוקם בקצה הצפוני של הטיילת במתחם \"מיראקל פארק\". האייקון של העיר, מציע תצפית 360° מדהימה על הים, ההרים והעיר",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": true
-            },
-            {
-              "id": "a1_3",
-              "title": "פסל עלי ונינו",
-              "text": "Ali and Nino - פסל מתכת ענק בגובה 8 מטר שזז לאט ומתמזג/מתפרק כל 10 דקות. מבוסס על רומן אהבה מ-1937. אייקון רומנטי של בטומי בחוף הים",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": true
-            },
-            {
-              "id": "a1_4",
-              "title": "מגדל האלפבית",
-              "text": "Alphabet Tower - מגדל בגובה 130 מטר עם 33 אותיות של האלפבית הגאורגי המפוזרות לאורכו. כולל מעלית שקופה ומסעדה מסתובבת בפסגה",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": true
-            },
-            {
-              "id": "a1_5",
-              "title": "מגדל צ׳ה צ׳ה",
-              "text": "Chacha Tower - מגדל שעון בסגנון עות׳מני. בכל יום ב-19:00, למשך 10 דקות, המגדל מזרים חינם צ׳ה צ׳ה (משקה אלכוהולי גאורגי מסורתי) מהברזים",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": true
-            },
-            {
-              "id": "a1_6",
-              "title": "לונה פארק",
-              "text": "Batumi Lunapark - פארק שעשועים גדול עם מתקנים לכל הגילים, הסמוך לדולפינריום ולאגם. אטרקציה מרכזית לבילוי משפחתי",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": true
-            },
-            {
-              "id": "a1_7",
-              "title": "אגם ארדגני",
-              "text": "Ardagani Lake - אגם מלאכותי גדול עם סירות, מזרקות מוסיקליות, טיילת והופעות מים. פינה ירוקה נעימה בלב העיר",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": true
-            },
-            {
-              "id": "a1_8",
-              "title": "הדולפינריום",
-              "text": "Batumi Dolphinarium - מופעי דולפינים יומיים, אחד הוותיקים באזור. מומלץ במיוחד למשפחות עם ילדים",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "mapUrl": "",
-              "pageUrl": "https://dolphinarium.ge/en/home/",
-              "visible": true
-            },
-            {
-              "id": "a1_9",
-              "title": "כיכר אירופה",
-              "text": "Europe Square - הכיכר המרכזית של העיר העתיקה עם מבנים בסגנון נאו-בארוק. פסל מדיאה הזהובה ניצב במרכז. לב התיירות הלילית",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": true
-            },
-            {
-              "id": "a1_10",
-              "title": "פארק 6 במאי",
-              "text": "6 May Park - פארק עירוני היסטורי עם אגם, גן חיות, גני שעשועים, יער של עצי מג׳ליקה ומונומנטים. אחת האטרקציות הירוקות הגדולות בעיר",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": true
-            }
-          ],
-          "pageBtnLabel": "מידע נוסף"
-        },
-        {
-          "id": "a2",
-          "title": "אתרים פופולריים",
-          "subtitle": "חובה לראות",
-          "icon": "📸",
-          "bg": "#5BC0DE",
-          "hotels": [
-            {
-              "id": "a2_1",
-              "title": "כיכר בטומי",
-              "text": "Batumi Piazza - כיכר בסגנון ונציאני באמצע העיר העתיקה, עם פסיפס רצפה, מגדל שעון נאו-מורי, בתי קפה, מסעדות ומופעים חיים בערב. לב התיירות הלילית",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": true
-            },
-            {
-              "id": "a2_2",
-              "title": "כיכר אירופה",
-              "text": "Europe Square - כיכר מרכזית שוחזרה למראות המאה ה-18. במרכזה פסל מדיאה עם גיזת הזהב. מוקפת במבנים אירופאים ומסעדות",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": true
-            },
-            {
-              "id": "a2_3",
-              "title": "טיילת בולווארד",
-              "text": "Boulevard Promenade - הטיילת הוותיקה של בטומי, 7 ק\"מ של גינות, מסעדות, פסלים ואומנות לאורך חוף הים. לב העיר",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": true
-            },
-            {
-              "id": "a2_4",
-              "title": "המרינה ומגדל השעון",
-              "text": "Marina & Clock Tower - אזור המרינה עם יאכטות, המזח הארוך ומגדל השעון הקלאסי של העיר. נקודת צילום פופולרית",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": true
-            },
-            {
-              "id": "a2_5",
-              "title": "הרובע היהודי ההיסטורי",
-              "text": "Historic Jewish Quarter - הרחובות שבין בית הכנסת העתיק לבית חב\"ד, אזור היסטורי חשוב עם מורשת הקהילה היהודית בבטומי",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": true
-            },
-            {
-              "id": "a2_6",
-              "title": "בית הכנסת הגדול",
-              "text": "Great Synagogue of Batumi - בית הכנסת המרכזי של הקהילה היהודית בעיר, בניין היסטורי ופעיל עד היום עם מניין קבוע",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": true
-            },
-            {
-              "id": "a2_7",
-              "title": "בית חב״ד בטומי",
-              "text": "Chabad Batumi - מרכז הקהילה היהודית, מתפקד כבית כנסת, מסעדה כשרה ומרכז שירותים לתיירים הישראלים",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "mapUrl": "",
-              "pageUrl": "http://chabadbatumi.ge/",
-              "visible": true
-            },
-            {
-              "id": "a2_8",
-              "title": "קתדרלת האם הקדושה",
-              "text": "Mother of God Cathedral - קתדרלה נוצרית גדולה מתחילת המאה ה-20 (1898-1903), הוקמה במקור כבית תפילה קתולי והפכה לכנסייה אורתודוקסית",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": true
-            },
-            {
-              "id": "a2_9",
-              "title": "כנסיית סנט ניקולס",
-              "text": "St. Nicholas Church - כנסייה אורתודוקסית היסטורית ברובע העתיק, מוקד חשוב של הנצרות הגאורגית, בעלת אדריכלות קלאסית",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": true
-            },
-            {
-              "id": "a2_10",
-              "title": "הכנסייה הארמנית",
-              "text": "Armenian Church - כנסייה היסטורית של הקהילה הארמנית בבטומי, סמל למגוון הדתי והתרבותי של העיר",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": true
-            },
-            {
-              "id": "a2_11",
-              "title": "שוק הפשפשים",
-              "titleEn": "Old Bazaar",
-              "text": "שוק מקומי אותנטי עם תבלינים, פירות, גבינות, ממתקים וחרצ׳ו. חוויה תרבותית חובה - מחירים מקומיים, מיקוח מקובל. ממוקם ליד התחנה המרכזית ופופולרי מאוד בקרב תיירים ומקומיים",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "coords": {
-                "lat": 41.6453,
-                "lng": 41.6401
-              },
-              "visible": true
-            }
-          ],
-          "pageBtnLabel": "מידע נוסף"
-        },
-        {
-          "id": "a3",
-          "title": "אתרים היסטוריים",
-          "subtitle": "סיפורה של העיר",
-          "icon": "🏛️",
-          "bg": "#1A6B8A",
-          "hotels": [
-            {
-              "id": "a3_1",
-              "title": "מבצר גוניו",
-              "titleEn": "Gonio Fortress",
-              "text": "מבצר רומי בן 2000 שנה, מהמבצרים העתיקים ביותר בגאורגיה. ממוקם 15 דק׳ מבטומי",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.573,41.575",
-              "pageUrl": "",
-              "visible": true,
-              "coords": {
-                "lat": 41.573,
-                "lng": 41.575
-              }
-            },
-            {
-              "id": "a3_2",
-              "title": "מבצר פטרה",
-              "titleEn": "Petra Fortress",
-              "text": "שרידי מבצר ביזנטי מהמאה ה-6 על גבעה מעל הים",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.76,41.74",
-              "pageUrl": "",
-              "visible": true,
-              "coords": {
-                "lat": 41.76,
-                "lng": 41.74
-              }
-            },
-            {
-              "id": "a3_3",
-              "title": "כנסיית סנט אנדרו",
-              "titleEn": "St. Andrew Church",
-              "text": "כנסייה עתיקה מהמאה ה-9, אחד המבנים הדתיים הוותיקים באזור",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.651,41.637",
-              "pageUrl": "",
-              "visible": true,
-              "coords": {
-                "lat": 41.651,
-                "lng": 41.637
-              }
-            },
-            {
-              "id": "a3_4",
-              "title": "גשר מכמחורי",
-              "titleEn": "Makhuntseti Bridge",
-              "text": "גשר קשתות מאבן מהמאה ה-12, פלא הנדסי מעל נהר אדג׳ריסצקאלי",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.75,42.78",
-              "pageUrl": "",
-              "visible": true,
-              "coords": {
-                "lat": 41.75,
-                "lng": 42.78
-              }
-            },
-            {
-              "id": "a3_5",
-              "title": "מוזיאון אדג׳רה",
-              "titleEn": "Adjara Museum",
-              "text": "מוזיאון ההיסטוריה של אדג׳רה עם ממצאים ארכיאולוגיים מכל התקופות",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.65,41.636",
-              "pageUrl": "",
-              "visible": true,
-              "coords": {
-                "lat": 41.65,
-                "lng": 41.636
-              }
-            },
-            {
-              "id": "a3_6",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a3_7",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a3_8",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a3_9",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a3_10",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            }
-          ],
-          "pageBtnLabel": "מידע נוסף"
-        },
-        {
-          "id": "a4",
-          "title": "סיורים קוליים",
-          "subtitle": "מסלולים מודרכים",
-          "icon": "🎧",
-          "bg": "#2E8BA8"
-        },
-        {
-          "id": "a5",
-          "title": "היסטוריה יהודית",
-          "subtitle": "קהילה ומורשת",
-          "icon": "✡️",
-          "bg": "#7ECFC0",
-          "hotels": [
-            {
-              "id": "a5_1",
-              "title": "בית הכנסת הגדול",
-              "titleEn": "Great Synagogue",
-              "text": "בית הכנסת המרכזי של בטומי, נבנה ב-1904. פעיל עד היום עם מניין קבוע",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6508,41.6365",
-              "pageUrl": "",
-              "visible": true,
-              "coords": {
-                "lat": 41.6508,
-                "lng": 41.6365
-              }
-            },
-            {
-              "id": "a5_2",
-              "title": "בית חב״ד בטומי",
-              "titleEn": "Chabad Batumi",
-              "text": "מרכז הקהילה היהודית - בית כנסת, מסעדה כשרה, שירותים לתיירים",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6505,41.636",
-              "pageUrl": "",
-              "visible": true,
-              "coords": {
-                "lat": 41.6505,
-                "lng": 41.636
-              }
-            },
-            {
-              "id": "a5_3",
-              "title": "הרובע היהודי",
-              "titleEn": "Jewish Quarter",
-              "text": "הרחובות ההיסטוריים בין בית הכנסת לבית חב״ד, מורשת קהילה עשירה",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6506,41.6362",
-              "pageUrl": "",
-              "visible": true,
-              "coords": {
-                "lat": 41.6506,
-                "lng": 41.6362
-              }
-            },
-            {
-              "id": "a5_4",
-              "title": "בית העלמין היהודי",
-              "titleEn": "Jewish Cemetery",
-              "text": "בית קברות היסטורי עם מצבות מהמאה ה-19",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.655,41.64",
-              "pageUrl": "",
-              "visible": true,
-              "coords": {
-                "lat": 41.655,
-                "lng": 41.64
-              }
-            },
-            {
-              "id": "a5_5",
-              "title": "מוזיאון הקהילה",
-              "titleEn": "Community Museum",
-              "text": "תערוכה על תולדות היהודים בגאורגיה מאז ימי בית ראשון",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6508,41.6365",
-              "pageUrl": "",
-              "visible": true,
-              "coords": {
-                "lat": 41.6508,
-                "lng": 41.6365
-              }
-            },
-            {
-              "id": "a5_6",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a5_7",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a5_8",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a5_9",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a5_10",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            }
-          ],
-          "pageBtnLabel": "מידע נוסף"
-        },
-        {
-          "id": "a6",
-          "title": "היסטוריה נוצרית",
-          "subtitle": "כנסיות ומנזרים",
-          "icon": "⛪",
-          "bg": "#3DA5C4",
-          "hotels": [
-            {
-              "id": "a6_1",
-              "title": "קתדרלת האם הקדושה",
-              "titleEn": "Mother of God Cathedral",
-              "text": "קתדרלה מרשימה מ-1903, במקור קתולית, כיום אורתודוקסית",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6495,41.6375",
-              "pageUrl": "",
-              "visible": true,
-              "coords": {
-                "lat": 41.6495,
-                "lng": 41.6375
-              }
-            },
-            {
-              "id": "a6_2",
-              "title": "כנסיית סנט ניקולס",
-              "titleEn": "St. Nicholas Church",
-              "text": "כנסייה אורתודוקסית היסטורית ברובע העתיק, אדריכלות קלאסית",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.651,41.637",
-              "pageUrl": "",
-              "visible": true,
-              "coords": {
-                "lat": 41.651,
-                "lng": 41.637
-              }
-            },
-            {
-              "id": "a6_3",
-              "title": "הכנסייה הארמנית",
-              "titleEn": "Armenian Church",
-              "text": "כנסייה היסטורית של הקהילה הארמנית, סמל למגוון הדתי של העיר",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6515,41.6368",
-              "pageUrl": "",
-              "visible": true,
-              "coords": {
-                "lat": 41.6515,
-                "lng": 41.6368
-              }
-            },
-            {
-              "id": "a6_4",
-              "title": "כנסייה קתולית",
-              "titleEn": "Catholic Church",
-              "text": "כנסייה קתולית קטנה ויפה ברובע העתיק",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.65,41.6358",
-              "pageUrl": "",
-              "visible": true,
-              "coords": {
-                "lat": 41.65,
-                "lng": 41.6358
-              }
-            },
-            {
-              "id": "a6_5",
-              "title": "מנזר שיו-מגוימה",
-              "titleEn": "Shio-Mgvime",
-              "text": "מנזר מערות עתיק מהמאה ה-6, טיול יום מבטומי",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.84,44.62",
-              "pageUrl": "",
-              "visible": true,
-              "coords": {
-                "lat": 41.84,
-                "lng": 44.62
-              }
-            },
-            {
-              "id": "a6_6",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a6_7",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a6_8",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a6_9",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a6_10",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            }
-          ],
-          "pageBtnLabel": "מידע נוסף"
-        },
-        {
-          "id": "a7",
-          "title": "אוטובוס תיירים",
-          "subtitle": "",
-          "icon": "🚌",
-          "bg": "#3DA5C425",
-          "hotels": [
-            {
-              "id": "a7_1",
-              "title": "הדרך הקלה והמהירה להכיר את כל באטומי בסיבוב אחד",
-              "titleEn": "",
-              "text": "הדרך הקלה והמהירה להכיר את כל באטומי בסיבוב אחד",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": true
-            },
-            {
-              "id": "a7_2",
-              "title": "האוטובוס הדו-קומתי מאפשר לכם לראות את כל נקודות הצ",
-              "titleEn": "",
-              "text": "האוטובוס הדו-קומתי מאפשר לכם לראות את כל נקודות הציון המרכזיות של העיר עם הדרכה קולית. ניתן לרדת ולעלות בחופשיות (",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": true
-            },
-            {
-              "id": "a7_3",
-              "title": "כ-40-50 לארי למבוגר (תקף ל-24 שעות)",
-              "titleEn": "",
-              "text": "כ-40-50 לארי למבוגר (תקף ל-24 שעות)",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": true
-            },
-            {
-              "id": "a7_4",
-              "title": "זמין באנגלית, רוסית ושפות נוספות",
-              "titleEn": "",
-              "text": "זמין באנגלית, רוסית ושפות נוספות",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": true
-            },
-            {
-              "id": "a7_5",
-              "title": "מומלץ לשבת בקומה השנייה לצילומים פנורמיים של קו הח",
-              "titleEn": "",
-              "text": "מומלץ לשבת בקומה השנייה לצילומים פנורמיים של קו החוף!",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": true
-            },
-            {
-              "id": "a7_6",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a7_7",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a7_8",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a7_9",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a7_10",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            }
-          ],
-          "pageBtnLabel": "מידע נוסף"
-        },
-        {
-          "id": "a8",
-          "title": "נסיעות פרטיות",
-          "subtitle": "",
-          "icon": "🚐",
-          "bg": "#3DA5C425",
-          "hotels": [
-            {
-              "id": "a8_1",
-              "title": "סוכנים ומדריכים ישראלים בבטומי\n\"",
-              "titleEn": "",
-              "text": "סוכנים ומדריכים ישראלים בבטומי\n\"",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": true
-            },
-            {
-              "id": "a8_2",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a8_3",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a8_4",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a8_5",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a8_6",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a8_7",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a8_8",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a8_9",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a8_10",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            }
-          ],
-          "pageBtnLabel": "מידע נוסף"
-        }
-      ],
-      "heroBg": "#F4A94E"
     },
     {
       "id": "4",
