@@ -255,6 +255,7 @@ function TourCard({ t, onRate }: { t: TourBlock; onRate: (id: string, score: num
 
 function CategoryMapModal({ visible, points, focusName, layerColor, onClose }: { visible: boolean; points: MapPoint[]; focusName: string; layerColor?: string; onClose: () => void }) {
   const [focus, setFocus] = useState<MapPoint | null>(null);
+  const [listOpen, setListOpen] = useState(false);
 
   useEffect(() => {
     if (visible && focusName) {
@@ -280,35 +281,44 @@ function CategoryMapModal({ visible, points, focusName, layerColor, onClose }: {
           {Platform.OS === 'web' && (
             <View style={{ borderBottom: '1px solid #eee', padding: 8, backgroundColor: '#fff' } as any}>
               {React.createElement('div', {
-                style: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 },
+                style: { display: 'flex', flexDirection: 'column', alignItems: 'center' },
               }, [
                 React.createElement('div', {
-                  key: 'au',
+                  key: 'toggle',
+                  onClick: () => setListOpen(!listOpen),
+                  style: { cursor: 'pointer', padding: '6px 16px', display: 'flex', alignItems: 'center', gap: 8, direction: 'rtl', width: '100%', justifyContent: 'center' },
+                }, [
+                  React.createElement('span', { key: 'txt', style: { fontSize: 14, fontWeight: 700, color: color, fontFamily: 'Arial, sans-serif' } }, `📍 ${focus?.name || focusName} (${points.length})`),
+                  React.createElement('span', { key: 'arr', style: { fontSize: 12, color: color } }, listOpen ? '▲' : '▼'),
+                ]),
+                listOpen && React.createElement('div', { key: 'au',
                   onClick: () => { const el = (document as any).getElementById('modal-carousel'); if (el) el.scrollBy({ top: -120, behavior: 'smooth' }); },
-                  style: { cursor: 'pointer', fontSize: 14, color: color, fontWeight: 900, padding: '2px 0', userSelect: 'none' },
+                  style: { cursor: 'pointer', fontSize: 12, color: color, fontWeight: 900, textAlign: 'center', userSelect: 'none', padding: '4px 0' },
                 }, '▲'),
-                React.createElement('div', {
+                listOpen && React.createElement('div', {
                   key: 'list',
                   id: 'modal-carousel',
                   style: { display: 'flex', flexDirection: 'column', gap: 4, overflowY: 'hidden', maxHeight: 190, width: '100%', scrollBehavior: 'smooth', direction: 'rtl' },
                 }, points.map((p, i) => {
-                  const on = focus?.name === p.name;
-                  return React.createElement('div', {
-                    key: p.name + i,
-                    onClick: () => setFocus(p),
-                    style: {
-                      padding: '8px 14px', borderRadius: 10, cursor: 'pointer', textAlign: 'right',
-                      background: on ? color : '#f8f9fa', color: on ? '#fff' : color,
-                      fontSize: 14, fontWeight: on ? 800 : 600, fontFamily: 'Arial, sans-serif',
-                      border: on ? 'none' : `1.5px solid ${color}20`,
-                      transition: 'all 0.15s ease', flexShrink: 0,
-                    },
-                  }, `📍 ${p.name}`);
-                })),
-                React.createElement('div', {
-                  key: 'ad',
+                    const on = focus?.name === p.name;
+                    const isKosher = p.name.includes('כשר') || p.name.toLowerCase().includes('kosher');
+                    const itemColor = isKosher ? '#2E7D32' : color;
+                    return React.createElement('div', {
+                      key: p.name + i,
+                      onClick: () => { setFocus(p); setListOpen(false); },
+                      style: {
+                        padding: '8px 14px', borderRadius: 10, cursor: 'pointer', textAlign: 'right',
+                        background: on ? itemColor : isKosher ? '#E8F5E9' : '#f8f9fa', color: on ? '#fff' : itemColor,
+                        fontSize: 14, fontWeight: on ? 800 : 600, fontFamily: 'Arial, sans-serif',
+                        border: on ? 'none' : `1.5px solid ${itemColor}30`,
+                        transition: 'all 0.15s ease', flexShrink: 0,
+                      },
+                    }, `${isKosher ? '✡️' : '📍'} ${p.name}`);
+                  })
+                ),
+                listOpen && React.createElement('div', { key: 'ad',
                   onClick: () => { const el = (document as any).getElementById('modal-carousel'); if (el) el.scrollBy({ top: 120, behavior: 'smooth' }); },
-                  style: { cursor: 'pointer', fontSize: 14, color: color, fontWeight: 900, padding: '2px 0', userSelect: 'none' },
+                  style: { cursor: 'pointer', fontSize: 12, color: color, fontWeight: 900, textAlign: 'center', userSelect: 'none', padding: '4px 0' },
                 }, '▼'),
               ])}
             </View>
