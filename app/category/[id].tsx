@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, useWindowDimensions, TouchableOpacity, Image, Linking, Platform } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, useWindowDimensions, TouchableOpacity, Image, Linking, Platform, Modal } from 'react-native';
 import { useLocalSearchParams, Stack, router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -9,6 +9,8 @@ import { PreviewContext } from '../../constants/previewContext';
 import { AdminContext } from '../../constants/adminContext';
 import DevicePreviewBar from '../../components/DevicePreviewBar';
 import { fetchContent, fetchRatings, submitRating } from '../../constants/api';
+
+type MapPoint = { name: string; lat: number; lng: number; description?: string };
 import AudioPlayer from '../../components/AudioPlayer';
 import FlightsModal from '../../components/FlightsModal';
 
@@ -251,9 +253,92 @@ function TourCard({ t, onRate }: { t: TourBlock; onRate: (id: string, score: num
   );
 }
 
-function HotelCard({ h, dark, pageBtnLabel }: { h: Hotel; dark: boolean; pageBtnLabel: string }) {
+function CategoryMapModal({ visible, points, focusName, layerColor, onClose }: { visible: boolean; points: MapPoint[]; focusName: string; layerColor?: string; onClose: () => void }) {
+  const [focus, setFocus] = useState<MapPoint | null>(null);
+
+  useEffect(() => {
+    if (visible && focusName) {
+      const p = points.find(pt => pt.name === focusName) || points[0];
+      if (p) setFocus(p);
+    }
+  }, [visible, focusName]);
+
+  if (!visible || points.length === 0) return null;
+
+  const color = layerColor || Colors.PRIMARY;
+  const mapSrc = focus
+    ? `https://www.google.com/maps?q=${focus.lat},${focus.lng}(${encodeURIComponent(focus.name)})&hl=iw&z=16&output=embed`
+    : `https://www.google.com/maps?q=${points[0].lat},${points[0].lng}&hl=iw&z=14&output=embed`;
+
+  return (
+    <Modal visible={visible} transparent animationType="fade">
+      <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', padding: 12 }}>
+        <View style={{ backgroundColor: '#fff', borderRadius: 20, overflow: 'hidden', maxHeight: '85%' }}>
+          <TouchableOpacity onPress={onClose} style={{ position: 'absolute', top: 10, left: 10, zIndex: 10, width: 32, height: 32, borderRadius: 16, backgroundColor: 'rgba(0,0,0,0.5)', alignItems: 'center', justifyContent: 'center' }}>
+            <Text style={{ color: '#fff', fontSize: 18, fontWeight: '800' }}>✕</Text>
+          </TouchableOpacity>
+          {Platform.OS === 'web' && (
+            <View style={{ borderBottom: '1px solid #eee', padding: 8, backgroundColor: '#fff' } as any}>
+              {React.createElement('div', {
+                style: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 },
+              }, [
+                React.createElement('div', {
+                  key: 'au',
+                  onClick: () => { const el = (document as any).getElementById('modal-carousel'); if (el) el.scrollBy({ top: -120, behavior: 'smooth' }); },
+                  style: { cursor: 'pointer', fontSize: 14, color: color, fontWeight: 900, padding: '2px 0', userSelect: 'none' },
+                }, '▲'),
+                React.createElement('div', {
+                  key: 'list',
+                  id: 'modal-carousel',
+                  style: { display: 'flex', flexDirection: 'column', gap: 4, overflowY: 'hidden', maxHeight: 190, width: '100%', scrollBehavior: 'smooth', direction: 'rtl' },
+                }, points.map((p, i) => {
+                  const on = focus?.name === p.name;
+                  return React.createElement('div', {
+                    key: p.name + i,
+                    onClick: () => setFocus(p),
+                    style: {
+                      padding: '8px 14px', borderRadius: 10, cursor: 'pointer', textAlign: 'right',
+                      background: on ? color : '#f8f9fa', color: on ? '#fff' : color,
+                      fontSize: 14, fontWeight: on ? 800 : 600, fontFamily: 'Arial, sans-serif',
+                      border: on ? 'none' : `1.5px solid ${color}20`,
+                      transition: 'all 0.15s ease', flexShrink: 0,
+                    },
+                  }, `📍 ${p.name}`);
+                })),
+                React.createElement('div', {
+                  key: 'ad',
+                  onClick: () => { const el = (document as any).getElementById('modal-carousel'); if (el) el.scrollBy({ top: 120, behavior: 'smooth' }); },
+                  style: { cursor: 'pointer', fontSize: 14, color: color, fontWeight: 900, padding: '2px 0', userSelect: 'none' },
+                }, '▼'),
+              ])}
+            </View>
+          )}
+          {Platform.OS === 'web' && React.createElement('iframe', {
+            src: mapSrc,
+            style: { width: '100%', height: 350, border: 0 },
+            title: 'block-map',
+          })}
+          {focus && (
+            <View style={{ padding: 14, borderTopWidth: 1, borderTopColor: '#eee' }}>
+              <Text style={{ fontSize: 16, fontWeight: '900', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl' }}>📍 {focus.name}</Text>
+              <TouchableOpacity
+                style={{ marginTop: 8, backgroundColor: color, paddingVertical: 10, borderRadius: 10, alignItems: 'center' }}
+                onPress={() => Linking.openURL(`https://www.google.com/maps/dir/?api=1&destination=${focus.lat},${focus.lng}`)}
+              >
+                <Text style={{ color: '#fff', fontWeight: '800', fontSize: 14 }}>🧭 נווט למקום</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
+      </View>
+    </Modal>
+  );
+}
+
+function HotelCard({ h, dark, pageBtnLabel, mapPoints, layerColor }: { h: Hotel; dark: boolean; pageBtnLabel: string; mapPoints?: MapPoint[]; layerColor?: string }) {
   const [showMap, setShowMap] = useState(false);
   const [showGallery, setShowGallery] = useState(false);
+  const [showCatMapModal, setShowCatMapModal] = useState(false);
   const hasGallery = !!(h.images && h.images.length > 0);
   const btnEnabled = hasGallery || !!h.pageUrl;
   if (showMap && h.coords) {
@@ -300,11 +385,15 @@ function HotelCard({ h, dark, pageBtnLabel }: { h: Hotel; dark: boolean; pageBtn
           <TouchableOpacity
             style={[st.hotelBtn, st.hotelBtnAccent, !h.coords && st.hotelBtnDisabled]}
             activeOpacity={h.coords ? 0.7 : 1}
-            onPress={() => h.coords && setShowMap(v => !v)}
-            disabled={!h.coords}
+            onPress={() => {
+              if (mapPoints && mapPoints.length > 0) setShowCatMapModal(true);
+              else if (h.coords) setShowMap(v => !v);
+            }}
+            disabled={!h.coords && !(mapPoints && mapPoints.length > 0)}
           >
-            <Text style={[st.hotelBtnTxt, !h.coords && st.hotelBtnTxtDisabled]}>{showMap ? 'הסתר מפה' : 'איפה זה'}</Text>
+            <Text style={[st.hotelBtnTxt, !h.coords && !(mapPoints && mapPoints.length > 0) && st.hotelBtnTxtDisabled]}>{showMap ? 'הסתר מפה' : 'איפה זה'}</Text>
           </TouchableOpacity>
+          <CategoryMapModal visible={showCatMapModal} points={mapPoints || []} focusName={h.title} layerColor={layerColor} onClose={() => setShowCatMapModal(false)} />
           <TouchableOpacity
             style={[st.hotelBtn, st.hotelBtnSecondary, !h.mapUrl && st.hotelBtnDisabled]}
             activeOpacity={h.mapUrl ? 0.7 : 1}
@@ -396,10 +485,25 @@ export default function CategoryScreen() {
   const [cat, setCat] = useState<Item | null>(null);
   const [selectedTour, setSelectedTour] = useState<TourBlock | null>(null);
   const [ratings, setRatings] = useState<Record<string, { sum: number; count: number }>>({});
+  const [mapPoints, setMapPoints] = useState<MapPoint[]>([]);
+  const [mapFocus, setMapFocus] = useState<MapPoint | null>(null);
+  const [showCatMap, setShowCatMap] = useState(false);
 
   useEffect(() => {
     fetchRatings().then(setRatings).catch(() => {});
   }, []);
+
+  useEffect(() => {
+    if (!cat) return;
+    fetchContent().then(data => {
+      if (data.mapLayers) {
+        const match = (data.mapLayers as any[]).find((l: any) =>
+          l.name && (cat.title.includes(l.name) || l.name.includes(cat.title))
+        );
+        if (match) setMapPoints(match.points || []);
+      }
+    }).catch(() => {});
+  }, [cat]);
 
   const handleRatingSubmit = async (tourId: string, score: number) => {
     try {
@@ -561,7 +665,7 @@ export default function CategoryScreen() {
             {cat.hotels.filter(h => h.visible !== false).map(h => (
               cat.cardStyle === 'passport'
                 ? <PassportCard key={h.id} h={h} pageBtnLabel={cat.pageBtnLabel || 'אתר/פייסבוק'} />
-                : <HotelCard key={h.id} h={h} dark={darkCat} pageBtnLabel={cat.pageBtnLabel || 'לדף המלון'} />
+                : <HotelCard key={h.id} h={h} dark={darkCat} pageBtnLabel={cat.pageBtnLabel || 'לדף המלון'} mapPoints={mapPoints} layerColor={mapPoints.length > 0 ? Colors.PRIMARY : undefined} />
             ))}
           </View>
         ) : cat.article ? (
@@ -688,7 +792,7 @@ const st = StyleSheet.create({
   hotelBtnSecondary: { backgroundColor: '#3DA5C4' },
   hotelBtnAccent: { backgroundColor: '#F4A94E' },
   hotelBtnTxt: { color: Colors.WHITE, fontSize: 13, fontWeight: '700' },
-  hotelBtnDisabled: { opacity: 0.35 },
+  hotelBtnDisabled: { opacity: 0.6 },
   hotelBtnTxtDisabled: {},
 
   tourGrid: { padding: 16, flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 12 },
