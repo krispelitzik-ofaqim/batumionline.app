@@ -21,7 +21,7 @@ type Item = {
   bgDark?: string; description?: string; summary?: string; heroBg?: string;
   layout?: 'card' | 'banner'; children?: Item[]; hotels?: Hotel[]; tours?: TourBlock[]; pageBtnLabel?: string; cardStyle?: string;
   theme?: 'dark' | 'light'; modal?: string; longText?: string;
-  titleEn?: string; titleGe?: string; heroImage?: string;
+  titleEn?: string; titleGe?: string; heroImage?: string; tourMapEmbed?: string;
   article?: {
     heroImage?: string; color?: string;
     sections: { icon: string; title: string; tip: string; image?: string; actionLabel?: string; actionUrl?: string }[];
@@ -136,6 +136,15 @@ function HotelImage({ uri, titleEn }: { uri?: string; titleEn?: string }) {
   );
 }
 
+function buildTourRouteUrl(audios: { title?: string; url: string; coords?: { lat: number; lng: number } }[]): string | null {
+  const pts = audios.filter(a => a.coords).map(a => a.coords!);
+  if (pts.length < 2) return null;
+  const origin = `${pts[0].lat},${pts[0].lng}`;
+  const dest = `${pts[pts.length - 1].lat},${pts[pts.length - 1].lng}`;
+  const waypoints = pts.slice(1, -1).map(p => `${p.lat},${p.lng}`).join('+to:');
+  return `https://www.google.com/maps?saddr=${origin}&daddr=${dest}${waypoints ? '+to:' + waypoints : ''}&dirflg=w&hl=iw&output=embed`;
+}
+
 function TourCard({ t, onRate }: { t: TourBlock; onRate: (id: string, score: number) => void }) {
   const [imgIdx, setImgIdx] = useState(0);
   const [mapBig, setMapBig] = useState(false);
@@ -147,8 +156,10 @@ function TourCard({ t, onRate }: { t: TourBlock; onRate: (id: string, score: num
   const displayedScore = ratingSubmitted ? rating : demoScore;
   const images = t.images && t.images.length > 0 ? t.images : [];
   const activeCoords = navCoords || t.coords;
-  const mapQ = activeCoords ? `${activeCoords.lat},${activeCoords.lng}` : 'Batumi,Georgia';
-  const mapSrc = `https://www.google.com/maps?q=${mapQ}${t.title ? `(${encodeURIComponent(t.title)})` : ''}&z=${navCoords ? 16 : 14}&output=embed`;
+  const routeUrl = buildTourRouteUrl(t.audios || []);
+  const mapSrc = navCoords
+    ? `https://www.google.com/maps?q=${navCoords.lat},${navCoords.lng}(${encodeURIComponent(navCoords.name || '')})&z=16&output=embed`
+    : routeUrl || (activeCoords ? `https://www.google.com/maps?q=${activeCoords.lat},${activeCoords.lng}&z=14&output=embed` : 'https://www.google.com/maps?q=Batumi,Georgia&z=13&output=embed');
   return (
     <View style={[tourSt.card, { backgroundColor: t.color }]}>
       <View style={tourSt.imgWrap}>
