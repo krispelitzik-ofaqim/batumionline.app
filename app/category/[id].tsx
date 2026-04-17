@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState, useRef } from 'react';
 import { View, Text, ScrollView, StyleSheet, useWindowDimensions, TouchableOpacity, Image, Linking, Platform, Modal } from 'react-native';
 import { useLocalSearchParams, Stack, router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -136,13 +136,97 @@ function HotelImage({ uri, titleEn }: { uri?: string; titleEn?: string }) {
   );
 }
 
+function TourStations({ audios, color, onNavigate, onActiveChange }: {
+  audios: { title?: string; url: string; coords?: { lat: number; lng: number } }[];
+  color: string;
+  onNavigate: (c: { lat: number; lng: number }) => void;
+  onActiveChange: (i: number, trk: any) => void;
+}) {
+  const [tracks, setTracks] = useState(audios);
+  const [playingIdx, setPlayingIdx] = useState<number>(-1);
+  const [pos, setPos] = useState(0);
+  const [dur, setDur] = useState(0);
+  const [dragIdx, setDragIdx] = useState<number>(-1);
+  const audioRef = useRef<any>(null);
+
+  useEffect(() => { setTracks(audios); }, [audios]);
+
+  const toggle = (idx: number) => {
+    if (Platform.OS !== 'web') return;
+    if (playingIdx === idx && audioRef.current) {
+      audioRef.current.pause();
+      setPlayingIdx(-1);
+      return;
+    }
+    if (audioRef.current) { audioRef.current.pause(); audioRef.current = null; }
+    const track = tracks[idx];
+    const au = new (window as any).Audio(track.url);
+    au.ontimeupdate = () => { setPos(au.currentTime || 0); setDur(au.duration || 0); };
+    au.onended = () => setPlayingIdx(-1);
+    au.play();
+    audioRef.current = au;
+    setPlayingIdx(idx);
+    onActiveChange(idx, track);
+    if (track.coords) onNavigate(track.coords);
+  };
+
+  useEffect(() => { return () => { if (audioRef.current) audioRef.current.pause(); }; }, []);
+
+  const fmt = (s: number) => { const m = Math.floor(s / 60); const r = Math.floor(s % 60); return `${m}:${r.toString().padStart(2, '0')}`; };
+
+  return (
+    <View style={{ gap: 6 }}>
+      <Text style={{ fontSize: 11, color: '#555', textAlign: 'center', writingDirection: 'rtl', paddingVertical: 2 }}>▶ לחץ להאזנה | 📌 נווט למקום | ≡ לשינוי הסדר</Text>
+      {tracks.map((au, i) => {
+        const isPlaying = playingIdx === i;
+        const pct = isPlaying && dur > 0 ? (pos / dur) * 100 : 0;
+        const row = (
+          <View style={{ backgroundColor: 'rgba(255,255,255,0.5)', borderRadius: 12, padding: 10, borderWidth: isPlaying ? 2 : 0, borderColor: color, borderTop: dragIdx === i ? `3px solid ${color}` : '3px solid transparent' }}>
+            <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 8 }}>
+              <Text style={{ fontSize: 16, color: '#999', fontWeight: '700', paddingHorizontal: 4, ...(Platform.OS === 'web' ? { cursor: 'grab' } as any : {}) }}>≡</Text>
+              <TouchableOpacity onPress={() => toggle(i)} style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: isPlaying ? color : 'rgba(0,0,0,0.15)', alignItems: 'center', justifyContent: 'center' }}>
+                <Text style={{ color: '#fff', fontSize: 14, fontWeight: '900' }}>{isPlaying ? '❚❚' : '▶'}</Text>
+              </TouchableOpacity>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: 14, fontWeight: isPlaying ? '900' : '700', color: '#1C2B35', textAlign: 'right', writingDirection: 'rtl' }}>{au.title || `תחנה ${i + 1}`}</Text>
+                {isPlaying && <Text style={{ fontSize: 10, color: '#888', textAlign: 'right' }}>{fmt(pos)} / {fmt(dur)}</Text>}
+              </View>
+              {au.coords && (
+                <TouchableOpacity onPress={() => onNavigate(au.coords!)} style={{ paddingHorizontal: 12, paddingVertical: 8, borderRadius: 10, backgroundColor: color }}>
+                  <Text style={{ fontSize: 12, fontWeight: '800', color: '#fff' }}>📌 נווט</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+            {isPlaying && (
+              <View style={{ height: 4, backgroundColor: 'rgba(0,0,0,0.1)', borderRadius: 2, marginTop: 6 }}>
+                <View style={{ height: '100%', width: `${pct}%`, backgroundColor: color, borderRadius: 2 } as any} />
+              </View>
+            )}
+          </View>
+        );
+        if (Platform.OS === 'web') {
+          return React.createElement('div', {
+            key: i, draggable: true,
+            onDragStart: (e: any) => { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', String(i)); },
+            onDragOver: (e: any) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; setDragIdx(i); },
+            onDragLeave: () => setDragIdx(-1),
+            onDrop: (e: any) => { e.preventDefault(); setDragIdx(-1); const from = parseInt(e.dataTransfer.getData('text/plain'), 10); if (!isNaN(from) && from !== i) { const arr = [...tracks]; const [moved] = arr.splice(from, 1); arr.splice(i, 0, moved); setTracks(arr); } },
+            onDragEnd: () => setDragIdx(-1),
+            style: { cursor: 'move' },
+          }, row);
+        }
+        return <View key={i}>{row}</View>;
+      })}
+    </View>
+  );
+}
+
 function buildTourRouteUrl(audios: { title?: string; url: string; coords?: { lat: number; lng: number } }[]): string | null {
-  const pts = audios.filter(a => a.coords && !a.title?.includes('רכבל תחנה עליונה') && !a.title?.includes('מוזיאון האשליות')).map(a => a.coords!);
-  if (pts.length < 2) return null;
-  const origin = `${pts[0].lat},${pts[0].lng}`;
-  const dest = `${pts[pts.length - 1].lat},${pts[pts.length - 1].lng}`;
-  const waypoints = pts.slice(1, -1).map(p => `${p.lat},${p.lng}`).join('+to:');
-  return `https://www.google.com/maps?saddr=${origin}&daddr=${dest}${waypoints ? '+to:' + waypoints : ''}&dirflg=w&hl=iw&output=embed`;
+  const pts = audios.filter(a => a.coords).map(a => a.coords!);
+  if (pts.length < 1) return null;
+  const avgLat = pts.reduce((s, p) => s + p.lat, 0) / pts.length;
+  const avgLng = pts.reduce((s, p) => s + p.lng, 0) / pts.length;
+  return `https://www.google.com/maps?q=${avgLat},${avgLng}&hl=iw&z=15&output=embed`;
 }
 
 function TourCard({ t, onRate }: { t: TourBlock; onRate: (id: string, score: number) => void }) {
@@ -224,18 +308,15 @@ function TourCard({ t, onRate }: { t: TourBlock; onRate: (id: string, score: num
 
       <View style={tourSt.audioWrap}>
         {t.audios && t.audios.length > 0 ? (
-          <>
-            <Text style={tourSt.hint}>💡 ניתן לגרור תחנות (≡) ולסדר לפי סדר הסיור שלך</Text>
-            <AudioPlayer
-              tracks={t.audios}
-              tint={t.color}
-              onNavigate={(c) => { setNavCoords(c); setMapBig(true); }}
-              onActiveChange={(i, trk) => {
-                if (images.length > 0) setImgIdx(i % images.length);
-                setStationTitle(trk.title || null);
-              }}
-            />
-          </>
+          <TourStations
+            audios={t.audios}
+            color={t.color}
+            onNavigate={(c) => { setNavCoords(c); setMapBig(true); }}
+            onActiveChange={(i, trk) => {
+              if (images.length > 0) setImgIdx(i % images.length);
+              setStationTitle(trk.title || null);
+            }}
+          />
         ) : (
           <Text style={{ textAlign: 'center', color: '#666', fontSize: 13, padding: 12 }}>
             🎧 נגני אודיו יתווספו דרך פאנל הניהול

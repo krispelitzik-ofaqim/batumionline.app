@@ -1226,6 +1226,21 @@ export default function AdminDashboard() {
 
   const reorderItem = (from: number, to: number) => {
     if (from === to || from < 0 || to < 0) return;
+    if (toursMode && childrenOf) {
+      const tours = [...(childrenOf.tours || [])];
+      if (from >= tours.length || to >= tours.length) return;
+      const [moved] = tours.splice(from, 1);
+      tours.splice(to, 0, moved);
+      const items = [...(data[activeNav] || [])];
+      const pIdx = items.findIndex(i => i.id === childrenOf.id);
+      if (pIdx >= 0) {
+        const newParent = { ...items[pIdx], tours };
+        items[pIdx] = newParent;
+        saveSection(activeNav, items);
+        setChildrenOf(newParent);
+      }
+      return;
+    }
     const source = childrenOf ? (childrenOf.children || []) : (data[activeNav] || []);
     const items = [...source];
     if (from >= items.length || to >= items.length) return;
