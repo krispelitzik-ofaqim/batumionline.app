@@ -32,6 +32,13 @@ export default function MapScreen() {
     if (lat && lng) {
       return `https://www.google.com/maps?q=${lat},${lng}${name ? `(${encodeURIComponent(name)})` : ''}&hl=iw&z=16&output=embed`;
     }
+    if (active !== 'הכל') {
+      const layer = layers.find(l => l.name === active);
+      if (layer && layer.points.length > 0) {
+        const center = layer.points[0];
+        return `https://www.google.com/maps?q=${center.lat},${center.lng}(${encodeURIComponent(center.name)})&hl=iw&z=14&output=embed`;
+      }
+    }
     return 'https://www.google.com/maps/d/embed?mid=1gr51dJM54EabXWSMhPE5f8n2J3-iiyQ&ehbc=2E312F';
   };
 
