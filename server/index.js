@@ -408,6 +408,11 @@ async function syncMapData() {
           }
           if (layers.length > 0) {
             const db = readDB();
+            const oldLayers = db.mapLayers || [];
+            for (const nl of layers) {
+              const old = oldLayers.find(o => o.name === nl.name);
+              if (old && old.color) nl.color = old.color;
+            }
             db.mapLayers = layers;
             writeDB(db);
             console.log(`🗺️ Map synced: ${layers.length} layers, ${layers.reduce((s,l) => s + l.points.length, 0)} points`);

@@ -111,13 +111,24 @@ export default function MapScreen() {
               <ScrollView style={styles.panelScroll} showsVerticalScrollIndicator={false}>
                 {layer.points.map((p, i) => (
                   <TouchableOpacity key={i} style={styles.panelItem} activeOpacity={0.7}
-                    onPress={() => setFocusPoint({ lat: p.lat, lng: p.lng, name: p.name })}>
+                    onPress={() => setFocusPoint(focusPoint?.name === p.name ? null : { lat: p.lat, lng: p.lng, name: p.name })}>
                     <Text style={styles.panelIcon}>📍</Text>
                     <View style={{ flex: 1 }}>
-                      <Text style={styles.panelName} numberOfLines={1}>{p.name}</Text>
-                      {p.description ? <Text style={styles.panelDesc} numberOfLines={2}>{p.description.replace(/<[^>]+>/g, '').substring(0, 60)}</Text> : null}
+                      <Text style={[styles.panelName, focusPoint?.name === p.name && { fontWeight: '900' }]} numberOfLines={1}>{p.name}</Text>
+                      {focusPoint?.name === p.name && p.description ? (
+                        Platform.OS === 'web' ? (
+                          React.createElement('div', {
+                            dangerouslySetInnerHTML: { __html: p.description },
+                            style: {
+                              marginTop: 6, fontSize: 12, color: 'rgba(255,255,255,0.9)',
+                              direction: 'rtl', textAlign: 'right', lineHeight: '1.6',
+                              maxHeight: 150, overflow: 'auto',
+                            },
+                          })
+                        ) : <Text style={styles.panelDesc}>{p.description.replace(/<[^>]+>/g, '')}</Text>
+                      ) : p.description ? <Text style={styles.panelDesc} numberOfLines={1}>{p.description.replace(/<[^>]+>/g, '').substring(0, 40)}</Text> : null}
                     </View>
-                    <Text style={styles.panelArrow}>←</Text>
+                    <Text style={styles.panelArrow}>{focusPoint?.name === p.name ? '▼' : '←'}</Text>
                   </TouchableOpacity>
                 ))}
               </ScrollView>
