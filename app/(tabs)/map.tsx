@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { Colors } from '../../constants/colors';
 import { ThemeContext } from '../../constants/theme';
@@ -17,9 +17,12 @@ export default function MapScreen() {
   const { lat, lng, name } = useLocalSearchParams<{ lat?: string; lng?: string; name?: string }>();
 
   useEffect(() => {
-    fetchContent().then(data => {
+    const load = () => fetchContent().then(data => {
       if (data.mapLayers) setLayers(data.mapLayers);
     }).catch(() => {});
+    load();
+    const iv = setInterval(load, 5000);
+    return () => clearInterval(iv);
   }, []);
 
   const buildMapSrc = () => {
@@ -43,16 +46,47 @@ export default function MapScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: bg }]}>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.barContent} style={styles.bar}>
-        {categories.map((c) => {
+      {Platform.OS === 'web' ? (
+        React.createElement('div', {
+          style: {
+            display: 'flex', flexWrap: 'wrap',
+            gap: '2px 14px', padding: '3px 10px', direction: 'rtl',
+            background: '#fff', borderBottom: '1px solid #eee',
+            justifyContent: 'center',
+          },
+        }, categories.map((c, i) => {
           const on = c === active;
-          return (
-            <TouchableOpacity key={c} onPress={() => { setActive(c); setFocusPoint(null); }} style={[styles.chip, on && styles.chipOn]}>
-              <Text style={[styles.chipText, on && styles.chipTextOn]} numberOfLines={1}>{c}</Text>
-            </TouchableOpacity>
-          );
-        })}
-      </ScrollView>
+          const layer = layers.find(l => l.name === c) as any;
+          const hc = (layer?.color) || (c === 'הכל' ? '#1A6B8A' : '#555');
+          const isMesadot = c.includes('מסעדות') && !categories[i-1]?.includes('מסעדות');
+          return [
+            isMesadot ? React.createElement('div', { key: 'break', style: { flexBasis: '100%', height: 0 } }) : null,
+            React.createElement('div', {
+              key: c,
+              onClick: () => { setActive(c); setFocusPoint(null); },
+              style: {
+                padding: '2px 0', cursor: 'pointer', textAlign: 'center',
+                color: hc, fontSize: 12, fontWeight: on ? 800 : 600, fontFamily: 'Arial, sans-serif',
+                transition: 'all 0.15s ease', whiteSpace: 'nowrap',
+                borderBottom: on ? `2px solid ${hc}` : '2px solid transparent',
+              },
+              onMouseEnter: (e: any) => { if (!on) { e.currentTarget.style.borderBottom = `2px solid ${hc}`; e.currentTarget.style.fontWeight = '800'; } },
+              onMouseLeave: (e: any) => { if (!on) { e.currentTarget.style.borderBottom = '2px solid transparent'; e.currentTarget.style.fontWeight = '600'; } },
+            }, c),
+          ];
+        }).flat().filter(Boolean))
+      ) : (
+        <View style={styles.layerGrid}>
+          {categories.map((c, i) => {
+            const on = c === active;
+            return (
+              <TouchableOpacity key={c} onPress={() => { setActive(c); setFocusPoint(null); }} style={[styles.layerChip, on && styles.layerChipOn]}>
+                <Text style={[styles.layerChipTxt, on && styles.layerChipTxtOn]} numberOfLines={2}>{c}</Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+      )}
       <View style={{ flex: 1, position: 'relative' }}>
         <View style={{ flex: 1, overflow: 'hidden' }}>
           <iframe
@@ -125,5 +159,10 @@ const styles = StyleSheet.create({
   panelArrow: { fontSize: 16, color: Colors.PRIMARY, fontWeight: '700' },
   panelClose: { width: 30, height: 30, borderRadius: 15, backgroundColor: '#f0f0f0', alignItems: 'center', justifyContent: 'center' },
   panelCloseX: { fontSize: 16, color: '#666', fontWeight: '700' },
+  layerGrid: { flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 4, padding: 8 },
+  layerChip: { backgroundColor: '#f0f4f8', borderRadius: 10, paddingVertical: 10, paddingHorizontal: 12, minHeight: 40, alignItems: 'center', justifyContent: 'center' },
+  layerChipOn: { backgroundColor: Colors.PRIMARY },
+  layerChipTxt: { fontSize: 12, fontWeight: '800', color: Colors.TEXT, textAlign: 'center', writingDirection: 'rtl' },
+  layerChipTxtOn: { color: '#fff' },
 });
 

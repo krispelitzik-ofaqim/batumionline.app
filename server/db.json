@@ -9307,7 +9307,8 @@
           "lng": 41.6071066,
           "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X4-mHqJeCNTa69zHf3RiiXtpfVVCaYegP1umNobXwhVAqCSpf2PBijvAZErHuzm2tJyOyJxLL4M6iRkRK7OUzwwZ5BnasHTB2N8kR-CA8Xe6vQRDUravpdbLFzo2SR8Q-H5mAb_3x2k8WQk0Q9NfrJze8v1Y5aBXZq0Dy9NoHhxWpWEOIKjMu_yKlp5xjVnUD1BUxGbS3hfqiZOJ7mvYjSAEDjikRmGI55VuoXiTI5QzL-RVbylAEpohd0?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
         }
-      ]
+      ],
+      "color": "#0288d1"
     },
     {
       "name": "דירות",
@@ -9402,7 +9403,8 @@
           "lng": 41.603161,
           "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X6M0qzxMMFk4iqyhHuWVDUA95ygyte2CfgF_5SwHO-KlhLrcS-_qX3gXOTqSDULL136sE8tyl4A-dWqlXpqnXHnXUJ7iCJq3MO0XkLwjtjOusaTPu5xtR0ontDt8VMRWPHBKChsz3ohVQbJFrWZd7Ui71xA_z4yhT-HcYqyh_wUcUZbyzjRcZU7q9nnmocLwiT3ir7z6Mp5TiHiF-2ab8MiYW2KV9JIyiWqM30Gu_Bvgf0D_3CViyz9SmM?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
         }
-      ]
+      ],
+      "color": "#f57c00"
     },
     {
       "name": "כפר נופש",
@@ -9425,7 +9427,8 @@
           "lng": 41.7650936,
           "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X6_F4_6agdb-Uh7waFvS40ueO0K6lfz9wtuPH0iX397Dl9i_xBbISOw_oRDpLwQqCAS2ft6ShDHayNH9_ocwB79_p5GdZYnflhOuBnSKUwv9avMg9aLqSBAviRmFv6AmLG5SZIiMomJ-x7br8vmUlFpwWzx4IdwowK-WZBWtSAUxjnMuv5eUsB9DiDCVYm8Ogwm4evnhMe_Sq0WVdWeVuGHKZW_3gCeRCGdaFTmfDmsKoXVZ1A8hTcvrzY?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
         }
-      ]
+      ],
+      "color": "#d4a017"
     },
     {
       "name": "אטרקציות",
@@ -9484,7 +9487,8 @@
           "lng": 41.6404693,
           "description": ""
         }
-      ]
+      ],
+      "color": "#ff5252"
     },
     {
       "name": "כדאי לבקר",
@@ -9549,7 +9553,8 @@
           "lng": 41.6385451,
           "description": ""
         }
-      ]
+      ],
+      "color": "#9c27b0"
     },
     {
       "name": "מסעדות",
@@ -9650,7 +9655,8 @@
           "lng": 41.648875,
           "description": ""
         }
-      ]
+      ],
+      "color": "#1a237e"
     },
     {
       "name": "מסעדות במלונות",
@@ -9709,7 +9715,8 @@
           "lng": 41.6157287,
           "description": ""
         }
-      ]
+      ],
+      "color": "#0f9d58"
     },
     {
       "name": "קניות בבטומי",
@@ -9768,7 +9775,8 @@
           "lng": 41.663385,
           "description": ""
         }
-      ]
+      ],
+      "color": "#afb42b"
     },
     {
       "name": "מצלמות רשת",
@@ -9797,7 +9805,8 @@
           "lng": 41.5689493,
           "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X48DL83Yp9AWCUCXvLJ3tHE0ZvLEeeNI2ZpSUivgxn8cXClB8lL4fs5hH8LETCPVRKP3MBIDXWKTgeGvA4WdsCZAooO0A7YmaBeVx9D1oG0F0uWp8eOT0wtCt35hkZyo2TxAszSdMEUMKwo9tZ7gOBgsCdZZ0swZgx1TiXZHPSaK1LGSATby822pFCryFMYBAG8viplW-L8Hkjw5yvJ7dGZtgB-H6c-oW7f_ffDxysPfGoWrdYPXdNzeqo?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מפה זו הינה חלק מפורטל החדשותי ״בטומי און ליין״ <br><br>https://www.batumionline.com/‏"
         }
-      ]
+      ],
+      "color": "#c2185b"
     }
   ]
 }
