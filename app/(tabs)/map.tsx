@@ -15,7 +15,7 @@ export default function MapScreen() {
 
   const mapSrc = lat && lng
     ? `https://www.google.com/maps?q=${lat},${lng}${name ? `(${encodeURIComponent(name)})` : ''}&hl=iw&z=16&output=embed`
-    : 'https://www.google.com/maps?q=Batumi,Georgia&hl=iw&z=13&output=embed';
+    : 'https://www.google.com/maps/d/embed?mid=1gr51dJM54EabXWSMhPE5f8n2J3-iiyQ&ehbc=2E312F';
 
   return (
     <View style={[styles.container, { backgroundColor: bg }]}>

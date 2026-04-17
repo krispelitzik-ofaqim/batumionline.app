@@ -24,7 +24,7 @@ const SITE = 'https://www.batumionline.app';
 export default function InfoPage() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const [tabs, setTabs] = useState<Tab[]>(DEFAULTS);
-  const [portalItem, setPortalItem] = useState<{ title: string; body: string; image?: string } | null>(null);
+  const [portalItem, setPortalItem] = useState<{ title: string; subtitle?: string; body: string; image?: string } | null>(null);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
@@ -43,50 +43,47 @@ export default function InfoPage() {
         }
         if (!isLegal && data.infoPortal && Array.isArray(data.infoPortal)) {
           const found = data.infoPortal.find((x: any) => x.id === id);
-          if (found) setPortalItem({ title: found.title, body: found.longText || found.subtitle || '', image: found.icon });
+          if (found) setPortalItem({ title: found.title, subtitle: found.subtitle || '', body: found.longText || found.subtitle || '', image: found.icon });
         }
       })
       .catch(() => {});
   }, [id]);
 
   if (!isLegal && portalItem) {
-    const hasImage = portalItem.image && portalItem.image.startsWith('http');
+    const hasImage = portalItem.image && (portalItem.image.startsWith('http') || portalItem.image.startsWith('data:'));
     return (
       <View style={styles.container}>
         <TouchableOpacity style={{ position: 'absolute', top: 16, right: 16, zIndex: 10, width: 38, height: 38, borderRadius: 19, backgroundColor: 'rgba(0,0,0,0.4)', alignItems: 'center', justifyContent: 'center' }} onPress={() => router.back()}>
           <Text style={{ fontSize: 26, color: '#fff', fontWeight: '800', marginTop: -2 }}>‹</Text>
         </TouchableOpacity>
         <ScrollView contentContainerStyle={{ paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
-          {hasImage ? (
-            <View style={{ height: 200, position: 'relative' }}>
-              {Platform.OS === 'web' ? (
+          <View style={{ position: 'relative' }}>
+            {hasImage ? (
+              Platform.OS === 'web' ? (
                 React.createElement('img', {
                   src: portalItem.image,
-                  style: { width: '100%', height: 200, objectFit: 'cover', display: 'block' },
+                  style: { width: '100%', height: 240, objectFit: 'cover', display: 'block' },
                   alt: portalItem.title,
                 })
               ) : (
-                <Image source={{ uri: portalItem.image }} style={{ width: '100%', height: 200 }} resizeMode="cover" />
-              )}
-              <LinearGradient colors={['transparent', 'rgba(0,0,0,0.7)']} style={{ position: 'absolute', bottom: 0, left: 0, right: 0, paddingHorizontal: 20, paddingBottom: 16, paddingTop: 40 }}>
-                <Text style={{ fontSize: 22, fontWeight: '900', color: '#fff', textAlign: 'right', writingDirection: 'rtl' }}>{portalItem.title}</Text>
-              </LinearGradient>
-            </View>
-          ) : (
-            <LinearGradient colors={['#1A6B8A', '#3DA5C4']} style={{ padding: 26, alignItems: 'center' }}>
-              <Text style={{ fontSize: 22, fontWeight: '900', color: '#fff', textAlign: 'center', writingDirection: 'rtl' }}>{portalItem.title}</Text>
+                <Image source={{ uri: portalItem.image }} style={{ width: '100%', height: 240 }} resizeMode="cover" />
+              )
+            ) : (
+              <LinearGradient colors={['#1A6B8A', '#3DA5C4']} style={{ height: 240 }} />
+            )}
+            <LinearGradient colors={['transparent', 'rgba(0,0,0,0.8)']} style={{ position: 'absolute', bottom: 0, left: 0, right: 0, paddingHorizontal: 20, paddingBottom: 24, paddingTop: 60 }}>
+              <Text style={{ fontSize: 26, fontWeight: '900', color: '#fff', textAlign: 'right', writingDirection: 'rtl' }}>{portalItem.title}</Text>
+              {portalItem.subtitle ? <Text style={{ fontSize: 14, color: 'rgba(255,255,255,0.85)', textAlign: 'right', writingDirection: 'rtl', marginTop: 4 }}>{portalItem.subtitle}</Text> : null}
             </LinearGradient>
-          )}
-          <View style={styles.bodyWrap}>
+          </View>
+          <View style={{ marginTop: -16, borderTopLeftRadius: 20, borderTopRightRadius: 20, backgroundColor: Colors.BACKGROUND, paddingTop: 20, paddingHorizontal: 16, minHeight: 400 }}>
             {Platform.OS === 'web' && portalItem.body.includes('<') ? (
               React.createElement('div', {
                 dangerouslySetInnerHTML: { __html: portalItem.body },
                 style: { fontSize: 14, color: '#444', textAlign: 'right', direction: 'rtl', lineHeight: '24px' },
               })
             ) : (
-              <View style={styles.card}>
-                <Text style={styles.cardBody}>{portalItem.body || 'תוכן יתווסף בקרוב'}</Text>
-              </View>
+              <Text style={styles.cardBody}>{portalItem.body || 'תוכן יתווסף בקרוב'}</Text>
             )}
           </View>
         </ScrollView>

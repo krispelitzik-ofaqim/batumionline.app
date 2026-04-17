@@ -68,26 +68,7 @@ export default function InfoPortal() {
     <View>
       <Text style={styles.sectionTitle}>פורטל המידע</Text>
 
-      {selected ? (
-        <View style={styles.expandedWrap}>
-          <TouchableOpacity activeOpacity={0.9} style={styles.expandedCard} onPress={openInfoPage}>
-            <View style={[styles.expandedTop, { backgroundColor: selected.bg || Colors.SECONDARY + '25' }]}>
-              {selectedIsImage ? (
-                <Image source={{ uri: selected.icon }} style={styles.expandedImage} resizeMode="cover" />
-              ) : (
-                <Text style={styles.expandedEmoji}>{selected.icon}</Text>
-              )}
-            </View>
-            <View style={styles.expandedBottom}>
-              <Text style={styles.expandedTitle}>{selected.title}</Text>
-              <Text style={styles.expandedSub}>{selected.subtitle || ''}</Text>
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.expandedClose} onPress={() => setSelected(null)}>
-            <Text style={styles.expandedCloseX}>✕</Text>
-          </TouchableOpacity>
-        </View>
-      ) : (
+      {(
         <ScrollView
           ref={scrollRef}
           horizontal
@@ -100,7 +81,7 @@ export default function InfoPortal() {
           {tripled.map((item, i) => {
             const isImage = !!item.icon && (item.icon.startsWith('data:') || item.icon.startsWith('http'));
             return (
-              <TouchableOpacity key={`${item.id}-${i}`} activeOpacity={0.85} style={styles.card} onPress={() => setSelected(item)}>
+              <TouchableOpacity key={`${item.id}-${i}`} activeOpacity={0.85} style={styles.card} onPress={() => router.push(`/info/${item.id}` as any)}>
                 <View style={[styles.cardTop, { backgroundColor: item.bg || Colors.SECONDARY + '25' }]}>
                   {isImage ? (
                     <Image source={{ uri: item.icon }} style={styles.cardImage} resizeMode="cover" />

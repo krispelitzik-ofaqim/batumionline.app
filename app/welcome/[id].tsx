@@ -16,8 +16,8 @@ function fireHearts() {
   for (let i = 0; i < 60; i++) {
     const p = (window as any).document.createElement('div');
     const x = Math.random() * 100;
-    const delay = Math.random() * 1.5;
-    const dur = 2 + Math.random() * 2;
+    const delay = Math.random() * 8;
+    const dur = 2.5 + Math.random() * 2.5;
     const size = 20 + Math.random() * 20;
     Object.assign(p.style, {
       position: 'absolute', top: '-40px', left: `${x}%`,
@@ -34,7 +34,7 @@ function fireHearts() {
     @keyframes hearts-fall-2 { 0% { top: -40px; opacity: 1; transform: scale(0.5); } 50% { opacity: 1; transform: scale(1.3); } 100% { top: 110vh; opacity: 0; transform: scale(0.7) translateX(40px); } }
   `;
   container.appendChild(style);
-  setTimeout(() => container.remove(), 6000);
+  setTimeout(() => container.remove(), 11000);
 }
 
 type WelcomeItem = {
@@ -95,7 +95,7 @@ export default function WelcomeScreen() {
           <View style={{ marginTop: 16 }}>
             <AudioPlayer
               tracks={item.audios}
-              onTimeReached={item.id === '5' ? { seconds: 120, callback: fireHearts } : undefined}
+              onTimeReached={item.id === '5' ? { seconds: 130, callback: fireHearts } : undefined}
             />
           </View>
         )}
