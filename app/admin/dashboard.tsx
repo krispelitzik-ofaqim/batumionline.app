@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
-  View, Text, ScrollView, TouchableOpacity, TextInput, StyleSheet, Alert, Modal,
+  View, Text, ScrollView, TouchableOpacity, TextInput, StyleSheet, Alert, Modal, Image,
   useWindowDimensions, Platform,
 } from 'react-native';
 import { router } from 'expo-router';
@@ -153,13 +153,13 @@ const SECTIONS: Section[] = [
   { key: 'welcome', label: 'סליידר ברוכים הבאים', icon: '👋', storageKey: '@admin_welcome', hasSubtitle: true, hasImage: true, hasAudio: false, hasLocation: false, hasSummary: false, hasLongText: false, defaults: DEFAULT_WELCOME },
   { key: 'info', label: 'פורטל המידע', icon: '📋', storageKey: '@admin_info_portal', hasSubtitle: true, hasImage: true, hasAudio: false, hasLocation: false, hasSummary: false, hasLongText: false, defaults: DEFAULT_INFO_PORTAL },
   { key: 'bottom', label: 'באנרים תחתונים', icon: '🏷️', storageKey: '@admin_bottom_banners', hasSubtitle: false, hasImage: false, hasAudio: false, hasLocation: false, hasSummary: false, hasLongText: false, defaults: DEFAULT_BOTTOM_BANNERS },
-  { key: 'side', label: 'באנרים צדדיים', icon: '📌', storageKey: '@admin_side_banners', hasSubtitle: false, hasImage: false, hasAudio: false, hasLocation: false, hasSummary: false, hasLongText: false, defaults: DEFAULT_SIDE_BANNERS },
+  { key: 'side', label: 'פורטל הנדל״ן', icon: '📌', storageKey: '@admin_side_banners', hasSubtitle: false, hasImage: false, hasAudio: false, hasLocation: false, hasSummary: false, hasLongText: false, defaults: DEFAULT_SIDE_BANNERS },
   { key: 'locations', label: 'מיקומים ומפה', icon: '📍', storageKey: '@admin_locations', hasSubtitle: true, hasImage: false, hasAudio: false, hasLocation: true, hasSummary: false, hasLongText: false, defaults: DEFAULT_LOCATIONS },
   { key: 'audio', label: 'קבצי אודיו', icon: '🎧', storageKey: '@admin_audio', hasSubtitle: true, hasImage: false, hasAudio: true, hasLocation: false, hasSummary: false, hasLongText: false, defaults: DEFAULT_AUDIO },
   { key: 'legal', label: 'מידע חובה', icon: '📜', storageKey: '@admin_legal', hasSubtitle: false, hasImage: false, hasAudio: false, hasLocation: false, hasSummary: false, hasLongText: true, defaults: DEFAULT_LEGAL },
 ];
 
-const TAG_GROUPS: { group: string; icon: string; tags: { key: string; label: string }[] }[] = [
+const TAG_GROUPS: { group: string; icon: string; tags: { key: string; label: string }[]; subgroups?: { label: string; tags: { key: string; label: string }[] }[] }[] = [
   { group: 'קטגוריות ראשיות', icon: '📂', subgroups: [
     { label: '🏨 אירוח ולינה', tags: [{ key: 'h1', label: 'מלונות יוקרה' },{ key: 'h2', label: 'מלונות 3-4' },{ key: 'h3', label: 'דירות נופש' },{ key: 'h4', label: 'כפרי נופש' },{ key: 'h5', label: 'ווילות' },{ key: 'h6', label: 'אכסניות' }] },
     { label: '🎡 אטרקציות ואתרים', tags: [{ key: 'a1', label: 'אטרקציות' },{ key: 'a2', label: 'אתרים פופולריים' },{ key: 'a3', label: 'היסטוריים' },{ key: 'a5', label: 'יהדות' },{ key: 'a6', label: 'נצרות' },{ key: 'a7', label: 'אוטובוס' },{ key: 'a8', label: 'נסיעות פרטיות' }] },
@@ -190,7 +190,7 @@ const TAG_GROUPS: { group: string; icon: string; tags: { key: string; label: str
   { group: 'סליידר ברוכים הבאים', icon: '👋', tags: [{ key: 'welcome', label: 'ברוכים הבאים' }] },
   { group: 'פורטל המידע', icon: '📋', tags: [{ key: 'info', label: 'פורטל מידע' }] },
   { group: 'באנרים תחתונים', icon: '🏷️', tags: [{ key: 'bottom', label: 'באנרים תחתונים' }] },
-  { group: 'באנרים צדדיים', icon: '📌', tags: [{ key: 'realestate', label: 'נדל״ן' },{ key: 'business', label: 'עסקים' }] },
+  { group: 'פורטל הנדל״ן', icon: '📌', tags: [{ key: 'realestate', label: 'נדל״ן' },{ key: 'business', label: 'עסקים' }] },
   { group: 'מיקומים ומפה', icon: '📍', tags: [{ key: 'locations', label: 'מיקומים' }] },
   { group: 'קבצי אודיו', icon: '🎧', tags: [{ key: 'player', label: 'נגן' },{ key: 'audio', label: 'אודיו' }] },
   { group: 'מידע חובה', icon: '📜', tags: [{ key: 'legal', label: 'מידע חובה' }] },
@@ -345,14 +345,17 @@ function RichEditor({ value, onChange }: { value: string; onChange: (v: string) 
 
 // ─── Edit Modal ────────────────────────────────────────────────
 function EditModal({
-  visible, item, section, onSave, onDelete, onClose, isWide, onMoveSection,
+  visible, item, section, onSave, onDelete, onClose, isWide, onMoveSection, allMedia,
 }: {
   visible: boolean; item: DataItem | null; section: Section | null;
   onSave: (item: DataItem) => void; onDelete: () => void; onClose: () => void;
   isWide: boolean;
   onMoveSection?: (target: 'main' | 'extra') => void;
+  allMedia?: { filename: string; url: string; tags?: string[] }[];
 }) {
   const [form, setForm] = useState<DataItem>({ id: '', title: '', icon: '', bg: '' });
+  const [showGalleryPicker, setShowGalleryPicker] = useState(false);
+  const [galleryPickerFilter, setGalleryPickerFilter] = useState('');
 
   useEffect(() => {
     if (item) setForm({ ...item });
@@ -519,6 +522,54 @@ function EditModal({
                   }),
                 ])}
               </View>
+              <TouchableOpacity
+                style={{ backgroundColor: '#10b981', paddingVertical: 10, paddingHorizontal: 16, borderRadius: 10, marginTop: 8 }}
+                onPress={() => {
+                  setShowGalleryPicker(true);
+                  const sKey = section?.key || '';
+                  const matchTag = TAG_OPTIONS.find(t => t.key === sKey || t.key === form.id);
+                  const matchGroup = TAG_GROUPS.find((g: any) => g.group === section?.label || g.tags.some((t: any) => t.key === sKey));
+                  setGalleryPickerFilter(matchTag?.key || (matchGroup?.tags[0]?.key) || '');
+                }}
+              >
+                <Text style={{ color: '#fff', fontWeight: '700', fontSize: 14, textAlign: 'center' }}>📁 בחר מהגלריה</Text>
+              </TouchableOpacity>
+              {showGalleryPicker && allMedia && (
+                <View style={{ marginTop: 10, borderWidth: 1, borderColor: '#e2e8f0', borderRadius: 12, padding: 10, backgroundColor: '#f8fafc', maxHeight: 350 }}>
+                  <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                    <Text style={{ fontSize: 14, fontWeight: '800', color: Colors.TEXT }}>בחר תמונה</Text>
+                    <TouchableOpacity onPress={() => setShowGalleryPicker(false)}>
+                      <Text style={{ fontSize: 18, color: '#999' }}>✕</Text>
+                    </TouchableOpacity>
+                  </View>
+                  {Platform.OS === 'web' && React.createElement('select', {
+                    value: galleryPickerFilter,
+                    onChange: (e: any) => setGalleryPickerFilter(e.target.value),
+                    style: { width: '100%', padding: '6px 10px', borderRadius: 8, border: '1px solid #d1d5db', fontSize: 12, fontWeight: 700, direction: 'rtl', cursor: 'pointer', marginBottom: 8 },
+                  }, [
+                    React.createElement('option', { key: '', value: '' }, 'הכל'),
+                    ...TAG_GROUPS.map((g: any) => g.subgroups
+                      ? g.subgroups.map((sg: any) => React.createElement('optgroup', { key: sg.label, label: sg.label }, sg.tags.map((t: any) => React.createElement('option', { key: t.key, value: t.key }, t.label))))
+                      : React.createElement('optgroup', { key: g.group, label: g.group }, g.tags.map((t: any) => React.createElement('option', { key: t.key, value: t.key }, t.label)))
+                    ).flat(),
+                  ])}
+                  <ScrollView style={{ maxHeight: 260 }} contentContainerStyle={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 6 }}>
+                    {allMedia.filter(f => {
+                      if (/\.(mp3|wav|m4a|aac)$/i.test(f.filename)) return false;
+                      if (!galleryPickerFilter) return true;
+                      return (f.tags || []).includes(galleryPickerFilter);
+                    }).map(f => (
+                      <TouchableOpacity key={f.filename} onPress={() => { set('icon', f.url); setShowGalleryPicker(false); }} activeOpacity={0.7}>
+                        {Platform.OS === 'web' && React.createElement('img', {
+                          src: f.url,
+                          style: { width: 70, height: 50, objectFit: 'cover', borderRadius: 6, border: '2px solid transparent', cursor: 'pointer' },
+                          alt: f.filename,
+                        })}
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+                </View>
+              )}
               <Text style={{ fontSize: 11, color: '#999', marginTop: 6, textAlign: 'right' }}>
                 התמונה תיחתך אוטומטית ליחס 170×100 עם פינות עליונות מעוגלות
               </Text>
@@ -993,16 +1044,19 @@ export default function AdminDashboard() {
   const [showMobileNav, setShowMobileNav] = useState(false);
   const [childrenOf, setChildrenOf] = useState<DataItem | null>(null);
   const [extraGroupVisible, setExtraGroupVisible] = useState(true);
-  const [mediaFiles, setMediaFiles] = useState<{ filename: string; url: string; tags?: string[] }[]>([]);
+  const [mediaFiles, setMediaFiles] = useState<{ filename: string; originalName?: string; url: string; tags?: string[] }[]>([]);
   const [galleryFiles, setGalleryFiles] = useState<{ filename: string; url: string }[]>([]);
   const [mediaFilter, setMediaFilter] = useState<string>('');
   const [mediaFolder, setMediaFolder] = useState<string>('');
+  const [dragOverIdx, setDragOverIdx] = useState<number>(-1);
+  const [selectedFiles, setSelectedFiles] = useState<Set<string>>(new Set());
+  const [mediaVersion, setMediaVersion] = useState(0);
 
   const refreshMedia = useCallback(async () => {
     try {
       const res = await fetch(`${API_BASE}/api/uploads`);
       const json = await res.json();
-      if (json.success) setMediaFiles(json.files);
+      if (json.success) { setMediaFiles(json.files); setMediaVersion(v => v + 1); }
     } catch {}
   }, []);
 
@@ -1200,7 +1254,7 @@ export default function AdminDashboard() {
   const renderNav = () => (
     <View style={[ns.nav, isWide && ns.navWide]}>
       <View style={ns.navHeader}>
-        <Text style={ns.navLogo}>B</Text>
+        <Image source={require('../../assets/images/batumi_icon_light.png')} style={{ width: 40, height: 40, borderRadius: 8 }} resizeMode="contain" />
         <View>
           <Text style={ns.navTitle}>Batumi Online</Text>
           <Text style={ns.navSub}>לוח ניהול</Text>
@@ -1216,7 +1270,7 @@ export default function AdminDashboard() {
             <Text style={ns.navIcon}>{item.icon}</Text>
             <Text style={[ns.navLabel, activeNav === item.key && ns.navLabelActive]}>{item.label}</Text>
             {item.key !== 'texts' && (
-              <Text style={ns.navBadge}>{item.key === 'media' ? mediaFiles.length : item.key === 'gallery' ? galleryFiles.length : (data[item.key] || []).length}</Text>
+              <Text key={`${item.key}-${mediaVersion}`} style={ns.navBadge}>{item.key === 'media' ? mediaFiles.length : item.key === 'gallery' ? galleryFiles.length : item.key === 'audio' ? mediaFiles.filter(f => /\.(mp3|wav|m4a|aac)$/i.test(f.filename)).length : (data[item.key] || []).length}</Text>
             )}
           </TouchableOpacity>
         ))}
@@ -1384,16 +1438,48 @@ export default function AdminDashboard() {
               },
             }),
           ])}
+          <TouchableOpacity
+            style={{ backgroundColor: Colors.SECONDARY, paddingHorizontal: 14, paddingVertical: 10, borderRadius: 10 }}
+            onPress={async () => { await refreshMedia(); }}
+          >
+            <Text style={{ color: '#fff', fontWeight: '700', fontSize: 14 }}>🔄 רענן</Text>
+          </TouchableOpacity>
+          {selectedFiles.size > 0 && (
+            <TouchableOpacity
+              style={{ backgroundColor: '#dc2626', paddingHorizontal: 14, paddingVertical: 10, borderRadius: 10 }}
+              onPress={async () => {
+                if (Platform.OS === 'web' && !confirm(`למחוק ${selectedFiles.size} קבצים?`)) return;
+                for (const fn of selectedFiles) {
+                  await fetch(`${API_BASE}/api/uploads/${encodeURIComponent(fn)}`, { method: 'DELETE' }).catch(() => {});
+                }
+                setSelectedFiles(new Set());
+                await refreshMedia();
+              }}
+            >
+              <Text style={{ color: '#fff', fontWeight: '700', fontSize: 14 }}>🗑 מחק {selectedFiles.size} נבחרים</Text>
+            </TouchableOpacity>
+          )}
         </View>
         <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 12 }}>
           {filteredFiles.map(f => (
-            <View key={f.filename} style={{ width: 160, backgroundColor: '#fafafa', borderRadius: 12, overflow: 'hidden', borderWidth: 1, borderColor: '#e8e8e8' }}>
+            <View key={f.filename} style={{ width: 160, backgroundColor: '#fafafa', borderRadius: 12, overflow: 'hidden', borderWidth: selectedFiles.has(f.filename) ? 2 : 1, borderColor: selectedFiles.has(f.filename) ? '#dc2626' : '#e8e8e8' }}>
+              <TouchableOpacity
+                style={{ position: 'absolute', top: 6, right: 6, zIndex: 10, width: 24, height: 24, borderRadius: 12, backgroundColor: selectedFiles.has(f.filename) ? '#dc2626' : 'rgba(255,255,255,0.8)', borderWidth: 2, borderColor: selectedFiles.has(f.filename) ? '#dc2626' : '#999', alignItems: 'center', justifyContent: 'center' }}
+                onPress={() => {
+                  const next = new Set(selectedFiles);
+                  if (next.has(f.filename)) next.delete(f.filename); else next.add(f.filename);
+                  setSelectedFiles(next);
+                }}
+              >
+                {selectedFiles.has(f.filename) && <Text style={{ color: '#fff', fontSize: 14, fontWeight: '900' }}>✓</Text>}
+              </TouchableOpacity>
               {Platform.OS === 'web' && (/\.(mp3|wav|m4a|aac)$/i.test(f.filename)
                 ? React.createElement('div', { style: { width: '100%', height: 110, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#1e293b', fontSize: 40 } }, '🎵')
                 : React.createElement('img', { src: f.url, style: { width: '100%', height: 110, objectFit: 'cover', display: 'block' }, alt: f.filename })
               )}
               <View style={{ padding: 8 }}>
-                <Text numberOfLines={1} style={{ fontSize: 10, color: '#999', textAlign: 'right', writingDirection: 'rtl', marginBottom: 6 }}>{f.filename}</Text>
+                <Text numberOfLines={1} style={{ fontSize: 10, color: f.originalName ? Colors.TEXT : '#999', fontWeight: f.originalName ? '700' : '400', textAlign: 'right', writingDirection: 'rtl', marginBottom: 2 }}>{f.originalName || f.filename}</Text>
+                {f.originalName && <Text numberOfLines={1} style={{ fontSize: 8, color: '#bbb', textAlign: 'right', writingDirection: 'rtl', marginBottom: 4 }}>{f.filename}</Text>}
                 <View style={{ marginBottom: 6 }}>
                   {Platform.OS === 'web' && React.createElement('select', {
                     value: (f.tags || []).find((t: string) => TAG_OPTIONS.some((o) => o.key === t)) || '',
@@ -1674,13 +1760,20 @@ export default function AdminDashboard() {
               key: item.id,
               draggable: true,
               onDragStart: (e: any) => { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', String(idx)); },
-              onDragOver: (e: any) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; },
+              onDragOver: (e: any) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; setDragOverIdx(idx); },
+              onDragLeave: () => setDragOverIdx(-1),
               onDrop: (e: any) => {
                 e.preventDefault();
+                setDragOverIdx(-1);
                 const from = parseInt(e.dataTransfer.getData('text/plain'), 10);
                 if (!isNaN(from)) reorderItem(from, idx);
               },
-              style: { cursor: 'move' },
+              onDragEnd: () => setDragOverIdx(-1),
+              style: {
+                cursor: 'move',
+                borderTop: dragOverIdx === idx ? '3px solid #1A6B8A' : '3px solid transparent',
+                transition: 'border-top 0.15s ease',
+              },
             }, rowInner);
           }
           return <View key={item.id}>{rowInner}</View>;
@@ -1763,6 +1856,7 @@ export default function AdminDashboard() {
         item={editItem}
         section={currentSection}
         onSave={handleSaveItem}
+        allMedia={mediaFiles}
         onDelete={handleDeleteItem}
         onClose={() => setEditItem(null)}
         isWide={isWide}
@@ -1802,9 +1896,10 @@ const ns = StyleSheet.create({
   navSub: { fontSize: 12, color: '#8899a6', writingDirection: 'rtl' },
   navItem: {
     flexDirection: 'row-reverse', alignItems: 'center', gap: 10,
-    paddingVertical: 12, paddingHorizontal: 20, marginHorizontal: 8, marginVertical: 1, borderRadius: 10,
+    paddingVertical: 14, paddingHorizontal: 20, marginHorizontal: 8, marginVertical: 2, borderRadius: 10,
+    borderBottomWidth: 1, borderBottomColor: '#2a3f4d',
   },
-  navItemActive: { backgroundColor: Colors.PRIMARY + '30' },
+  navItemActive: { backgroundColor: Colors.PRIMARY + '30', borderBottomColor: Colors.PRIMARY },
   navIcon: { fontSize: 18 },
   navLabel: { flex: 1, fontSize: 14, color: '#b0bec5', textAlign: 'right', writingDirection: 'rtl' },
   navLabelActive: { color: Colors.WHITE, fontWeight: '600' },

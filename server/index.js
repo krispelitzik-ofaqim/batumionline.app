@@ -139,12 +139,14 @@ app.get('/api/uploads', (req, res) => {
   try {
     const data = readDB();
     const tags = data.mediaTags || {};
+    const names = data.fileNames || {};
     const files = fs.readdirSync(UPLOADS_DIR)
       .filter(f => !f.startsWith('.') && !fs.statSync(path.join(UPLOADS_DIR, f)).isDirectory())
       .map(f => {
         const stat = fs.statSync(path.join(UPLOADS_DIR, f));
         return {
           filename: f,
+          originalName: names[f] || '',
           url: `http://localhost:${PORT}/uploads/${f}`,
           size: stat.size,
           mtime: stat.mtimeMs,
@@ -258,6 +260,13 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
       return res.status(400).json({ success: false, error: 'No file uploaded' });
     }
     const url = `http://localhost:${PORT}/uploads/${req.file.filename}`;
+    // Save original name mapping (fix Hebrew encoding)
+    const db = readDB();
+    if (!db.fileNames) db.fileNames = {};
+    let origName = req.file.originalname;
+    try { origName = Buffer.from(origName, 'latin1').toString('utf8'); } catch {}
+    db.fileNames[req.file.filename] = origName;
+    writeDB(db);
     res.json({
       success: true,
       url,

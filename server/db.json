@@ -927,1392 +927,6 @@
       "heroBg": "#1A6B8A"
     },
     {
-      "id": "2",
-      "title": "אטרקציות ואתרים",
-      "subtitle": "גלה מקומות וחוויות",
-      "description": "גלו את האתרים המרהיבים של בטומי — מהגנים הבוטניים ועד כיכר פיאצה, הטיילת לאורך הים, ומוזיאונים מרתקים.",
-      "icon": "🎡",
-      "bg": "#F4A94E",
-      "bgDark": "#F4A94E",
-      "image": "",
-      "children": [
-        {
-          "id": "a1",
-          "title": "אטרקציות",
-          "subtitle": "כיף לכל המשפחה",
-          "icon": "🎡",
-          "bg": "#F4A94E",
-          "hotels": [
-            {
-              "id": "a1_1",
-              "title": "הטיילת החדשה",
-              "text": "Batumi New Boulevard - הטיילת הארוכה לאורך חוף הים, עם גינות, אומנות, פסלים וכיסאות נדנדה. לב פועם של העיר, מושלמת להליכה ולרכיבה על אופניים",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": true
-            },
-            {
-              "id": "a1_2",
-              "title": "הגלגל הענק",
-              "text": "Panoramic Wheel - ממוקם בקצה הצפוני של הטיילת במתחם \"מיראקל פארק\". האייקון של העיר, מציע תצפית 360° מדהימה על הים, ההרים והעיר",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": true
-            },
-            {
-              "id": "a1_3",
-              "title": "פסל עלי ונינו",
-              "text": "Ali and Nino - פסל מתכת ענק בגובה 8 מטר שזז לאט ומתמזג/מתפרק כל 10 דקות. מבוסס על רומן אהבה מ-1937. אייקון רומנטי של בטומי בחוף הים",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": true
-            },
-            {
-              "id": "a1_4",
-              "title": "מגדל האלפבית",
-              "text": "Alphabet Tower - מגדל בגובה 130 מטר עם 33 אותיות של האלפבית הגאורגי המפוזרות לאורכו. כולל מעלית שקופה ומסעדה מסתובבת בפסגה",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": true
-            },
-            {
-              "id": "a1_5",
-              "title": "מגדל צ׳ה צ׳ה",
-              "text": "Chacha Tower - מגדל שעון בסגנון עות׳מני. בכל יום ב-19:00, למשך 10 דקות, המגדל מזרים חינם צ׳ה צ׳ה (משקה אלכוהולי גאורגי מסורתי) מהברזים",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": true
-            },
-            {
-              "id": "a1_6",
-              "title": "לונה פארק",
-              "text": "Batumi Lunapark - פארק שעשועים גדול עם מתקנים לכל הגילים, הסמוך לדולפינריום ולאגם. אטרקציה מרכזית לבילוי משפחתי",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": true
-            },
-            {
-              "id": "a1_7",
-              "title": "אגם ארדגני",
-              "text": "Ardagani Lake - אגם מלאכותי גדול עם סירות, מזרקות מוסיקליות, טיילת והופעות מים. פינה ירוקה נעימה בלב העיר",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": true
-            },
-            {
-              "id": "a1_8",
-              "title": "הדולפינריום",
-              "text": "Batumi Dolphinarium - מופעי דולפינים יומיים, אחד הוותיקים באזור. מומלץ במיוחד למשפחות עם ילדים",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "mapUrl": "",
-              "pageUrl": "https://dolphinarium.ge/en/home/",
-              "visible": true
-            },
-            {
-              "id": "a1_9",
-              "title": "כיכר אירופה",
-              "text": "Europe Square - הכיכר המרכזית של העיר העתיקה עם מבנים בסגנון נאו-בארוק. פסל מדיאה הזהובה ניצב במרכז. לב התיירות הלילית",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": true
-            },
-            {
-              "id": "a1_10",
-              "title": "פארק 6 במאי",
-              "text": "6 May Park - פארק עירוני היסטורי עם אגם, גן חיות, גני שעשועים, יער של עצי מג׳ליקה ומונומנטים. אחת האטרקציות הירוקות הגדולות בעיר",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": true
-            }
-          ],
-          "pageBtnLabel": "מידע נוסף"
-        },
-        {
-          "id": "a2",
-          "title": "אתרים פופולריים",
-          "subtitle": "חובה לראות",
-          "icon": "📸",
-          "bg": "#5BC0DE",
-          "hotels": [
-            {
-              "id": "a2_1",
-              "title": "כיכר בטומי",
-              "text": "Batumi Piazza - כיכר בסגנון ונציאני באמצע העיר העתיקה, עם פסיפס רצפה, מגדל שעון נאו-מורי, בתי קפה, מסעדות ומופעים חיים בערב. לב התיירות הלילית",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": true
-            },
-            {
-              "id": "a2_2",
-              "title": "כיכר אירופה",
-              "text": "Europe Square - כיכר מרכזית שוחזרה למראות המאה ה-18. במרכזה פסל מדיאה עם גיזת הזהב. מוקפת במבנים אירופאים ומסעדות",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": true
-            },
-            {
-              "id": "a2_3",
-              "title": "טיילת בולווארד",
-              "text": "Boulevard Promenade - הטיילת הוותיקה של בטומי, 7 ק\"מ של גינות, מסעדות, פסלים ואומנות לאורך חוף הים. לב העיר",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": true
-            },
-            {
-              "id": "a2_4",
-              "title": "המרינה ומגדל השעון",
-              "text": "Marina & Clock Tower - אזור המרינה עם יאכטות, המזח הארוך ומגדל השעון הקלאסי של העיר. נקודת צילום פופולרית",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": true
-            },
-            {
-              "id": "a2_5",
-              "title": "הרובע היהודי ההיסטורי",
-              "text": "Historic Jewish Quarter - הרחובות שבין בית הכנסת העתיק לבית חב\"ד, אזור היסטורי חשוב עם מורשת הקהילה היהודית בבטומי",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": true
-            },
-            {
-              "id": "a2_6",
-              "title": "בית הכנסת הגדול",
-              "text": "Great Synagogue of Batumi - בית הכנסת המרכזי של הקהילה היהודית בעיר, בניין היסטורי ופעיל עד היום עם מניין קבוע",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": true
-            },
-            {
-              "id": "a2_7",
-              "title": "בית חב״ד בטומי",
-              "text": "Chabad Batumi - מרכז הקהילה היהודית, מתפקד כבית כנסת, מסעדה כשרה ומרכז שירותים לתיירים הישראלים",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "mapUrl": "",
-              "pageUrl": "http://chabadbatumi.ge/",
-              "visible": true
-            },
-            {
-              "id": "a2_8",
-              "title": "קתדרלת האם הקדושה",
-              "text": "Mother of God Cathedral - קתדרלה נוצרית גדולה מתחילת המאה ה-20 (1898-1903), הוקמה במקור כבית תפילה קתולי והפכה לכנסייה אורתודוקסית",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": true
-            },
-            {
-              "id": "a2_9",
-              "title": "כנסיית סנט ניקולס",
-              "text": "St. Nicholas Church - כנסייה אורתודוקסית היסטורית ברובע העתיק, מוקד חשוב של הנצרות הגאורגית, בעלת אדריכלות קלאסית",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": true
-            },
-            {
-              "id": "a2_10",
-              "title": "הכנסייה הארמנית",
-              "text": "Armenian Church - כנסייה היסטורית של הקהילה הארמנית בבטומי, סמל למגוון הדתי והתרבותי של העיר",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": true
-            },
-            {
-              "id": "a2_11",
-              "title": "שוק הפשפשים",
-              "titleEn": "Old Bazaar",
-              "text": "שוק מקומי אותנטי עם תבלינים, פירות, גבינות, ממתקים וחרצ׳ו. חוויה תרבותית חובה - מחירים מקומיים, מיקוח מקובל. ממוקם ליד התחנה המרכזית ופופולרי מאוד בקרב תיירים ומקומיים",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "coords": {
-                "lat": 41.6453,
-                "lng": 41.6401
-              },
-              "visible": true
-            }
-          ],
-          "pageBtnLabel": "מידע נוסף"
-        },
-        {
-          "id": "a3",
-          "title": "אתרים היסטוריים",
-          "subtitle": "סיפורה של העיר",
-          "icon": "🏛️",
-          "bg": "#1A6B8A",
-          "hotels": [
-            {
-              "id": "a3_1",
-              "title": "מבצר גוניו",
-              "titleEn": "Gonio Fortress",
-              "text": "מבצר רומי בן 2000 שנה, מהמבצרים העתיקים ביותר בגאורגיה. ממוקם 15 דק׳ מבטומי",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.573,41.575",
-              "pageUrl": "",
-              "visible": true,
-              "coords": {
-                "lat": 41.573,
-                "lng": 41.575
-              }
-            },
-            {
-              "id": "a3_2",
-              "title": "מבצר פטרה",
-              "titleEn": "Petra Fortress",
-              "text": "שרידי מבצר ביזנטי מהמאה ה-6 על גבעה מעל הים",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.76,41.74",
-              "pageUrl": "",
-              "visible": true,
-              "coords": {
-                "lat": 41.76,
-                "lng": 41.74
-              }
-            },
-            {
-              "id": "a3_3",
-              "title": "כנסיית סנט אנדרו",
-              "titleEn": "St. Andrew Church",
-              "text": "כנסייה עתיקה מהמאה ה-9, אחד המבנים הדתיים הוותיקים באזור",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.651,41.637",
-              "pageUrl": "",
-              "visible": true,
-              "coords": {
-                "lat": 41.651,
-                "lng": 41.637
-              }
-            },
-            {
-              "id": "a3_4",
-              "title": "גשר מכמחורי",
-              "titleEn": "Makhuntseti Bridge",
-              "text": "גשר קשתות מאבן מהמאה ה-12, פלא הנדסי מעל נהר אדג׳ריסצקאלי",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.75,42.78",
-              "pageUrl": "",
-              "visible": true,
-              "coords": {
-                "lat": 41.75,
-                "lng": 42.78
-              }
-            },
-            {
-              "id": "a3_5",
-              "title": "מוזיאון אדג׳רה",
-              "titleEn": "Adjara Museum",
-              "text": "מוזיאון ההיסטוריה של אדג׳רה עם ממצאים ארכיאולוגיים מכל התקופות",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.65,41.636",
-              "pageUrl": "",
-              "visible": true,
-              "coords": {
-                "lat": 41.65,
-                "lng": 41.636
-              }
-            },
-            {
-              "id": "a3_6",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a3_7",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a3_8",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a3_9",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a3_10",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            }
-          ],
-          "pageBtnLabel": "מידע נוסף"
-        },
-        {
-          "id": "a4",
-          "title": "סיורים קוליים",
-          "subtitle": "מסלולים מודרכים",
-          "icon": "🎧",
-          "bg": "#2E8BA8"
-        },
-        {
-          "id": "a5",
-          "title": "היסטוריה יהודית",
-          "subtitle": "קהילה ומורשת",
-          "icon": "✡️",
-          "bg": "#7ECFC0",
-          "hotels": [
-            {
-              "id": "a5_1",
-              "title": "בית הכנסת הגדול",
-              "titleEn": "Great Synagogue",
-              "text": "בית הכנסת המרכזי של בטומי, נבנה ב-1904. פעיל עד היום עם מניין קבוע",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6508,41.6365",
-              "pageUrl": "",
-              "visible": true,
-              "coords": {
-                "lat": 41.6508,
-                "lng": 41.6365
-              }
-            },
-            {
-              "id": "a5_2",
-              "title": "בית חב״ד בטומי",
-              "titleEn": "Chabad Batumi",
-              "text": "מרכז הקהילה היהודית - בית כנסת, מסעדה כשרה, שירותים לתיירים",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6505,41.636",
-              "pageUrl": "",
-              "visible": true,
-              "coords": {
-                "lat": 41.6505,
-                "lng": 41.636
-              }
-            },
-            {
-              "id": "a5_3",
-              "title": "הרובע היהודי",
-              "titleEn": "Jewish Quarter",
-              "text": "הרחובות ההיסטוריים בין בית הכנסת לבית חב״ד, מורשת קהילה עשירה",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6506,41.6362",
-              "pageUrl": "",
-              "visible": true,
-              "coords": {
-                "lat": 41.6506,
-                "lng": 41.6362
-              }
-            },
-            {
-              "id": "a5_4",
-              "title": "בית העלמין היהודי",
-              "titleEn": "Jewish Cemetery",
-              "text": "בית קברות היסטורי עם מצבות מהמאה ה-19",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.655,41.64",
-              "pageUrl": "",
-              "visible": true,
-              "coords": {
-                "lat": 41.655,
-                "lng": 41.64
-              }
-            },
-            {
-              "id": "a5_5",
-              "title": "מוזיאון הקהילה",
-              "titleEn": "Community Museum",
-              "text": "תערוכה על תולדות היהודים בגאורגיה מאז ימי בית ראשון",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6508,41.6365",
-              "pageUrl": "",
-              "visible": true,
-              "coords": {
-                "lat": 41.6508,
-                "lng": 41.6365
-              }
-            },
-            {
-              "id": "a5_6",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a5_7",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a5_8",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a5_9",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a5_10",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            }
-          ],
-          "pageBtnLabel": "מידע נוסף"
-        },
-        {
-          "id": "a6",
-          "title": "היסטוריה נוצרית",
-          "subtitle": "כנסיות ומנזרים",
-          "icon": "⛪",
-          "bg": "#3DA5C4",
-          "hotels": [
-            {
-              "id": "a6_1",
-              "title": "קתדרלת האם הקדושה",
-              "titleEn": "Mother of God Cathedral",
-              "text": "קתדרלה מרשימה מ-1903, במקור קתולית, כיום אורתודוקסית",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6495,41.6375",
-              "pageUrl": "",
-              "visible": true,
-              "coords": {
-                "lat": 41.6495,
-                "lng": 41.6375
-              }
-            },
-            {
-              "id": "a6_2",
-              "title": "כנסיית סנט ניקולס",
-              "titleEn": "St. Nicholas Church",
-              "text": "כנסייה אורתודוקסית היסטורית ברובע העתיק, אדריכלות קלאסית",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.651,41.637",
-              "pageUrl": "",
-              "visible": true,
-              "coords": {
-                "lat": 41.651,
-                "lng": 41.637
-              }
-            },
-            {
-              "id": "a6_3",
-              "title": "הכנסייה הארמנית",
-              "titleEn": "Armenian Church",
-              "text": "כנסייה היסטורית של הקהילה הארמנית, סמל למגוון הדתי של העיר",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6515,41.6368",
-              "pageUrl": "",
-              "visible": true,
-              "coords": {
-                "lat": 41.6515,
-                "lng": 41.6368
-              }
-            },
-            {
-              "id": "a6_4",
-              "title": "כנסייה קתולית",
-              "titleEn": "Catholic Church",
-              "text": "כנסייה קתולית קטנה ויפה ברובע העתיק",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.65,41.6358",
-              "pageUrl": "",
-              "visible": true,
-              "coords": {
-                "lat": 41.65,
-                "lng": 41.6358
-              }
-            },
-            {
-              "id": "a6_5",
-              "title": "מנזר שיו-מגוימה",
-              "titleEn": "Shio-Mgvime",
-              "text": "מנזר מערות עתיק מהמאה ה-6, טיול יום מבטומי",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.84,44.62",
-              "pageUrl": "",
-              "visible": true,
-              "coords": {
-                "lat": 41.84,
-                "lng": 44.62
-              }
-            },
-            {
-              "id": "a6_6",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a6_7",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a6_8",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a6_9",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a6_10",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            }
-          ],
-          "pageBtnLabel": "מידע נוסף"
-        },
-        {
-          "id": "a7",
-          "title": "אוטובוס תיירים",
-          "subtitle": "",
-          "icon": "🚌",
-          "bg": "#3DA5C425",
-          "hotels": [
-            {
-              "id": "a7_1",
-              "title": "הדרך הקלה והמהירה להכיר את כל באטומי בסיבוב אחד",
-              "titleEn": "",
-              "text": "הדרך הקלה והמהירה להכיר את כל באטומי בסיבוב אחד",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": true
-            },
-            {
-              "id": "a7_2",
-              "title": "האוטובוס הדו-קומתי מאפשר לכם לראות את כל נקודות הצ",
-              "titleEn": "",
-              "text": "האוטובוס הדו-קומתי מאפשר לכם לראות את כל נקודות הציון המרכזיות של העיר עם הדרכה קולית. ניתן לרדת ולעלות בחופשיות (",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": true
-            },
-            {
-              "id": "a7_3",
-              "title": "כ-40-50 לארי למבוגר (תקף ל-24 שעות)",
-              "titleEn": "",
-              "text": "כ-40-50 לארי למבוגר (תקף ל-24 שעות)",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": true
-            },
-            {
-              "id": "a7_4",
-              "title": "זמין באנגלית, רוסית ושפות נוספות",
-              "titleEn": "",
-              "text": "זמין באנגלית, רוסית ושפות נוספות",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": true
-            },
-            {
-              "id": "a7_5",
-              "title": "מומלץ לשבת בקומה השנייה לצילומים פנורמיים של קו הח",
-              "titleEn": "",
-              "text": "מומלץ לשבת בקומה השנייה לצילומים פנורמיים של קו החוף!",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": true
-            },
-            {
-              "id": "a7_6",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a7_7",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a7_8",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a7_9",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a7_10",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            }
-          ],
-          "pageBtnLabel": "מידע נוסף"
-        },
-        {
-          "id": "a8",
-          "title": "נסיעות פרטיות",
-          "subtitle": "",
-          "icon": "🚐",
-          "bg": "#3DA5C425",
-          "hotels": [
-            {
-              "id": "a8_1",
-              "title": "סוכנים ומדריכים ישראלים בבטומי\n\"",
-              "titleEn": "",
-              "text": "סוכנים ומדריכים ישראלים בבטומי\n\"",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": true
-            },
-            {
-              "id": "a8_2",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a8_3",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a8_4",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a8_5",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a8_6",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a8_7",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a8_8",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a8_9",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a8_10",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            }
-          ],
-          "pageBtnLabel": "מידע נוסף"
-        }
-      ],
-      "heroBg": "#F4A94E"
-    },
-    {
-      "id": "3",
-      "title": "סיורים קוליים",
-      "subtitle": "מסלולים מודרכים",
-      "description": "טיילו בבטומי עם מדריך אישי באוזן! סיורים קוליים בעברית לאורך מסלולים מרכזיים בעיר.",
-      "icon": "🎧",
-      "bg": "#2D4A5E",
-      "bgDark": "#1A6B8A",
-      "image": "",
-      "children": [],
-      "heroBg": "#2D4A5E",
-      "tours": [
-        {
-          "id": "t_1",
-          "title": "העיר העתיקה",
-          "text": "סיור מרתק ברובע העתיק של בטומי, בין הכיכרות, בתי הקפה והבניינים ההיסטוריים. תגלו את הסיפורים מאחורי כל פינה, את המיזוג בין התרבויות ואת האווירה הייחודית של העיר.",
-          "color": "#B8E6C1",
-          "images": [
-            "http://localhost:3001/uploads/1775910069485-6.jpg",
-            "http://localhost:3001/uploads/1775910069497-754.jpg",
-            "http://localhost:3001/uploads/1775910069506-223.jpg"
-          ],
-          "audios": [
-            {
-              "title": "1. כיכר אירופה",
-              "url": "http://localhost:3001/uploads/1776002188513-612.mp3",
-              "coords": {
-                "lat": 41.6533,
-                "lng": 41.6355
-              }
-            },
-            {
-              "title": "2. פסל עלי ונינו",
-              "url": "http://localhost:3001/uploads/1776002215391-967.mp3",
-              "coords": {
-                "lat": 41.6488,
-                "lng": 41.6398
-              }
-            },
-            {
-              "title": "3. מגדל האלפבית",
-              "url": "http://localhost:3001/uploads/1776002237090-835.mp3",
-              "coords": {
-                "lat": 41.6527,
-                "lng": 41.6386
-              }
-            },
-            {
-              "title": "4. הטיילת",
-              "url": "http://localhost:3001/uploads/1776002253481-93.mp3",
-              "coords": {
-                "lat": 41.6463,
-                "lng": 41.6367
-              }
-            }
-          ],
-          "visible": true,
-          "subtitle": "סיור הליכה ברובע העתיק"
-        },
-        {
-          "id": "t_2",
-          "title": "סיור הטיילת",
-          "text": "הליכה לאורך הטיילת המפורסמת של בטומי - מהמרינה עד הגלגל הענק. תגלו את הפסלים, הגנים והמונומנטים לאורך הדרך, תוך האזנה לסיפורים על הארכיטקטורה המודרנית של העיר.",
-          "color": "#FADADD",
-          "images": [
-            "http://localhost:3001/uploads/1775910069516-30.jpg",
-            "http://localhost:3001/uploads/1775910069526-255.jpg"
-          ],
-          "audios": [
-            {
-              "title": "1. כיכר אירופה",
-              "url": "http://localhost:3001/uploads/1776002270866-146.mp3",
-              "coords": {
-                "lat": 41.6543,
-                "lng": 41.6365
-              }
-            },
-            {
-              "title": "2. פסל עלי ונינו",
-              "url": "http://localhost:3001/uploads/1776002287224-652.mp3",
-              "coords": {
-                "lat": 41.6498,
-                "lng": 41.6408
-              }
-            },
-            {
-              "title": "3. מגדל האלפבית",
-              "url": "http://localhost:3001/uploads/1776003051932-39.mp3",
-              "coords": {
-                "lat": 41.6537,
-                "lng": 41.639599999999994
-              }
-            },
-            {
-              "title": "4. הטיילת",
-              "url": "http://localhost:3001/uploads/1776004810011-62.mp3",
-              "coords": {
-                "lat": 41.647299999999994,
-                "lng": 41.637699999999995
-              }
-            }
-          ],
-          "visible": true,
-          "subtitle": "לאורך חוף הים"
-        },
-        {
-          "id": "t_3",
-          "title": "אדריכלות מודרנית",
-          "text": "בטומי היא מעבדת אדריכלות חיה - בניינים פוטוריסטיים, מגדלים מעוצבים ומבני נוף. הסיור יוביל אתכם בין הבולטים שבהם, עם הסבר על הסיפור מאחורי כל מבנה.",
-          "color": "#C7E6F5",
-          "images": [
-            "http://localhost:3001/uploads/1775910069535-937.jpg",
-            "http://localhost:3001/uploads/1775910069548-933.jpg",
-            "http://localhost:3001/uploads/1775910069562-341.jpg",
-            "http://localhost:3001/uploads/1775910069573-698.jpg"
-          ],
-          "audios": [
-            {
-              "title": "1. כיכר אירופה",
-              "url": "http://localhost:3001/uploads/1776004835623-813.mp3",
-              "coords": {
-                "lat": 41.655300000000004,
-                "lng": 41.6375
-              }
-            },
-            {
-              "title": "2. פסל עלי ונינו",
-              "url": "http://localhost:3001/uploads/1776004855237-413.mp3",
-              "coords": {
-                "lat": 41.650800000000004,
-                "lng": 41.6418
-              }
-            },
-            {
-              "title": "3. מגדל האלפבית",
-              "url": "http://localhost:3001/uploads/1776004878847-105.mp3",
-              "coords": {
-                "lat": 41.654700000000005,
-                "lng": 41.6406
-              }
-            },
-            {
-              "title": "4. הטיילת",
-              "url": "http://localhost:3001/uploads/1776005085649-506.mp3",
-              "coords": {
-                "lat": 41.6483,
-                "lng": 41.6387
-              }
-            }
-          ],
-          "visible": true,
-          "subtitle": "מהגלגל הענק למגדל האלפבית"
-        },
-        {
-          "id": "t_4",
-          "title": "סיור יהודי",
-          "text": "",
-          "color": "#FFF5B1",
-          "images": [
-            "http://localhost:3001/uploads/1775910069627-459.jpg",
-            "http://localhost:3001/uploads/1775910069643-44.jpg",
-            "http://localhost:3001/uploads/1775910069656-446.jpg",
-            "http://localhost:3001/uploads/1775910069672-831.jpg"
-          ],
-          "audios": [
-            {
-              "title": "1. כיכר אירופה",
-              "url": "http://localhost:3001/uploads/1776005106931-992.mp3",
-              "coords": {
-                "lat": 41.6563,
-                "lng": 41.6385
-              }
-            },
-            {
-              "title": "2. פסל עלי ונינו",
-              "url": "http://localhost:3001/uploads/1776002188513-612.mp3",
-              "coords": {
-                "lat": 41.6518,
-                "lng": 41.6428
-              }
-            },
-            {
-              "title": "3. מגדל האלפבית",
-              "url": "http://localhost:3001/uploads/1776002215391-967.mp3",
-              "coords": {
-                "lat": 41.6557,
-                "lng": 41.6416
-              }
-            },
-            {
-              "title": "4. הטיילת",
-              "url": "http://localhost:3001/uploads/1776002237090-835.mp3",
-              "coords": {
-                "lat": 41.6493,
-                "lng": 41.6397
-              }
-            }
-          ],
-          "visible": true,
-          "subtitle": "מורשת יהודית בבטומי"
-        },
-        {
-          "id": "t_5",
-          "title": "סיור גנים",
-          "text": "",
-          "color": "#FFD1A9",
-          "images": [
-            "http://localhost:3001/uploads/1775910069689-689.jpg",
-            "http://localhost:3001/uploads/1775910069707-877.jpg",
-            "http://localhost:3001/uploads/1775910069718-813.jpg",
-            "http://localhost:3001/uploads/1775910069727-542.jpg"
-          ],
-          "audios": [
-            {
-              "title": "1. כיכר אירופה",
-              "url": "http://localhost:3001/uploads/1776002253481-93.mp3",
-              "coords": {
-                "lat": 41.6573,
-                "lng": 41.6395
-              }
-            },
-            {
-              "title": "2. פסל עלי ונינו",
-              "url": "http://localhost:3001/uploads/1776002270866-146.mp3",
-              "coords": {
-                "lat": 41.6528,
-                "lng": 41.6438
-              }
-            },
-            {
-              "title": "3. מגדל האלפבית",
-              "url": "http://localhost:3001/uploads/1776002287224-652.mp3",
-              "coords": {
-                "lat": 41.6567,
-                "lng": 41.642599999999995
-              }
-            },
-            {
-              "title": "4. הטיילת",
-              "url": "http://localhost:3001/uploads/1776003051932-39.mp3",
-              "coords": {
-                "lat": 41.650299999999994,
-                "lng": 41.640699999999995
-              }
-            }
-          ],
-          "visible": true,
-          "subtitle": "גנים, פארקים ופינות ירוקות"
-        },
-        {
-          "id": "t_6",
-          "title": "סיור קולינרי",
-          "text": "",
-          "color": "#DCC6FC",
-          "images": [
-            "http://localhost:3001/uploads/1775910069741-591.jpg",
-            "http://localhost:3001/uploads/1775910069754-713.jpg",
-            "http://localhost:3001/uploads/1775910069774-994.jpg",
-            "http://localhost:3001/uploads/1775910069789-35.jpg"
-          ],
-          "audios": [
-            {
-              "title": "1. כיכר אירופה",
-              "url": "http://localhost:3001/uploads/1776004810011-62.mp3",
-              "coords": {
-                "lat": 41.658300000000004,
-                "lng": 41.6405
-              }
-            },
-            {
-              "title": "2. פסל עלי ונינו",
-              "url": "http://localhost:3001/uploads/1776004835623-813.mp3",
-              "coords": {
-                "lat": 41.653800000000004,
-                "lng": 41.644800000000004
-              }
-            },
-            {
-              "title": "3. מגדל האלפבית",
-              "url": "http://localhost:3001/uploads/1776004855237-413.mp3",
-              "coords": {
-                "lat": 41.657700000000006,
-                "lng": 41.6436
-              }
-            },
-            {
-              "title": "4. הטיילת",
-              "url": "http://localhost:3001/uploads/1776004878847-105.mp3",
-              "coords": {
-                "lat": 41.6513,
-                "lng": 41.6417
-              }
-            }
-          ],
-          "visible": true,
-          "subtitle": "טעמים מקומיים ובתי קפה"
-        },
-        {
-          "id": "t_7",
-          "title": "סיור שוק",
-          "text": "",
-          "color": "#A3D9B1",
-          "images": [
-            "http://localhost:3001/uploads/1775910069804-487.jpg",
-            "http://localhost:3001/uploads/1775910069817-888.jpg",
-            "http://localhost:3001/uploads/1775910069828-261.jpg",
-            "http://localhost:3001/uploads/1775910069848-396.jpg"
-          ],
-          "audios": [
-            {
-              "title": "1. כיכר אירופה",
-              "url": "http://localhost:3001/uploads/1776005085649-506.mp3",
-              "coords": {
-                "lat": 41.6593,
-                "lng": 41.6415
-              }
-            },
-            {
-              "title": "2. פסל עלי ונינו",
-              "url": "http://localhost:3001/uploads/1776005106931-992.mp3",
-              "coords": {
-                "lat": 41.6548,
-                "lng": 41.6458
-              }
-            },
-            {
-              "title": "3. מגדל האלפבית",
-              "url": "http://localhost:3001/uploads/1776002188513-612.mp3",
-              "coords": {
-                "lat": 41.6587,
-                "lng": 41.6446
-              }
-            },
-            {
-              "title": "4. הטיילת",
-              "url": "http://localhost:3001/uploads/1776002215391-967.mp3",
-              "coords": {
-                "lat": 41.6523,
-                "lng": 41.6427
-              }
-            }
-          ],
-          "visible": true,
-          "subtitle": "שווקים, דוכנים וקניות"
-        },
-        {
-          "id": "t_8",
-          "title": "סיור בטבע",
-          "text": "",
-          "color": "#B5EAE5",
-          "images": [
-            "http://localhost:3001/uploads/1775910069856-849.jpg",
-            "http://localhost:3001/uploads/1775910069871-73.jpg",
-            "http://localhost:3001/uploads/1775910069886-735.jpg",
-            "http://localhost:3001/uploads/1775910069905-986.jpg"
-          ],
-          "audios": [
-            {
-              "title": "1. כיכר אירופה",
-              "url": "http://localhost:3001/uploads/1776002237090-835.mp3",
-              "coords": {
-                "lat": 41.6603,
-                "lng": 41.6425
-              }
-            },
-            {
-              "title": "2. פסל עלי ונינו",
-              "url": "http://localhost:3001/uploads/1776002253481-93.mp3",
-              "coords": {
-                "lat": 41.6558,
-                "lng": 41.6468
-              }
-            },
-            {
-              "title": "3. מגדל האלפבית",
-              "url": "http://localhost:3001/uploads/1776002270866-146.mp3",
-              "coords": {
-                "lat": 41.6597,
-                "lng": 41.645599999999995
-              }
-            },
-            {
-              "title": "4. הטיילת",
-              "url": "http://localhost:3001/uploads/1776002287224-652.mp3",
-              "coords": {
-                "lat": 41.653299999999994,
-                "lng": 41.643699999999995
-              }
-            }
-          ],
-          "visible": true,
-          "subtitle": "יציאה אל הטבע הקרוב"
-        },
-        {
-          "id": "t_9",
-          "title": "סיור כנסיות",
-          "text": "",
-          "color": "#D3DCE3",
-          "images": [
-            "http://localhost:3001/uploads/1775910069920-177.jpg",
-            "http://localhost:3001/uploads/1775910069932-509.jpg",
-            "http://localhost:3001/uploads/1775910069944-981.jpg",
-            "http://localhost:3001/uploads/1775910069968-962.jpg"
-          ],
-          "audios": [
-            {
-              "title": "1. כיכר אירופה",
-              "url": "http://localhost:3001/uploads/1776003051932-39.mp3",
-              "coords": {
-                "lat": 41.661300000000004,
-                "lng": 41.6435
-              }
-            },
-            {
-              "title": "2. פסל עלי ונינו",
-              "url": "http://localhost:3001/uploads/1776004810011-62.mp3",
-              "coords": {
-                "lat": 41.656800000000004,
-                "lng": 41.647800000000004
-              }
-            },
-            {
-              "title": "3. מגדל האלפבית",
-              "url": "http://localhost:3001/uploads/1776004835623-813.mp3",
-              "coords": {
-                "lat": 41.660700000000006,
-                "lng": 41.6466
-              }
-            },
-            {
-              "title": "4. הטיילת",
-              "url": "http://localhost:3001/uploads/1776004855237-413.mp3",
-              "coords": {
-                "lat": 41.6543,
-                "lng": 41.6447
-              }
-            }
-          ],
-          "visible": true,
-          "subtitle": "כנסיות ומקומות תפילה"
-        },
-        {
-          "id": "t_10",
-          "title": "סיור חוף",
-          "text": "",
-          "color": "#88D8C0",
-          "images": [
-            "http://localhost:3001/uploads/1775910069983-380.jpg",
-            "http://localhost:3001/uploads/1775910069996-282.jpg",
-            "http://localhost:3001/uploads/1775910070037-277.jpg",
-            "http://localhost:3001/uploads/1775910070062-191.jpg"
-          ],
-          "audios": [
-            {
-              "title": "1. כיכר אירופה",
-              "url": "http://localhost:3001/uploads/1776004878847-105.mp3",
-              "coords": {
-                "lat": 41.6623,
-                "lng": 41.6445
-              }
-            },
-            {
-              "title": "2. פסל עלי ונינו",
-              "url": "http://localhost:3001/uploads/1776005085649-506.mp3",
-              "coords": {
-                "lat": 41.6578,
-                "lng": 41.6488
-              }
-            },
-            {
-              "title": "3. מגדל האלפבית",
-              "url": "http://localhost:3001/uploads/1776005106931-992.mp3",
-              "coords": {
-                "lat": 41.6617,
-                "lng": 41.6476
-              }
-            },
-            {
-              "title": "4. הטיילת",
-              "url": "http://localhost:3001/uploads/1776002188513-612.mp3",
-              "coords": {
-                "lat": 41.6553,
-                "lng": 41.6457
-              }
-            }
-          ],
-          "visible": true,
-          "subtitle": "חופים וסגנון ים תיכוני"
-        }
-      ]
-    },
-    {
       "id": "6",
       "title": "מסעדות ואוכל",
       "subtitle": "מטבח מקומי ואוכל משובח",
@@ -4294,6 +2908,1392 @@
         }
       ],
       "heroBg": "#7ECFC0"
+    },
+    {
+      "id": "3",
+      "title": "סיורים קוליים",
+      "subtitle": "מסלולים מודרכים",
+      "description": "טיילו בבטומי עם מדריך אישי באוזן! סיורים קוליים בעברית לאורך מסלולים מרכזיים בעיר.",
+      "icon": "🎧",
+      "bg": "#2D4A5E",
+      "bgDark": "#1A6B8A",
+      "image": "",
+      "children": [],
+      "heroBg": "#2D4A5E",
+      "tours": [
+        {
+          "id": "t_1",
+          "title": "העיר העתיקה",
+          "text": "סיור מרתק ברובע העתיק של בטומי, בין הכיכרות, בתי הקפה והבניינים ההיסטוריים. תגלו את הסיפורים מאחורי כל פינה, את המיזוג בין התרבויות ואת האווירה הייחודית של העיר.",
+          "color": "#B8E6C1",
+          "images": [
+            "http://localhost:3001/uploads/1775910069485-6.jpg",
+            "http://localhost:3001/uploads/1775910069497-754.jpg",
+            "http://localhost:3001/uploads/1775910069506-223.jpg"
+          ],
+          "audios": [
+            {
+              "title": "1. כיכר אירופה",
+              "url": "http://localhost:3001/uploads/1776002188513-612.mp3",
+              "coords": {
+                "lat": 41.6533,
+                "lng": 41.6355
+              }
+            },
+            {
+              "title": "2. פסל עלי ונינו",
+              "url": "http://localhost:3001/uploads/1776002215391-967.mp3",
+              "coords": {
+                "lat": 41.6488,
+                "lng": 41.6398
+              }
+            },
+            {
+              "title": "3. מגדל האלפבית",
+              "url": "http://localhost:3001/uploads/1776002237090-835.mp3",
+              "coords": {
+                "lat": 41.6527,
+                "lng": 41.6386
+              }
+            },
+            {
+              "title": "4. הטיילת",
+              "url": "http://localhost:3001/uploads/1776002253481-93.mp3",
+              "coords": {
+                "lat": 41.6463,
+                "lng": 41.6367
+              }
+            }
+          ],
+          "visible": true,
+          "subtitle": "סיור הליכה ברובע העתיק"
+        },
+        {
+          "id": "t_2",
+          "title": "סיור הטיילת",
+          "text": "הליכה לאורך הטיילת המפורסמת של בטומי - מהמרינה עד הגלגל הענק. תגלו את הפסלים, הגנים והמונומנטים לאורך הדרך, תוך האזנה לסיפורים על הארכיטקטורה המודרנית של העיר.",
+          "color": "#FADADD",
+          "images": [
+            "http://localhost:3001/uploads/1775910069516-30.jpg",
+            "http://localhost:3001/uploads/1775910069526-255.jpg"
+          ],
+          "audios": [
+            {
+              "title": "1. כיכר אירופה",
+              "url": "http://localhost:3001/uploads/1776002270866-146.mp3",
+              "coords": {
+                "lat": 41.6543,
+                "lng": 41.6365
+              }
+            },
+            {
+              "title": "2. פסל עלי ונינו",
+              "url": "http://localhost:3001/uploads/1776002287224-652.mp3",
+              "coords": {
+                "lat": 41.6498,
+                "lng": 41.6408
+              }
+            },
+            {
+              "title": "3. מגדל האלפבית",
+              "url": "http://localhost:3001/uploads/1776003051932-39.mp3",
+              "coords": {
+                "lat": 41.6537,
+                "lng": 41.639599999999994
+              }
+            },
+            {
+              "title": "4. הטיילת",
+              "url": "http://localhost:3001/uploads/1776004810011-62.mp3",
+              "coords": {
+                "lat": 41.647299999999994,
+                "lng": 41.637699999999995
+              }
+            }
+          ],
+          "visible": true,
+          "subtitle": "לאורך חוף הים"
+        },
+        {
+          "id": "t_3",
+          "title": "אדריכלות מודרנית",
+          "text": "בטומי היא מעבדת אדריכלות חיה - בניינים פוטוריסטיים, מגדלים מעוצבים ומבני נוף. הסיור יוביל אתכם בין הבולטים שבהם, עם הסבר על הסיפור מאחורי כל מבנה.",
+          "color": "#C7E6F5",
+          "images": [
+            "http://localhost:3001/uploads/1775910069535-937.jpg",
+            "http://localhost:3001/uploads/1775910069548-933.jpg",
+            "http://localhost:3001/uploads/1775910069562-341.jpg",
+            "http://localhost:3001/uploads/1775910069573-698.jpg"
+          ],
+          "audios": [
+            {
+              "title": "1. כיכר אירופה",
+              "url": "http://localhost:3001/uploads/1776004835623-813.mp3",
+              "coords": {
+                "lat": 41.655300000000004,
+                "lng": 41.6375
+              }
+            },
+            {
+              "title": "2. פסל עלי ונינו",
+              "url": "http://localhost:3001/uploads/1776004855237-413.mp3",
+              "coords": {
+                "lat": 41.650800000000004,
+                "lng": 41.6418
+              }
+            },
+            {
+              "title": "3. מגדל האלפבית",
+              "url": "http://localhost:3001/uploads/1776004878847-105.mp3",
+              "coords": {
+                "lat": 41.654700000000005,
+                "lng": 41.6406
+              }
+            },
+            {
+              "title": "4. הטיילת",
+              "url": "http://localhost:3001/uploads/1776005085649-506.mp3",
+              "coords": {
+                "lat": 41.6483,
+                "lng": 41.6387
+              }
+            }
+          ],
+          "visible": true,
+          "subtitle": "מהגלגל הענק למגדל האלפבית"
+        },
+        {
+          "id": "t_4",
+          "title": "סיור יהודי",
+          "text": "",
+          "color": "#FFF5B1",
+          "images": [
+            "http://localhost:3001/uploads/1775910069627-459.jpg",
+            "http://localhost:3001/uploads/1775910069643-44.jpg",
+            "http://localhost:3001/uploads/1775910069656-446.jpg",
+            "http://localhost:3001/uploads/1775910069672-831.jpg"
+          ],
+          "audios": [
+            {
+              "title": "1. כיכר אירופה",
+              "url": "http://localhost:3001/uploads/1776005106931-992.mp3",
+              "coords": {
+                "lat": 41.6563,
+                "lng": 41.6385
+              }
+            },
+            {
+              "title": "2. פסל עלי ונינו",
+              "url": "http://localhost:3001/uploads/1776002188513-612.mp3",
+              "coords": {
+                "lat": 41.6518,
+                "lng": 41.6428
+              }
+            },
+            {
+              "title": "3. מגדל האלפבית",
+              "url": "http://localhost:3001/uploads/1776002215391-967.mp3",
+              "coords": {
+                "lat": 41.6557,
+                "lng": 41.6416
+              }
+            },
+            {
+              "title": "4. הטיילת",
+              "url": "http://localhost:3001/uploads/1776002237090-835.mp3",
+              "coords": {
+                "lat": 41.6493,
+                "lng": 41.6397
+              }
+            }
+          ],
+          "visible": true,
+          "subtitle": "מורשת יהודית בבטומי"
+        },
+        {
+          "id": "t_5",
+          "title": "סיור גנים",
+          "text": "",
+          "color": "#FFD1A9",
+          "images": [
+            "http://localhost:3001/uploads/1775910069689-689.jpg",
+            "http://localhost:3001/uploads/1775910069707-877.jpg",
+            "http://localhost:3001/uploads/1775910069718-813.jpg",
+            "http://localhost:3001/uploads/1775910069727-542.jpg"
+          ],
+          "audios": [
+            {
+              "title": "1. כיכר אירופה",
+              "url": "http://localhost:3001/uploads/1776002253481-93.mp3",
+              "coords": {
+                "lat": 41.6573,
+                "lng": 41.6395
+              }
+            },
+            {
+              "title": "2. פסל עלי ונינו",
+              "url": "http://localhost:3001/uploads/1776002270866-146.mp3",
+              "coords": {
+                "lat": 41.6528,
+                "lng": 41.6438
+              }
+            },
+            {
+              "title": "3. מגדל האלפבית",
+              "url": "http://localhost:3001/uploads/1776002287224-652.mp3",
+              "coords": {
+                "lat": 41.6567,
+                "lng": 41.642599999999995
+              }
+            },
+            {
+              "title": "4. הטיילת",
+              "url": "http://localhost:3001/uploads/1776003051932-39.mp3",
+              "coords": {
+                "lat": 41.650299999999994,
+                "lng": 41.640699999999995
+              }
+            }
+          ],
+          "visible": true,
+          "subtitle": "גנים, פארקים ופינות ירוקות"
+        },
+        {
+          "id": "t_6",
+          "title": "סיור קולינרי",
+          "text": "",
+          "color": "#DCC6FC",
+          "images": [
+            "http://localhost:3001/uploads/1775910069741-591.jpg",
+            "http://localhost:3001/uploads/1775910069754-713.jpg",
+            "http://localhost:3001/uploads/1775910069774-994.jpg",
+            "http://localhost:3001/uploads/1775910069789-35.jpg"
+          ],
+          "audios": [
+            {
+              "title": "1. כיכר אירופה",
+              "url": "http://localhost:3001/uploads/1776004810011-62.mp3",
+              "coords": {
+                "lat": 41.658300000000004,
+                "lng": 41.6405
+              }
+            },
+            {
+              "title": "2. פסל עלי ונינו",
+              "url": "http://localhost:3001/uploads/1776004835623-813.mp3",
+              "coords": {
+                "lat": 41.653800000000004,
+                "lng": 41.644800000000004
+              }
+            },
+            {
+              "title": "3. מגדל האלפבית",
+              "url": "http://localhost:3001/uploads/1776004855237-413.mp3",
+              "coords": {
+                "lat": 41.657700000000006,
+                "lng": 41.6436
+              }
+            },
+            {
+              "title": "4. הטיילת",
+              "url": "http://localhost:3001/uploads/1776004878847-105.mp3",
+              "coords": {
+                "lat": 41.6513,
+                "lng": 41.6417
+              }
+            }
+          ],
+          "visible": true,
+          "subtitle": "טעמים מקומיים ובתי קפה"
+        },
+        {
+          "id": "t_7",
+          "title": "סיור שוק",
+          "text": "",
+          "color": "#A3D9B1",
+          "images": [
+            "http://localhost:3001/uploads/1775910069804-487.jpg",
+            "http://localhost:3001/uploads/1775910069817-888.jpg",
+            "http://localhost:3001/uploads/1775910069828-261.jpg",
+            "http://localhost:3001/uploads/1775910069848-396.jpg"
+          ],
+          "audios": [
+            {
+              "title": "1. כיכר אירופה",
+              "url": "http://localhost:3001/uploads/1776005085649-506.mp3",
+              "coords": {
+                "lat": 41.6593,
+                "lng": 41.6415
+              }
+            },
+            {
+              "title": "2. פסל עלי ונינו",
+              "url": "http://localhost:3001/uploads/1776005106931-992.mp3",
+              "coords": {
+                "lat": 41.6548,
+                "lng": 41.6458
+              }
+            },
+            {
+              "title": "3. מגדל האלפבית",
+              "url": "http://localhost:3001/uploads/1776002188513-612.mp3",
+              "coords": {
+                "lat": 41.6587,
+                "lng": 41.6446
+              }
+            },
+            {
+              "title": "4. הטיילת",
+              "url": "http://localhost:3001/uploads/1776002215391-967.mp3",
+              "coords": {
+                "lat": 41.6523,
+                "lng": 41.6427
+              }
+            }
+          ],
+          "visible": true,
+          "subtitle": "שווקים, דוכנים וקניות"
+        },
+        {
+          "id": "t_8",
+          "title": "סיור בטבע",
+          "text": "",
+          "color": "#B5EAE5",
+          "images": [
+            "http://localhost:3001/uploads/1775910069856-849.jpg",
+            "http://localhost:3001/uploads/1775910069871-73.jpg",
+            "http://localhost:3001/uploads/1775910069886-735.jpg",
+            "http://localhost:3001/uploads/1775910069905-986.jpg"
+          ],
+          "audios": [
+            {
+              "title": "1. כיכר אירופה",
+              "url": "http://localhost:3001/uploads/1776002237090-835.mp3",
+              "coords": {
+                "lat": 41.6603,
+                "lng": 41.6425
+              }
+            },
+            {
+              "title": "2. פסל עלי ונינו",
+              "url": "http://localhost:3001/uploads/1776002253481-93.mp3",
+              "coords": {
+                "lat": 41.6558,
+                "lng": 41.6468
+              }
+            },
+            {
+              "title": "3. מגדל האלפבית",
+              "url": "http://localhost:3001/uploads/1776002270866-146.mp3",
+              "coords": {
+                "lat": 41.6597,
+                "lng": 41.645599999999995
+              }
+            },
+            {
+              "title": "4. הטיילת",
+              "url": "http://localhost:3001/uploads/1776002287224-652.mp3",
+              "coords": {
+                "lat": 41.653299999999994,
+                "lng": 41.643699999999995
+              }
+            }
+          ],
+          "visible": true,
+          "subtitle": "יציאה אל הטבע הקרוב"
+        },
+        {
+          "id": "t_9",
+          "title": "סיור כנסיות",
+          "text": "",
+          "color": "#D3DCE3",
+          "images": [
+            "http://localhost:3001/uploads/1775910069920-177.jpg",
+            "http://localhost:3001/uploads/1775910069932-509.jpg",
+            "http://localhost:3001/uploads/1775910069944-981.jpg",
+            "http://localhost:3001/uploads/1775910069968-962.jpg"
+          ],
+          "audios": [
+            {
+              "title": "1. כיכר אירופה",
+              "url": "http://localhost:3001/uploads/1776003051932-39.mp3",
+              "coords": {
+                "lat": 41.661300000000004,
+                "lng": 41.6435
+              }
+            },
+            {
+              "title": "2. פסל עלי ונינו",
+              "url": "http://localhost:3001/uploads/1776004810011-62.mp3",
+              "coords": {
+                "lat": 41.656800000000004,
+                "lng": 41.647800000000004
+              }
+            },
+            {
+              "title": "3. מגדל האלפבית",
+              "url": "http://localhost:3001/uploads/1776004835623-813.mp3",
+              "coords": {
+                "lat": 41.660700000000006,
+                "lng": 41.6466
+              }
+            },
+            {
+              "title": "4. הטיילת",
+              "url": "http://localhost:3001/uploads/1776004855237-413.mp3",
+              "coords": {
+                "lat": 41.6543,
+                "lng": 41.6447
+              }
+            }
+          ],
+          "visible": true,
+          "subtitle": "כנסיות ומקומות תפילה"
+        },
+        {
+          "id": "t_10",
+          "title": "סיור חוף",
+          "text": "",
+          "color": "#88D8C0",
+          "images": [
+            "http://localhost:3001/uploads/1775910069983-380.jpg",
+            "http://localhost:3001/uploads/1775910069996-282.jpg",
+            "http://localhost:3001/uploads/1775910070037-277.jpg",
+            "http://localhost:3001/uploads/1775910070062-191.jpg"
+          ],
+          "audios": [
+            {
+              "title": "1. כיכר אירופה",
+              "url": "http://localhost:3001/uploads/1776004878847-105.mp3",
+              "coords": {
+                "lat": 41.6623,
+                "lng": 41.6445
+              }
+            },
+            {
+              "title": "2. פסל עלי ונינו",
+              "url": "http://localhost:3001/uploads/1776005085649-506.mp3",
+              "coords": {
+                "lat": 41.6578,
+                "lng": 41.6488
+              }
+            },
+            {
+              "title": "3. מגדל האלפבית",
+              "url": "http://localhost:3001/uploads/1776005106931-992.mp3",
+              "coords": {
+                "lat": 41.6617,
+                "lng": 41.6476
+              }
+            },
+            {
+              "title": "4. הטיילת",
+              "url": "http://localhost:3001/uploads/1776002188513-612.mp3",
+              "coords": {
+                "lat": 41.6553,
+                "lng": 41.6457
+              }
+            }
+          ],
+          "visible": true,
+          "subtitle": "חופים וסגנון ים תיכוני"
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "title": "אטרקציות ואתרים",
+      "subtitle": "גלה מקומות וחוויות",
+      "description": "גלו את האתרים המרהיבים של בטומי — מהגנים הבוטניים ועד כיכר פיאצה, הטיילת לאורך הים, ומוזיאונים מרתקים.",
+      "icon": "🎡",
+      "bg": "#F4A94E",
+      "bgDark": "#F4A94E",
+      "image": "",
+      "children": [
+        {
+          "id": "a1",
+          "title": "אטרקציות",
+          "subtitle": "כיף לכל המשפחה",
+          "icon": "🎡",
+          "bg": "#F4A94E",
+          "hotels": [
+            {
+              "id": "a1_1",
+              "title": "הטיילת החדשה",
+              "text": "Batumi New Boulevard - הטיילת הארוכה לאורך חוף הים, עם גינות, אומנות, פסלים וכיסאות נדנדה. לב פועם של העיר, מושלמת להליכה ולרכיבה על אופניים",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a1_2",
+              "title": "הגלגל הענק",
+              "text": "Panoramic Wheel - ממוקם בקצה הצפוני של הטיילת במתחם \"מיראקל פארק\". האייקון של העיר, מציע תצפית 360° מדהימה על הים, ההרים והעיר",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a1_3",
+              "title": "פסל עלי ונינו",
+              "text": "Ali and Nino - פסל מתכת ענק בגובה 8 מטר שזז לאט ומתמזג/מתפרק כל 10 דקות. מבוסס על רומן אהבה מ-1937. אייקון רומנטי של בטומי בחוף הים",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a1_4",
+              "title": "מגדל האלפבית",
+              "text": "Alphabet Tower - מגדל בגובה 130 מטר עם 33 אותיות של האלפבית הגאורגי המפוזרות לאורכו. כולל מעלית שקופה ומסעדה מסתובבת בפסגה",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a1_5",
+              "title": "מגדל צ׳ה צ׳ה",
+              "text": "Chacha Tower - מגדל שעון בסגנון עות׳מני. בכל יום ב-19:00, למשך 10 דקות, המגדל מזרים חינם צ׳ה צ׳ה (משקה אלכוהולי גאורגי מסורתי) מהברזים",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a1_6",
+              "title": "לונה פארק",
+              "text": "Batumi Lunapark - פארק שעשועים גדול עם מתקנים לכל הגילים, הסמוך לדולפינריום ולאגם. אטרקציה מרכזית לבילוי משפחתי",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a1_7",
+              "title": "אגם ארדגני",
+              "text": "Ardagani Lake - אגם מלאכותי גדול עם סירות, מזרקות מוסיקליות, טיילת והופעות מים. פינה ירוקה נעימה בלב העיר",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a1_8",
+              "title": "הדולפינריום",
+              "text": "Batumi Dolphinarium - מופעי דולפינים יומיים, אחד הוותיקים באזור. מומלץ במיוחד למשפחות עם ילדים",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "mapUrl": "",
+              "pageUrl": "https://dolphinarium.ge/en/home/",
+              "visible": true
+            },
+            {
+              "id": "a1_9",
+              "title": "כיכר אירופה",
+              "text": "Europe Square - הכיכר המרכזית של העיר העתיקה עם מבנים בסגנון נאו-בארוק. פסל מדיאה הזהובה ניצב במרכז. לב התיירות הלילית",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a1_10",
+              "title": "פארק 6 במאי",
+              "text": "6 May Park - פארק עירוני היסטורי עם אגם, גן חיות, גני שעשועים, יער של עצי מג׳ליקה ומונומנטים. אחת האטרקציות הירוקות הגדולות בעיר",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            }
+          ],
+          "pageBtnLabel": "מידע נוסף"
+        },
+        {
+          "id": "a2",
+          "title": "אתרים פופולריים",
+          "subtitle": "חובה לראות",
+          "icon": "📸",
+          "bg": "#5BC0DE",
+          "hotels": [
+            {
+              "id": "a2_1",
+              "title": "כיכר בטומי",
+              "text": "Batumi Piazza - כיכר בסגנון ונציאני באמצע העיר העתיקה, עם פסיפס רצפה, מגדל שעון נאו-מורי, בתי קפה, מסעדות ומופעים חיים בערב. לב התיירות הלילית",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a2_2",
+              "title": "כיכר אירופה",
+              "text": "Europe Square - כיכר מרכזית שוחזרה למראות המאה ה-18. במרכזה פסל מדיאה עם גיזת הזהב. מוקפת במבנים אירופאים ומסעדות",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a2_3",
+              "title": "טיילת בולווארד",
+              "text": "Boulevard Promenade - הטיילת הוותיקה של בטומי, 7 ק\"מ של גינות, מסעדות, פסלים ואומנות לאורך חוף הים. לב העיר",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a2_4",
+              "title": "המרינה ומגדל השעון",
+              "text": "Marina & Clock Tower - אזור המרינה עם יאכטות, המזח הארוך ומגדל השעון הקלאסי של העיר. נקודת צילום פופולרית",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a2_5",
+              "title": "הרובע היהודי ההיסטורי",
+              "text": "Historic Jewish Quarter - הרחובות שבין בית הכנסת העתיק לבית חב\"ד, אזור היסטורי חשוב עם מורשת הקהילה היהודית בבטומי",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a2_6",
+              "title": "בית הכנסת הגדול",
+              "text": "Great Synagogue of Batumi - בית הכנסת המרכזי של הקהילה היהודית בעיר, בניין היסטורי ופעיל עד היום עם מניין קבוע",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a2_7",
+              "title": "בית חב״ד בטומי",
+              "text": "Chabad Batumi - מרכז הקהילה היהודית, מתפקד כבית כנסת, מסעדה כשרה ומרכז שירותים לתיירים הישראלים",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "mapUrl": "",
+              "pageUrl": "http://chabadbatumi.ge/",
+              "visible": true
+            },
+            {
+              "id": "a2_8",
+              "title": "קתדרלת האם הקדושה",
+              "text": "Mother of God Cathedral - קתדרלה נוצרית גדולה מתחילת המאה ה-20 (1898-1903), הוקמה במקור כבית תפילה קתולי והפכה לכנסייה אורתודוקסית",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a2_9",
+              "title": "כנסיית סנט ניקולס",
+              "text": "St. Nicholas Church - כנסייה אורתודוקסית היסטורית ברובע העתיק, מוקד חשוב של הנצרות הגאורגית, בעלת אדריכלות קלאסית",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a2_10",
+              "title": "הכנסייה הארמנית",
+              "text": "Armenian Church - כנסייה היסטורית של הקהילה הארמנית בבטומי, סמל למגוון הדתי והתרבותי של העיר",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a2_11",
+              "title": "שוק הפשפשים",
+              "titleEn": "Old Bazaar",
+              "text": "שוק מקומי אותנטי עם תבלינים, פירות, גבינות, ממתקים וחרצ׳ו. חוויה תרבותית חובה - מחירים מקומיים, מיקוח מקובל. ממוקם ליד התחנה המרכזית ופופולרי מאוד בקרב תיירים ומקומיים",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "coords": {
+                "lat": 41.6453,
+                "lng": 41.6401
+              },
+              "visible": true
+            }
+          ],
+          "pageBtnLabel": "מידע נוסף"
+        },
+        {
+          "id": "a3",
+          "title": "אתרים היסטוריים",
+          "subtitle": "סיפורה של העיר",
+          "icon": "🏛️",
+          "bg": "#1A6B8A",
+          "hotels": [
+            {
+              "id": "a3_1",
+              "title": "מבצר גוניו",
+              "titleEn": "Gonio Fortress",
+              "text": "מבצר רומי בן 2000 שנה, מהמבצרים העתיקים ביותר בגאורגיה. ממוקם 15 דק׳ מבטומי",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.573,41.575",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.573,
+                "lng": 41.575
+              }
+            },
+            {
+              "id": "a3_2",
+              "title": "מבצר פטרה",
+              "titleEn": "Petra Fortress",
+              "text": "שרידי מבצר ביזנטי מהמאה ה-6 על גבעה מעל הים",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.76,41.74",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.76,
+                "lng": 41.74
+              }
+            },
+            {
+              "id": "a3_3",
+              "title": "כנסיית סנט אנדרו",
+              "titleEn": "St. Andrew Church",
+              "text": "כנסייה עתיקה מהמאה ה-9, אחד המבנים הדתיים הוותיקים באזור",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.651,41.637",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.651,
+                "lng": 41.637
+              }
+            },
+            {
+              "id": "a3_4",
+              "title": "גשר מכמחורי",
+              "titleEn": "Makhuntseti Bridge",
+              "text": "גשר קשתות מאבן מהמאה ה-12, פלא הנדסי מעל נהר אדג׳ריסצקאלי",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.75,42.78",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.75,
+                "lng": 42.78
+              }
+            },
+            {
+              "id": "a3_5",
+              "title": "מוזיאון אדג׳רה",
+              "titleEn": "Adjara Museum",
+              "text": "מוזיאון ההיסטוריה של אדג׳רה עם ממצאים ארכיאולוגיים מכל התקופות",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.65,41.636",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.65,
+                "lng": 41.636
+              }
+            },
+            {
+              "id": "a3_6",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a3_7",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a3_8",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a3_9",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a3_10",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            }
+          ],
+          "pageBtnLabel": "מידע נוסף"
+        },
+        {
+          "id": "a4",
+          "title": "סיורים קוליים",
+          "subtitle": "מסלולים מודרכים",
+          "icon": "🎧",
+          "bg": "#2E8BA8"
+        },
+        {
+          "id": "a5",
+          "title": "היסטוריה יהודית",
+          "subtitle": "קהילה ומורשת",
+          "icon": "✡️",
+          "bg": "#7ECFC0",
+          "hotels": [
+            {
+              "id": "a5_1",
+              "title": "בית הכנסת הגדול",
+              "titleEn": "Great Synagogue",
+              "text": "בית הכנסת המרכזי של בטומי, נבנה ב-1904. פעיל עד היום עם מניין קבוע",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6508,41.6365",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.6508,
+                "lng": 41.6365
+              }
+            },
+            {
+              "id": "a5_2",
+              "title": "בית חב״ד בטומי",
+              "titleEn": "Chabad Batumi",
+              "text": "מרכז הקהילה היהודית - בית כנסת, מסעדה כשרה, שירותים לתיירים",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6505,41.636",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.6505,
+                "lng": 41.636
+              }
+            },
+            {
+              "id": "a5_3",
+              "title": "הרובע היהודי",
+              "titleEn": "Jewish Quarter",
+              "text": "הרחובות ההיסטוריים בין בית הכנסת לבית חב״ד, מורשת קהילה עשירה",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6506,41.6362",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.6506,
+                "lng": 41.6362
+              }
+            },
+            {
+              "id": "a5_4",
+              "title": "בית העלמין היהודי",
+              "titleEn": "Jewish Cemetery",
+              "text": "בית קברות היסטורי עם מצבות מהמאה ה-19",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.655,41.64",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.655,
+                "lng": 41.64
+              }
+            },
+            {
+              "id": "a5_5",
+              "title": "מוזיאון הקהילה",
+              "titleEn": "Community Museum",
+              "text": "תערוכה על תולדות היהודים בגאורגיה מאז ימי בית ראשון",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6508,41.6365",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.6508,
+                "lng": 41.6365
+              }
+            },
+            {
+              "id": "a5_6",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a5_7",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a5_8",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a5_9",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a5_10",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            }
+          ],
+          "pageBtnLabel": "מידע נוסף"
+        },
+        {
+          "id": "a6",
+          "title": "היסטוריה נוצרית",
+          "subtitle": "כנסיות ומנזרים",
+          "icon": "⛪",
+          "bg": "#3DA5C4",
+          "hotels": [
+            {
+              "id": "a6_1",
+              "title": "קתדרלת האם הקדושה",
+              "titleEn": "Mother of God Cathedral",
+              "text": "קתדרלה מרשימה מ-1903, במקור קתולית, כיום אורתודוקסית",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6495,41.6375",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.6495,
+                "lng": 41.6375
+              }
+            },
+            {
+              "id": "a6_2",
+              "title": "כנסיית סנט ניקולס",
+              "titleEn": "St. Nicholas Church",
+              "text": "כנסייה אורתודוקסית היסטורית ברובע העתיק, אדריכלות קלאסית",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.651,41.637",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.651,
+                "lng": 41.637
+              }
+            },
+            {
+              "id": "a6_3",
+              "title": "הכנסייה הארמנית",
+              "titleEn": "Armenian Church",
+              "text": "כנסייה היסטורית של הקהילה הארמנית, סמל למגוון הדתי של העיר",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6515,41.6368",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.6515,
+                "lng": 41.6368
+              }
+            },
+            {
+              "id": "a6_4",
+              "title": "כנסייה קתולית",
+              "titleEn": "Catholic Church",
+              "text": "כנסייה קתולית קטנה ויפה ברובע העתיק",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.65,41.6358",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.65,
+                "lng": 41.6358
+              }
+            },
+            {
+              "id": "a6_5",
+              "title": "מנזר שיו-מגוימה",
+              "titleEn": "Shio-Mgvime",
+              "text": "מנזר מערות עתיק מהמאה ה-6, טיול יום מבטומי",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.84,44.62",
+              "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.84,
+                "lng": 44.62
+              }
+            },
+            {
+              "id": "a6_6",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a6_7",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a6_8",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a6_9",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a6_10",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            }
+          ],
+          "pageBtnLabel": "מידע נוסף"
+        },
+        {
+          "id": "a7",
+          "title": "אוטובוס תיירים",
+          "subtitle": "",
+          "icon": "🚌",
+          "bg": "#3DA5C425",
+          "hotels": [
+            {
+              "id": "a7_1",
+              "title": "הדרך הקלה והמהירה להכיר את כל באטומי בסיבוב אחד",
+              "titleEn": "",
+              "text": "הדרך הקלה והמהירה להכיר את כל באטומי בסיבוב אחד",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a7_2",
+              "title": "האוטובוס הדו-קומתי מאפשר לכם לראות את כל נקודות הצ",
+              "titleEn": "",
+              "text": "האוטובוס הדו-קומתי מאפשר לכם לראות את כל נקודות הציון המרכזיות של העיר עם הדרכה קולית. ניתן לרדת ולעלות בחופשיות (",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a7_3",
+              "title": "כ-40-50 לארי למבוגר (תקף ל-24 שעות)",
+              "titleEn": "",
+              "text": "כ-40-50 לארי למבוגר (תקף ל-24 שעות)",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a7_4",
+              "title": "זמין באנגלית, רוסית ושפות נוספות",
+              "titleEn": "",
+              "text": "זמין באנגלית, רוסית ושפות נוספות",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a7_5",
+              "title": "מומלץ לשבת בקומה השנייה לצילומים פנורמיים של קו הח",
+              "titleEn": "",
+              "text": "מומלץ לשבת בקומה השנייה לצילומים פנורמיים של קו החוף!",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a7_6",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a7_7",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a7_8",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a7_9",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a7_10",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            }
+          ],
+          "pageBtnLabel": "מידע נוסף"
+        },
+        {
+          "id": "a8",
+          "title": "נסיעות פרטיות",
+          "subtitle": "",
+          "icon": "🚐",
+          "bg": "#3DA5C425",
+          "hotels": [
+            {
+              "id": "a8_1",
+              "title": "סוכנים ומדריכים ישראלים בבטומי\n\"",
+              "titleEn": "",
+              "text": "סוכנים ומדריכים ישראלים בבטומי\n\"",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": true
+            },
+            {
+              "id": "a8_2",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a8_3",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a8_4",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a8_5",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a8_6",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a8_7",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a8_8",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a8_9",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            },
+            {
+              "id": "a8_10",
+              "title": "",
+              "titleEn": "",
+              "text": "",
+              "image": "http://localhost:3001/uploads/city.jpg",
+              "images": [],
+              "mapUrl": "",
+              "pageUrl": "",
+              "visible": false
+            }
+          ],
+          "pageBtnLabel": "מידע נוסף"
+        }
+      ],
+      "heroBg": "#F4A94E"
     },
     {
       "id": "4",
@@ -8743,9 +8743,23 @@
   ],
   "sideBanners": [
     {
+      "id": "1776406904580",
+      "title": "פריט חדש",
+      "subtitle": "",
+      "icon": "http://localhost:3001/uploads/1775910070124-950.jpg",
+      "bg": "#1A6B8A"
+    },
+    {
+      "id": "1776406595309",
+      "title": "פריט חדש",
+      "subtitle": "",
+      "icon": "data:image/jpeg;base64,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",
+      "bg": "#1A6B8A"
+    },
+    {
       "id": "realestate",
       "title": "פורטל הנדל״ן",
-      "icon": "http://localhost:3001/uploads/1775910069526-255.jpg",
+      "icon": "http://localhost:3001/uploads/1775910069516-30.jpg",
       "bg": "#F4A94E"
     },
     {
@@ -8932,6 +8946,84 @@
     ],
     "1776368266538-140.jpg": [
       "gallery_main"
+    ],
+    "1775910070891-592.jpg": [
+      "main_unsorted"
+    ],
+    "1775910069516-30.jpg": [
+      "realestate"
+    ],
+    "1776417799978-531.mp3": [
+      "player"
+    ],
+    "1776417799966-700.mp3": [
+      "player"
+    ],
+    "1776417799952-343.mp3": [
+      "player"
+    ],
+    "1776417799926-92.mp3": [
+      "player"
+    ],
+    "1776417799903-336.mp3": [
+      "player"
+    ],
+    "1776418202406-770.mp3": [
+      "player"
+    ],
+    "1776418202386-286.mp3": [
+      "player"
+    ],
+    "1776418202370-29.mp3": [
+      "player"
+    ],
+    "1776418202349-817.mp3": [
+      "player"
+    ],
+    "1776418202323-317.mp3": [
+      "player"
+    ],
+    "1776418469590-540.mp3": [
+      "player"
+    ],
+    "1776418469575-88.mp3": [
+      "player"
+    ],
+    "1776418469560-788.mp3": [
+      "player"
+    ],
+    "1776418469538-919.mp3": [
+      "player"
+    ],
+    "1776418469519-920.mp3": [
+      "player"
+    ],
+    "1776418469496-320.mp3": [
+      "player"
+    ],
+    "1776419283468-693.mp3": [
+      "player"
+    ],
+    "1776419283453-799.mp3": [
+      "player"
+    ],
+    "1776419283438-349.mp3": [
+      "player"
+    ],
+    "1776419283424-945.mp3": [
+      "player"
+    ],
+    "1776419283399-945.mp3": [
+      "player"
+    ],
+    "1776419371768-464.mp3": [
+      "player"
+    ],
+    "1776419371747-814.mp3": [
+      "player"
+    ],
+    "1776419371724-669.mp3": [
+      "player"
     ]
   },
   "legal": [
@@ -9049,5 +9141,26 @@
         }
       ]
     }
-  ]
+  ],
+  "fileNames": {
+    "1776418202323-317.mp3": "אוכל ומסעדות.mp3",
+    "1776418202349-817.mp3": "קזינו והימורים.mp3",
+    "1776418202370-29.mp3": "רשתות מזון מהיר מקומיות בבטומי.mp3",
+    "1776418202386-286.mp3": "שופינג וקניות.mp3",
+    "1776418202406-770.mp3": "תחבורה בבטומי.mp3",
+    "1776418469496-320.mp3": "בטומי און ליין.mp3",
+    "1776418469519-920.mp3": "ברוכים הבאים לבטומי.mp3",
+    "1776418469538-919.mp3": "דרך צלחה.mp3",
+    "1776418469560-788.mp3": "היסטוריה כללית.mp3",
+    "1776418469575-88.mp3": "ישראלים בבטומי.mp3",
+    "1776418469590-540.mp3": "נחיתה רכה.mp3",
+    "1776419283399-945.mp3": "הכנסייה הארמנית.mp3",
+    "1776419283424-945.mp3": "כנסיית סנט ניקולס.mp3",
+    "1776419283438-349.mp3": "מזג האויר סקירה שנתית.mp3",
+    "1776419283453-799.mp3": "נצרות בבטומי.mp3",
+    "1776419283468-693.mp3": "קטדרלת האם הקדושה.mp3",
+    "1776419371724-669.mp3": "בית הכנסת היהודי.mp3",
+    "1776419371747-814.mp3": "בית חבד בטומי.mp3",
+    "1776419371768-464.mp3": "הקהילה היהודית.mp3"
+  }
 }
