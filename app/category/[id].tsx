@@ -137,7 +137,7 @@ function HotelImage({ uri, titleEn }: { uri?: string; titleEn?: string }) {
 }
 
 function buildTourRouteUrl(audios: { title?: string; url: string; coords?: { lat: number; lng: number } }[]): string | null {
-  const pts = audios.filter(a => a.coords).map(a => a.coords!);
+  const pts = audios.filter(a => a.coords && !a.title?.includes('רכבל תחנה עליונה') && !a.title?.includes('מוזיאון האשליות')).map(a => a.coords!);
   if (pts.length < 2) return null;
   const origin = `${pts[0].lat},${pts[0].lng}`;
   const dest = `${pts[pts.length - 1].lat},${pts[pts.length - 1].lng}`;
@@ -158,7 +158,7 @@ function TourCard({ t, onRate }: { t: TourBlock; onRate: (id: string, score: num
   const activeCoords = navCoords || t.coords;
   const routeUrl = buildTourRouteUrl(t.audios || []);
   const mapSrc = navCoords
-    ? `https://www.google.com/maps?q=${navCoords.lat},${navCoords.lng}(${encodeURIComponent(navCoords.name || '')})&z=16&output=embed`
+    ? `https://www.google.com/maps?q=${navCoords.lat},${navCoords.lng}&z=16&output=embed`
     : routeUrl || (activeCoords ? `https://www.google.com/maps?q=${activeCoords.lat},${activeCoords.lng}&z=14&output=embed` : 'https://www.google.com/maps?q=Batumi,Georgia&z=13&output=embed');
   return (
     <View style={[tourSt.card, { backgroundColor: t.color }]}>
@@ -198,10 +198,10 @@ function TourCard({ t, onRate }: { t: TourBlock; onRate: (id: string, score: num
       <Text style={[tourSt.text, !t.text && { fontStyle: 'italic', color: '#777' }]}>
         {t.text || 'תיאור הסיור יופיע כאן — ערוך דרך פאנל הניהול'}
       </Text>
-      <View style={[tourSt.mapWrap, { height: mapBig ? 400 : 200 }]}>
+      <View style={[tourSt.mapWrap, { height: mapBig ? 400 : 200, overflow: 'hidden' }]}>
         {Platform.OS === 'web' ? (
           // @ts-ignore
-          <iframe src={mapSrc} style={{ width: '100%', height: '100%', border: 0, pointerEvents: 'none' }} />
+          <iframe src={mapSrc} style={{ width: '100%', height: 'calc(100% + 60px)', border: 0, pointerEvents: 'none', marginTop: -60 }} />
         ) : (
           <View style={{ flex: 1, backgroundColor: '#ddd', alignItems: 'center', justifyContent: 'center' }}>
             <Text>מפה</Text>
