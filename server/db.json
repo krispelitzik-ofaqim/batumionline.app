@@ -975,93 +975,198 @@
           "bg": "#F4A94E",
           "hotels": [
             {
+              "id": "at_11",
+              "title": "הרכבל Argo",
+              "titleEn": "Argo Cable Car",
+              "text": "רכבל שמגיע לפסגת ההר עם נוף פנורמי על כל בטומי והים השחור.",
+              "image": "http://localhost:3001/uploads/cable_car_batumi.png",
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6476,41.6456",
+              "coords": {
+                "lat": 41.6476,
+                "lng": 41.6456
+              },
+              "visible": true
+            },
+            {
               "id": "a1_1",
               "title": "הטיילת החדשה",
               "text": "Batumi New Boulevard - הטיילת הארוכה לאורך חוף הים, עם גינות, אומנות, פסלים וכיסאות נדנדה. לב פועם של העיר, מושלמת להליכה ולרכיבה על אופניים",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "mapUrl": "",
+              "image": "http://localhost:3001/uploads/new_boulevard.png",
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.654,41.635",
               "pageUrl": "",
-              "visible": true
+              "visible": true,
+              "coords": {
+                "lat": 41.654,
+                "lng": 41.635
+              }
             },
             {
               "id": "a1_2",
               "title": "הגלגל הענק",
               "text": "Panoramic Wheel - ממוקם בקצה הצפוני של הטיילת במתחם \"מיראקל פארק\". האייקון של העיר, מציע תצפית 360° מדהימה על הים, ההרים והעיר",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "mapUrl": "",
+              "image": "http://localhost:3001/uploads/ferris_wheel_final.png",
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6554,41.6426",
               "pageUrl": "",
-              "visible": true
+              "visible": true,
+              "coords": {
+                "lat": 41.6554,
+                "lng": 41.6426
+              }
             },
             {
               "id": "a1_3",
               "title": "פסל עלי ונינו",
               "text": "Ali and Nino - פסל מתכת ענק בגובה 8 מטר שזז לאט ומתמזג/מתפרק כל 10 דקות. מבוסס על רומן אהבה מ-1937. אייקון רומנטי של בטומי בחוף הים",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "mapUrl": "",
+              "image": "http://localhost:3001/uploads/ali_nino.png",
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6556,41.6432",
               "pageUrl": "",
-              "visible": true
+              "visible": true,
+              "coords": {
+                "lat": 41.6556,
+                "lng": 41.6432
+              }
             },
             {
               "id": "a1_4",
               "title": "מגדל האלפבית",
               "text": "Alphabet Tower - מגדל בגובה 130 מטר עם 33 אותיות של האלפבית הגאורגי המפוזרות לאורכו. כולל מעלית שקופה ומסעדה מסתובבת בפסגה",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "mapUrl": "",
+              "image": "http://localhost:3001/uploads/alphabet_tower.png",
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.656,41.6393",
               "pageUrl": "",
-              "visible": true
+              "visible": true,
+              "coords": {
+                "lat": 41.656,
+                "lng": 41.6393
+              }
             },
             {
               "id": "a1_5",
-              "title": "מגדל צ׳ה צ׳ה",
+              "title": "מגדל השעון",
               "text": "Chacha Tower - מגדל שעון בסגנון עות׳מני. בכל יום ב-19:00, למשך 10 דקות, המגדל מזרים חינם צ׳ה צ׳ה (משקה אלכוהולי גאורגי מסורתי) מהברזים",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "mapUrl": "",
+              "image": "http://localhost:3001/uploads/clock_tower.png",
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6525,41.642",
               "pageUrl": "",
-              "visible": true
+              "visible": true,
+              "coords": {
+                "lat": 41.6525,
+                "lng": 41.642
+              }
             },
             {
               "id": "a1_6",
               "title": "לונה פארק",
               "text": "Batumi Lunapark - פארק שעשועים גדול עם מתקנים לכל הגילים, הסמוך לדולפינריום ולאגם. אטרקציה מרכזית לבילוי משפחתי",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "mapUrl": "",
+              "image": "http://localhost:3001/uploads/luna_park_final.png",
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.655,41.644",
               "pageUrl": "",
-              "visible": true
+              "visible": true,
+              "coords": {
+                "lat": 41.655,
+                "lng": 41.644
+              }
             },
             {
               "id": "a1_7",
               "title": "אגם ארדגני",
               "text": "Ardagani Lake - אגם מלאכותי גדול עם סירות, מזרקות מוסיקליות, טיילת והופעות מים. פינה ירוקה נעימה בלב העיר",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "mapUrl": "",
+              "image": "http://localhost:3001/uploads/ardagani_lake.png",
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6478,41.623",
               "pageUrl": "",
-              "visible": true
+              "visible": true,
+              "coords": {
+                "lat": 41.6478,
+                "lng": 41.623
+              }
             },
             {
               "id": "a1_8",
               "title": "הדולפינריום",
               "text": "Batumi Dolphinarium - מופעי דולפינים יומיים, אחד הוותיקים באזור. מומלץ במיוחד למשפחות עם ילדים",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "mapUrl": "",
+              "image": "http://localhost:3001/uploads/dolphinarium.png",
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6478,41.6228",
               "pageUrl": "https://dolphinarium.ge/en/home/",
-              "visible": true
-            },
-            {
-              "id": "a1_9",
-              "title": "כיכר אירופה",
-              "text": "Europe Square - הכיכר המרכזית של העיר העתיקה עם מבנים בסגנון נאו-בארוק. פסל מדיאה הזהובה ניצב במרכז. לב התיירות הלילית",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": true
+              "visible": true,
+              "coords": {
+                "lat": 41.6478,
+                "lng": 41.6228
+              }
             },
             {
               "id": "a1_10",
               "title": "פארק 6 במאי",
               "text": "6 May Park - פארק עירוני היסטורי עם אגם, גן חיות, גני שעשועים, יער של עצי מג׳ליקה ומונומנטים. אחת האטרקציות הירוקות הגדולות בעיר",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "mapUrl": "",
+              "image": "http://localhost:3001/uploads/park_6_may.png",
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.643,41.612",
               "pageUrl": "",
+              "visible": true,
+              "coords": {
+                "lat": 41.643,
+                "lng": 41.612
+              }
+            },
+            {
+              "id": "at_13",
+              "title": "המרינה",
+              "titleEn": "Batumi Marina",
+              "text": "נמל היאכטות והסירות עם מסעדות וטיילת.",
+              "image": "http://localhost:3001/uploads/marina_batumi.png",
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6530,41.6370",
+              "coords": {
+                "lat": 41.653,
+                "lng": 41.637
+              },
+              "visible": true
+            },
+            {
+              "id": "at_14",
+              "title": "המזרקות המרקדות",
+              "titleEn": "Dancing Fountains",
+              "text": "מופע מים ואור מרהיב באגם ארדגני בערב.",
+              "image": "http://localhost:3001/uploads/dancing_fountains.png",
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6478,41.6230",
+              "coords": {
+                "lat": 41.6478,
+                "lng": 41.623
+              },
+              "visible": true
+            },
+            {
+              "id": "at_15",
+              "title": "הבית ההפוך",
+              "titleEn": "Upside Down House",
+              "text": "בית הפוך - אטרקציה מיוחדת ליד מסעדת הסנאט.",
+              "image": "http://localhost:3001/uploads/upside_down_final.png",
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6505,41.6358",
+              "coords": {
+                "lat": 41.6505,
+                "lng": 41.6358
+              },
+              "visible": true
+            },
+            {
+              "id": "at_16",
+              "title": "האקווריום",
+              "titleEn": "Batumi Aquarium",
+              "text": "אקווריום עם מגוון דגים ויצורי ים מהים השחור.",
+              "image": "http://localhost:3001/uploads/aquarium_batumi.png",
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6480,41.6225",
+              "coords": {
+                "lat": 41.648,
+                "lng": 41.6225
+              },
+              "visible": true
+            },
+            {
+              "id": "at_17",
+              "title": "גן החיות",
+              "titleEn": "Batumi Zoo",
+              "text": "גן חיות קטן בפארק 6 במאי עם חיות מקומיות.",
+              "image": "http://localhost:3001/uploads/zoo_batumi.png",
+              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6430,41.6120",
+              "coords": {
+                "lat": 41.643,
+                "lng": 41.612
+              },
               "visible": true
             }
           ],
@@ -1078,7 +1183,7 @@
               "id": "a2_1",
               "title": "כיכר בטומי",
               "text": "Batumi Piazza - כיכר בסגנון ונציאני באמצע העיר העתיקה, עם פסיפס רצפה, מגדל שעון נאו-מורי, בתי קפה, מסעדות ומופעים חיים בערב. לב התיירות הלילית",
-              "image": "http://localhost:3001/uploads/city.jpg",
+              "image": "http://localhost:3001/uploads/batumi_square.png",
               "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6495,41.6412",
               "pageUrl": "",
               "visible": true,
@@ -1091,7 +1196,7 @@
               "id": "a2_2",
               "title": "כיכר אירופה",
               "text": "Europe Square - כיכר מרכזית שוחזרה למראות המאה ה-18. במרכזה פסל מדיאה עם גיזת הזהב. מוקפת במבנים אירופאים ומסעדות",
-              "image": "http://localhost:3001/uploads/city.jpg",
+              "image": "http://localhost:3001/uploads/europe_square.png",
               "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.651,41.6361",
               "pageUrl": "",
               "visible": true,
@@ -1117,91 +1222,13 @@
               "id": "a2_4",
               "title": "המרינה ומגדל השעון",
               "text": "Marina & Clock Tower - אזור המרינה עם יאכטות, המזח הארוך ומגדל השעון הקלאסי של העיר. נקודת צילום פופולרית",
-              "image": "http://localhost:3001/uploads/city.jpg",
+              "image": "http://localhost:3001/uploads/marina_clock.png",
               "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.653,41.637",
               "pageUrl": "",
               "visible": true,
               "coords": {
                 "lat": 41.653,
                 "lng": 41.637
-              }
-            },
-            {
-              "id": "a2_5",
-              "title": "הרובע היהודי ההיסטורי",
-              "text": "Historic Jewish Quarter - הרחובות שבין בית הכנסת העתיק לבית חב\"ד, אזור היסטורי חשוב עם מורשת הקהילה היהודית בבטומי",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6473,41.6343",
-              "pageUrl": "",
-              "visible": true,
-              "coords": {
-                "lat": 41.6473,
-                "lng": 41.6343
-              }
-            },
-            {
-              "id": "a2_6",
-              "title": "בית הכנסת הגדול",
-              "text": "Great Synagogue of Batumi - בית הכנסת המרכזי של הקהילה היהודית בעיר, בניין היסטורי ופעיל עד היום עם מניין קבוע",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6473,41.6343",
-              "pageUrl": "",
-              "visible": true,
-              "coords": {
-                "lat": 41.6473,
-                "lng": 41.6343
-              }
-            },
-            {
-              "id": "a2_7",
-              "title": "בית חב״ד בטומי",
-              "text": "Chabad Batumi - מרכז הקהילה היהודית, מתפקד כבית כנסת, מסעדה כשרה ומרכז שירותים לתיירים הישראלים",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6495,41.6418",
-              "pageUrl": "http://chabadbatumi.ge/",
-              "visible": true,
-              "coords": {
-                "lat": 41.6495,
-                "lng": 41.6418
-              }
-            },
-            {
-              "id": "a2_8",
-              "title": "קתדרלת האם הקדושה",
-              "text": "Mother of God Cathedral - קתדרלה נוצרית גדולה מתחילת המאה ה-20 (1898-1903), הוקמה במקור כבית תפילה קתולי והפכה לכנסייה אורתודוקסית",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6464,41.6385",
-              "pageUrl": "",
-              "visible": true,
-              "coords": {
-                "lat": 41.6464,
-                "lng": 41.6385
-              }
-            },
-            {
-              "id": "a2_9",
-              "title": "כנסיית סנט ניקולס",
-              "text": "St. Nicholas Church - כנסייה אורתודוקסית היסטורית ברובע העתיק, מוקד חשוב של הנצרות הגאורגית, בעלת אדריכלות קלאסית",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6505,41.6375",
-              "pageUrl": "",
-              "visible": true,
-              "coords": {
-                "lat": 41.6505,
-                "lng": 41.6375
-              }
-            },
-            {
-              "id": "a2_10",
-              "title": "הכנסייה הארמנית",
-              "text": "Armenian Church - כנסייה היסטורית של הקהילה הארמנית בבטומי, סמל למגוון הדתי והתרבותי של העיר",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6498,41.6368",
-              "pageUrl": "",
-              "visible": true,
-              "coords": {
-                "lat": 41.6498,
-                "lng": 41.6368
               }
             },
             {
@@ -1303,61 +1330,6 @@
                 "lat": 41.65,
                 "lng": 41.636
               }
-            },
-            {
-              "id": "a3_6",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a3_7",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a3_8",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a3_9",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a3_10",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
             }
           ],
           "pageBtnLabel": "מידע נוסף"
@@ -1450,61 +1422,6 @@
                 "lat": 41.6508,
                 "lng": 41.6365
               }
-            },
-            {
-              "id": "a5_6",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a5_7",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a5_8",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a5_9",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a5_10",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
             }
           ],
           "pageBtnLabel": "מידע נוסף"
@@ -1619,108 +1536,13 @@
               "text": "סוכנים ומדריכים ישראלים בבטומי\n\"",
               "image": "http://localhost:3001/uploads/city.jpg",
               "images": [],
-              "mapUrl": "",
+              "mapUrl": "https://www.google.com/maps/search/?api=1&query=%D7%A1%D7%95%D7%9B%D7%A0%D7%99%D7%9D%20%D7%95%D7%9E%D7%93%D7%A8%D7%99%D7%9B%D7%99%D7%9D%20%D7%99%D7%A9%D7%A8%D7%90%D7%9C%D7%99%D7%9D%20%D7%91%D7%91%D7%98%D7%95%D7%9E%D7%99%0A%22%20Batumi",
               "pageUrl": "",
-              "visible": true
-            },
-            {
-              "id": "a8_2",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a8_3",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a8_4",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a8_5",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a8_6",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a8_7",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a8_8",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a8_9",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "a8_10",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
+              "visible": true,
+              "coords": {
+                "lat": 41.65,
+                "lng": 41.6355
+              }
             }
           ],
           "pageBtnLabel": "מידע נוסף"
@@ -1749,7 +1571,7 @@
               "id": "r1_1",
               "title": "מסעדת אולד בולוווארד",
               "text": "Old Boulevard - מסעדה מפוארת על הטיילת, אווירה קלאסית ומטבח גאורגי-אירופאי ברמה גבוהה. מתאימה לארוחת ערב מיוחדת",
-              "image": "http://localhost:3001/uploads/city.jpg",
+              "image": "http://localhost:3001/uploads/old_boulevard_restaurant.png",
               "images": [
                 "http://localhost:3001/uploads/1775910069485-6.jpg",
                 "http://localhost:3001/uploads/1775910069497-754.jpg",
@@ -1774,7 +1596,7 @@
               "id": "r1_2",
               "title": "מסעדת אקסודוס",
               "text": "Exodus - מסעדה בוטיק אינטימית במרכז העיר, מטבח חדשני עם נגיעות ים תיכוניות",
-              "image": "http://localhost:3001/uploads/city.jpg",
+              "image": "http://localhost:3001/uploads/exodus_restaurant.png",
               "images": [
                 "http://localhost:3001/uploads/1775910069590-365.jpg",
                 "http://localhost:3001/uploads/1775910069604-188.jpg",
@@ -1799,7 +1621,7 @@
               "id": "r1_3",
               "title": "מסעדת ברן",
               "text": "Barn - מסעדת בשרים מובילה, אוירה כפרית מודרנית, מנות בשר ברמה מעולה",
-              "image": "http://localhost:3001/uploads/city.jpg",
+              "image": "http://localhost:3001/uploads/bern_restaurant.png",
               "images": [
                 "http://localhost:3001/uploads/1775910069718-813.jpg",
                 "http://localhost:3001/uploads/1775910069727-542.jpg",
@@ -1824,7 +1646,7 @@
               "id": "r1_4",
               "title": "מסעדת טאבדורי",
               "text": "Tabidouri - מסעדה גאורגית מסורתית ותיקה עם חצר גדולה, חצ׳פורי וחינקלי מצוינים",
-              "image": "http://localhost:3001/uploads/city.jpg",
+              "image": "http://localhost:3001/uploads/tavaduri_restaurant.png",
               "images": [
                 "http://localhost:3001/uploads/1775910069848-396.jpg",
                 "http://localhost:3001/uploads/1775910069856-849.jpg",
@@ -1849,7 +1671,7 @@
               "id": "r1_5",
               "title": "מסעדת לב בטומי",
               "text": "Heart of Batumi - מסעדה במרכז התיירות עם תפריט מגוון ומחירים נגישים",
-              "image": "http://localhost:3001/uploads/city.jpg",
+              "image": "http://localhost:3001/uploads/heart_batumi.png",
               "images": [
                 "http://localhost:3001/uploads/1775910069983-380.jpg",
                 "http://localhost:3001/uploads/1775910069996-282.jpg",
@@ -1874,7 +1696,7 @@
               "id": "r1_6",
               "title": "מסעדת לגונה",
               "text": "Laguna - מסעדת דגים ופירות ים וותיקה ומוכרת, בחירה מובילה לאוכלי דגים",
-              "image": "http://localhost:3001/uploads/city.jpg",
+              "image": "http://localhost:3001/uploads/laguna_restaurant.png",
               "images": [
                 "http://localhost:3001/uploads/1775910070176-889.jpg",
                 "http://localhost:3001/uploads/1775910070221-937.jpg",
@@ -1899,7 +1721,7 @@
               "id": "r1_7",
               "title": "מסעדת פאן פאן",
               "text": "Pan Pan - מסעדה איטלקית פופולרית, פיצה ופסטה אותנטיות",
-              "image": "http://localhost:3001/uploads/city.jpg",
+              "image": "http://localhost:3001/uploads/fanfan_restaurant.png",
               "images": [
                 "http://localhost:3001/uploads/1775910070458-970.jpg",
                 "http://localhost:3001/uploads/1775910070476-345.jpg",
@@ -1924,7 +1746,7 @@
               "id": "r1_8",
               "title": "מסעדת קלודס",
               "text": "Klaudes - מסעדת שף אלגנטית ומודרנית עם מטבח פיוז׳ן ברמה גבוהה",
-              "image": "http://localhost:3001/uploads/city.jpg",
+              "image": "http://localhost:3001/uploads/clouds_final.png",
               "images": [
                 "http://localhost:3001/uploads/1775910070763-495.jpg",
                 "http://localhost:3001/uploads/1775910070779-308.jpg",
@@ -1949,7 +1771,7 @@
               "id": "r1_9",
               "title": "מסעדת אובל",
               "text": "Restaurant Oval - מסעדה יוקרתית עם עיצוב ייחודי, מטבח אירופאי מעודן",
-              "image": "http://localhost:3001/uploads/city.jpg",
+              "image": "http://localhost:3001/uploads/oval_restaurant.png",
               "images": [
                 "http://localhost:3001/uploads/1775912685744-66.jpg",
                 "http://localhost:3001/uploads/1776169557752-173.jpg",
@@ -1974,7 +1796,7 @@
               "id": "r1_10",
               "title": "מסעדת רטרו",
               "text": "Retro - מסעדה בסגנון רטרו נוסטלגי, מטבח מקומי ואווירה חמה",
-              "image": "http://localhost:3001/uploads/city.jpg",
+              "image": "http://localhost:3001/uploads/retro_final.png",
               "images": [
                 "http://localhost:3001/uploads/info_tips.jpg",
                 "http://localhost:3001/uploads/synagogue.jpg",
@@ -1994,6 +1816,71 @@
                 "lat": 41.6502,
                 "lng": 41.6355
               }
+            },
+            {
+              "id": "res_11",
+              "title": "פורטו פרנקו",
+              "titleEn": "Porto Franco",
+              "text": "החצ׳אפורי האדג׳רי הטוב ביותר בעיר לפי TasteAtlas.",
+              "image": "http://localhost:3001/uploads/porto_franco.png",
+              "mapUrl": "https://www.google.com/maps/search/?api=1&query=Porto+Franco+Batumi",
+              "coords": {
+                "lat": 41.651,
+                "lng": 41.6358
+              },
+              "visible": true
+            },
+            {
+              "id": "res_12",
+              "title": "סנאט רסטורנט",
+              "titleEn": "Senate Restaurant",
+              "text": "אחת המסעדות הבולטות והיוקרתיות בבטומי. קונספט של אוכל, אווירה ותיאטרון.",
+              "image": "http://localhost:3001/uploads/senate_restaurant.png",
+              "mapUrl": "https://www.google.com/maps/search/?api=1&query=Senate+Restaurant+Batumi",
+              "coords": {
+                "lat": 41.652,
+                "lng": 41.637
+              },
+              "visible": true
+            },
+            {
+              "id": "res_13",
+              "title": "שמויחדה גנצוואלה",
+              "titleEn": "Shemoikhede Genatsvale",
+              "text": "רשת מקומית פופולרית לחינקלי ושיפודי בשר. אווירה גאורגית אותנטית.",
+              "image": "http://localhost:3001/uploads/shemoikhede_final.png",
+              "mapUrl": "https://www.google.com/maps/search/?api=1&query=Shemoikhede+Genatsvale+Batumi",
+              "coords": {
+                "lat": 41.6498,
+                "lng": 41.6348
+              },
+              "visible": true
+            },
+            {
+              "id": "res_14",
+              "title": "בלו וואייב",
+              "titleEn": "Blue Wave",
+              "text": "מסעדת דגים ופירות ים ותיקה ומוכרת בבטומי. על חוף הים.",
+              "image": "http://localhost:3001/uploads/blue_wave_final.png",
+              "mapUrl": "https://www.google.com/maps/search/?api=1&query=Blue+Wave+Restaurant+Batumi",
+              "coords": {
+                "lat": 41.653,
+                "lng": 41.638
+              },
+              "visible": true
+            },
+            {
+              "id": "res_15",
+              "title": "קיזיקי",
+              "titleEn": "Kiziki",
+              "text": "מסעדה גדולה ומסורתית. מנות גדולות ומחירים זולים.",
+              "image": "http://localhost:3001/uploads/kiziki_restaurant.png",
+              "mapUrl": "https://www.google.com/maps/search/?api=1&query=Kiziki+Restaurant+Batumi",
+              "coords": {
+                "lat": 41.6495,
+                "lng": 41.634
+              },
+              "visible": true
             }
           ],
           "pageBtnLabel": "מה אוכלים"
@@ -2006,327 +1893,138 @@
           "bg": "#1A6B8A",
           "hotels": [
             {
-              "id": "r2_1",
-              "title": "מסעדה יוקרתית 1",
-              "titleEn": "Luxury One",
-              "text": "תיאור דמו למסעדה יוקרתית - ערוך בפאנל",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [
-                "http://localhost:3001/uploads/1775910069741-591.jpg",
-                "http://localhost:3001/uploads/1775910069754-713.jpg",
-                "http://localhost:3001/uploads/1775910069774-994.jpg",
-                "http://localhost:3001/uploads/1775910069789-35.jpg",
-                "http://localhost:3001/uploads/1775910069804-487.jpg",
-                "http://localhost:3001/uploads/1775910069817-888.jpg",
-                "http://localhost:3001/uploads/1775910069828-261.jpg",
-                "http://localhost:3001/uploads/1775910069848-396.jpg",
-                "http://localhost:3001/uploads/1775910069856-849.jpg"
-              ],
-              "mapUrl": "",
-              "pageUrl": "",
+              "id": "lux_1",
+              "title": "360 Sky Bar",
+              "titleEn": "מלון שרתון - קומה 20",
+              "text": "נוף פנורמי של 360 מעלות על כל העיר והים. חוויה קולינרית בשמיים.",
+              "image": "http://localhost:3001/uploads/360_skybar.png",
+              "mapUrl": "https://www.google.com/maps/search/?api=1&query=Sheraton+Batumi+Sky+Bar",
+              "coords": {
+                "lat": 41.6509,
+                "lng": 41.6304
+              },
               "visible": true
             },
             {
-              "id": "r2_2",
-              "title": "מסעדה יוקרתית 2",
-              "titleEn": "Luxury Two",
-              "text": "תיאור דמו למסעדה יוקרתית - ערוך בפאנל",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [
-                "http://localhost:3001/uploads/1775910069871-73.jpg",
-                "http://localhost:3001/uploads/1775910069886-735.jpg",
-                "http://localhost:3001/uploads/1775910069905-986.jpg",
-                "http://localhost:3001/uploads/1775910069920-177.jpg",
-                "http://localhost:3001/uploads/1775910069932-509.jpg",
-                "http://localhost:3001/uploads/1775910069944-981.jpg",
-                "http://localhost:3001/uploads/1775910069968-962.jpg",
-                "http://localhost:3001/uploads/1775910069983-380.jpg",
-                "http://localhost:3001/uploads/1775910069996-282.jpg"
-              ],
-              "mapUrl": "",
-              "pageUrl": "",
+              "id": "lux_2",
+              "title": "Umami at Clouds",
+              "titleEn": "מלון רדיסון בלו - קומה 19",
+              "text": "מסעדה אסיאתית-פיוז׳ן בקומה ה-19 של מלון רדיסון. נוף מרהיב.",
+              "image": "http://localhost:3001/uploads/umami_clouds_final.png",
+              "mapUrl": "https://www.google.com/maps/search/?api=1&query=Radisson+Blu+Batumi+Umami",
+              "coords": {
+                "lat": 41.6536,
+                "lng": 41.6376
+              },
               "visible": true
             },
             {
-              "id": "r2_3",
-              "title": "מסעדה יוקרתית 3",
-              "titleEn": "Luxury Three",
-              "text": "תיאור דמו למסעדה יוקרתית - ערוך בפאנל",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [
-                "http://localhost:3001/uploads/1775910070037-277.jpg",
-                "http://localhost:3001/uploads/1775910070062-191.jpg",
-                "http://localhost:3001/uploads/1775910070091-127.jpg",
-                "http://localhost:3001/uploads/1775910070109-574.jpg",
-                "http://localhost:3001/uploads/1775910070124-950.jpg",
-                "http://localhost:3001/uploads/1775910070138-826.jpg",
-                "http://localhost:3001/uploads/1775910070157-641.jpg",
-                "http://localhost:3001/uploads/1775910070176-889.jpg",
-                "http://localhost:3001/uploads/1775910070221-937.jpg"
-              ],
-              "mapUrl": "",
-              "pageUrl": "",
+              "id": "lux_3",
+              "title": "Nephele Sky Bar",
+              "titleEn": "מלון הילטון - גג",
+              "text": "בר-מסעדה על גג מלון הילטון. קוקטיילים ומנות שף עם נוף.",
+              "image": "http://localhost:3001/uploads/nephele_skybar.png",
+              "mapUrl": "https://www.google.com/maps/search/?api=1&query=Hilton+Batumi+Nephele",
+              "coords": {
+                "lat": 41.6491,
+                "lng": 41.6258
+              },
               "visible": true
             },
             {
-              "id": "r2_4",
-              "title": "מסעדה יוקרתית 4",
-              "titleEn": "Luxury Four",
-              "text": "תיאור דמו למסעדה יוקרתית - ערוך בפאנל",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [
-                "http://localhost:3001/uploads/1775910070239-832.jpg",
-                "http://localhost:3001/uploads/1775910070274-35.jpg",
-                "http://localhost:3001/uploads/1775910070300-113.jpg",
-                "http://localhost:3001/uploads/1775910070328-92.jpg",
-                "http://localhost:3001/uploads/1775910070374-216.jpg",
-                "http://localhost:3001/uploads/1775910070408-889.jpg",
-                "http://localhost:3001/uploads/1775910070425-205.jpg",
-                "http://localhost:3001/uploads/1775910070458-970.jpg",
-                "http://localhost:3001/uploads/1775910070476-345.jpg"
-              ],
-              "mapUrl": "",
-              "pageUrl": "",
+              "id": "lux_4",
+              "title": "The Kitchen",
+              "titleEn": "מלון Rooms - קומת גג",
+              "text": "אווירה מעוצבת בקומת הגג. מטבח מודרני ויצירתי.",
+              "image": "http://localhost:3001/uploads/the_kitchen_rooms.png",
+              "mapUrl": "https://www.google.com/maps/search/?api=1&query=Rooms+Hotel+Batumi+Kitchen",
+              "coords": {
+                "lat": 41.6505,
+                "lng": 41.6355
+              },
               "visible": true
             },
             {
-              "id": "r2_5",
-              "title": "מסעדה יוקרתית 5",
-              "titleEn": "Luxury Five",
-              "text": "תיאור דמו למסעדה יוקרתית - ערוך בפאנל",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [
-                "http://localhost:3001/uploads/1775910070494-597.jpg",
-                "http://localhost:3001/uploads/1775910070508-159.jpg",
-                "http://localhost:3001/uploads/1775910070572-696.jpg",
-                "http://localhost:3001/uploads/1775910070621-489.jpg",
-                "http://localhost:3001/uploads/1775910070660-822.jpg",
-                "http://localhost:3001/uploads/1775910070713-406.jpg",
-                "http://localhost:3001/uploads/1775910070743-855.jpg",
-                "http://localhost:3001/uploads/1775910070763-495.jpg",
-                "http://localhost:3001/uploads/1775910070779-308.jpg"
-              ],
-              "mapUrl": "",
-              "pageUrl": "",
+              "id": "lux_5",
+              "title": "Restaurant Ambassadori",
+              "titleEn": "מלון אמבסדורי",
+              "text": "מטבח איטלקי ואירופאי במלון אמבסדורי. עיצוב מרשים עם צמחייה.",
+              "image": "http://localhost:3001/uploads/ambassadori_restaurant.png",
+              "mapUrl": "https://www.google.com/maps/search/?api=1&query=Ambassadori+Hotel+Batumi+Restaurant",
+              "coords": {
+                "lat": 41.6515,
+                "lng": 41.6365
+              },
               "visible": true
             },
             {
-              "id": "r2_6",
-              "title": "מסעדה יוקרתית 6",
-              "titleEn": "Luxury Six",
-              "text": "תיאור דמו למסעדה יוקרתית - ערוך בפאנל",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [
-                "http://localhost:3001/uploads/1775910070804-219.jpg",
-                "http://localhost:3001/uploads/1775910070843-322.jpg",
-                "http://localhost:3001/uploads/1775910070868-452.jpg",
-                "http://localhost:3001/uploads/1775910070891-592.jpg",
-                "http://localhost:3001/uploads/1775912626901-944.jpg",
-                "http://localhost:3001/uploads/1775912646740-741.jpg",
-                "http://localhost:3001/uploads/1775912672953-364.jpg",
-                "http://localhost:3001/uploads/1775912685744-66.jpg",
-                "http://localhost:3001/uploads/1776169557752-173.jpg"
-              ],
-              "mapUrl": "",
-              "pageUrl": "",
+              "id": "lux_6",
+              "title": "Brasserie & Latitude Bar",
+              "titleEn": "מלון לה מרידיאן",
+              "text": "מטבח צרפתי קלאסי עם נגיעות מקומיות. אלגנטיות ועדינות.",
+              "image": "http://localhost:3001/uploads/brasserie_meridien.png",
+              "mapUrl": "https://www.google.com/maps/search/?api=1&query=Le+Meridien+Batumi+Brasserie",
+              "coords": {
+                "lat": 41.654,
+                "lng": 41.6365
+              },
               "visible": true
             },
             {
-              "id": "r2_7",
-              "title": "מסעדה יוקרתית 7",
-              "titleEn": "Luxury Seven",
-              "text": "תיאור דמו למסעדה יוקרתית - ערוך בפאנל",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [
-                "http://localhost:3001/uploads/city.jpg",
-                "http://localhost:3001/uploads/info_culture.jpg",
-                "http://localhost:3001/uploads/info_embassy.jpg",
-                "http://localhost:3001/uploads/info_health.jpg",
-                "http://localhost:3001/uploads/info_insurance.jpg",
-                "http://localhost:3001/uploads/info_tax.jpg",
-                "http://localhost:3001/uploads/info_telecom.jpg",
-                "http://localhost:3001/uploads/info_tips.jpg",
-                "http://localhost:3001/uploads/synagogue.jpg"
-              ],
-              "mapUrl": "",
-              "pageUrl": "",
+              "id": "lux_7",
+              "title": "A La Turca",
+              "titleEn": "מלון ווינדהאם",
+              "text": "מטבח טורקי אותנטי עם מנות בינלאומיות. במלון ווינדהאם.",
+              "image": "http://localhost:3001/uploads/alaturca_wyndham.png",
+              "mapUrl": "https://www.google.com/maps/search/?api=1&query=Wyndham+Batumi+A+La+Turca",
+              "coords": {
+                "lat": 41.6502,
+                "lng": 41.6361
+              },
               "visible": true
             },
             {
-              "id": "r2_8",
-              "title": "מסעדה יוקרתית 8",
-              "titleEn": "Luxury Eight",
-              "text": "תיאור דמו למסעדה יוקרתית - ערוך בפאנל",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [
-                "http://localhost:3001/uploads/welcome_app.jpg",
-                "http://localhost:3001/uploads/1775910069485-6.jpg",
-                "http://localhost:3001/uploads/1775910069497-754.jpg",
-                "http://localhost:3001/uploads/1775910069506-223.jpg",
-                "http://localhost:3001/uploads/1775910069516-30.jpg",
-                "http://localhost:3001/uploads/1775910069526-255.jpg",
-                "http://localhost:3001/uploads/1775910069535-937.jpg",
-                "http://localhost:3001/uploads/1775910069548-933.jpg",
-                "http://localhost:3001/uploads/1775910069562-341.jpg"
-              ],
-              "mapUrl": "",
-              "pageUrl": "",
+              "id": "lux_8",
+              "title": "Wave Restaurant",
+              "titleEn": "מלון Grand Gloria",
+              "text": "גולת הכותרת של מלון גראנד גלוריה. מטבח ים תיכוני.",
+              "image": "http://localhost:3001/uploads/wave_gloria.png",
+              "mapUrl": "https://www.google.com/maps/search/?api=1&query=Grand+Gloria+Hotel+Batumi+Wave",
+              "coords": {
+                "lat": 41.642,
+                "lng": 41.613
+              },
               "visible": true
             },
             {
-              "id": "r2_9",
-              "title": "מסעדה יוקרתית 9",
-              "titleEn": "Luxury Nine",
-              "text": "תיאור דמו למסעדה יוקרתית - ערוך בפאנל",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [
-                "http://localhost:3001/uploads/1775910069573-698.jpg",
-                "http://localhost:3001/uploads/1775910069590-365.jpg",
-                "http://localhost:3001/uploads/1775910069604-188.jpg",
-                "http://localhost:3001/uploads/1775910069616-946.jpg",
-                "http://localhost:3001/uploads/1775910069627-459.jpg",
-                "http://localhost:3001/uploads/1775910069643-44.jpg",
-                "http://localhost:3001/uploads/1775910069656-446.jpg",
-                "http://localhost:3001/uploads/1775910069672-831.jpg",
-                "http://localhost:3001/uploads/1775910069689-689.jpg"
-              ],
-              "mapUrl": "",
-              "pageUrl": "",
+              "id": "lux_9",
+              "title": "Cena Restaurant",
+              "titleEn": "מלון Colosseum Marina",
+              "text": "מרפסת נעימה שפונה לים ולחוף. מטבח איטלקי וגאורגי.",
+              "image": "http://localhost:3001/uploads/cena_colosseum.png",
+              "mapUrl": "https://www.google.com/maps/search/?api=1&query=Colosseum+Marina+Batumi+Cena",
+              "coords": {
+                "lat": 41.6376,
+                "lng": 41.6093
+              },
               "visible": true
             },
             {
-              "id": "r2_10",
-              "title": "מסעדה יוקרתית 10",
-              "titleEn": "Luxury Ten",
-              "text": "תיאור דמו למסעדה יוקרתית - ערוך בפאנל",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [
-                "http://localhost:3001/uploads/1775910069707-877.jpg",
-                "http://localhost:3001/uploads/1775910069718-813.jpg",
-                "http://localhost:3001/uploads/1775910069727-542.jpg",
-                "http://localhost:3001/uploads/1775910069741-591.jpg",
-                "http://localhost:3001/uploads/1775910069754-713.jpg",
-                "http://localhost:3001/uploads/1775910069774-994.jpg",
-                "http://localhost:3001/uploads/1775910069789-35.jpg",
-                "http://localhost:3001/uploads/1775910069804-487.jpg",
-                "http://localhost:3001/uploads/1775910069817-888.jpg"
-              ],
-              "mapUrl": "",
-              "pageUrl": "",
+              "id": "lux_10",
+              "title": "Kitchen & Bar",
+              "titleEn": "מלון Courtyard by Marriott",
+              "text": "מסעדה מודרנית במלון קורטיארד. אפשרות מצוינת לארוחה נינוחה.",
+              "image": "http://localhost:3001/uploads/kitchen_courtyard.png",
+              "mapUrl": "https://www.google.com/maps/search/?api=1&query=Courtyard+Marriott+Batumi+Kitchen",
+              "coords": {
+                "lat": 41.6417,
+                "lng": 41.6158
+              },
               "visible": true
-            },
-            {
-              "id": "r2_11",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "r2_12",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "r2_13",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "r2_14",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "r2_15",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "r2_16",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "r2_17",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "r2_18",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "r2_19",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "r2_20",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
             }
           ],
-          "pageBtnLabel": "מה אוכלים"
+          "pageBtnLabel": "הזמן שולחן",
+          "longText": "<div style=\"font-family:Arial,sans-serif;padding:8px 16px;direction:rtl;text-align:right;font-size:12px;line-height:1.5;color:#444\"><p style=\"margin:0\">גולשים יקרים, בחרנו עבורכם מספר מסעדות הממוקמות בתוך מלונות. מסעדות בסטנדרט גבוהה, מוקפדות, נקיות ומגישות אוכל עדכני או אוטנתי. במסעדות אלו לרוב מקפידים על קוד לבוש \"Smart Casual\" (אלגנטי לא רשמי), מומלץ לא להגיע בבגדי ים או כפכפים. חשוב מאוד להזמין מקום מראש.</p></div>"
         },
         {
           "id": "r4",
@@ -2336,327 +2034,73 @@
           "bg": "#3DA5C4",
           "hotels": [
             {
-              "id": "r4_1",
-              "title": "כשר 1",
-              "titleEn": "Kosher 1",
-              "text": "תיאור דמו - ערוך בפאנל הניהול",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [
-                "http://localhost:3001/uploads/1775910070621-489.jpg",
-                "http://localhost:3001/uploads/1775910070660-822.jpg",
-                "http://localhost:3001/uploads/1775910070713-406.jpg",
-                "http://localhost:3001/uploads/1775910070743-855.jpg",
-                "http://localhost:3001/uploads/1775910070763-495.jpg",
-                "http://localhost:3001/uploads/1775910070779-308.jpg",
-                "http://localhost:3001/uploads/1775910070804-219.jpg",
-                "http://localhost:3001/uploads/1775910070843-322.jpg",
-                "http://localhost:3001/uploads/1775910070868-452.jpg"
-              ],
-              "mapUrl": "",
-              "pageUrl": "",
+              "id": "kos_1",
+              "title": "מסעדת המלך שלמה",
+              "titleEn": "King Solomon Restaurant",
+              "text": "שתי מסעדות יוקרתיות במלון המלך שלמה. כינור דוד - בשרית. קהלת - חלבית.",
+              "image": "http://localhost:3001/uploads/king_solomon_rest_final.png",
+              "mapUrl": "https://www.google.com/maps/search/?api=1&query=King+Solomon+Hotel+Batumi+Restaurant",
+              "coords": {
+                "lat": 41.6395,
+                "lng": 41.6172
+              },
               "visible": true
             },
             {
-              "id": "r4_2",
-              "title": "כשר 2",
-              "titleEn": "Kosher 2",
-              "text": "תיאור דמו - ערוך בפאנל הניהול",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [
-                "http://localhost:3001/uploads/1775910070891-592.jpg",
-                "http://localhost:3001/uploads/1775912626901-944.jpg",
-                "http://localhost:3001/uploads/1775912646740-741.jpg",
-                "http://localhost:3001/uploads/1775912672953-364.jpg",
-                "http://localhost:3001/uploads/1775912685744-66.jpg",
-                "http://localhost:3001/uploads/1776169557752-173.jpg",
-                "http://localhost:3001/uploads/city.jpg",
-                "http://localhost:3001/uploads/info_culture.jpg",
-                "http://localhost:3001/uploads/info_embassy.jpg"
-              ],
-              "mapUrl": "",
-              "pageUrl": "",
+              "id": "kos_2",
+              "title": "בית חב״ד",
+              "titleEn": "Chabad House Batumi",
+              "text": "הלב הפועם של הקהילה היהודית והישראלית בעיר. בניהול הרב זלמן ומושקא. אוכל כשר ואווירה חמה.",
+              "image": "http://localhost:3001/uploads/chabad_rest_final.png",
+              "mapUrl": "https://www.google.com/maps/search/?api=1&query=Chabad+House+Batumi",
+              "coords": {
+                "lat": 41.6495,
+                "lng": 41.6418
+              },
               "visible": true
             },
             {
-              "id": "r4_3",
-              "title": "כשר 3",
-              "titleEn": "Kosher 3",
-              "text": "תיאור דמו - ערוך בפאנל הניהול",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [
-                "http://localhost:3001/uploads/info_health.jpg",
-                "http://localhost:3001/uploads/info_insurance.jpg",
-                "http://localhost:3001/uploads/info_tax.jpg",
-                "http://localhost:3001/uploads/info_telecom.jpg",
-                "http://localhost:3001/uploads/info_tips.jpg",
-                "http://localhost:3001/uploads/synagogue.jpg",
-                "http://localhost:3001/uploads/welcome_app.jpg",
-                "http://localhost:3001/uploads/1775910069485-6.jpg",
-                "http://localhost:3001/uploads/1775910069497-754.jpg"
-              ],
-              "mapUrl": "",
-              "pageUrl": "",
+              "id": "kos_3",
+              "title": "מענדיס",
+              "titleEn": "Mendys Batumi",
+              "text": "המסעדה הפופולרית ביותר בקרב הישראלים. שילוב מושלם בין מטבח גאורגי מסורתי לכשרות למהדרין.",
+              "image": "http://localhost:3001/uploads/mendys_rest_final.png",
+              "mapUrl": "https://www.google.com/maps/search/?api=1&query=Mendys+Kosher+Restaurant+Batumi",
+              "coords": {
+                "lat": 41.65,
+                "lng": 41.635
+              },
               "visible": true
             },
             {
-              "id": "r4_4",
-              "title": "כשר 4",
-              "titleEn": "Kosher 4",
-              "text": "תיאור דמו - ערוך בפאנל הניהול",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [
-                "http://localhost:3001/uploads/1775910069506-223.jpg",
-                "http://localhost:3001/uploads/1775910069516-30.jpg",
-                "http://localhost:3001/uploads/1775910069526-255.jpg",
-                "http://localhost:3001/uploads/1775910069535-937.jpg",
-                "http://localhost:3001/uploads/1775910069548-933.jpg",
-                "http://localhost:3001/uploads/1775910069562-341.jpg",
-                "http://localhost:3001/uploads/1775910069573-698.jpg",
-                "http://localhost:3001/uploads/1775910069590-365.jpg",
-                "http://localhost:3001/uploads/1775910069604-188.jpg"
-              ],
-              "mapUrl": "",
-              "pageUrl": "",
+              "id": "kos_4",
+              "title": "עין הים",
+              "titleEn": "Ein HaYam",
+              "text": "מסעדה בשרית כשרה למהדרין בשיתוף עם בית חב״ד המקומי.",
+              "image": "http://localhost:3001/uploads/ein_hayam_final.png",
+              "mapUrl": "https://www.google.com/maps/search/?api=1&query=Ein+HaYam+Kosher+Batumi",
+              "coords": {
+                "lat": 41.6505,
+                "lng": 41.6355
+              },
               "visible": true
             },
             {
-              "id": "r4_5",
-              "title": "כשר 5",
-              "titleEn": "Kosher 5",
-              "text": "תיאור דמו - ערוך בפאנל הניהול",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [
-                "http://localhost:3001/uploads/1775910069616-946.jpg",
-                "http://localhost:3001/uploads/1775910069627-459.jpg",
-                "http://localhost:3001/uploads/1775910069643-44.jpg",
-                "http://localhost:3001/uploads/1775910069656-446.jpg",
-                "http://localhost:3001/uploads/1775910069672-831.jpg",
-                "http://localhost:3001/uploads/1775910069689-689.jpg",
-                "http://localhost:3001/uploads/1775910069707-877.jpg",
-                "http://localhost:3001/uploads/1775910069718-813.jpg",
-                "http://localhost:3001/uploads/1775910069727-542.jpg"
-              ],
-              "mapUrl": "",
-              "pageUrl": "",
+              "id": "kos_5",
+              "title": "הבית הירושלמי",
+              "titleEn": "Jerusalem House",
+              "text": "אוכל ביתי כשר ומגוון רחב של מנות באווירה משפחתית.",
+              "image": "http://localhost:3001/uploads/jerusalem_house_rest.png",
+              "mapUrl": "https://www.google.com/maps/search/?api=1&query=Jerusalem+House+Kosher+Batumi",
+              "coords": {
+                "lat": 41.6498,
+                "lng": 41.6345
+              },
               "visible": true
-            },
-            {
-              "id": "r4_6",
-              "title": "כשר 6",
-              "titleEn": "Kosher 6",
-              "text": "תיאור דמו - ערוך בפאנל הניהול",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [
-                "http://localhost:3001/uploads/1775910069741-591.jpg",
-                "http://localhost:3001/uploads/1775910069754-713.jpg",
-                "http://localhost:3001/uploads/1775910069774-994.jpg",
-                "http://localhost:3001/uploads/1775910069789-35.jpg",
-                "http://localhost:3001/uploads/1775910069804-487.jpg",
-                "http://localhost:3001/uploads/1775910069817-888.jpg",
-                "http://localhost:3001/uploads/1775910069828-261.jpg",
-                "http://localhost:3001/uploads/1775910069848-396.jpg",
-                "http://localhost:3001/uploads/1775910069856-849.jpg"
-              ],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": true
-            },
-            {
-              "id": "r4_7",
-              "title": "כשר 7",
-              "titleEn": "Kosher 7",
-              "text": "תיאור דמו - ערוך בפאנל הניהול",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [
-                "http://localhost:3001/uploads/1775910069871-73.jpg",
-                "http://localhost:3001/uploads/1775910069886-735.jpg",
-                "http://localhost:3001/uploads/1775910069905-986.jpg",
-                "http://localhost:3001/uploads/1775910069920-177.jpg",
-                "http://localhost:3001/uploads/1775910069932-509.jpg",
-                "http://localhost:3001/uploads/1775910069944-981.jpg",
-                "http://localhost:3001/uploads/1775910069968-962.jpg",
-                "http://localhost:3001/uploads/1775910069983-380.jpg",
-                "http://localhost:3001/uploads/1775910069996-282.jpg"
-              ],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": true
-            },
-            {
-              "id": "r4_8",
-              "title": "כשר 8",
-              "titleEn": "Kosher 8",
-              "text": "תיאור דמו - ערוך בפאנל הניהול",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [
-                "http://localhost:3001/uploads/1775910070037-277.jpg",
-                "http://localhost:3001/uploads/1775910070062-191.jpg",
-                "http://localhost:3001/uploads/1775910070091-127.jpg",
-                "http://localhost:3001/uploads/1775910070109-574.jpg",
-                "http://localhost:3001/uploads/1775910070124-950.jpg",
-                "http://localhost:3001/uploads/1775910070138-826.jpg",
-                "http://localhost:3001/uploads/1775910070157-641.jpg",
-                "http://localhost:3001/uploads/1775910070176-889.jpg",
-                "http://localhost:3001/uploads/1775910070221-937.jpg"
-              ],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": true
-            },
-            {
-              "id": "r4_9",
-              "title": "כשר 9",
-              "titleEn": "Kosher 9",
-              "text": "תיאור דמו - ערוך בפאנל הניהול",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [
-                "http://localhost:3001/uploads/1775910070239-832.jpg",
-                "http://localhost:3001/uploads/1775910070274-35.jpg",
-                "http://localhost:3001/uploads/1775910070300-113.jpg",
-                "http://localhost:3001/uploads/1775910070328-92.jpg",
-                "http://localhost:3001/uploads/1775910070374-216.jpg",
-                "http://localhost:3001/uploads/1775910070408-889.jpg",
-                "http://localhost:3001/uploads/1775910070425-205.jpg",
-                "http://localhost:3001/uploads/1775910070458-970.jpg",
-                "http://localhost:3001/uploads/1775910070476-345.jpg"
-              ],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": true
-            },
-            {
-              "id": "r4_10",
-              "title": "כשר 10",
-              "titleEn": "Kosher 10",
-              "text": "תיאור דמו - ערוך בפאנל הניהול",
-              "image": "http://localhost:3001/uploads/city.jpg",
-              "images": [
-                "http://localhost:3001/uploads/1775910070494-597.jpg",
-                "http://localhost:3001/uploads/1775910070508-159.jpg",
-                "http://localhost:3001/uploads/1775910070572-696.jpg",
-                "http://localhost:3001/uploads/1775910070621-489.jpg",
-                "http://localhost:3001/uploads/1775910070660-822.jpg",
-                "http://localhost:3001/uploads/1775910070713-406.jpg",
-                "http://localhost:3001/uploads/1775910070743-855.jpg",
-                "http://localhost:3001/uploads/1775910070763-495.jpg",
-                "http://localhost:3001/uploads/1775910070779-308.jpg"
-              ],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": true
-            },
-            {
-              "id": "r4_11",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "r4_12",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "r4_13",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "r4_14",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "r4_15",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "r4_16",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "r4_17",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "r4_18",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "r4_19",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
-            },
-            {
-              "id": "r4_20",
-              "title": "",
-              "titleEn": "",
-              "text": "",
-              "image": "",
-              "images": [],
-              "mapUrl": "",
-              "pageUrl": "",
-              "visible": false
             }
           ],
-          "pageBtnLabel": "מה אוכלים"
+          "pageBtnLabel": "הזמן מקום",
+          "longText": "<div style=\"font-family:Arial,sans-serif;padding:8px 16px;direction:rtl;text-align:right;font-size:12px;line-height:1.5;color:#444\"><p style=\"margin:0 0 8px\">⚠️ שימו לב! בשל העובדה כי יש צורך בתעודת כשרות מעודכנת אחת לשנה, וודאו שהמסעדה מחזיקה בתעודה כזו.</p><p style=\"margin:0;color:#c62828;font-weight:bold\">בבטומי פועלת מסעדה ששמה ״ירושלים - Jerusalem״ אולם זוהי מסעדה עם כשרות Halal ולא כשרות על פי היהדות.</p></div>"
         },
         {
           "id": "r3",
@@ -9494,6 +8938,306 @@
         }
       ],
       "color": "#c2185b"
+    },
+    {
+      "name": "מסעדות כשרות",
+      "color": "#2E7D32",
+      "points": [
+        {
+          "name": "מסעדת המלך שלמה",
+          "lat": 41.6395,
+          "lng": 41.6172,
+          "description": "כינור דוד בשרית, קהלת חלבית"
+        },
+        {
+          "name": "בית חב״ד",
+          "lat": 41.6495,
+          "lng": 41.6418,
+          "description": "אוכל כשר ואווירה חמה"
+        },
+        {
+          "name": "מענדיס",
+          "lat": 41.65,
+          "lng": 41.635,
+          "description": "כשר למהדרין, מטבח גאורגי"
+        },
+        {
+          "name": "עין הים",
+          "lat": 41.6505,
+          "lng": 41.6355,
+          "description": "בשרית כשרה למהדרין"
+        },
+        {
+          "name": "הבית הירושלמי",
+          "lat": 41.6498,
+          "lng": 41.6345,
+          "description": "אוכל ביתי כשר"
+        }
+      ]
+    },
+    {
+      "name": "בתי קפה וארוחות בוקר",
+      "color": "#795548",
+      "points": [
+        {
+          "name": "Lovita Cafe",
+          "lat": 41.6505,
+          "lng": 41.636,
+          "description": "🍳 ארוחת בוקר"
+        },
+        {
+          "name": "Freeduchio Cafe",
+          "lat": 41.648,
+          "lng": 41.63,
+          "description": "🍳 ארוחת בוקר"
+        },
+        {
+          "name": "Blue Elephant",
+          "lat": 41.651,
+          "lng": 41.6355,
+          "description": "🍳 ארוחת בוקר"
+        },
+        {
+          "name": "OTKHI",
+          "lat": 41.6495,
+          "lng": 41.6345,
+          "description": "🍳 ארוחת בוקר"
+        },
+        {
+          "name": "Erti Kava",
+          "lat": 41.6512,
+          "lng": 41.6358,
+          "description": "☕ קפה בלבד"
+        },
+        {
+          "name": "Kawagrapia",
+          "lat": 41.65,
+          "lng": 41.635,
+          "description": "🍳 ארוחת בוקר"
+        },
+        {
+          "name": "Laguna Cafe",
+          "lat": 41.6498,
+          "lng": 41.6342,
+          "description": "🍳 ארוחת בוקר"
+        },
+        {
+          "name": "Coffee Lab",
+          "lat": 41.6508,
+          "lng": 41.6348,
+          "description": "☕ קפה בלבד"
+        },
+        {
+          "name": "Nord Coffee Base",
+          "lat": 41.6515,
+          "lng": 41.637,
+          "description": "☕ קפה בלבד"
+        },
+        {
+          "name": "Hedonist Coffee",
+          "lat": 41.6508,
+          "lng": 41.6362,
+          "description": "🍳 ארוחת בוקר"
+        },
+        {
+          "name": "Rhino Coffee",
+          "lat": 41.6505,
+          "lng": 41.6355,
+          "description": "☕ קפה בלבד"
+        },
+        {
+          "name": "Coffeetopia",
+          "lat": 41.6512,
+          "lng": 41.6358,
+          "description": "🍳 ארוחת בוקר"
+        },
+        {
+          "name": "MOK Coffee - Grand Mall",
+          "lat": 41.6425,
+          "lng": 41.614,
+          "description": "☕ קפה בלבד"
+        },
+        {
+          "name": "MOK Coffee - Metro City",
+          "lat": 41.643,
+          "lng": 41.615,
+          "description": "☕ קפה בלבד"
+        },
+        {
+          "name": "FoxCoffee",
+          "lat": 41.65,
+          "lng": 41.6348,
+          "description": "☕ קפה בלבד"
+        },
+        {
+          "name": "Chocolatte",
+          "lat": 41.6502,
+          "lng": 41.6352,
+          "description": "🍳 ארוחת בוקר"
+        },
+        {
+          "name": "Dona Bakery",
+          "lat": 41.649,
+          "lng": 41.634,
+          "description": "🍳 ארוחת בוקר"
+        },
+        {
+          "name": "Basil Coffee & Wine",
+          "lat": 41.6515,
+          "lng": 41.6365,
+          "description": "☕ קפה בלבד"
+        },
+        {
+          "name": "Tangerine Cafe",
+          "lat": 41.651,
+          "lng": 41.636,
+          "description": "☕ קפה בלבד"
+        },
+        {
+          "name": "Cafe Batumi",
+          "lat": 41.653,
+          "lng": 41.6375,
+          "description": "🍳 ארוחת בוקר"
+        },
+        {
+          "name": "Senate Coffee",
+          "lat": 41.6505,
+          "lng": 41.6358,
+          "description": "☕ קפה בלבד"
+        },
+        {
+          "name": "קפה בקניון הגראנד",
+          "lat": 41.6425,
+          "lng": 41.614,
+          "description": "☕ קפה בלבד"
+        },
+        {
+          "name": "המסעדה המסתובבת",
+          "lat": 41.6535,
+          "lng": 41.634,
+          "description": "🍳 ארוחת בוקר"
+        }
+      ]
+    },
+    {
+      "name": "אוכל רחוב",
+      "color": "#ff6b35",
+      "points": [
+        {
+          "name": "חצ׳אפורי מהחלון",
+          "lat": 41.651,
+          "lng": 41.6358,
+          "description": "🧀 חובה לטעום"
+        },
+        {
+          "name": "צ׳ורצ׳לה בשוק",
+          "lat": 41.652,
+          "lng": 41.634,
+          "description": "🍇 סמל גאורגי"
+        },
+        {
+          "name": "קובדרי",
+          "lat": 41.6505,
+          "lng": 41.635,
+          "description": "🥩 סוואנטי אותנטי"
+        },
+        {
+          "name": "לוביאני",
+          "lat": 41.6498,
+          "lng": 41.6345,
+          "description": "💰 2 לארי בלבד"
+        },
+        {
+          "name": "אצ׳מה",
+          "lat": 41.6512,
+          "lng": 41.6362,
+          "description": "🏠 אדג׳רי מקורי"
+        },
+        {
+          "name": "שווארמה על הגריל",
+          "lat": 41.6506,
+          "lng": 41.6349,
+          "description": "🌶️ חריף ומשגע"
+        },
+        {
+          "name": "סמסה חמה",
+          "lat": 41.65,
+          "lng": 41.6355,
+          "description": "🔥 רותח מהתנור"
+        },
+        {
+          "name": "פנוראקי (סופגניות)",
+          "lat": 41.6495,
+          "lng": 41.634,
+          "description": "🌅 ארוחת בוקר"
+        }
+      ]
+    },
+    {
+      "name": "אטרקציות",
+      "color": "#e91e63",
+      "points": [
+        {
+          "name": "הטיילת החדשה",
+          "lat": 41.654,
+          "lng": 41.635,
+          "description": ""
+        },
+        {
+          "name": "הגלגל הענק",
+          "lat": 41.6554,
+          "lng": 41.6426,
+          "description": ""
+        },
+        {
+          "name": "פסל עלי ונינו",
+          "lat": 41.6556,
+          "lng": 41.6432,
+          "description": ""
+        },
+        {
+          "name": "מגדל האלפבית",
+          "lat": 41.656,
+          "lng": 41.6393,
+          "description": ""
+        },
+        {
+          "name": "מגדל צ׳ה צ׳ה",
+          "lat": 41.6525,
+          "lng": 41.642,
+          "description": ""
+        },
+        {
+          "name": "לונה פארק",
+          "lat": 41.655,
+          "lng": 41.644,
+          "description": ""
+        },
+        {
+          "name": "אגם ארדגני",
+          "lat": 41.6478,
+          "lng": 41.623,
+          "description": ""
+        },
+        {
+          "name": "הדולפינריום",
+          "lat": 41.6478,
+          "lng": 41.6228,
+          "description": ""
+        },
+        {
+          "name": "כיכר אירופה",
+          "lat": 41.651,
+          "lng": 41.6361,
+          "description": ""
+        },
+        {
+          "name": "פארק 6 במאי",
+          "lat": 41.643,
+          "lng": 41.612,
+          "description": ""
+        }
+      ]
     }
   ],
   "ratings": {
@@ -9524,5 +9268,12 @@
     "plan2Color": "#1A6B8A",
     "appleUrl": "https://apps.apple.com/app/batumionline/id6744278498",
     "googleUrl": "https://play.google.com/store/apps/details?id=com.batumionline.batumi"
+  },
+  "paywall": {
+    "mode": "premium",
+    "lockedCategories": [
+      "3"
+    ],
+    "trialEnabled": false
   }
 }

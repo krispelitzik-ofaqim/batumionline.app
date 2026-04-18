@@ -1100,7 +1100,7 @@ export default function AdminDashboard() {
   const [mediaVersion, setMediaVersion] = useState(0);
   const [ratings, setRatings] = useState<Record<string, { sum: number; count: number }>>({});
   const [subBlock, setSubBlock] = useState<any>(null);
-  const [subTab, setSubTab] = useState<'banner' | 'dashboard' | 'crm' | 'marketing' | 'accounting' | 'cancels'>('dashboard');
+  const [subTab, setSubTab] = useState<'banner' | 'dashboard' | 'crm' | 'paywall' | 'marketing' | 'accounting' | 'cancels'>('dashboard');
 
   const refreshMedia = useCallback(async () => {
     try {
@@ -1390,10 +1390,10 @@ export default function AdminDashboard() {
   const saveSubBlock = async (updated: any) => {
     setSubBlock(updated);
     try {
-      await fetch(`${API_BASE}/api/content`, {
-        method: 'POST',
+      await fetch(`${API_BASE}/api/content/subscriptionBlock`, {
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ subscriptionBlock: updated }),
+        body: JSON.stringify(updated),
       });
       setSaved(true); setTimeout(() => setSaved(false), 2000);
     } catch {}
@@ -1402,6 +1402,7 @@ export default function AdminDashboard() {
   const [subTabOrder, setSubTabOrder] = useState([
     { key: 'dashboard' as const, label: 'דשבורד לקוחות', icon: '👥' },
     { key: 'crm' as const, label: 'CRM', icon: '🤝' },
+    { key: 'paywall' as const, label: 'שליטה בתוכן', icon: '🔒' },
     { key: 'accounting' as const, label: 'הנה״ח', icon: '📊' },
     { key: 'cancels' as const, label: 'ביטולים', icon: '❌' },
     { key: 'marketing' as const, label: 'שיווק ופרסום', icon: '📣' },
@@ -1409,8 +1410,120 @@ export default function AdminDashboard() {
   ]);
   const [dragTabIdx, setDragTabIdx] = useState(-1);
   const [demoMode, setDemoMode] = useState(true);
+  const [paywallData, setPaywallData] = useState<{ mode: string; lockedCategories: string[]; trialEnabled?: boolean }>({ mode: 'free', lockedCategories: [], trialEnabled: true });
+  const [pwCategories, setPwCategories] = useState<{ id: string; title: string; parent: string }[]>([]);
 
-  const tabColors: Record<string, string> = { dashboard: '#1A6B8A', crm: '#8b5cf6', marketing: '#f59e0b', accounting: '#3b82f6', cancels: '#dc2626', banner: '#64748b' };
+  useEffect(() => {
+    fetchContent().then((apiData: any) => {
+      const cats: { id: string; title: string; parent: string }[] = [];
+      (apiData.mainCategories || []).forEach((c: any) => {
+        if (c.title) cats.push({ id: c.id, title: c.title, parent: 'ראשיות' });
+        (c.children || []).forEach((ch: any) => { if (ch.title) cats.push({ id: ch.id, title: ch.title, parent: c.title }); });
+      });
+      (apiData.extraCategories || []).forEach((c: any) => {
+        if (c.title) cats.push({ id: c.id, title: c.title, parent: 'נוספות' });
+        (c.children || []).forEach((ch: any) => { if (ch.title) cats.push({ id: ch.id, title: ch.title, parent: c.title }); });
+      });
+      setPwCategories(cats);
+      if (apiData.paywall) setPaywallData(apiData.paywall);
+    }).catch(() => {});
+  }, []);
+
+  const savePaywall = async (updated: any) => {
+    setPaywallData(updated);
+    try {
+      await fetch(`${API_BASE}/api/content/paywall`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(updated) });
+      setSaved(true); setTimeout(() => setSaved(false), 2000);
+    } catch {}
+  };
+
+  const tabColors: Record<string, string> = { dashboard: '#1A6B8A', crm: '#8b5cf6', paywall: '#e91e63', marketing: '#f59e0b', accounting: '#3b82f6', cancels: '#dc2626', banner: '#64748b' };
+
+  const renderPaywall = () => {
+    const pw = paywallData;
+    const isFree = pw.mode === 'free';
+    return (
+      <View style={{ gap: 14 }}>
+        <View style={{ borderRadius: 16, overflow: 'hidden' }}>
+          <View style={{ backgroundColor: '#1C2B35', padding: 16, alignItems: 'center' }}>
+            <Text style={{ fontSize: 16, fontWeight: '900', color: '#F4A94E', marginBottom: 10 }}>🔒 שליטה בתוכן</Text>
+            <TouchableOpacity
+              onPress={() => savePaywall({ ...pw, mode: isFree ? 'premium' : 'free' })}
+              style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 10, backgroundColor: isFree ? 'rgba(16,185,129,0.2)' : 'rgba(244,169,78,0.2)', paddingVertical: 10, paddingHorizontal: 20, borderRadius: 14 }}
+            >
+              <View style={{ width: 50, height: 26, borderRadius: 13, backgroundColor: isFree ? '#10b981' : '#F4A94E', justifyContent: 'center', padding: 3 }}>
+                <View style={{ width: 20, height: 20, borderRadius: 10, backgroundColor: '#fff', alignSelf: isFree ? 'flex-start' : 'flex-end' }} />
+              </View>
+              <Text style={{ fontSize: 14, fontWeight: '900', color: isFree ? '#34d399' : '#F4A94E' }}>{isFree ? '🟢 מצב חינמי - הכל פתוח' : '🔒 מצב פרימיום - חלקי בתשלום'}</Text>
+            </TouchableOpacity>
+            <Text style={{ fontSize: 11, color: '#94a3b8', marginTop: 8, textAlign: 'center', writingDirection: 'rtl' }}>{isFree ? 'כל התוכן פתוח לכולם (מצב בדיקות)' : 'קטגוריות נעולות יציגו מסך שדרוג'}</Text>
+            {!isFree && (
+              <TouchableOpacity
+                onPress={() => savePaywall({ ...pw, trialEnabled: !pw.trialEnabled })}
+                style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 8, marginTop: 10, backgroundColor: pw.trialEnabled ? 'rgba(16,185,129,0.2)' : 'rgba(220,38,38,0.2)', paddingVertical: 8, paddingHorizontal: 16, borderRadius: 10 }}
+              >
+                <View style={{ width: 36, height: 20, borderRadius: 10, backgroundColor: pw.trialEnabled ? '#10b981' : '#dc2626', justifyContent: 'center', padding: 2 }}>
+                  <View style={{ width: 16, height: 16, borderRadius: 8, backgroundColor: '#fff', alignSelf: pw.trialEnabled ? 'flex-end' : 'flex-start' }} />
+                </View>
+                <Text style={{ fontSize: 12, fontWeight: '800', color: pw.trialEnabled ? '#34d399' : '#f87171' }}>{pw.trialEnabled ? '⏳ 24 שעות ניסיון: פעיל' : '⏳ 24 שעות ניסיון: כבוי - נעילה מיידית'}</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        </View>
+        {!isFree && (
+          <View style={{ borderRadius: 16, overflow: 'hidden', borderWidth: 2, borderColor: '#F4A94E' }}>
+            <View style={{ backgroundColor: '#F4A94E', paddingVertical: 8, paddingHorizontal: 16 }}>
+              <Text style={{ fontSize: 14, fontWeight: '900', color: '#fff', textAlign: 'right', writingDirection: 'rtl' }}>🔐 בחר קטגוריות נעולות</Text>
+            </View>
+            <View style={{ backgroundColor: '#fffbeb', padding: 12, gap: 12 }}>
+              {(() => {
+                const groups: Record<string, typeof pwCategories> = {};
+                pwCategories.forEach(cat => {
+                  const g = cat.parent === 'ראשיות' || cat.parent === 'נוספות' ? cat.title : cat.parent;
+                  if (!groups[g]) groups[g] = [];
+                  if (cat.parent !== 'ראשיות' && cat.parent !== 'נוספות') groups[g].push(cat);
+                });
+                const parentCats = pwCategories.filter(c => c.parent === 'ראשיות' || c.parent === 'נוספות');
+                return parentCats.map(pc => {
+                  const children = groups[pc.title] || [];
+                  const pcLocked = pw.lockedCategories.includes(pc.id);
+                  return (
+                    <View key={pc.id} style={{ borderRadius: 12, overflow: 'hidden', borderWidth: 1, borderColor: '#e0e0e0' }}>
+                      <TouchableOpacity onPress={() => savePaywall({ ...pw, lockedCategories: pcLocked ? pw.lockedCategories.filter((id: string) => id !== pc.id) : [...pw.lockedCategories, pc.id] })}
+                        style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 10, backgroundColor: pcLocked ? '#fef2f2' : '#f0fdf4', padding: 12 }}>
+                        <Text style={{ fontSize: 16 }}>{pcLocked ? '🔒' : '🔓'}</Text>
+                        <Text style={{ flex: 1, fontSize: 14, fontWeight: '900', color: '#1C2B35', writingDirection: 'rtl' }}>{pc.title}</Text>
+                        <View style={{ paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8, backgroundColor: pcLocked ? '#fee2e2' : '#dcfce7' }}>
+                          <Text style={{ fontSize: 10, fontWeight: '800', color: pcLocked ? '#dc2626' : '#16a34a' }}>{pcLocked ? 'נעול' : 'חינם'}</Text>
+                        </View>
+                      </TouchableOpacity>
+                      {children.length > 0 && (
+                        <View style={{ backgroundColor: '#fff', padding: 6, gap: 4 }}>
+                          {children.map(ch => {
+                            const chLocked = pw.lockedCategories.includes(ch.id);
+                            return (
+                              <TouchableOpacity key={ch.id} onPress={() => savePaywall({ ...pw, lockedCategories: chLocked ? pw.lockedCategories.filter((id: string) => id !== ch.id) : [...pw.lockedCategories, ch.id] })}
+                                style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 8, paddingVertical: 8, paddingHorizontal: 10, borderBottomWidth: 1, borderBottomColor: '#f5f5f5' }}>
+                                <Text style={{ fontSize: 14 }}>{chLocked ? '🔒' : '🔓'}</Text>
+                                <Text style={{ flex: 1, fontSize: 12, fontWeight: '700', color: '#555', writingDirection: 'rtl' }}>{ch.title}</Text>
+                                <View style={{ paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6, backgroundColor: chLocked ? '#fee2e2' : '#dcfce7' }}>
+                                  <Text style={{ fontSize: 9, fontWeight: '800', color: chLocked ? '#dc2626' : '#16a34a' }}>{chLocked ? 'נעול' : 'חינם'}</Text>
+                                </View>
+                              </TouchableOpacity>
+                            );
+                          })}
+                        </View>
+                      )}
+                    </View>
+                  );
+                });
+              })()}
+            </View>
+          </View>
+        )}
+      </View>
+    );
+  };
 
   const renderSubscription = () => {
     const activeColor = tabColors[subTab] || '#1A6B8A';
@@ -1473,6 +1586,7 @@ export default function AdminDashboard() {
         {subTab === 'banner' ? renderSubBanner()
           : subTab === 'dashboard' ? renderSubDashboard()
           : subTab === 'crm' ? renderSubCrm()
+          : subTab === 'paywall' ? renderPaywall()
           : subTab === 'marketing' ? renderSubMarketing()
           : subTab === 'accounting' ? renderSubAccounting()
           : renderSubCancels()}

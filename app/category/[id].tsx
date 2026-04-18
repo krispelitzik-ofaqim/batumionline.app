@@ -625,6 +625,10 @@ function CategoryMapModal({ visible, points, focusName, layerColor, onClose }: {
                   onClick: () => { const el = (document as any).getElementById('modal-carousel'); if (el) el.scrollBy({ top: 120, behavior: 'smooth' }); },
                   style: { cursor: 'pointer', fontSize: 12, color: color, fontWeight: 900, textAlign: 'center', userSelect: 'none', padding: '4px 0' },
                 }, '▼'),
+                listOpen && React.createElement('div', { key: 'close',
+                  onClick: () => setListOpen(false),
+                  style: { cursor: 'pointer', fontSize: 12, color: '#fff', fontWeight: 800, textAlign: 'center', userSelect: 'none', padding: '6px 0', marginTop: 4, backgroundColor: color, borderRadius: 8 },
+                }, '▲ סגור תפריט'),
               ])}
             </View>
           )}
@@ -699,17 +703,6 @@ function HotelCard({ h, dark, pageBtnLabel, mapPoints, layerColor }: { h: Hotel;
         <Text style={[st.hotelText, dark && { color: '#cbd5e1' }]}>{h.text}</Text>
         <View style={st.hotelBtnRow}>
           <TouchableOpacity
-            style={[st.hotelBtn, st.hotelBtnPrimary, !btnEnabled && st.hotelBtnDisabled]}
-            activeOpacity={btnEnabled ? 0.7 : 1}
-            onPress={() => {
-              if (hasGallery) setShowGallery(true);
-              else if (h.pageUrl) Linking.openURL(h.pageUrl);
-            }}
-            disabled={!btnEnabled}
-          >
-            <Text style={[st.hotelBtnTxt, !btnEnabled && st.hotelBtnTxtDisabled]}>{pageBtnLabel}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
             style={[st.hotelBtn, st.hotelBtnAccent, !h.coords && st.hotelBtnDisabled]}
             activeOpacity={h.coords ? 0.7 : 1}
             onPress={() => {
@@ -721,6 +714,17 @@ function HotelCard({ h, dark, pageBtnLabel, mapPoints, layerColor }: { h: Hotel;
             <Text style={[st.hotelBtnTxt, !h.coords && !(mapPoints && mapPoints.length > 0) && st.hotelBtnTxtDisabled]}>{showMap ? 'הסתר מפה' : 'איפה זה'}</Text>
           </TouchableOpacity>
           <CategoryMapModal visible={showCatMapModal} points={mapPoints || []} focusName={h.title} layerColor={layerColor} onClose={() => setShowCatMapModal(false)} />
+          <TouchableOpacity
+            style={[st.hotelBtn, st.hotelBtnPrimary, !btnEnabled && st.hotelBtnDisabled]}
+            activeOpacity={btnEnabled ? 0.7 : 1}
+            onPress={() => {
+              if (hasGallery) setShowGallery(true);
+              else if (h.pageUrl) Linking.openURL(h.pageUrl);
+            }}
+            disabled={!btnEnabled}
+          >
+            <Text style={[st.hotelBtnTxt, !btnEnabled && st.hotelBtnTxtDisabled]}>{pageBtnLabel}</Text>
+          </TouchableOpacity>
           <TouchableOpacity
             style={[st.hotelBtn, st.hotelBtnSecondary, !h.mapUrl && st.hotelBtnDisabled]}
             activeOpacity={h.mapUrl ? 0.7 : 1}
@@ -820,6 +824,9 @@ export default function CategoryScreen() {
   const [showCatMap, setShowCatMap] = useState(false);
   const [recommendations, setRecommendations] = useState<any[]>([]);
   const [allRestaurants, setAllRestaurants] = useState<{ name: string; lat: number; lng: number; mapUrl?: string }[]>([]);
+  const [paywall, setPaywall] = useState<{ mode: string; lockedCategories: string[] }>({ mode: 'free', lockedCategories: [] });
+  const [isLocked, setIsLocked] = useState(false);
+  const [trialHoursLeft, setTrialHoursLeft] = useState<number | null>(null);
   const [showRecForm, setShowRecForm] = useState(false);
   const [recName, setRecName] = useState('');
   const [recText, setRecText] = useState('');
@@ -876,6 +883,30 @@ export default function CategoryScreen() {
         ? all.find((c: Item) => c.id === aliased)
         : findDeep(all);
       if (found) setCat(found);
+      if (data.paywall) {
+        setPaywall(data.paywall);
+        if (data.paywall.mode === 'premium' && data.paywall.lockedCategories.includes(id as string)) {
+          if (data.paywall.trialEnabled === false) {
+            setIsLocked(true);
+          } else {
+            const key = '@batumi_first_open';
+            let firstOpen = null as string | null;
+            try { firstOpen = typeof localStorage !== 'undefined' ? localStorage.getItem(key) : null; } catch {}
+            if (!firstOpen) {
+              try { if (typeof localStorage !== 'undefined') localStorage.setItem(key, new Date().toISOString()); } catch {}
+              setTrialHoursLeft(24);
+            } else {
+              const elapsed = Date.now() - new Date(firstOpen).getTime();
+              const hours24 = 24 * 60 * 60 * 1000;
+              const hoursLeft = Math.max(0, Math.ceil((hours24 - elapsed) / (60 * 60 * 1000)));
+              setTrialHoursLeft(hoursLeft);
+              if (elapsed > hours24) {
+                setIsLocked(true);
+              }
+            }
+          }
+        }
+      }
       if (found?.cardStyle === 'foodie') {
         fetch(`${API_BASE}/api/recommendations`).then(r => r.json()).then(j => { if (j.success) setRecommendations(j.data); }).catch(() => {});
       }
@@ -909,6 +940,28 @@ export default function CategoryScreen() {
   const children = cat.children || [];
   const darkCat = cat.theme === 'dark' || dark;
 
+  const lockedOverlay = isLocked ? (
+    <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 100, justifyContent: 'center', alignItems: 'center' }}>
+      {Platform.OS === 'web' && React.createElement('div', {
+        style: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backdropFilter: 'blur(1px)', backgroundColor: 'rgba(255,255,255,0.3)' },
+      })}
+      <View style={{ backgroundColor: '#fff', borderRadius: 14, padding: 16, alignItems: 'center', maxWidth: 220, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 12, elevation: 8 }}>
+        <Text style={{ fontSize: 24 }}>🔒</Text>
+        <Text style={{ fontSize: 14, fontWeight: '900', color: '#1C2B35', textAlign: 'center', writingDirection: 'rtl', marginTop: 6 }}>תוכן פרימיום</Text>
+        <Text style={{ fontSize: 11, color: '#888', textAlign: 'center', writingDirection: 'rtl', marginTop: 4 }}>שדרג למנוי לגישה מלאה</Text>
+        <TouchableOpacity
+          onPress={() => router.push('/welcome/6' as any)}
+          style={{ marginTop: 10, backgroundColor: '#F4A94E', paddingVertical: 8, paddingHorizontal: 24, borderRadius: 10 }}
+        >
+          <Text style={{ fontSize: 12, fontWeight: '900', color: '#fff' }}>שדרג עכשיו</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => router.back()} style={{ marginTop: 6 }}>
+          <Text style={{ fontSize: 10, color: '#888' }}>חזרה</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  ) : null;
+
   if (cat.modal === 'flights') {
     return (
       <SafeAreaView style={[st.safe, darkCat && { backgroundColor: cat.heroBg || '#0f1419' }]}>
@@ -922,6 +975,7 @@ export default function CategoryScreen() {
     <SafeAreaView style={[st.safe, darkCat && { backgroundColor: cat.heroBg || '#0f1419' }]}>
       <Stack.Screen options={{ headerShown: true, title: cat.title, headerBackTitle: 'חזרה' }} />
       <DevicePreviewBar />
+      {lockedOverlay}
       <ScrollView ref={scrollRef} showsVerticalScrollIndicator={false} style={{ maxWidth: w, alignSelf: 'center', width: '100%' }}>
         {cat.heroImage ? (
           <View style={st.heroImgWrap}>
@@ -936,6 +990,13 @@ export default function CategoryScreen() {
           <View style={[st.hero, { backgroundColor: cat.heroBg || cat.bg || (darkCat ? '#1a1a2e' : '#3DA5C4') }]}>
             <Text style={[st.heroTitle, darkCat && { color: '#F4A94E' }]}>{cat.title}</Text>
             {cat.subtitle ? <Text style={[st.heroSub, darkCat && { color: '#d4af37' }]}>{cat.subtitle}</Text> : null}
+          </View>
+        )}
+
+        {isAdmin && trialHoursLeft !== null && trialHoursLeft > 0 && !isLocked && paywall.mode === 'premium' && paywall.lockedCategories.includes(id as string) && (
+          <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: '#fff8e1', paddingVertical: 8, paddingHorizontal: 12, marginHorizontal: 16, marginTop: 8, borderRadius: 10, borderWidth: 1, borderColor: '#f4a94e' }}>
+            <Text style={{ fontSize: 16 }}>⏳</Text>
+            <Text style={{ fontSize: 11, fontWeight: '700', color: '#92400e', writingDirection: 'rtl' }}>תקופת ניסיון חינם - נותרו {trialHoursLeft} שעות</Text>
           </View>
         )}
 
