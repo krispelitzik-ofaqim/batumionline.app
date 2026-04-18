@@ -89,11 +89,17 @@ export default function MapScreen() {
       )}
       <View style={{ flex: 1, position: 'relative' }}>
         <View style={{ flex: 1, overflow: 'hidden' }}>
-          <iframe
-            title="batumi-map"
-            src={buildMapSrc()}
-            style={{ width: '100%', height: 'calc(100% + 50px)', border: 0, marginTop: -50 } as any}
-          />
+          {Platform.OS === 'web' ? (
+            <iframe
+              title="batumi-map"
+              src={buildMapSrc()}
+              style={{ width: '100%', height: 'calc(100% + 50px)', border: 0, marginTop: -50 } as any}
+            />
+          ) : (
+            <View style={{ flex: 1, backgroundColor: '#ddd', alignItems: 'center', justifyContent: 'center' }}>
+              <Text>מפה</Text>
+            </View>
+          )}
         </View>
         {active !== 'הכל' && (() => {
           const layer = layers.find(l => l.name === active);

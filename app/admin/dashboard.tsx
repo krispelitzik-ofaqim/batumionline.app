@@ -6,7 +6,7 @@ import {
 import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Colors } from '../../constants/colors';
-import { fetchContent, updateAllContent, updateSection, API_BASE } from '../../constants/api';
+import { fetchContent, updateAllContent, updateSection, fetchRatings, API_BASE } from '../../constants/api';
 
 // ─── Types ─────────────────────────────────────────────────────
 type HotelBlock = {
@@ -15,6 +15,7 @@ type HotelBlock = {
   coords?: { lat: number; lng: number };
   visible?: boolean;
   images?: string[];
+  amenities?: string[];
 };
 type TourBlock = {
   id: string; title: string; subtitle?: string; text: string; color: string;
@@ -202,6 +203,7 @@ const TAG_OPTIONS = TAG_GROUPS.flatMap(g => g.tags);
 const NAV_ITEMS = [
   { key: 'texts', label: 'דף הבית', icon: '✏️' },
   ...SECTIONS.map(s => ({ key: s.key, label: s.label, icon: s.icon })),
+  { key: 'subscription', label: 'ניהול מנויים', icon: '💳' },
   { key: 'media', label: 'תמונות', icon: '🖼️' },
 ];
 
@@ -345,13 +347,14 @@ function RichEditor({ value, onChange }: { value: string; onChange: (v: string) 
 
 // ─── Edit Modal ────────────────────────────────────────────────
 function EditModal({
-  visible, item, section, onSave, onDelete, onClose, isWide, onMoveSection, allMedia,
+  visible, item, section, onSave, onDelete, onClose, isWide, onMoveSection, allMedia, ratings,
 }: {
   visible: boolean; item: DataItem | null; section: Section | null;
   onSave: (item: DataItem) => void; onDelete: () => void; onClose: () => void;
   isWide: boolean;
   onMoveSection?: (target: 'main' | 'extra') => void;
   allMedia?: { filename: string; url: string; tags?: string[] }[];
+  ratings?: Record<string, { sum: number; count: number }>;
 }) {
   const [form, setForm] = useState<DataItem>({ id: '', title: '', icon: '', bg: '' });
   const [showGalleryPicker, setShowGalleryPicker] = useState(false);
@@ -804,6 +807,23 @@ function EditModal({
                     <Text style={ms.label}>🧭 כפתור "נווט למקום" — לינק Google Maps</Text>
                     <TextInput style={[ms.input, { marginBottom: 8 }]} value={hb.mapUrl || ''} onChangeText={v => { const n=[...(form.hotels||[])]; n[idx]={...n[idx],mapUrl:v}; setForm(p=>({...p,hotels:n})); }} placeholder="https://www.google.com/maps/..." placeholderTextColor="#bbb" textAlign="left" />
 
+                    <Text style={ms.label}>🏷️ תגיות מידע מהיר (לחץ להוסיף/להסיר)</Text>
+                    <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 4, marginBottom: 8 }}>
+                      {['קזינו', 'בריכה', 'ספא'].map(tag => {
+                        const has = (hb.amenities || []).includes(tag);
+                        return (
+                          <TouchableOpacity key={tag} onPress={() => {
+                            const n=[...(form.hotels||[])];
+                            const cur = n[idx].amenities || [];
+                            n[idx]={...n[idx], amenities: has ? cur.filter(a => a !== tag) : [...cur, tag]};
+                            setForm(p=>({...p,hotels:n}));
+                          }} style={{ paddingHorizontal: 10, paddingVertical: 5, borderRadius: 10, backgroundColor: has ? '#1A6B8A' : '#f0f4f8', borderWidth: 1, borderColor: has ? '#1A6B8A' : '#e2e8f0' }}>
+                            <Text style={{ fontSize: 11, fontWeight: '700', color: has ? '#fff' : '#64748b' }}>{tag}</Text>
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </View>
+
                     <Text style={ms.label}>🖼 גלריית "מה אוכלים" ({(hb.images || []).length}/9)</Text>
                     {(hb.images || []).length > 0 && (
                       <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 6, marginBottom: 6 }}>
@@ -908,7 +928,12 @@ function EditModal({
                 {form.tours.map((tb, idx) => (
                   <View key={tb.id} style={{ borderWidth: 1, borderColor: '#e8e8e8', borderRadius: 12, padding: 12, marginBottom: 12, backgroundColor: tb.color || '#f9f9f9' }}>
                     <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                      <Text style={{ fontSize: 13, fontWeight: '800', color: Colors.TEXT }}>בלוק {idx + 1}</Text>
+                      <View style={{ alignItems: 'flex-end' }}>
+                        <Text style={{ fontSize: 13, fontWeight: '800', color: Colors.TEXT }}>בלוק {idx + 1}</Text>
+                        {ratings?.[tb.id] && ratings[tb.id].count > 0 && (
+                          <Text style={{ fontSize: 11, color: '#555', marginTop: 2 }}>⭐ {(ratings[tb.id].sum / ratings[tb.id].count).toFixed(1)} ({ratings[tb.id].count} דירוגים)</Text>
+                        )}
+                      </View>
                       <View style={{ flexDirection: 'row-reverse', gap: 10, alignItems: 'center' }}>
                         <TouchableOpacity
                           onPress={() => { const n=[...(form.tours||[])]; n[idx]={...n[idx],visible:!(n[idx].visible!==false)}; setForm(p=>({...p,tours:n})); }}
@@ -949,6 +974,28 @@ function EditModal({
                       multiline
                       numberOfLines={4}
                     />
+
+                    <Text style={ms.label}>📍 קואורדינטות כלליות של הסיור</Text>
+                    <View style={{ flexDirection: 'row-reverse', gap: 6, marginBottom: 8 }}>
+                      <TextInput
+                        style={[ms.input, { flex: 1 }]}
+                        value={String(tb.coords?.lat ?? '')}
+                        onChangeText={v => { const n=[...(form.tours||[])]; n[idx]={...n[idx],coords:{lat:parseFloat(v)||0,lng:n[idx].coords?.lng||0}}; setForm(p=>({...p,tours:n})); }}
+                        placeholder="Lat"
+                        placeholderTextColor="#bbb"
+                        textAlign="left"
+                        keyboardType="numeric"
+                      />
+                      <TextInput
+                        style={[ms.input, { flex: 1 }]}
+                        value={String(tb.coords?.lng ?? '')}
+                        onChangeText={v => { const n=[...(form.tours||[])]; n[idx]={...n[idx],coords:{lat:n[idx].coords?.lat||0,lng:parseFloat(v)||0}}; setForm(p=>({...p,tours:n})); }}
+                        placeholder="Lng"
+                        placeholderTextColor="#bbb"
+                        textAlign="left"
+                        keyboardType="numeric"
+                      />
+                    </View>
 
                     <Text style={ms.label}>🎧 נגנים ({(tb.audios || []).length})</Text>
                     {(tb.audios || []).map((au, aIdx) => (
@@ -1051,6 +1098,9 @@ export default function AdminDashboard() {
   const [dragOverIdx, setDragOverIdx] = useState<number>(-1);
   const [selectedFiles, setSelectedFiles] = useState<Set<string>>(new Set());
   const [mediaVersion, setMediaVersion] = useState(0);
+  const [ratings, setRatings] = useState<Record<string, { sum: number; count: number }>>({});
+  const [subBlock, setSubBlock] = useState<any>(null);
+  const [subTab, setSubTab] = useState<'banner' | 'dashboard' | 'crm' | 'marketing' | 'accounting' | 'cancels'>('dashboard');
 
   const refreshMedia = useCallback(async () => {
     try {
@@ -1099,6 +1149,8 @@ export default function AdminDashboard() {
         setData(loaded);
         if (apiData.texts) setTexts(apiData.texts);
         if (typeof apiData.extraGroupVisible === 'boolean') setExtraGroupVisible(apiData.extraGroupVisible);
+        try { const r = await fetchRatings(); setRatings(r); } catch {}
+        if (apiData.subscriptionBlock) setSubBlock(apiData.subscriptionBlock);
         // Clear stale AsyncStorage
         for (const s of SECTIONS) await AsyncStorage.removeItem(s.storageKey).catch(() => {});
       } catch {
@@ -1330,6 +1382,721 @@ export default function AdminDashboard() {
             </View>
           </View>
         )}
+      </View>
+    );
+  };
+
+  // ─── Subscription Block ─────────────────────────────────────
+  const saveSubBlock = async (updated: any) => {
+    setSubBlock(updated);
+    try {
+      await fetch(`${API_BASE}/api/content`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subscriptionBlock: updated }),
+      });
+      setSaved(true); setTimeout(() => setSaved(false), 2000);
+    } catch {}
+  };
+
+  const [subTabOrder, setSubTabOrder] = useState([
+    { key: 'dashboard' as const, label: 'דשבורד לקוחות', icon: '👥' },
+    { key: 'crm' as const, label: 'CRM', icon: '🤝' },
+    { key: 'accounting' as const, label: 'הנה״ח', icon: '📊' },
+    { key: 'cancels' as const, label: 'ביטולים', icon: '❌' },
+    { key: 'marketing' as const, label: 'שיווק ופרסום', icon: '📣' },
+    { key: 'banner' as const, label: 'באנר פרסום', icon: '📢' },
+  ]);
+  const [dragTabIdx, setDragTabIdx] = useState(-1);
+  const [demoMode, setDemoMode] = useState(true);
+
+  const tabColors: Record<string, string> = { dashboard: '#1A6B8A', crm: '#8b5cf6', marketing: '#f59e0b', accounting: '#3b82f6', cancels: '#dc2626', banner: '#64748b' };
+
+  const renderSubscription = () => {
+    const activeColor = tabColors[subTab] || '#1A6B8A';
+    return (
+      <View style={{ padding: 16 }}>
+        {/* Header */}
+        <View style={{ borderRadius: 16, overflow: 'hidden', marginBottom: 14 }}>
+          <View style={{ backgroundColor: '#1C2B35', padding: 16 }}>
+            <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Text style={{ fontSize: 20, fontWeight: '900', color: '#F4A94E', writingDirection: 'rtl' }}>💳 ניהול מנויים</Text>
+              <TouchableOpacity
+                onPress={() => setDemoMode(!demoMode)}
+                style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 6, paddingVertical: 6, paddingHorizontal: 14, borderRadius: 20, backgroundColor: demoMode ? 'rgba(245,158,11,0.2)' : 'rgba(16,185,129,0.2)' }}
+              >
+                <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: demoMode ? '#f59e0b' : '#10b981' }} />
+                <Text style={{ fontSize: 11, fontWeight: '800', color: demoMode ? '#fbbf24' : '#34d399' }}>{demoMode ? 'מצב דמו' : 'נתוני אמת'}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+        {/* Tabs */}
+        {Platform.OS === 'web' ? (
+          React.createElement('div', {
+            style: { display: 'flex', flexDirection: 'row-reverse', gap: 4, marginBottom: 16, flexWrap: 'wrap', background: '#f1f5f9', borderRadius: 14, padding: 4 },
+          }, subTabOrder.map((t, i) => {
+            const tc = tabColors[t.key] || '#1A6B8A';
+            const on = subTab === t.key;
+            return React.createElement('div', {
+              key: t.key,
+              draggable: true,
+              onClick: () => setSubTab(t.key),
+              onDragStart: (e: any) => { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', String(i)); },
+              onDragOver: (e: any) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; setDragTabIdx(i); },
+              onDragLeave: () => setDragTabIdx(-1),
+              onDrop: (e: any) => { e.preventDefault(); setDragTabIdx(-1); const from = parseInt(e.dataTransfer.getData('text/plain'), 10); if (!isNaN(from) && from !== i) { const arr = [...subTabOrder]; const [moved] = arr.splice(from, 1); arr.splice(i, 0, moved); setSubTabOrder(arr); } },
+              onDragEnd: () => setDragTabIdx(-1),
+              style: {
+                padding: '8px 14px', borderRadius: 10, cursor: 'grab', userSelect: 'none',
+                backgroundColor: on ? tc : 'transparent',
+                borderTop: dragTabIdx === i ? `3px solid ${tc}` : '3px solid transparent',
+                fontSize: 12, fontWeight: 800, color: on ? '#fff' : '#475569',
+                fontFamily: 'Arial, sans-serif',
+                transition: 'all 0.15s ease',
+              },
+            }, `${t.icon} ${t.label}`);
+          }))
+        ) : (
+          <View style={{ flexDirection: 'row-reverse', gap: 4, marginBottom: 16, flexWrap: 'wrap', backgroundColor: '#f1f5f9', borderRadius: 14, padding: 4 }}>
+            {subTabOrder.map(t => {
+              const tc = tabColors[t.key] || '#1A6B8A';
+              const on = subTab === t.key;
+              return (
+                <TouchableOpacity key={t.key} onPress={() => setSubTab(t.key)} style={{ paddingVertical: 8, paddingHorizontal: 14, borderRadius: 10, backgroundColor: on ? tc : 'transparent' }}>
+                  <Text style={{ fontSize: 12, fontWeight: '800', color: on ? '#fff' : '#475569' }}>{t.icon} {t.label}</Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        )}
+        {subTab === 'banner' ? renderSubBanner()
+          : subTab === 'dashboard' ? renderSubDashboard()
+          : subTab === 'crm' ? renderSubCrm()
+          : subTab === 'marketing' ? renderSubMarketing()
+          : subTab === 'accounting' ? renderSubAccounting()
+          : renderSubCancels()}
+      </View>
+    );
+  };
+
+  const demoStats = {
+    totalDownloads: 1247,
+    activeUsers: 389,
+    totalPurchases: 156,
+    dailyRevenue: 384,
+    monthlyRevenue: 8920,
+    yearlyRevenue: 67400,
+    iosUsers: 98,
+    androidUsers: 58,
+    recentUsers: [
+      { name: 'ישראל כ.', city: 'תל אביב', date: '18/04', plan: 'שנתי', status: 'פעיל', device: 'iOS' },
+      { name: 'מיכל ד.', city: 'חיפה', date: '17/04', plan: '30 ימים', status: 'פעיל', device: 'Android' },
+      { name: 'אבי ר.', city: 'ירושלים', date: '16/04', plan: 'שנתי', status: 'פעיל', device: 'iOS' },
+      { name: 'דנה ל.', city: 'רעננה', date: '15/04', plan: '30 ימים', status: 'פג', device: 'Android' },
+      { name: 'יוסי מ.', city: 'באר שבע', date: '14/04', plan: 'שנתי', status: 'פעיל', device: 'iOS' },
+    ],
+    mapPoints: [
+      { city: 'תל אביב', count: 52, pct: 33 },
+      { city: 'ירושלים', count: 31, pct: 20 },
+      { city: 'חיפה', count: 24, pct: 15 },
+      { city: 'רעננה', count: 18, pct: 12 },
+      { city: 'באר שבע', count: 12, pct: 8 },
+      { city: 'נתניה', count: 10, pct: 6 },
+      { city: 'אחר', count: 9, pct: 6 },
+    ],
+  };
+
+  const StatCard = ({ icon, label, value, color }: { icon: string; label: string; value: string; color: string }) => (
+    <View style={{ flex: 1, backgroundColor: '#fff', borderRadius: 14, padding: 14, borderRightWidth: 4, borderRightColor: color, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 }}>
+      <Text style={{ fontSize: 22, marginBottom: 4 }}>{icon}</Text>
+      <Text style={{ fontSize: 22, fontWeight: '900', color: Colors.TEXT }}>{value}</Text>
+      <Text style={{ fontSize: 11, color: '#888', fontWeight: '600', writingDirection: 'rtl' }}>{label}</Text>
+    </View>
+  );
+
+  const renderSubDashboard = () => {
+    if (!demoMode) return (
+      <View style={{ backgroundColor: '#f8fafc', borderRadius: 14, padding: 30, alignItems: 'center' }}>
+        <Text style={{ fontSize: 40, marginBottom: 10 }}>📡</Text>
+        <Text style={{ fontSize: 16, fontWeight: '800', color: Colors.TEXT, textAlign: 'center', writingDirection: 'rtl' }}>ממתין לחיבור מערכת תשלומים</Text>
+        <Text style={{ fontSize: 12, color: '#888', textAlign: 'center', writingDirection: 'rtl', marginTop: 6 }}>נתוני אמת יופיעו כאן לאחר חיבור RevenueCat / Stripe</Text>
+      </View>
+    );
+    return (
+    <View style={{ gap: 14 }}>
+      {/* Live indicator */}
+      <View style={{ borderRadius: 16, overflow: 'hidden' }}>
+        <View style={{ backgroundColor: '#1C2B35', padding: 16 }}>
+          <Text style={{ fontSize: 14, fontWeight: '900', color: '#F4A94E', textAlign: 'center', marginBottom: 12 }}>📊 סקירה כללית</Text>
+          <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-around' }}>
+            <View style={{ alignItems: 'center' }}>
+              <Text style={{ fontSize: 28, fontWeight: '900', color: '#fff' }}>{demoStats.totalDownloads.toLocaleString()}</Text>
+              <Text style={{ fontSize: 10, color: '#94a3b8' }}>📥 הורדות</Text>
+            </View>
+            <View style={{ width: 1, backgroundColor: '#334155' }} />
+            <View style={{ alignItems: 'center' }}>
+              <Text style={{ fontSize: 28, fontWeight: '900', color: '#10b981' }}>{demoStats.activeUsers}</Text>
+              <Text style={{ fontSize: 10, color: '#94a3b8' }}>👥 פעילים</Text>
+            </View>
+            <View style={{ width: 1, backgroundColor: '#334155' }} />
+            <View style={{ alignItems: 'center' }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: '#22c55e' }} />
+                <Text style={{ fontSize: 28, fontWeight: '900', color: '#22c55e' }}>14</Text>
+              </View>
+              <Text style={{ fontSize: 10, color: '#94a3b8' }}>🟢 אונליין</Text>
+            </View>
+            <View style={{ width: 1, backgroundColor: '#334155' }} />
+            <View style={{ alignItems: 'center' }}>
+              <Text style={{ fontSize: 28, fontWeight: '900', color: '#F4A94E' }}>{demoStats.totalPurchases}</Text>
+              <Text style={{ fontSize: 10, color: '#94a3b8' }}>💰 רכישות</Text>
+            </View>
+          </View>
+        </View>
+      </View>
+
+      {/* Platform split */}
+      <View style={{ flexDirection: 'row-reverse', gap: 10 }}>
+        <View style={{ flex: 1, borderRadius: 14, overflow: 'hidden', borderWidth: 2, borderColor: '#007AFF' }}>
+          <View style={{ backgroundColor: '#007AFF', paddingVertical: 6, alignItems: 'center' }}>
+            <Text style={{ fontSize: 11, fontWeight: '800', color: '#fff' }}>🍎 iOS</Text>
+          </View>
+          <View style={{ backgroundColor: '#eff6ff', padding: 12, alignItems: 'center' }}>
+            <Text style={{ fontSize: 24, fontWeight: '900', color: '#007AFF' }}>{demoStats.iosUsers}</Text>
+            <Text style={{ fontSize: 10, color: '#888' }}>משתמשים</Text>
+          </View>
+        </View>
+        <View style={{ flex: 1, borderRadius: 14, overflow: 'hidden', borderWidth: 2, borderColor: '#3DDC84' }}>
+          <View style={{ backgroundColor: '#3DDC84', paddingVertical: 6, alignItems: 'center' }}>
+            <Text style={{ fontSize: 11, fontWeight: '800', color: '#fff' }}>🤖 Android</Text>
+          </View>
+          <View style={{ backgroundColor: '#f0fdf4', padding: 12, alignItems: 'center' }}>
+            <Text style={{ fontSize: 24, fontWeight: '900', color: '#16a34a' }}>{demoStats.androidUsers}</Text>
+            <Text style={{ fontSize: 10, color: '#888' }}>משתמשים</Text>
+          </View>
+        </View>
+      </View>
+
+      {/* Revenue */}
+      <View style={{ borderRadius: 16, overflow: 'hidden', borderWidth: 2, borderColor: '#10b981' }}>
+        <View style={{ backgroundColor: '#10b981', paddingVertical: 8, paddingHorizontal: 16 }}>
+          <Text style={{ fontSize: 14, fontWeight: '900', color: '#fff', textAlign: 'right', writingDirection: 'rtl' }}>💰 הכנסות</Text>
+        </View>
+        <View style={{ backgroundColor: '#f0fdf4', padding: 12 }}>
+          <View style={{ flexDirection: 'row-reverse', gap: 8 }}>
+            <View style={{ flex: 1, backgroundColor: '#fff', borderRadius: 12, padding: 14, alignItems: 'center', borderRightWidth: 4, borderRightColor: '#10b981' }}>
+              <Text style={{ fontSize: 9, color: '#888', fontWeight: '700' }}>יומי</Text>
+              <Text style={{ fontSize: 22, fontWeight: '900', color: '#10b981' }}>₪{demoStats.dailyRevenue}</Text>
+            </View>
+            <View style={{ flex: 1, backgroundColor: '#fff', borderRadius: 12, padding: 14, alignItems: 'center', borderRightWidth: 4, borderRightColor: '#3b82f6' }}>
+              <Text style={{ fontSize: 9, color: '#888', fontWeight: '700' }}>חודשי</Text>
+              <Text style={{ fontSize: 22, fontWeight: '900', color: '#3b82f6' }}>₪{demoStats.monthlyRevenue.toLocaleString()}</Text>
+            </View>
+            <View style={{ flex: 1, backgroundColor: '#fff', borderRadius: 12, padding: 14, alignItems: 'center', borderRightWidth: 4, borderRightColor: '#f59e0b' }}>
+              <Text style={{ fontSize: 9, color: '#888', fontWeight: '700' }}>שנתי</Text>
+              <Text style={{ fontSize: 22, fontWeight: '900', color: '#f59e0b' }}>₪{demoStats.yearlyRevenue.toLocaleString()}</Text>
+            </View>
+          </View>
+        </View>
+      </View>
+
+      {/* City breakdown */}
+      <View style={{ borderRadius: 16, overflow: 'hidden', borderWidth: 2, borderColor: '#3DA5C4' }}>
+        <View style={{ backgroundColor: '#3DA5C4', paddingVertical: 8, paddingHorizontal: 16 }}>
+          <Text style={{ fontSize: 14, fontWeight: '900', color: '#fff', textAlign: 'right', writingDirection: 'rtl' }}>🗺️ התפלגות לפי עיר</Text>
+        </View>
+        <View style={{ backgroundColor: '#f0f9ff', padding: 12 }}>
+        {demoStats.mapPoints.map((p, i) => (
+          <View key={i} style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 8, marginBottom: 8, backgroundColor: '#fff', borderRadius: 10, padding: 8 }}>
+            <Text style={{ fontSize: 12, fontWeight: '700', color: Colors.TEXT, width: 65, textAlign: 'right', writingDirection: 'rtl' }}>{p.city}</Text>
+            <View style={{ flex: 1, height: 20, backgroundColor: '#e2e8f0', borderRadius: 10, overflow: 'hidden' }}>
+              <View style={{ width: `${p.pct}%`, height: '100%', backgroundColor: i === 0 ? '#1A6B8A' : i === 1 ? '#3DA5C4' : i === 2 ? '#F4A94E' : '#94a3b8', borderRadius: 10 } as any} />
+            </View>
+            <Text style={{ fontSize: 12, color: '#1C2B35', fontWeight: '800', width: 30, textAlign: 'center' }}>{p.count}</Text>
+          </View>
+        ))}
+        </View>
+      </View>
+
+      {/* Recent users */}
+      <View style={{ borderRadius: 16, overflow: 'hidden', borderWidth: 2, borderColor: '#8b5cf6' }}>
+        <View style={{ backgroundColor: '#8b5cf6', paddingVertical: 8, paddingHorizontal: 16 }}>
+          <Text style={{ fontSize: 14, fontWeight: '900', color: '#fff', textAlign: 'right', writingDirection: 'rtl' }}>👥 לקוחות אחרונים</Text>
+        </View>
+        <View style={{ backgroundColor: '#faf5ff', padding: 12 }}>
+        {demoStats.recentUsers.map((u, i) => (
+          <View key={i} style={{ flexDirection: 'row-reverse', alignItems: 'center', paddingVertical: 10, borderBottomWidth: i < demoStats.recentUsers.length - 1 ? 1 : 0, borderBottomColor: '#e9d5ff', gap: 10 }}>
+            <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: '#8b5cf6', alignItems: 'center', justifyContent: 'center' }}>
+              <Text style={{ fontSize: 16 }}>👤</Text>
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={{ fontSize: 13, fontWeight: '800', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl' }}>{u.name}</Text>
+              <Text style={{ fontSize: 11, color: '#888', textAlign: 'right', writingDirection: 'rtl' }}>{u.device === 'iOS' ? '🍎' : '🤖'} {u.city} · {u.date} · {u.plan}</Text>
+            </View>
+            <View style={{ paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8, backgroundColor: u.status === 'פעיל' ? '#dcfce7' : '#fee2e2' }}>
+              <Text style={{ fontSize: 10, fontWeight: '800', color: u.status === 'פעיל' ? '#16a34a' : '#dc2626' }}>{u.status}</Text>
+            </View>
+          </View>
+        ))}
+        </View>
+      </View>
+
+      <View style={{ backgroundColor: '#fffbeb', borderRadius: 10, padding: 12, borderWidth: 1, borderColor: '#fde68a' }}>
+        <Text style={{ fontSize: 11, color: '#92400e', textAlign: 'center', writingDirection: 'rtl', fontWeight: '600' }}>📊 נתוני דמו — יתעדכנו אוטומטית עם חיבור מערכת תשלומים</Text>
+      </View>
+    </View>
+  );
+  };
+
+  const demoCrmContacts = [
+    { name: 'ישראל כהן', email: 'israel@gmail.com', phone: '054-1234567', plan: 'שנתי', joined: '18/04/2026', lastActive: 'היום', score: 92 },
+    { name: 'מיכל דהן', email: 'michal@gmail.com', phone: '052-9876543', plan: '30 ימים', joined: '17/04/2026', lastActive: 'אתמול', score: 78 },
+    { name: 'אבי רוזן', email: 'avi@gmail.com', phone: '050-5551234', plan: 'שנתי', joined: '16/04/2026', lastActive: 'לפני 3 ימים', score: 65 },
+    { name: 'דנה לוי', email: 'dana@gmail.com', phone: '053-7778899', plan: '30 ימים', joined: '15/04/2026', lastActive: 'לפני שבוע', score: 34 },
+    { name: 'יוסי מזרחי', email: 'yossi@gmail.com', phone: '058-1112233', plan: 'שנתי', joined: '14/04/2026', lastActive: 'היום', score: 88 },
+  ];
+
+  const renderSubCrm = () => {
+    if (!demoMode) return (
+      <View style={{ backgroundColor: '#f8fafc', borderRadius: 14, padding: 30, alignItems: 'center' }}>
+        <Text style={{ fontSize: 40, marginBottom: 10 }}>📡</Text>
+        <Text style={{ fontSize: 16, fontWeight: '800', color: Colors.TEXT, textAlign: 'center', writingDirection: 'rtl' }}>ממתין לחיבור מערכת תשלומים</Text>
+        <Text style={{ fontSize: 12, color: '#888', textAlign: 'center', writingDirection: 'rtl', marginTop: 6 }}>נתוני אמת יופיעו כאן לאחר חיבור RevenueCat / Stripe</Text>
+      </View>
+    );
+    return (
+    <View style={{ gap: 14 }}>
+      <View style={{ flexDirection: 'row-reverse', gap: 10 }}>
+        <StatCard icon="👥" label="סה״כ לקוחות" value="156" color="#3DA5C4" />
+        <StatCard icon="🔥" label="פעילים השבוע" value="89" color="#10b981" />
+        <StatCard icon="⚠️" label="בסיכון נטישה" value="12" color="#f59e0b" />
+      </View>
+
+      <View style={{ backgroundColor: '#fff', borderRadius: 14, padding: 16, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 }}>
+        <Text style={{ fontSize: 15, fontWeight: '800', color: Colors.TEXT, textAlign: 'right', marginBottom: 12, writingDirection: 'rtl' }}>🤝 כרטיסי לקוחות</Text>
+        {demoCrmContacts.map((c, i) => (
+          <View key={i} style={{ backgroundColor: '#fafafa', borderRadius: 12, padding: 12, marginBottom: 8 }}>
+            <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+              <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 8 }}>
+                <View style={{ width: 34, height: 34, borderRadius: 17, backgroundColor: '#e8f4f8', alignItems: 'center', justifyContent: 'center' }}>
+                  <Text style={{ fontSize: 14 }}>👤</Text>
+                </View>
+                <View>
+                  <Text style={{ fontSize: 13, fontWeight: '800', color: Colors.TEXT, writingDirection: 'rtl' }}>{c.name}</Text>
+                  <Text style={{ fontSize: 10, color: '#888' }}>{c.email}</Text>
+                </View>
+              </View>
+              <View style={{ alignItems: 'center' }}>
+                <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: c.score >= 80 ? '#dcfce7' : c.score >= 50 ? '#fef3c7' : '#fee2e2', alignItems: 'center', justifyContent: 'center' }}>
+                  <Text style={{ fontSize: 12, fontWeight: '900', color: c.score >= 80 ? '#16a34a' : c.score >= 50 ? '#92400e' : '#dc2626' }}>{c.score}</Text>
+                </View>
+                <Text style={{ fontSize: 8, color: '#888', marginTop: 1 }}>ציון</Text>
+              </View>
+            </View>
+            <View style={{ flexDirection: 'row-reverse', gap: 12, marginTop: 4 }}>
+              <Text style={{ fontSize: 10, color: '#888', writingDirection: 'rtl' }}>📱 {c.phone}</Text>
+              <Text style={{ fontSize: 10, color: '#888', writingDirection: 'rtl' }}>📦 {c.plan}</Text>
+              <Text style={{ fontSize: 10, color: '#888', writingDirection: 'rtl' }}>🕐 {c.lastActive}</Text>
+            </View>
+          </View>
+        ))}
+      </View>
+
+      <View style={{ backgroundColor: '#fffbeb', borderRadius: 10, padding: 12, borderWidth: 1, borderColor: '#fde68a' }}>
+        <Text style={{ fontSize: 11, color: '#92400e', textAlign: 'center', writingDirection: 'rtl', fontWeight: '600' }}>📊 נתוני דמו — יתעדכנו אוטומטית עם חיבור מערכת תשלומים</Text>
+      </View>
+    </View>
+  );
+  };
+
+  const demoCoupons = [
+    { code: 'BATUMI10', discount: '10%', uses: 23, maxUses: 50, expires: '30/05/2026', status: 'פעיל' },
+    { code: 'WELCOME', discount: '7 ימים חינם', uses: 45, maxUses: 100, expires: '31/12/2026', status: 'פעיל' },
+    { code: 'FRIEND25', discount: '25%', uses: 12, maxUses: 30, expires: '15/04/2026', status: 'פג' },
+  ];
+
+  const demoCampaigns = [
+    { name: 'שתף וקבל חודש חינם', shares: 67, conversions: 18, status: 'פעיל' },
+    { name: 'מבצע קיץ 2026', shares: 0, conversions: 0, status: 'טיוטה' },
+  ];
+
+  const demoPushHistory = [
+    { title: '🎧 סיור חדש: חוף הים', sent: 389, opened: 156, date: '17/04/2026' },
+    { title: '🔥 מבצע סוף שבוע!', sent: 412, opened: 203, date: '14/04/2026' },
+    { title: '📍 עדכון מפות חדש', sent: 350, opened: 128, date: '10/04/2026' },
+  ];
+
+  const renderSubMarketing = () => {
+    if (!demoMode) return (
+      <View style={{ backgroundColor: '#f8fafc', borderRadius: 14, padding: 30, alignItems: 'center' }}>
+        <Text style={{ fontSize: 40, marginBottom: 10 }}>📡</Text>
+        <Text style={{ fontSize: 16, fontWeight: '800', color: Colors.TEXT, textAlign: 'center', writingDirection: 'rtl' }}>ממתין לחיבור מערכת תשלומים</Text>
+        <Text style={{ fontSize: 12, color: '#888', textAlign: 'center', writingDirection: 'rtl', marginTop: 6 }}>כלי שיווק יהיו זמינים לאחר חיבור מערכת תשלומים והתראות</Text>
+      </View>
+    );
+    return (
+    <View style={{ gap: 16 }}>
+      {/* Hero Stats Bar */}
+      <View style={{ borderRadius: 16, overflow: 'hidden' }}>
+        <View style={{ backgroundColor: '#1C2B35', padding: 18 }}>
+          <Text style={{ fontSize: 16, fontWeight: '900', color: '#F4A94E', textAlign: 'center', writingDirection: 'rtl', marginBottom: 14 }}>📣 מרכז שיווק ופרסום</Text>
+          <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-around' }}>
+            <View style={{ alignItems: 'center' }}>
+              <Text style={{ fontSize: 26, fontWeight: '900', color: '#fff' }}>1,151</Text>
+              <Text style={{ fontSize: 10, color: '#94a3b8' }}>חשיפות השבוע</Text>
+            </View>
+            <View style={{ width: 1, backgroundColor: '#334155' }} />
+            <View style={{ alignItems: 'center' }}>
+              <Text style={{ fontSize: 26, fontWeight: '900', color: '#10b981' }}>487</Text>
+              <Text style={{ fontSize: 10, color: '#94a3b8' }}>קליקים</Text>
+            </View>
+            <View style={{ width: 1, backgroundColor: '#334155' }} />
+            <View style={{ alignItems: 'center' }}>
+              <Text style={{ fontSize: 26, fontWeight: '900', color: '#F4A94E' }}>42%</Text>
+              <Text style={{ fontSize: 10, color: '#94a3b8' }}>המרה</Text>
+            </View>
+          </View>
+        </View>
+      </View>
+
+      {/* Push Notifications */}
+      <View style={{ borderRadius: 16, overflow: 'hidden', borderWidth: 2, borderColor: '#6366f1' }}>
+        <View style={{ backgroundColor: '#6366f1', paddingVertical: 10, paddingHorizontal: 16, flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Text style={{ fontSize: 14, fontWeight: '900', color: '#fff' }}>🔔 התראות פוש</Text>
+          <TouchableOpacity style={{ paddingVertical: 5, paddingHorizontal: 14, borderRadius: 20, backgroundColor: '#fff' }}>
+            <Text style={{ fontSize: 11, fontWeight: '800', color: '#6366f1' }}>+ שלח התראה</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={{ backgroundColor: '#faf5ff', padding: 12 }}>
+          {demoPushHistory.map((p, i) => (
+            <View key={i} style={{ flexDirection: 'row-reverse', alignItems: 'center', paddingVertical: 10, borderBottomWidth: i < demoPushHistory.length - 1 ? 1 : 0, borderBottomColor: '#e9d5ff', gap: 10 }}>
+              <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: '#6366f1', alignItems: 'center', justifyContent: 'center' }}>
+                <Text style={{ fontSize: 14, fontWeight: '900', color: '#fff' }}>{Math.round(p.opened / p.sent * 100)}%</Text>
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: 13, fontWeight: '700', color: '#1C2B35', textAlign: 'right', writingDirection: 'rtl' }}>{p.title}</Text>
+                <Text style={{ fontSize: 10, color: '#888', textAlign: 'right' }}>{p.date} · נשלח ל-{p.sent} · נפתח {p.opened}</Text>
+              </View>
+            </View>
+          ))}
+        </View>
+      </View>
+
+      {/* Coupons */}
+      <View style={{ borderRadius: 16, overflow: 'hidden', borderWidth: 2, borderColor: '#F4A94E' }}>
+        <View style={{ backgroundColor: '#F4A94E', paddingVertical: 10, paddingHorizontal: 16, flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Text style={{ fontSize: 14, fontWeight: '900', color: '#fff' }}>🎟️ קופונים והנחות</Text>
+          <TouchableOpacity style={{ paddingVertical: 5, paddingHorizontal: 14, borderRadius: 20, backgroundColor: '#fff' }}>
+            <Text style={{ fontSize: 11, fontWeight: '800', color: '#F4A94E' }}>+ צור קופון</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={{ backgroundColor: '#fffbeb', padding: 12 }}>
+          {demoCoupons.map((c, i) => (
+            <View key={i} style={{ backgroundColor: '#fff', borderRadius: 12, padding: 12, marginBottom: 8, borderRightWidth: 4, borderRightColor: c.status === 'פעיל' ? '#10b981' : '#9ca3af' }}>
+              <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 8 }}>
+                  <View style={{ backgroundColor: '#1C2B35', paddingHorizontal: 12, paddingVertical: 5, borderRadius: 8 }}>
+                    <Text style={{ fontSize: 14, fontWeight: '900', color: '#F4A94E', letterSpacing: 2 }}>{c.code}</Text>
+                  </View>
+                  <Text style={{ fontSize: 14, fontWeight: '800', color: '#1C2B35' }}>{c.discount}</Text>
+                </View>
+                <View style={{ paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12, backgroundColor: c.status === 'פעיל' ? '#dcfce7' : '#fee2e2' }}>
+                  <Text style={{ fontSize: 11, fontWeight: '800', color: c.status === 'פעיל' ? '#16a34a' : '#dc2626' }}>{c.status}</Text>
+                </View>
+              </View>
+              <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', marginTop: 4 }}>
+                <Text style={{ fontSize: 11, color: '#666', writingDirection: 'rtl' }}>שימושים: {c.uses}/{c.maxUses}</Text>
+                <Text style={{ fontSize: 11, color: '#666', writingDirection: 'rtl' }}>תוקף: {c.expires}</Text>
+              </View>
+              <View style={{ height: 6, backgroundColor: '#e5e7eb', borderRadius: 3, marginTop: 8 }}>
+                <View style={{ height: '100%', width: `${(c.uses / c.maxUses) * 100}%`, backgroundColor: c.status === 'פעיל' ? '#F4A94E' : '#9ca3af', borderRadius: 3 } as any} />
+              </View>
+            </View>
+          ))}
+        </View>
+      </View>
+
+      {/* Campaigns */}
+      <View style={{ borderRadius: 16, overflow: 'hidden', borderWidth: 2, borderColor: '#10b981' }}>
+        <View style={{ backgroundColor: '#10b981', paddingVertical: 10, paddingHorizontal: 16, flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Text style={{ fontSize: 14, fontWeight: '900', color: '#fff' }}>🚀 קמפיינים</Text>
+          <TouchableOpacity style={{ paddingVertical: 5, paddingHorizontal: 14, borderRadius: 20, backgroundColor: '#fff' }}>
+            <Text style={{ fontSize: 11, fontWeight: '800', color: '#10b981' }}>+ צור קמפיין</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={{ backgroundColor: '#f0fdf4', padding: 12 }}>
+          {demoCampaigns.map((c, i) => (
+            <View key={i} style={{ backgroundColor: '#fff', borderRadius: 12, padding: 14, marginBottom: 8 }}>
+              <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                <Text style={{ fontSize: 14, fontWeight: '800', color: '#1C2B35', writingDirection: 'rtl' }}>{c.name}</Text>
+                <View style={{ paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12, backgroundColor: c.status === 'פעיל' ? '#10b981' : '#e2e8f0' }}>
+                  <Text style={{ fontSize: 11, fontWeight: '800', color: c.status === 'פעיל' ? '#fff' : '#64748b' }}>{c.status}</Text>
+                </View>
+              </View>
+              <View style={{ flexDirection: 'row-reverse', gap: 10 }}>
+                <View style={{ flex: 1, backgroundColor: '#eff6ff', borderRadius: 10, padding: 10, alignItems: 'center' }}>
+                  <Text style={{ fontSize: 22, fontWeight: '900', color: '#3b82f6' }}>{c.shares}</Text>
+                  <Text style={{ fontSize: 9, color: '#64748b', fontWeight: '700' }}>שיתופים</Text>
+                </View>
+                <View style={{ flex: 1, backgroundColor: '#f0fdf4', borderRadius: 10, padding: 10, alignItems: 'center' }}>
+                  <Text style={{ fontSize: 22, fontWeight: '900', color: '#10b981' }}>{c.conversions}</Text>
+                  <Text style={{ fontSize: 9, color: '#64748b', fontWeight: '700' }}>הרשמות</Text>
+                </View>
+                <View style={{ flex: 1, backgroundColor: '#fffbeb', borderRadius: 10, padding: 10, alignItems: 'center' }}>
+                  <Text style={{ fontSize: 22, fontWeight: '900', color: '#f59e0b' }}>{c.shares > 0 ? Math.round(c.conversions / c.shares * 100) : 0}%</Text>
+                  <Text style={{ fontSize: 9, color: '#64748b', fontWeight: '700' }}>המרה</Text>
+                </View>
+              </View>
+            </View>
+          ))}
+        </View>
+      </View>
+
+      {/* Audience Targeting */}
+      <View style={{ borderRadius: 16, overflow: 'hidden', borderWidth: 2, borderColor: '#3DA5C4' }}>
+        <View style={{ backgroundColor: '#3DA5C4', paddingVertical: 10, paddingHorizontal: 16 }}>
+          <Text style={{ fontSize: 14, fontWeight: '900', color: '#fff', textAlign: 'right', writingDirection: 'rtl' }}>🎯 קהלי יעד</Text>
+        </View>
+        <View style={{ backgroundColor: '#f0f9ff', padding: 12, gap: 8 }}>
+          {[
+            { label: 'כל המשתמשים', count: 156, color: '#3DA5C4' },
+            { label: 'מנויים שנתיים', count: 82, color: '#10b981' },
+            { label: 'מנויים חודשיים', count: 74, color: '#F4A94E' },
+            { label: 'לא רכשו עדיין', count: 233, color: '#6366f1' },
+            { label: 'מנוי פג תוקף', count: 18, color: '#dc2626' },
+          ].map((seg, i) => (
+            <View key={i} style={{ flexDirection: 'row-reverse', alignItems: 'center', backgroundColor: '#fff', borderRadius: 10, padding: 10, gap: 10 }}>
+              <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: seg.color }} />
+              <Text style={{ flex: 1, fontSize: 13, fontWeight: '700', color: '#1C2B35', textAlign: 'right', writingDirection: 'rtl' }}>{seg.label}</Text>
+              <Text style={{ fontSize: 14, fontWeight: '900', color: seg.color }}>{seg.count}</Text>
+              <TouchableOpacity style={{ paddingVertical: 4, paddingHorizontal: 10, borderRadius: 8, backgroundColor: seg.color }}>
+                <Text style={{ fontSize: 10, fontWeight: '800', color: '#fff' }}>שלח</Text>
+              </TouchableOpacity>
+            </View>
+          ))}
+        </View>
+      </View>
+
+      <View style={{ backgroundColor: '#fffbeb', borderRadius: 10, padding: 12, borderWidth: 1, borderColor: '#fde68a' }}>
+        <Text style={{ fontSize: 11, color: '#92400e', textAlign: 'center', writingDirection: 'rtl', fontWeight: '600' }}>📊 נתוני דמו — יתעדכנו אוטומטית עם חיבור מערכת תשלומים</Text>
+      </View>
+    </View>
+  );
+  };
+
+  const demoTransactions = [
+    { id: 'INV-001', name: 'ישראל כ.', amount: '₪130.8', plan: 'שנתי', date: '18/04/2026', status: 'שולם' },
+    { id: 'INV-002', name: 'מיכל ד.', amount: '₪64', plan: '30 ימים', date: '17/04/2026', status: 'שולם' },
+    { id: 'INV-003', name: 'אבי ר.', amount: '₪130.8', plan: 'שנתי', date: '16/04/2026', status: 'שולם' },
+    { id: 'INV-004', name: 'דנה ל.', amount: '₪64', plan: '30 ימים', date: '15/04/2026', status: 'החזר' },
+    { id: 'INV-005', name: 'יוסי מ.', amount: '₪130.8', plan: 'שנתי', date: '14/04/2026', status: 'שולם' },
+  ];
+
+  const renderSubAccounting = () => {
+    if (!demoMode) return (
+      <View style={{ backgroundColor: '#f8fafc', borderRadius: 14, padding: 30, alignItems: 'center' }}>
+        <Text style={{ fontSize: 40, marginBottom: 10 }}>📡</Text>
+        <Text style={{ fontSize: 16, fontWeight: '800', color: Colors.TEXT, textAlign: 'center', writingDirection: 'rtl' }}>ממתין לחיבור מערכת תשלומים</Text>
+        <Text style={{ fontSize: 12, color: '#888', textAlign: 'center', writingDirection: 'rtl', marginTop: 6 }}>נתוני אמת יופיעו כאן לאחר חיבור RevenueCat / Stripe</Text>
+      </View>
+    );
+    return (
+    <View style={{ gap: 14 }}>
+      <View style={{ flexDirection: 'row-reverse', gap: 10 }}>
+        <View style={{ flex: 1, backgroundColor: '#f0fdf4', borderRadius: 14, padding: 14, alignItems: 'center' }}>
+          <Text style={{ fontSize: 10, color: '#888', fontWeight: '700' }}>סה״כ נכנס</Text>
+          <Text style={{ fontSize: 20, fontWeight: '900', color: '#10b981' }}>₪67,400</Text>
+        </View>
+        <View style={{ flex: 1, backgroundColor: '#fef2f2', borderRadius: 14, padding: 14, alignItems: 'center' }}>
+          <Text style={{ fontSize: 10, color: '#888', fontWeight: '700' }}>החזרים</Text>
+          <Text style={{ fontSize: 20, fontWeight: '900', color: '#dc2626' }}>₪1,280</Text>
+        </View>
+        <View style={{ flex: 1, backgroundColor: '#eff6ff', borderRadius: 14, padding: 14, alignItems: 'center' }}>
+          <Text style={{ fontSize: 10, color: '#888', fontWeight: '700' }}>נטו</Text>
+          <Text style={{ fontSize: 20, fontWeight: '900', color: '#3b82f6' }}>₪66,120</Text>
+        </View>
+      </View>
+
+      <View style={{ backgroundColor: '#fff', borderRadius: 14, padding: 16, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 }}>
+        <Text style={{ fontSize: 15, fontWeight: '800', color: Colors.TEXT, textAlign: 'right', marginBottom: 12, writingDirection: 'rtl' }}>🧾 תנועות אחרונות</Text>
+        {demoTransactions.map((t, i) => (
+          <View key={i} style={{ flexDirection: 'row-reverse', alignItems: 'center', paddingVertical: 10, borderBottomWidth: i < demoTransactions.length - 1 ? 1 : 0, borderBottomColor: '#f0f0f0', gap: 8 }}>
+            <Text style={{ fontSize: 11, color: '#888', fontWeight: '700', width: 60 }}>{t.id}</Text>
+            <View style={{ flex: 1 }}>
+              <Text style={{ fontSize: 13, fontWeight: '700', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl' }}>{t.name}</Text>
+              <Text style={{ fontSize: 10, color: '#888', textAlign: 'right' }}>{t.date} · {t.plan}</Text>
+            </View>
+            <Text style={{ fontSize: 14, fontWeight: '900', color: t.status === 'החזר' ? '#dc2626' : '#10b981' }}>{t.amount}</Text>
+            <View style={{ paddingHorizontal: 6, paddingVertical: 2, borderRadius: 6, backgroundColor: t.status === 'שולם' ? '#dcfce7' : '#fee2e2' }}>
+              <Text style={{ fontSize: 9, fontWeight: '800', color: t.status === 'שולם' ? '#16a34a' : '#dc2626' }}>{t.status}</Text>
+            </View>
+          </View>
+        ))}
+      </View>
+
+      <View style={{ backgroundColor: '#fffbeb', borderRadius: 10, padding: 12, borderWidth: 1, borderColor: '#fde68a' }}>
+        <Text style={{ fontSize: 11, color: '#92400e', textAlign: 'center', writingDirection: 'rtl', fontWeight: '600' }}>📊 נתוני דמו — יתעדכנו אוטומטית עם חיבור מערכת תשלומים</Text>
+      </View>
+    </View>
+  );
+  };
+
+  const demoCancels = [
+    { name: 'דנה ל.', plan: '30 ימים', date: '15/04/2026', reason: 'לא רלוונטי יותר', refund: '₪64', status: 'הוחזר' },
+    { name: 'רונית ש.', plan: 'שנתי', date: '10/04/2026', reason: 'מחיר גבוה', refund: '₪98.2', status: 'הוחזר' },
+    { name: 'עמית כ.', plan: '30 ימים', date: '08/04/2026', reason: 'בעיה טכנית', refund: '₪64', status: 'ממתין' },
+  ];
+
+  const renderSubCancels = () => {
+    if (!demoMode) return (
+      <View style={{ backgroundColor: '#f8fafc', borderRadius: 14, padding: 30, alignItems: 'center' }}>
+        <Text style={{ fontSize: 40, marginBottom: 10 }}>📡</Text>
+        <Text style={{ fontSize: 16, fontWeight: '800', color: Colors.TEXT, textAlign: 'center', writingDirection: 'rtl' }}>ממתין לחיבור מערכת תשלומים</Text>
+        <Text style={{ fontSize: 12, color: '#888', textAlign: 'center', writingDirection: 'rtl', marginTop: 6 }}>נתוני אמת יופיעו כאן לאחר חיבור RevenueCat / Stripe</Text>
+      </View>
+    );
+    return (
+    <View style={{ gap: 14 }}>
+      <View style={{ flexDirection: 'row-reverse', gap: 10 }}>
+        <View style={{ flex: 1, backgroundColor: '#fef2f2', borderRadius: 14, padding: 14, alignItems: 'center' }}>
+          <Text style={{ fontSize: 10, color: '#888', fontWeight: '700' }}>סה״כ ביטולים</Text>
+          <Text style={{ fontSize: 24, fontWeight: '900', color: '#dc2626' }}>3</Text>
+        </View>
+        <View style={{ flex: 1, backgroundColor: '#fff7ed', borderRadius: 14, padding: 14, alignItems: 'center' }}>
+          <Text style={{ fontSize: 10, color: '#888', fontWeight: '700' }}>ממתינים</Text>
+          <Text style={{ fontSize: 24, fontWeight: '900', color: '#f59e0b' }}>1</Text>
+        </View>
+        <View style={{ flex: 1, backgroundColor: '#f0fdf4', borderRadius: 14, padding: 14, alignItems: 'center' }}>
+          <Text style={{ fontSize: 10, color: '#888', fontWeight: '700' }}>הוחזרו</Text>
+          <Text style={{ fontSize: 24, fontWeight: '900', color: '#10b981' }}>2</Text>
+        </View>
+      </View>
+
+      <View style={{ backgroundColor: '#fff', borderRadius: 14, padding: 16, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 }}>
+        <Text style={{ fontSize: 15, fontWeight: '800', color: Colors.TEXT, textAlign: 'right', marginBottom: 12, writingDirection: 'rtl' }}>❌ בקשות ביטול</Text>
+        {demoCancels.map((c, i) => (
+          <View key={i} style={{ backgroundColor: '#fafafa', borderRadius: 12, padding: 12, marginBottom: 8 }}>
+            <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+              <Text style={{ fontSize: 14, fontWeight: '800', color: Colors.TEXT, writingDirection: 'rtl' }}>{c.name}</Text>
+              <View style={{ paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8, backgroundColor: c.status === 'הוחזר' ? '#dcfce7' : '#fef3c7' }}>
+                <Text style={{ fontSize: 10, fontWeight: '800', color: c.status === 'הוחזר' ? '#16a34a' : '#92400e' }}>{c.status}</Text>
+              </View>
+            </View>
+            <Text style={{ fontSize: 11, color: '#888', textAlign: 'right', writingDirection: 'rtl' }}>{c.date} · {c.plan} · החזר: {c.refund}</Text>
+            <Text style={{ fontSize: 12, color: '#666', textAlign: 'right', writingDirection: 'rtl', marginTop: 4 }}>סיבה: {c.reason}</Text>
+          </View>
+        ))}
+      </View>
+
+      <View style={{ backgroundColor: '#fffbeb', borderRadius: 10, padding: 12, borderWidth: 1, borderColor: '#fde68a' }}>
+        <Text style={{ fontSize: 11, color: '#92400e', textAlign: 'center', writingDirection: 'rtl', fontWeight: '600' }}>📊 נתוני דמו — יתעדכנו אוטומטית עם חיבור מערכת תשלומים</Text>
+      </View>
+    </View>
+  );
+  };
+
+  const renderSubBanner = () => {
+    if (!subBlock) return <Text style={{ textAlign: 'center', padding: 20, color: '#888' }}>טוען...</Text>;
+    const s = subBlock;
+    const upd = (key: string, val: any) => saveSubBlock({ ...s, [key]: val });
+    const updPlan = (plan: 'plan1' | 'plan2', key: string, val: string) => saveSubBlock({ ...s, [plan]: { ...s[plan], [key]: val } });
+    return (
+      <View style={{ gap: 14 }}>
+        {/* General settings */}
+        <View style={{ borderRadius: 16, overflow: 'hidden', borderWidth: 2, borderColor: '#64748b' }}>
+          <View style={{ backgroundColor: '#64748b', paddingVertical: 8, paddingHorizontal: 16 }}>
+            <Text style={{ fontSize: 14, fontWeight: '900', color: '#fff', textAlign: 'right', writingDirection: 'rtl' }}>✏️ הגדרות כלליות</Text>
+          </View>
+          <View style={{ backgroundColor: '#f8fafc', padding: 14, gap: 8 }}>
+            <View>
+              <Text style={ms.label}>📝 כותרת</Text>
+              <TextInput style={[ms.input]} value={s.title} onChangeText={v => upd('title', v)} textAlign="right" />
+            </View>
+            <View>
+              <Text style={ms.label}>📋 תיאור</Text>
+              <TextInput style={[ms.input, ms.textArea]} value={s.desc} onChangeText={v => upd('desc', v)} textAlign="right" multiline numberOfLines={3} />
+            </View>
+            <View style={{ flexDirection: 'row-reverse', gap: 8 }}>
+              <View style={{ flex: 1 }}>
+                <Text style={ms.label}>🎨 צבע רקע</Text>
+                <TextInput style={ms.input} value={s.bgColor || ''} onChangeText={v => upd('bgColor', v)} textAlign="left" placeholder="#ffffff" placeholderTextColor="#bbb" />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={ms.label}>🎨 צבע כותרת</Text>
+                <TextInput style={ms.input} value={s.titleColor || ''} onChangeText={v => upd('titleColor', v)} textAlign="left" placeholder="#1C2B35" placeholderTextColor="#bbb" />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={ms.label}>🔤 גודל פונט</Text>
+                <TextInput style={ms.input} value={String(s.fontSize || 20)} onChangeText={v => upd('fontSize', parseInt(v) || 20)} textAlign="left" keyboardType="numeric" />
+              </View>
+            </View>
+          </View>
+        </View>
+
+        {/* Plans side by side */}
+        <View style={{ flexDirection: 'row-reverse', gap: 10 }}>
+          {/* Plan 1 */}
+          <View style={{ flex: 1, borderRadius: 16, overflow: 'hidden', borderWidth: 2, borderColor: '#F4A94E' }}>
+            <View style={{ backgroundColor: '#F4A94E', paddingVertical: 8, paddingHorizontal: 12 }}>
+              <Text style={{ fontSize: 13, fontWeight: '900', color: '#fff', textAlign: 'center' }}>📦 מסלול 1</Text>
+            </View>
+            <View style={{ backgroundColor: '#fffbeb', padding: 10, gap: 6 }}>
+              <Text style={ms.label}>שם</Text>
+              <TextInput style={ms.input} value={s.plan1?.label || ''} onChangeText={v => updPlan('plan1', 'label', v)} textAlign="right" />
+              <Text style={ms.label}>מחיר</Text>
+              <TextInput style={ms.input} value={s.plan1?.price || ''} onChangeText={v => updPlan('plan1', 'price', v)} textAlign="right" />
+              <Text style={ms.label}>תקופה</Text>
+              <TextInput style={ms.input} value={s.plan1?.period || ''} onChangeText={v => updPlan('plan1', 'period', v)} textAlign="right" />
+              <Text style={ms.label}>הערה</Text>
+              <TextInput style={ms.input} value={s.plan1?.note || ''} onChangeText={v => updPlan('plan1', 'note', v)} textAlign="right" />
+              <Text style={ms.label}>🎨 צבע</Text>
+              <TextInput style={ms.input} value={s.plan1Color || ''} onChangeText={v => upd('plan1Color', v)} textAlign="left" placeholder="#f0f4f8" placeholderTextColor="#bbb" />
+            </View>
+          </View>
+
+          {/* Plan 2 */}
+          <View style={{ flex: 1, borderRadius: 16, overflow: 'hidden', borderWidth: 2, borderColor: '#1A6B8A' }}>
+            <View style={{ backgroundColor: '#1A6B8A', paddingVertical: 8, paddingHorizontal: 12 }}>
+              <Text style={{ fontSize: 13, fontWeight: '900', color: '#fff', textAlign: 'center' }}>📦 מסלול 2</Text>
+            </View>
+            <View style={{ backgroundColor: '#f0f9ff', padding: 10, gap: 6 }}>
+              <Text style={ms.label}>שם</Text>
+              <TextInput style={ms.input} value={s.plan2?.label || ''} onChangeText={v => updPlan('plan2', 'label', v)} textAlign="right" />
+              <Text style={ms.label}>מחיר</Text>
+              <TextInput style={ms.input} value={s.plan2?.price || ''} onChangeText={v => updPlan('plan2', 'price', v)} textAlign="right" />
+              <Text style={ms.label}>תקופה</Text>
+              <TextInput style={ms.input} value={s.plan2?.period || ''} onChangeText={v => updPlan('plan2', 'period', v)} textAlign="right" />
+              <Text style={ms.label}>הערה</Text>
+              <TextInput style={ms.input} value={s.plan2?.note || ''} onChangeText={v => updPlan('plan2', 'note', v)} textAlign="right" />
+              <Text style={ms.label}>🎨 צבע</Text>
+              <TextInput style={ms.input} value={s.plan2Color || ''} onChangeText={v => upd('plan2Color', v)} textAlign="left" placeholder="#1A6B8A" placeholderTextColor="#bbb" />
+            </View>
+          </View>
+        </View>
+
+        {/* Store links */}
+        <View style={{ borderRadius: 16, overflow: 'hidden', borderWidth: 2, borderColor: '#1C2B35' }}>
+          <View style={{ backgroundColor: '#1C2B35', paddingVertical: 8, paddingHorizontal: 16 }}>
+            <Text style={{ fontSize: 14, fontWeight: '900', color: '#F4A94E', textAlign: 'right', writingDirection: 'rtl' }}>🔗 קישורים לחנויות</Text>
+          </View>
+          <View style={{ backgroundColor: '#f8fafc', padding: 14, gap: 8 }}>
+            <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 8, backgroundColor: '#fff', borderRadius: 10, padding: 10, borderRightWidth: 4, borderRightColor: '#007AFF' }}>
+              <Text style={{ fontSize: 20 }}>🍎</Text>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: 11, fontWeight: '800', color: '#888', writingDirection: 'rtl' }}>Apple App Store</Text>
+                <TextInput style={[ms.input, { marginTop: 4 }]} value={s.appleUrl || ''} onChangeText={v => upd('appleUrl', v)} textAlign="left" />
+              </View>
+            </View>
+            <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 8, backgroundColor: '#fff', borderRadius: 10, padding: 10, borderRightWidth: 4, borderRightColor: '#3DDC84' }}>
+              <Text style={{ fontSize: 20 }}>🤖</Text>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: 11, fontWeight: '800', color: '#888', writingDirection: 'rtl' }}>Google Play</Text>
+                <TextInput style={[ms.input, { marginTop: 4 }]} value={s.googleUrl || ''} onChangeText={v => upd('googleUrl', v)} textAlign="left" />
+              </View>
+            </View>
+          </View>
+        </View>
       </View>
     );
   };
@@ -1858,6 +2625,7 @@ export default function AdminDashboard() {
             {activeNav === 'texts' ? renderTexts()
               : activeNav === 'media' ? renderMedia()
               : activeNav === 'gallery' ? renderGallery()
+              : activeNav === 'subscription' ? renderSubscription()
               : renderItems()}
 
             <View style={{ height: 40 }} />
@@ -1872,6 +2640,7 @@ export default function AdminDashboard() {
         section={currentSection}
         onSave={handleSaveItem}
         allMedia={mediaFiles}
+        ratings={ratings}
         onDelete={handleDeleteItem}
         onClose={() => setEditItem(null)}
         isWide={isWide}

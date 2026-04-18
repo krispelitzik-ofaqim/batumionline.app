@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState, useRef } from 'react';
-import { View, Text, ScrollView, StyleSheet, useWindowDimensions, TouchableOpacity, Image, Linking, Platform, Modal } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, useWindowDimensions, TouchableOpacity, Image, Linking, Platform, Modal, TextInput as RNTextInput } from 'react-native';
 import { useLocalSearchParams, Stack, router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -8,13 +8,13 @@ import { ThemeContext } from '../../constants/theme';
 import { PreviewContext } from '../../constants/previewContext';
 import { AdminContext } from '../../constants/adminContext';
 import DevicePreviewBar from '../../components/DevicePreviewBar';
-import { fetchContent, fetchRatings, submitRating } from '../../constants/api';
+import { fetchContent, fetchRatings, submitRating, API_BASE } from '../../constants/api';
 
 type MapPoint = { name: string; lat: number; lng: number; description?: string };
 import AudioPlayer from '../../components/AudioPlayer';
 import FlightsModal from '../../components/FlightsModal';
 
-type Hotel = { id: string; title: string; titleEn?: string; text: string; image: string; mapUrl?: string; pageUrl?: string; coords?: { lat: number; lng: number }; visible?: boolean; images?: string[] };
+type Hotel = { id: string; title: string; titleEn?: string; text: string; image: string; mapUrl?: string; pageUrl?: string; coords?: { lat: number; lng: number }; visible?: boolean; images?: string[]; amenities?: string[]; price?: string };
 type TourBlock = { id: string; title: string; subtitle?: string; text: string; color: string; images: string[]; audios: { title?: string; url: string }[]; visible?: boolean; coords?: { lat: number; lng: number } };
 type Item = {
   id: string; title: string; subtitle?: string; icon: string; bg?: string;
@@ -34,6 +34,41 @@ type Item = {
     terminal?: boolean;
   };
 };
+
+function FoodieCard({ h, isLast }: { h: Hotel; isLast?: boolean }) {
+  const [imgFailed, setImgFailed] = useState(!h.image || h.image.includes('city.jpg'));
+  const badge = h.amenities?.[0] || '🔥 חובה לטעום';
+  return (
+    <TouchableOpacity activeOpacity={0.85} onPress={() => h.mapUrl && Linking.openURL(h.mapUrl)}
+      style={{ paddingVertical: 12, borderBottomWidth: isLast ? 0 : 1, borderBottomColor: '#e0e0e0' }}>
+      <View style={{ flexDirection: 'row-reverse', gap: 12 }}>
+        <View style={{ width: 80, height: 80, borderRadius: 12, overflow: 'hidden', backgroundColor: '#f0f0f0' }}>
+          {!imgFailed ? (
+            <Image source={{ uri: h.image }} style={{ width: '100%', height: '100%' }} resizeMode="cover" onError={() => setImgFailed(true)} />
+          ) : (
+            <View style={{ width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
+              <Text style={{ fontSize: 30 }}>🍽️</Text>
+            </View>
+          )}
+        </View>
+        <View style={{ flex: 1, gap: 3 }}>
+          <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Text style={{ fontSize: 15, fontWeight: '900', color: '#1C2B35', writingDirection: 'rtl' }}>{h.title}</Text>
+            {h.price && <Text style={{ fontSize: 11, fontWeight: '800', color: '#10b981' }}>{h.price}</Text>}
+          </View>
+          {h.titleEn ? <Text style={{ fontSize: 10, color: '#888' }}>{h.titleEn}</Text> : null}
+          <Text style={{ fontSize: 11, color: '#666', writingDirection: 'rtl', lineHeight: 16 }} numberOfLines={2}>{h.text}</Text>
+          <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginTop: 2 }}>
+            <View style={{ backgroundColor: '#ff6b35', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6 }}>
+              <Text style={{ fontSize: 9, fontWeight: '900', color: '#fff' }}>{badge}</Text>
+            </View>
+            <Text style={{ fontSize: 9, color: '#ff6b35', fontWeight: '700' }}>📍 לחץ לנווט</Text>
+          </View>
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
+}
 
 function PassportCard({ h, pageBtnLabel }: { h: Hotel; pageBtnLabel: string }) {
   const [imgFailed, setImgFailed] = useState(false);
@@ -117,10 +152,26 @@ const passSt = StyleSheet.create({
 
 function HotelImage({ uri, titleEn }: { uri?: string; titleEn?: string }) {
   const [failed, setFailed] = useState(!uri);
+  const isSvg = uri && uri.endsWith('.svg');
   if (failed) {
     return (
       <View style={[st.hotelImg, { backgroundColor: '#e5e7eb', alignItems: 'center', justifyContent: 'center' }]}>
         <Text style={{ fontSize: 48 }}>🏨</Text>
+      </View>
+    );
+  }
+  if (isSvg && Platform.OS === 'web') {
+    return (
+      <View style={st.hotelImg}>
+        <Image source={{ uri: 'http://localhost:3001/uploads/city.jpg' }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+        <View style={{ position: 'absolute', bottom: 8, right: 8, width: 44, height: 44, borderRadius: 22, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', borderWidth: 2, borderColor: '#e2e8f0', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.15, shadowRadius: 4 }}>
+          {React.createElement('img', { src: uri, style: { width: 28, height: 28, objectFit: 'contain' }, alt: titleEn || '' })}
+        </View>
+        {titleEn ? (
+          <View style={st.enBadge}>
+            <Text style={st.enBadgeTxt}>{titleEn}</Text>
+          </View>
+        ) : null}
       </View>
     );
   }
@@ -136,11 +187,59 @@ function HotelImage({ uri, titleEn }: { uri?: string; titleEn?: string }) {
   );
 }
 
-function TourStations({ audios, color, onNavigate, onActiveChange }: {
+function FoodRecGps({ restaurants }: { restaurants: { name: string; lat: number; lng: number; mapUrl?: string; category?: string }[] }) {
+  const [nearby, setNearby] = useState<{ name: string; dist: number; mapUrl?: string; category?: string }[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const findNearby = (myLat: number, myLng: number) => {
+      const dists = restaurants.map(r => {
+        const d = Math.sqrt(Math.pow((r.lat - myLat) * 111000, 2) + Math.pow((r.lng - myLng) * 85000, 2));
+        return { ...r, dist: Math.round(d) };
+      }).filter(r => r.dist < 1000).sort((a, b) => a.dist - b.dist).slice(0, 3);
+      setNearby(dists);
+      setLoading(false);
+    };
+
+    if (Platform.OS === 'web' && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => findNearby(pos.coords.latitude, pos.coords.longitude),
+        () => {
+          // GPS failed - use demo location in Batumi center
+          findNearby(41.6505, 41.6355);
+        }
+      );
+    } else {
+      findNearby(41.6505, 41.6355);
+    }
+  }, []);
+
+  if (loading) return <Text style={{ fontSize: 9, color: '#888', textAlign: 'center', marginTop: 4 }}>📍 מחפש מסעדות בקרבתך...</Text>;
+  if (nearby.length === 0) return null;
+
+  return (
+    <View style={{ marginTop: 6, gap: 4 }}>
+      {nearby.map((r, i) => (
+        <TouchableOpacity key={i} onPress={() => r.mapUrl && Linking.openURL(r.mapUrl)} style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 8, padding: 8, backgroundColor: r.category?.includes('קפה') ? '#efebe9' : r.category?.includes('רחוב') ? '#fff3e0' : r.category?.includes('מקומי') ? '#fce4ec' : '#fff8e1', borderRadius: 8, borderWidth: 1, borderColor: r.category?.includes('קפה') ? '#bcaaa4' : r.category?.includes('רחוב') ? '#ff6b35' : r.category?.includes('מקומי') ? '#f48fb1' : '#f4a94e' }}>
+          <Text style={{ fontSize: 14 }}>{r.category?.includes('קפה') ? '☕' : r.category?.includes('רחוב') ? '🔥' : r.category?.includes('מקומי') ? '🥙' : '🍽️'}</Text>
+          <View style={{ flex: 1 }}>
+            <Text style={{ fontSize: 11, fontWeight: '800', color: '#1C2B35', writingDirection: 'rtl' }}>{r.name}</Text>
+            <Text style={{ fontSize: 9, color: '#888', writingDirection: 'rtl' }}>{r.category} · {r.dist} מטר · לחץ לנווט</Text>
+          </View>
+          <Text style={{ fontSize: 12 }}>📍</Text>
+        </TouchableOpacity>
+      ))}
+    </View>
+  );
+}
+
+function TourStations({ audios, color, onNavigate, onActiveChange, nearbyRestaurants, foodRecEnabled }: {
   audios: { title?: string; url: string; coords?: { lat: number; lng: number } }[];
   color: string;
   onNavigate: (c: { lat: number; lng: number }) => void;
   onActiveChange: (i: number, trk: any) => void;
+  nearbyRestaurants?: { name: string; lat: number; lng: number; mapUrl?: string; category?: string }[];
+  foodRecEnabled?: boolean;
 }) {
   const [tracks, setTracks] = useState(audios);
   const [playingIdx, setPlayingIdx] = useState<number>(-1);
@@ -181,7 +280,7 @@ function TourStations({ audios, color, onNavigate, onActiveChange }: {
         const isPlaying = playingIdx === i;
         const pct = isPlaying && dur > 0 ? (pos / dur) * 100 : 0;
         const row = (
-          <View style={{ backgroundColor: 'rgba(255,255,255,0.5)', borderRadius: 12, padding: 10, borderWidth: isPlaying ? 2 : 0, borderColor: color, borderTop: dragIdx === i ? `3px solid ${color}` : '3px solid transparent' }}>
+          <View style={{ backgroundColor: 'rgba(255,255,255,0.5)', borderRadius: 12, padding: 10, borderWidth: isPlaying ? 2 : 0, borderColor: color, borderTopWidth: 3, borderTopColor: dragIdx === i ? color : 'transparent' }}>
             <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 8 }}>
               <Text style={{ fontSize: 16, color: '#999', fontWeight: '700', paddingHorizontal: 4, ...(Platform.OS === 'web' ? { cursor: 'grab' } as any : {}) }}>≡</Text>
               <TouchableOpacity onPress={() => toggle(i)} style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: isPlaying ? color : 'rgba(0,0,0,0.15)', alignItems: 'center', justifyContent: 'center' }}>
@@ -202,6 +301,29 @@ function TourStations({ audios, color, onNavigate, onActiveChange }: {
                 <View style={{ height: '100%', width: `${pct}%`, backgroundColor: color, borderRadius: 2 } as any} />
               </View>
             )}
+            {isPlaying && foodRecEnabled && nearbyRestaurants && nearbyRestaurants.length > 0 && (() => {
+              const myLat = 41.6505;
+              const myLng = 41.6355;
+              const dists = nearbyRestaurants.map(r => {
+                const d = Math.sqrt(Math.pow((r.lat - myLat) * 111000, 2) + Math.pow((r.lng - myLng) * 85000, 2));
+                return { ...r, dist: Math.round(d) };
+              }).filter(r => r.dist < 1500).sort((a, b) => a.dist - b.dist).slice(0, 3);
+              if (dists.length === 0) return null;
+              return (
+                <View style={{ marginTop: 6, gap: 4 }}>
+                  {dists.map((r, ri) => (
+                    <TouchableOpacity key={ri} onPress={() => r.mapUrl && Linking.openURL(r.mapUrl)} style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 8, padding: 8, backgroundColor: r.category?.includes('קפה') ? '#efebe9' : r.category?.includes('רחוב') ? '#fff3e0' : r.category?.includes('מקומי') ? '#fce4ec' : '#fff8e1', borderRadius: 8, borderWidth: 1, borderColor: r.category?.includes('קפה') ? '#bcaaa4' : r.category?.includes('רחוב') ? '#ff6b35' : r.category?.includes('מקומי') ? '#f48fb1' : '#f4a94e' }}>
+                      <Text style={{ fontSize: 14 }}>{r.category?.includes('קפה') ? '☕' : r.category?.includes('רחוב') ? '🔥' : r.category?.includes('מקומי') ? '🥙' : '🍽️'}</Text>
+                      <View style={{ flex: 1 }}>
+                        <Text style={{ fontSize: 11, fontWeight: '800', color: '#1C2B35', writingDirection: 'rtl' }}>{r.name}</Text>
+                        <Text style={{ fontSize: 9, color: '#888', writingDirection: 'rtl' }}>{r.category} · {r.dist} מטר · לחץ לנווט</Text>
+                      </View>
+                      <Text style={{ fontSize: 12 }}>📍</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              );
+            })()}
           </View>
         );
         if (Platform.OS === 'web') {
@@ -229,13 +351,93 @@ function buildTourRouteUrl(audios: { title?: string; url: string; coords?: { lat
   return `https://www.google.com/maps?q=${avgLat},${avgLng}&hl=iw&z=15&output=embed`;
 }
 
-function TourCard({ t, onRate }: { t: TourBlock; onRate: (id: string, score: number) => void }) {
+function TourAlbum({ tourId, color }: { tourId: string; color: string }) {
+  const [open, setOpen] = useState(false);
+  const [photos, setPhotos] = useState<any[]>([]);
+  const [name, setName] = useState('');
+  const [city, setCity] = useState('');
+  const [uploaded, setUploaded] = useState(false);
+
+  useEffect(() => {
+    if (open) {
+      fetch(`${API_BASE}/api/tour-album/${tourId}`).then(r => r.json()).then(j => { if (j.success) setPhotos(j.data); }).catch(() => {});
+    }
+  }, [open, uploaded]);
+
+  if (!open) {
+    return (
+      <TouchableOpacity onPress={() => setOpen(true)} style={{ marginHorizontal: 12, marginTop: 8, paddingVertical: 10, borderRadius: 10, backgroundColor: color, alignItems: 'center' }}>
+        <Text style={{ fontSize: 13, fontWeight: '800', color: '#fff' }}>📸 פתח אלבום גולשים</Text>
+      </TouchableOpacity>
+    );
+  }
+
+  return (
+    <View style={{ margin: 12, backgroundColor: '#fff', borderRadius: 14, padding: 12, borderWidth: 1, borderColor: '#e0e0e0' }}>
+      <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+        <Text style={{ fontSize: 14, fontWeight: '900', color: '#1C2B35', writingDirection: 'rtl' }}>📸 אלבום גולשים</Text>
+        <TouchableOpacity onPress={() => setOpen(false)} style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: '#f0f0f0', alignItems: 'center', justifyContent: 'center' }}>
+          <Text style={{ fontSize: 14, fontWeight: '800', color: '#999' }}>✕</Text>
+        </TouchableOpacity>
+      </View>
+
+      {photos.length > 0 ? (
+        <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 4, marginBottom: 12 }}>
+          {photos.map((p: any) => (
+            <View key={p.id} style={{ width: '32%' }}>
+              <View style={{ aspectRatio: 1, borderRadius: 8, overflow: 'hidden', backgroundColor: '#f0f0f0' }}>
+                <Image source={{ uri: p.image.startsWith('/') ? `http://localhost:3001${p.image}` : p.image }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+              </View>
+              <Text style={{ fontSize: 9, color: '#1C2B35', fontWeight: '700', textAlign: 'center', marginTop: 3, writingDirection: 'rtl' }}>{p.name}</Text>
+              <Text style={{ fontSize: 8, color: '#888', textAlign: 'center', writingDirection: 'rtl' }}>{p.city} · {p.date}</Text>
+            </View>
+          ))}
+        </View>
+      ) : (
+        <Text style={{ fontSize: 12, color: '#888', textAlign: 'center', marginBottom: 12, writingDirection: 'rtl' }}>עדיין אין תמונות. היו הראשונים!</Text>
+      )}
+
+      {uploaded ? (
+        <View style={{ padding: 10, backgroundColor: '#dcfce7', borderRadius: 8, alignItems: 'center' }}>
+          <Text style={{ fontSize: 13, fontWeight: '800', color: '#16a34a' }}>✓ התמונה נשלחה לאישור. תודה!</Text>
+        </View>
+      ) : (
+        <View style={{ gap: 6 }}>
+          <RNTextInput value={name} onChangeText={setName} placeholder="✏️ השם שלך" placeholderTextColor="#888" style={{ backgroundColor: '#f8f8f8', borderRadius: 8, padding: 8, fontSize: 13, textAlign: 'right', writingDirection: 'rtl', borderWidth: 1, borderColor: '#e0e0e0' }} />
+          <RNTextInput value={city} onChangeText={setCity} placeholder="🏙️ מאיפה את/ה?" placeholderTextColor="#888" style={{ backgroundColor: '#f8f8f8', borderRadius: 8, padding: 8, fontSize: 13, textAlign: 'right', writingDirection: 'rtl', borderWidth: 1, borderColor: '#e0e0e0' }} />
+          {Platform.OS === 'web' && React.createElement('label', {
+            style: { display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: color, borderRadius: 8, padding: 10, cursor: 'pointer' },
+          }, [
+            React.createElement('input', { key: 'inp', type: 'file', accept: 'image/*', style: { display: 'none' },
+              onChange: (e: any) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  const fd = new FormData();
+                  fd.append('file', file);
+                  fd.append('name', name || 'גולש');
+                  fd.append('city', city || '');
+                  fetch(`${API_BASE}/api/tour-album/${tourId}`, { method: 'POST', body: fd })
+                    .then(r => r.json()).then(() => setUploaded(true)).catch(() => {});
+                }
+              },
+            }),
+            React.createElement('span', { key: 'txt', style: { color: '#fff', fontSize: 13, fontWeight: 800 } }, '📸 העלה תמונה'),
+          ])}
+        </View>
+      )}
+    </View>
+  );
+}
+
+function TourCard({ t, onRate, nearbyRestaurants }: { t: TourBlock; onRate: (id: string, score: number) => void; nearbyRestaurants?: { name: string; lat: number; lng: number; mapUrl?: string }[] }) {
   const [imgIdx, setImgIdx] = useState(0);
   const [mapBig, setMapBig] = useState(false);
   const [navCoords, setNavCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [stationTitle, setStationTitle] = useState<string | null>(null);
   const [rating, setRating] = useState(0);
   const [ratingSubmitted, setRatingSubmitted] = useState(false);
+  const [foodRec, setFoodRec] = useState(false);
+  const [nearbyFood, setNearbyFood] = useState<{ name: string; dist: number; mapUrl?: string } | null>(null);
   const demoScore = 4;
   const displayedScore = ratingSubmitted ? rating : demoScore;
   const images = t.images && t.images.length > 0 ? t.images : [];
@@ -306,11 +508,20 @@ function TourCard({ t, onRate }: { t: TourBlock; onRate: (id: string, score: num
         )}
       </View>
 
+      <TouchableOpacity onPress={() => setFoodRec(!foodRec)} style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'center', gap: 6, paddingVertical: 8, marginHorizontal: 12 }}>
+        <View style={{ width: 36, height: 20, borderRadius: 10, backgroundColor: foodRec ? '#00c853' : '#f48fb1', justifyContent: 'center', padding: 2 }}>
+          <View style={{ width: 16, height: 16, borderRadius: 8, backgroundColor: '#fff', alignSelf: foodRec ? 'flex-end' : 'flex-start' }} />
+        </View>
+        <Text style={{ fontSize: 10, color: foodRec ? '#00c853' : '#e91e63', fontWeight: '700', writingDirection: 'rtl' }}>{foodRec ? '🍽️ המלצה למסעדות בקרבתך - פעיל' : 'הפעל המלצות מסעדות בקרבתך'}</Text>
+      </TouchableOpacity>
+
       <View style={tourSt.audioWrap}>
         {t.audios && t.audios.length > 0 ? (
           <TourStations
             audios={t.audios}
             color={t.color}
+            nearbyRestaurants={nearbyRestaurants}
+            foodRecEnabled={foodRec}
             onNavigate={(c) => { setNavCoords(c); setMapBig(true); }}
             onActiveChange={(i, trk) => {
               if (images.length > 0) setImgIdx(i % images.length);
@@ -323,6 +534,8 @@ function TourCard({ t, onRate }: { t: TourBlock; onRate: (id: string, score: num
           </Text>
         )}
       </View>
+
+      <TourAlbum tourId={t.id} color={t.color} />
 
       <View style={tourSt.ratingRow}>
         <Text style={tourSt.ratingLabel}>דרג את הסיור</Text>
@@ -470,7 +683,19 @@ function HotelCard({ h, dark, pageBtnLabel, mapPoints, layerColor }: { h: Hotel;
     <View style={[st.hotelCard, dark && { backgroundColor: '#2a3942' }]}>
       <HotelImage uri={h.image} titleEn={h.titleEn} />
       <View style={st.hotelBody}>
-        <Text style={[st.hotelTitle, dark && { color: Colors.BACKGROUND }]}>{h.title}</Text>
+        <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Text style={[st.hotelTitle, dark && { color: Colors.BACKGROUND }, { flex: 1 }]}>{h.title}</Text>
+          {h.price ? <Text style={{ fontSize: 11, fontWeight: '800', color: '#10b981', backgroundColor: '#f0fdf4', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8 }}>{h.price}</Text> : null}
+        </View>
+        {h.amenities && h.amenities.length > 0 && (
+          <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 4, marginBottom: 6 }}>
+            {h.amenities.map((a, i) => (
+              <View key={i} style={{ backgroundColor: dark ? 'rgba(26,107,138,0.3)' : '#e8f4f8', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 6, borderWidth: 1, borderColor: dark ? 'rgba(61,165,196,0.3)' : '#c7e6f5' }}>
+                <Text style={{ fontSize: 10, color: dark ? '#3DA5C4' : '#1A6B8A', fontWeight: '800', letterSpacing: 0.5 }}>{a}</Text>
+              </View>
+            ))}
+          </View>
+        )}
         <Text style={[st.hotelText, dark && { color: '#cbd5e1' }]}>{h.text}</Text>
         <View style={st.hotelBtnRow}>
           <TouchableOpacity
@@ -586,10 +811,21 @@ export default function CategoryScreen() {
 
   const [cat, setCat] = useState<Item | null>(null);
   const [selectedTour, setSelectedTour] = useState<TourBlock | null>(null);
+  const scrollRef = useRef<ScrollView>(null);
+  const [tourMapOpen, setTourMapOpen] = useState(false);
   const [ratings, setRatings] = useState<Record<string, { sum: number; count: number }>>({});
   const [mapPoints, setMapPoints] = useState<MapPoint[]>([]);
+  const [mapLayerColor, setMapLayerColor] = useState<string | undefined>(undefined);
   const [mapFocus, setMapFocus] = useState<MapPoint | null>(null);
   const [showCatMap, setShowCatMap] = useState(false);
+  const [recommendations, setRecommendations] = useState<any[]>([]);
+  const [allRestaurants, setAllRestaurants] = useState<{ name: string; lat: number; lng: number; mapUrl?: string }[]>([]);
+  const [showRecForm, setShowRecForm] = useState(false);
+  const [recName, setRecName] = useState('');
+  const [recText, setRecText] = useState('');
+  const [recLocation, setRecLocation] = useState('');
+  const [recPrice, setRecPrice] = useState('');
+  const [recSent, setRecSent] = useState(false);
 
   useEffect(() => {
     fetchRatings().then(setRatings).catch(() => {});
@@ -599,10 +835,17 @@ export default function CategoryScreen() {
     if (!cat) return;
     fetchContent().then(data => {
       if (data.mapLayers) {
-        const match = (data.mapLayers as any[]).find((l: any) =>
-          l.name && (cat.title.includes(l.name) || l.name.includes(cat.title))
-        );
-        if (match) setMapPoints(match.points || []);
+        const layers = data.mapLayers as any[];
+        const scored = layers.filter((l: any) => l.name).map((l: any) => {
+          if (l.name === cat.title) return { layer: l, score: 100 };
+          if (cat.title.includes(l.name)) return { layer: l, score: l.name.length };
+          if (l.name.includes(cat.title)) return { layer: l, score: cat.title.length };
+          const words = l.name.split(/\s+/).filter((w: string) => w.length > 2);
+          const matching = words.filter((w: string) => cat.title.includes(w) && w !== 'של');
+          return matching.length > 0 ? { layer: l, score: matching.join('').length } : null;
+        }).filter(Boolean) as { layer: any; score: number }[];
+        scored.sort((a, b) => b.score - a.score);
+        if (scored.length > 0) { setMapPoints(scored[0].layer.points || []); setMapLayerColor(scored[0].layer.color); }
       }
     }).catch(() => {});
   }, [cat]);
@@ -633,6 +876,22 @@ export default function CategoryScreen() {
         ? all.find((c: Item) => c.id === aliased)
         : findDeep(all);
       if (found) setCat(found);
+      if (found?.cardStyle === 'foodie') {
+        fetch(`${API_BASE}/api/recommendations`).then(r => r.json()).then(j => { if (j.success) setRecommendations(j.data); }).catch(() => {});
+      }
+      if (found?.tours && found.tours.length > 0) {
+        const cat6 = [...(data.mainCategories || [])].find((c: any) => c.id === '6' || c.id === 6);
+        if (cat6?.children) {
+          const rests: any[] = [];
+          cat6.children.forEach((sub: any) => {
+            if (sub.id === 'r2') return;
+            (sub.hotels || []).forEach((h: any) => {
+              if (h.coords && h.visible !== false) rests.push({ name: h.title, lat: h.coords.lat, lng: h.coords.lng, mapUrl: h.mapUrl, category: sub.title });
+            });
+          });
+          setAllRestaurants(rests);
+        }
+      }
     }).catch(() => {});
   }, [id]);
 
@@ -663,7 +922,7 @@ export default function CategoryScreen() {
     <SafeAreaView style={[st.safe, darkCat && { backgroundColor: cat.heroBg || '#0f1419' }]}>
       <Stack.Screen options={{ headerShown: true, title: cat.title, headerBackTitle: 'חזרה' }} />
       <DevicePreviewBar />
-      <ScrollView showsVerticalScrollIndicator={false} style={{ maxWidth: w, alignSelf: 'center', width: '100%' }}>
+      <ScrollView ref={scrollRef} showsVerticalScrollIndicator={false} style={{ maxWidth: w, alignSelf: 'center', width: '100%' }}>
         {cat.heroImage ? (
           <View style={st.heroImgWrap}>
             <Image source={{ uri: cat.heroImage }} style={st.heroImgBg} resizeMode="cover" />
@@ -686,10 +945,34 @@ export default function CategoryScreen() {
               <TouchableOpacity onPress={() => setSelectedTour(null)} style={st.tourBack}>
                 <Text style={st.tourBackTxt}>‹ חזרה לבחירת סיור</Text>
               </TouchableOpacity>
-              <TourCard t={selectedTour} onRate={handleRatingSubmit} />
+              <TourCard t={selectedTour} onRate={handleRatingSubmit} nearbyRestaurants={allRestaurants} />
             </View>
           ) : (
-            <View style={st.tourGrid}>
+            <View>
+              <TouchableOpacity
+                style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 12, marginHorizontal: 16, marginTop: 4, borderRadius: 14, backgroundColor: tourMapOpen ? '#e8f4f8' : Colors.PRIMARY }}
+                onPress={() => setTourMapOpen(!tourMapOpen)}
+                activeOpacity={0.8}
+              >
+                <Text style={{ fontSize: 15, fontWeight: '800', color: tourMapOpen ? Colors.PRIMARY : '#fff' }}>🗺️ מפת כל המסלולים</Text>
+                <Text style={{ fontSize: 12, color: tourMapOpen ? Colors.PRIMARY : '#fff' }}>{tourMapOpen ? '▲' : '▼'}</Text>
+              </TouchableOpacity>
+              {tourMapOpen && Platform.OS === 'web' && (
+                <View style={{ marginHorizontal: 8, marginTop: 8, borderRadius: 14, overflow: 'hidden', height: 500, borderWidth: 1, borderColor: '#ddd', position: 'relative' }}>
+                  {React.createElement('iframe', {
+                    src: 'https://www.google.com/maps/d/embed?mid=1ruTENTudaTnlMJh50IZ6Y_Odmu3Y4DE&ehbc=2E312F&z=13',
+                    style: { width: '100%', height: 'calc(100% + 60px)', border: 0, marginTop: -60 },
+                    title: 'tour-routes-map',
+                  })}
+                  <TouchableOpacity
+                    onPress={() => setTourMapOpen(false)}
+                    style={{ position: 'absolute', top: 10, left: 10, width: 34, height: 34, borderRadius: 17, backgroundColor: 'rgba(0,0,0,0.55)', alignItems: 'center', justifyContent: 'center' }}
+                  >
+                    <Text style={{ color: '#fff', fontSize: 18, fontWeight: '800' }}>✕</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+              <View style={st.tourGrid}>
               {cat.tours.filter(t => t.visible !== false).map(t => {
                 const r = ratings[t.id];
                 const avg = r && r.count > 0 ? Math.round(r.sum / r.count) : 0;
@@ -708,6 +991,7 @@ export default function CategoryScreen() {
                   </TouchableOpacity>
                 );
               })}
+            </View>
             </View>
           )
         ) : children.length > 0 ? (
@@ -764,11 +1048,126 @@ export default function CategoryScreen() {
           })()
         ) : cat.hotels && cat.hotels.length > 0 ? (
           <View style={st.hotelList}>
+            {cat.longText && Platform.OS === 'web' && cat.hotels.length <= 10 && (
+              <View style={{ paddingHorizontal: 16, paddingTop: 8 }}>
+                {React.createElement('div', {
+                  dangerouslySetInnerHTML: { __html: cat.longText },
+                  style: { direction: 'rtl', textAlign: 'right' },
+                })}
+              </View>
+            )}
             {cat.hotels.filter(h => h.visible !== false).map(h => (
               cat.cardStyle === 'passport'
                 ? <PassportCard key={h.id} h={h} pageBtnLabel={cat.pageBtnLabel || 'אתר/פייסבוק'} />
-                : <HotelCard key={h.id} h={h} dark={darkCat} pageBtnLabel={cat.pageBtnLabel || 'לדף המלון'} mapPoints={mapPoints} layerColor={mapPoints.length > 0 ? Colors.PRIMARY : undefined} />
+                : cat.cardStyle === 'foodie'
+                ? <FoodieCard key={h.id} h={h} isLast={cat.hotels!.filter(x => x.visible !== false).indexOf(h) === cat.hotels!.filter(x => x.visible !== false).length - 1} />
+                : <HotelCard key={h.id} h={h} dark={darkCat} pageBtnLabel={cat.pageBtnLabel || 'לדף המלון'} mapPoints={mapPoints} layerColor={mapLayerColor || (mapPoints.length > 0 ? Colors.PRIMARY : undefined)} />
             ))}
+            {cat.longText && Platform.OS === 'web' && cat.hotels.length > 10 && (
+              <View style={{ paddingBottom: 16 }}>
+                {React.createElement('div', {
+                  dangerouslySetInnerHTML: { __html: cat.longText },
+                  style: { direction: 'rtl', textAlign: 'right' },
+                })}
+              </View>
+            )}
+            {cat.cardStyle === 'foodie' && (
+              <View style={{ backgroundColor: '#1e1e2a', borderRadius: 16, margin: 16, marginTop: 8, padding: 16 }}>
+                <Text style={{ fontSize: 16, fontWeight: '900', color: '#ff6b35', textAlign: 'center', writingDirection: 'rtl', marginBottom: 12 }}>💬 המלצות הגולשים</Text>
+                {recommendations.length > 0 ? recommendations.map((r: any, i: number) => (
+                  <View key={r.id} style={{ paddingVertical: 10, borderBottomWidth: i < recommendations.length - 1 ? 1 : 0, borderBottomColor: '#333' }}>
+                    <View style={{ flexDirection: 'row-reverse', gap: 10, alignItems: 'flex-start' }}>
+                      {r.image && (
+                        <Image source={{ uri: r.image.startsWith('/') ? `http://localhost:3001${r.image}` : r.image }} style={{ width: 50, height: 50, borderRadius: 8 }} resizeMode="cover" />
+                      )}
+                      <View style={{ flex: 1 }}>
+                        <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <Text style={{ fontSize: 13, fontWeight: '800', color: '#fff', writingDirection: 'rtl' }}>{r.name}</Text>
+                          <Text style={{ fontSize: 9, color: '#666' }}>{r.date}</Text>
+                        </View>
+                        <Text style={{ fontSize: 12, color: '#ccc', writingDirection: 'rtl', lineHeight: 18, marginTop: 2 }}>{r.text}</Text>
+                        <View style={{ flexDirection: 'row-reverse', gap: 10, marginTop: 2 }}>
+                          {r.location ? <Text style={{ fontSize: 10, color: '#ff6b35', writingDirection: 'rtl' }}>📍 {r.location}</Text> : null}
+                          {r.price ? <Text style={{ fontSize: 10, color: '#10b981', writingDirection: 'rtl' }}>💰 {r.price}</Text> : null}
+                        </View>
+                      </View>
+                    </View>
+                  </View>
+                )) : (
+                  <Text style={{ fontSize: 12, color: '#666', textAlign: 'center', writingDirection: 'rtl' }}>עדיין אין המלצות. היו הראשונים!</Text>
+                )}
+                {!showRecForm ? (
+                  <TouchableOpacity onPress={() => setShowRecForm(true)} style={{ marginTop: 14, paddingVertical: 10, borderRadius: 10, backgroundColor: '#ff6b35', alignItems: 'center' }}>
+                    <Text style={{ fontSize: 13, fontWeight: '800', color: '#fff' }}>✍️ הוסף המלצה</Text>
+                  </TouchableOpacity>
+                ) : recSent ? (
+                  <View style={{ marginTop: 14, padding: 14, backgroundColor: '#10b981', borderRadius: 10, alignItems: 'center' }}>
+                    <Text style={{ fontSize: 13, fontWeight: '800', color: '#fff' }}>✓ ההמלצה נשלחה לאישור. תודה!</Text>
+                  </View>
+                ) : (
+                  <View style={{ marginTop: 14, gap: 8 }}>
+                    <RNTextInput value={recName} onChangeText={setRecName} placeholder="✏️ השם שלך" placeholderTextColor="#888" style={{ backgroundColor: '#2a2a3a', borderRadius: 8, padding: 10, color: '#fff', fontSize: 14, textAlign: 'right', writingDirection: 'rtl' }} />
+                    <RNTextInput value={recText} onChangeText={setRecText} placeholder="🍽️ מה אכלת ואיך היה?" placeholderTextColor="#888" multiline numberOfLines={3} style={{ backgroundColor: '#2a2a3a', borderRadius: 8, padding: 10, color: '#fff', fontSize: 14, textAlign: 'right', writingDirection: 'rtl', minHeight: 70 }} />
+                    <View style={{ flexDirection: 'row-reverse', gap: 6 }}>
+                      <RNTextInput value={recLocation} onChangeText={setRecLocation} placeholder="📍 מיקום" placeholderTextColor="#888" style={{ flex: 1, backgroundColor: '#2a2a3a', borderRadius: 8, padding: 10, color: '#fff', fontSize: 14, textAlign: 'right', writingDirection: 'rtl' }} />
+                      <TouchableOpacity
+                        onPress={() => {
+                          if (Platform.OS === 'web' && navigator.geolocation) {
+                            navigator.geolocation.getCurrentPosition(
+                              (pos) => setRecLocation(`${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`),
+                              () => setRecLocation('לא הצלחתי לזהות מיקום')
+                            );
+                          }
+                        }}
+                        style={{ backgroundColor: '#ff6b35', borderRadius: 8, paddingHorizontal: 14, alignItems: 'center', justifyContent: 'center' }}
+                      >
+                        <Text style={{ fontSize: 16 }}>📍</Text>
+                      </TouchableOpacity>
+                    </View>
+                    <RNTextInput value={recPrice} onChangeText={setRecPrice} placeholder="💰 כמה עלה? (לדוגמה: 5 לארי)" placeholderTextColor="#888" style={{ backgroundColor: '#2a2a3a', borderRadius: 8, padding: 10, color: '#fff', fontSize: 14, textAlign: 'right', writingDirection: 'rtl' }} />
+                    {Platform.OS === 'web' && React.createElement('label', {
+                      style: { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: '#2a2a3a', borderRadius: 8, padding: 10, cursor: 'pointer' },
+                    }, [
+                      React.createElement('input', { key: 'inp', type: 'file', accept: 'image/*', style: { display: 'none' },
+                        onChange: (e: any) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            const fd = new FormData();
+                            fd.append('file', file);
+                            fd.append('name', recName || 'גולש');
+                            fd.append('text', recText);
+                            fd.append('location', recLocation);
+                            fetch(`${API_BASE}/api/recommendations`, { method: 'POST', body: fd })
+                              .then(r => r.json()).then(() => setRecSent(true)).catch(() => {});
+                          }
+                        },
+                      }),
+                      React.createElement('span', { key: 'txt', style: { color: '#888', fontSize: 14 } }, '📸 הוסף תמונה'),
+                    ])}
+                    <View style={{ flexDirection: 'row-reverse', gap: 8 }}>
+                      <TouchableOpacity
+                        onPress={async () => {
+                          if (!recText.trim()) return;
+                          try {
+                            await fetch(`${API_BASE}/api/recommendations`, {
+                              method: 'POST', headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ name: recName || 'גולש אנונימי', text: recText, location: recLocation, price: recPrice }),
+                            });
+                            setRecSent(true);
+                          } catch {}
+                        }}
+                        style={{ flex: 1, paddingVertical: 12, borderRadius: 10, backgroundColor: '#ff6b35', alignItems: 'center' }}
+                      >
+                        <Text style={{ fontSize: 14, fontWeight: '800', color: '#fff' }}>שלח המלצה</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity onPress={() => setShowRecForm(false)} style={{ paddingVertical: 12, paddingHorizontal: 16, borderRadius: 10, backgroundColor: '#333' }}>
+                        <Text style={{ fontSize: 14, fontWeight: '800', color: '#999' }}>ביטול</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                )}
+              </View>
+            )}
           </View>
         ) : cat.article ? (
           <ArticleView cat={cat} darkCat={darkCat} />
@@ -791,6 +1190,14 @@ export default function CategoryScreen() {
               {cat.description || 'אין תוכן עדיין'}
             </Text>
           </View>
+        )}
+        {((cat.hotels && cat.hotels.filter(h => h.visible !== false).length >= 10) || (cat.children && cat.children.length >= 10) || (cat.tours && cat.tours.filter(t => t.visible !== false).length >= 10)) && (
+          <TouchableOpacity
+            onPress={() => scrollRef.current?.scrollTo({ y: 0, animated: true })}
+            style={{ alignSelf: 'center', marginVertical: 20, paddingVertical: 10, paddingHorizontal: 24, borderRadius: 20, backgroundColor: '#1C2B35' }}
+          >
+            <Text style={{ fontSize: 13, fontWeight: '800', color: '#F4A94E' }}>▲ חזור לראש הדף</Text>
+          </TouchableOpacity>
         )}
       </ScrollView>
     </SafeAreaView>

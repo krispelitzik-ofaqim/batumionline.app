@@ -367,6 +367,156 @@ app.post('/api/ratings/:id', (req, res) => {
   }
 });
 
+// ─── User Recommendations ────────────────────────────────────
+app.get('/api/recommendations', (req, res) => {
+  try {
+    const db = readDB();
+    const approved = (db.recommendations || []).filter(r => r.status === 'approved');
+    res.json({ success: true, data: approved });
+  } catch (e) {
+    res.status(500).json({ success: false, error: e.message });
+  }
+});
+
+app.get('/api/recommendations/all', (req, res) => {
+  try {
+    const db = readDB();
+    res.json({ success: true, data: db.recommendations || [] });
+  } catch (e) {
+    res.status(500).json({ success: false, error: e.message });
+  }
+});
+
+app.post('/api/recommendations', upload.single('file'), (req, res) => {
+  try {
+    const { text, location, name } = req.body;
+    if (!text) return res.status(400).json({ success: false, error: 'text required' });
+    const db = readDB();
+    if (!db.recommendations) db.recommendations = [];
+    const rec = {
+      id: 'rec_' + Date.now(),
+      name: name || 'גולש אנונימי',
+      text,
+      location: location || '',
+      image: req.file ? `/uploads/${req.file.filename}` : null,
+      status: 'pending',
+      date: new Date().toISOString().split('T')[0],
+    };
+    db.recommendations.push(rec);
+    writeDB(db);
+    res.json({ success: true, data: rec });
+  } catch (e) {
+    res.status(500).json({ success: false, error: e.message });
+  }
+});
+
+app.post('/api/recommendations/:id/approve', (req, res) => {
+  try {
+    const db = readDB();
+    const rec = (db.recommendations || []).find(r => r.id === req.params.id);
+    if (!rec) return res.status(404).json({ success: false, error: 'not found' });
+    rec.status = 'approved';
+    writeDB(db);
+    res.json({ success: true });
+  } catch (e) {
+    res.status(500).json({ success: false, error: e.message });
+  }
+});
+
+app.post('/api/recommendations/:id/reject', (req, res) => {
+  try {
+    const db = readDB();
+    const rec = (db.recommendations || []).find(r => r.id === req.params.id);
+    if (!rec) return res.status(404).json({ success: false, error: 'not found' });
+    rec.status = 'rejected';
+    writeDB(db);
+    res.json({ success: true });
+  } catch (e) {
+    res.status(500).json({ success: false, error: e.message });
+  }
+});
+
+app.delete('/api/recommendations/:id', (req, res) => {
+  try {
+    const db = readDB();
+    db.recommendations = (db.recommendations || []).filter(r => r.id !== req.params.id);
+    writeDB(db);
+    res.json({ success: true });
+  } catch (e) {
+    res.status(500).json({ success: false, error: e.message });
+  }
+});
+
+// ─── Tour Album (user photos) ────────────────────────────────
+app.get('/api/tour-album/:tourId', (req, res) => {
+  try {
+    const db = readDB();
+    const photos = (db.tourAlbums?.[req.params.tourId] || []).filter(p => p.status === 'approved');
+    res.json({ success: true, data: photos });
+  } catch (e) {
+    res.status(500).json({ success: false, error: e.message });
+  }
+});
+
+app.get('/api/tour-album', (req, res) => {
+  try {
+    const db = readDB();
+    res.json({ success: true, data: db.tourAlbums || {} });
+  } catch (e) {
+    res.status(500).json({ success: false, error: e.message });
+  }
+});
+
+app.post('/api/tour-album/:tourId', upload.single('file'), (req, res) => {
+  try {
+    const { tourId } = req.params;
+    const { name, city } = req.body;
+    if (!req.file) return res.status(400).json({ success: false, error: 'image required' });
+    const db = readDB();
+    if (!db.tourAlbums) db.tourAlbums = {};
+    if (!db.tourAlbums[tourId]) db.tourAlbums[tourId] = [];
+    const photo = {
+      id: 'tp_' + Date.now(),
+      name: name || 'גולש',
+      city: city || '',
+      image: `/uploads/${req.file.filename}`,
+      date: new Date().toISOString().split('T')[0],
+      status: 'pending',
+    };
+    db.tourAlbums[tourId].push(photo);
+    writeDB(db);
+    res.json({ success: true, data: photo });
+  } catch (e) {
+    res.status(500).json({ success: false, error: e.message });
+  }
+});
+
+app.post('/api/tour-album/:tourId/:photoId/approve', (req, res) => {
+  try {
+    const db = readDB();
+    const photo = (db.tourAlbums?.[req.params.tourId] || []).find(p => p.id === req.params.photoId);
+    if (!photo) return res.status(404).json({ success: false });
+    photo.status = 'approved';
+    writeDB(db);
+    res.json({ success: true });
+  } catch (e) {
+    res.status(500).json({ success: false, error: e.message });
+  }
+});
+
+app.post('/api/tour-album/:tourId/:photoId/reject', (req, res) => {
+  try {
+    const db = readDB();
+    const photo = (db.tourAlbums?.[req.params.tourId] || []).find(p => p.id === req.params.photoId);
+    if (!photo) return res.status(404).json({ success: false });
+    photo.status = 'rejected';
+    writeDB(db);
+    res.json({ success: true });
+  } catch (e) {
+    res.status(500).json({ success: false, error: e.message });
+  }
+});
+
 // ─── Auto-sync Google My Maps (daily) ─────────────────────────
 const https = require('https');
 const { DOMParser } = (() => { try { return require('xmldom'); } catch { return { DOMParser: null }; } })();

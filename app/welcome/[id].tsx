@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView, Platform, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Platform, Image, TouchableOpacity, Linking } from 'react-native';
 import { useLocalSearchParams, Stack } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -46,11 +46,13 @@ type WelcomeItem = {
 export default function WelcomeScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const [item, setItem] = useState<WelcomeItem | null>(null);
+  const [sub, setSub] = useState<any>(null);
 
   useEffect(() => {
     fetchContent().then((data) => {
       const found = (data.welcome || []).find((w: WelcomeItem) => w.id === id);
       if (found) setItem(found);
+      if (data.subscriptionBlock) setSub(data.subscriptionBlock);
     }).catch(() => {});
   }, [id]);
 
@@ -100,16 +102,64 @@ export default function WelcomeScreen() {
           </View>
         )}
 
-        <View style={styles.card}>
-          {item.longText && Platform.OS === 'web' && item.longText.includes('<') ? (
-            React.createElement('div', {
-              dangerouslySetInnerHTML: { __html: item.longText },
-              style: { fontSize: 14, color: '#444', textAlign: 'right', direction: 'rtl', lineHeight: '24px' },
-            })
-          ) : (
-            <Text style={styles.cardBody}>{item.longText || 'תוכן יתווסף בקרוב'}</Text>
-          )}
-        </View>
+        {item.id === '6' && sub && (
+          <View style={[subSt.wrap, { backgroundColor: sub.bgColor || '#fff' }]}>
+            <Text style={[subSt.title, { color: sub.titleColor || '#1C2B35', fontSize: sub.fontSize || 20 }]}>📱 {sub.title}</Text>
+            <Text style={subSt.desc}>{sub.desc}</Text>
+            <View style={subSt.plans}>
+              <View style={[subSt.plan, { backgroundColor: sub.plan1Color || '#f0f4f8' }]}>
+                <Text style={subSt.planLabel}>{sub.plan1?.label}</Text>
+                <Text style={subSt.planPrice}>{sub.plan1?.price}</Text>
+                <Text style={subSt.planPeriod}>{sub.plan1?.period}</Text>
+                <Text style={subSt.planNote}>{sub.plan1?.note}</Text>
+              </View>
+              <View style={[subSt.plan, { backgroundColor: sub.plan2Color || '#1A6B8A', borderColor: sub.plan2Color || '#1A6B8A' }]}>
+                <Text style={subSt.bestBadge}>משתלם!</Text>
+                <Text style={[subSt.planLabel, { color: '#fff' }]}>{sub.plan2?.label}</Text>
+                <Text style={[subSt.planPrice, { color: '#fff' }]}>{sub.plan2?.price}</Text>
+                <Text style={[subSt.planPeriod, { color: 'rgba(255,255,255,0.8)' }]}>{sub.plan2?.period}</Text>
+                <Text style={[subSt.planNote, { color: 'rgba(255,255,255,0.7)' }]}>{sub.plan2?.note}</Text>
+              </View>
+            </View>
+            <View style={subSt.stores}>
+              <TouchableOpacity onPress={() => Linking.openURL(sub.appleUrl)} style={subSt.storeBtn}>
+                {Platform.OS === 'web' ? (
+                  React.createElement('img', {
+                    src: 'https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us?size=250x83',
+                    alt: 'Download on the App Store',
+                    style: { width: 130, height: 40, objectFit: 'contain' },
+                  })
+                ) : (
+                  <Image source={{ uri: 'https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us?size=250x83' }} style={{ width: 140, height: 42 }} resizeMode="contain" />
+                )}
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => Linking.openURL(sub.googleUrl)} style={subSt.storeBtn}>
+                {Platform.OS === 'web' ? (
+                  React.createElement('img', {
+                    src: 'https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png',
+                    alt: 'Get it on Google Play',
+                    style: { width: 180, height: 55, objectFit: 'contain', margin: '-7px' },
+                  })
+                ) : (
+                  <Image source={{ uri: 'https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png' }} style={{ width: 170, height: 52 }} resizeMode="contain" />
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
+
+        {item.longText ? (
+          <View style={styles.card}>
+            {Platform.OS === 'web' && item.longText.includes('<') ? (
+              React.createElement('div', {
+                dangerouslySetInnerHTML: { __html: item.longText },
+                style: { fontSize: 14, color: '#444', textAlign: 'right', direction: 'rtl', lineHeight: '24px' },
+              })
+            ) : (
+              <Text style={styles.cardBody}>{item.longText}</Text>
+            )}
+          </View>
+        ) : null}
 
       </ScrollView>
     </SafeAreaView>
@@ -139,5 +189,31 @@ const styles = StyleSheet.create({
     shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 8, elevation: 2,
   },
   cardBody: { fontSize: 14, color: '#444', textAlign: 'right', writingDirection: 'rtl', lineHeight: 24 },
+});
+
+const subSt = StyleSheet.create({
+  wrap: {
+    marginTop: 16, backgroundColor: '#fff', borderRadius: 16, padding: 20,
+    shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.08, shadowRadius: 10, elevation: 3,
+  },
+  title: { fontSize: 20, fontWeight: '900', color: Colors.TEXT, textAlign: 'center', writingDirection: 'rtl' },
+  desc: { fontSize: 13, color: '#666', textAlign: 'center', writingDirection: 'rtl', marginTop: 6, lineHeight: 20 },
+  plans: { flexDirection: 'row-reverse', gap: 12, marginTop: 16 },
+  plan: {
+    flex: 1, backgroundColor: '#f0f4f8', borderRadius: 14, padding: 16, alignItems: 'center',
+    borderWidth: 2, borderColor: '#e2e8f0',
+  },
+  planBest: { backgroundColor: Colors.PRIMARY, borderColor: Colors.PRIMARY },
+  bestBadge: {
+    position: 'absolute', top: -10, backgroundColor: Colors.ACCENT, color: '#fff',
+    fontSize: 11, fontWeight: '800', paddingHorizontal: 10, paddingVertical: 3, borderRadius: 10, overflow: 'hidden',
+  },
+  planLabel: { fontSize: 14, fontWeight: '700', color: Colors.TEXT, marginTop: 4 },
+  planPrice: { fontSize: 28, fontWeight: '900', color: Colors.PRIMARY, marginTop: 4 },
+  planPeriod: { fontSize: 11, color: '#888', marginTop: 2, textAlign: 'center' },
+  planNote: { fontSize: 10, color: '#aaa', marginTop: 6, textAlign: 'center', fontWeight: '600' },
+  stores: { flexDirection: 'row-reverse', justifyContent: 'center', gap: 12, marginTop: 20, alignItems: 'center' },
+  storeBtn: { height: 50, width: 150 },
+  storeLogo: { width: '100%', height: '100%' },
 });
 
