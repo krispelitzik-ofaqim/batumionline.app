@@ -14,13 +14,13 @@ type MapPoint = { name: string; lat: number; lng: number; description?: string }
 import AudioPlayer from '../../components/AudioPlayer';
 import FlightsModal from '../../components/FlightsModal';
 
-type Hotel = { id: string; title: string; titleEn?: string; text: string; image: string; mapUrl?: string; pageUrl?: string; coords?: { lat: number; lng: number }; visible?: boolean; images?: string[]; amenities?: string[]; price?: string };
+type Hotel = { id: string; title: string; titleEn?: string; text: string; image: string; mapUrl?: string; pageUrl?: string; coords?: { lat: number; lng: number }; visible?: boolean; images?: string[]; amenities?: string[]; price?: string; audio?: string };
 type TourBlock = { id: string; title: string; subtitle?: string; text: string; color: string; images: string[]; audios: { title?: string; url: string }[]; visible?: boolean; coords?: { lat: number; lng: number } };
 type Item = {
   id: string; title: string; subtitle?: string; icon: string; bg?: string;
   bgDark?: string; description?: string; summary?: string; heroBg?: string;
   layout?: 'card' | 'banner'; children?: Item[]; hotels?: Hotel[]; tours?: TourBlock[]; pageBtnLabel?: string; cardStyle?: string;
-  theme?: 'dark' | 'light'; modal?: string; longText?: string;
+  theme?: 'dark' | 'light'; modal?: string; longText?: string; introAudio?: string;
   titleEn?: string; titleGe?: string; heroImage?: string; tourMapEmbed?: string;
   article?: {
     heroImage?: string; color?: string;
@@ -233,6 +233,13 @@ function FoodRecGps({ restaurants }: { restaurants: { name: string; lat: number;
   );
 }
 
+function isLight(hex: string): boolean {
+  const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex || '');
+  if (!m) return false;
+  const r = parseInt(m[1], 16), g = parseInt(m[2], 16), b = parseInt(m[3], 16);
+  return (r * 0.299 + g * 0.587 + b * 0.114) > 170;
+}
+
 function TourStations({ audios, color, onNavigate, onActiveChange, nearbyRestaurants, foodRecEnabled }: {
   audios: { title?: string; url: string; coords?: { lat: number; lng: number } }[];
   color: string;
@@ -284,7 +291,7 @@ function TourStations({ audios, color, onNavigate, onActiveChange, nearbyRestaur
             <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 8 }}>
               <Text style={{ fontSize: 16, color: '#999', fontWeight: '700', paddingHorizontal: 4, ...(Platform.OS === 'web' ? { cursor: 'grab' } as any : {}) }}>≡</Text>
               <TouchableOpacity onPress={() => toggle(i)} style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: isPlaying ? color : 'rgba(0,0,0,0.15)', alignItems: 'center', justifyContent: 'center' }}>
-                <Text style={{ color: '#fff', fontSize: 14, fontWeight: '900' }}>{isPlaying ? '❚❚' : '▶'}</Text>
+                <Text style={{ color: isPlaying ? (isLight(color) ? '#1C2B35' : '#fff') : '#fff', fontSize: 14, fontWeight: '900' }}>{isPlaying ? '❚❚' : '▶'}</Text>
               </TouchableOpacity>
               <View style={{ flex: 1 }}>
                 <Text style={{ fontSize: 14, fontWeight: isPlaying ? '900' : '700', color: '#1C2B35', textAlign: 'right', writingDirection: 'rtl' }}>{au.title || `תחנה ${i + 1}`}</Text>
@@ -292,7 +299,7 @@ function TourStations({ audios, color, onNavigate, onActiveChange, nearbyRestaur
               </View>
               {au.coords && (
                 <TouchableOpacity onPress={() => onNavigate(au.coords!)} style={{ paddingHorizontal: 12, paddingVertical: 8, borderRadius: 10, backgroundColor: color }}>
-                  <Text style={{ fontSize: 12, fontWeight: '800', color: '#fff' }}>📌 נווט</Text>
+                  <Text style={{ fontSize: 12, fontWeight: '800', color: isLight(color) ? '#1C2B35' : '#fff' }}>📌 נווט</Text>
                 </TouchableOpacity>
               )}
             </View>
@@ -367,7 +374,7 @@ function TourAlbum({ tourId, color }: { tourId: string; color: string }) {
   if (!open) {
     return (
       <TouchableOpacity onPress={() => setOpen(true)} style={{ marginHorizontal: 12, marginTop: 8, paddingVertical: 10, borderRadius: 10, backgroundColor: color, alignItems: 'center' }}>
-        <Text style={{ fontSize: 13, fontWeight: '800', color: '#fff' }}>📸 פתח אלבום גולשים</Text>
+        <Text style={{ fontSize: 13, fontWeight: '800', color: isLight(color) ? '#1C2B35' : '#fff' }}>📸 פתח אלבום גולשים</Text>
       </TouchableOpacity>
     );
   }
@@ -686,6 +693,11 @@ function HotelCard({ h, dark, pageBtnLabel, mapPoints, layerColor }: { h: Hotel;
   return (
     <View style={[st.hotelCard, dark && { backgroundColor: '#2a3942' }]}>
       <HotelImage uri={h.image} titleEn={h.titleEn} />
+      {h.audio ? (
+        <View style={{ paddingHorizontal: 12, paddingTop: 8 }}>
+          <AudioPlayer tracks={[{ title: h.title, url: h.audio }]} compact />
+        </View>
+      ) : null}
       <View style={st.hotelBody}>
         <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' }}>
           <Text style={[st.hotelTitle, dark && { color: Colors.BACKGROUND }, { flex: 1 }]}>{h.title}</Text>
@@ -966,7 +978,7 @@ export default function CategoryScreen() {
     return (
       <SafeAreaView style={[st.safe, darkCat && { backgroundColor: cat.heroBg || '#0f1419' }]}>
         <Stack.Screen options={{ headerShown: true, title: cat.title, headerBackTitle: 'חזרה' }} />
-        <FlightsModal visible={true} onClose={() => router.back()} bgColor={cat.bg || '#2D4A5E'} />
+        <FlightsModal visible={true} onClose={() => router.back()} bgColor="#2D4A5E" />
       </SafeAreaView>
     );
   }
@@ -1045,7 +1057,6 @@ export default function CategoryScreen() {
                       ))}
                       {r && r.count > 0 && <Text style={{ fontSize: 10, color: 'rgba(0,0,0,0.5)', marginRight: 4 }}>({r.count})</Text>}
                     </View>
-                    {avg >= 4 && <Text style={st.tourGridPopular}>סיור זה פופולרי בקרב הגולשים</Text>}
                     <Text style={st.tourGridIcon}>🎧</Text>
                     <Text style={st.tourGridTitle} numberOfLines={2}>{t.title || 'ללא כותרת'}</Text>
                     <Text style={st.tourGridSub} numberOfLines={2}>{t.subtitle || ' '}</Text>
@@ -1115,6 +1126,11 @@ export default function CategoryScreen() {
                   dangerouslySetInnerHTML: { __html: cat.longText },
                   style: { direction: 'rtl', textAlign: 'right' },
                 })}
+              </View>
+            )}
+            {cat.introAudio && (
+              <View style={{ paddingHorizontal: 16, paddingTop: 4, paddingBottom: 8 }}>
+                <AudioPlayer tracks={[{ title: cat.title, url: cat.introAudio }]} compact />
               </View>
             )}
             {cat.hotels.filter(h => h.visible !== false).map(h => (

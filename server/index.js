@@ -589,6 +589,89 @@ app.get('/api/sync-map', async (req, res) => {
   res.json({ success: true, layers: layers.length, points: layers.reduce((s, l) => s + l.points.length, 0) });
 });
 
+// ─── Subscribers (phone-based access) ─────────────────────────
+
+function normalizePhone(p) {
+  return String(p || '').replace(/\D/g, '');
+}
+
+function computeExpiry(plan, startDate) {
+  const start = startDate ? new Date(startDate) : new Date();
+  const d = new Date(start);
+  if (plan === 'year') d.setFullYear(d.getFullYear() + 1);
+  else d.setDate(d.getDate() + 30); // default 30d
+  return d.toISOString();
+}
+
+// GET /api/subscribers — list all
+app.get('/api/subscribers', (req, res) => {
+  const db = readDB();
+  res.json({ success: true, subscribers: db.subscribers || [] });
+});
+
+// GET /api/subscribers/check?phone=... — check active status
+app.get('/api/subscribers/check', (req, res) => {
+  const phone = normalizePhone(req.query.phone);
+  if (!phone) return res.json({ success: false, active: false, error: 'missing phone' });
+  const db = readDB();
+  const sub = (db.subscribers || []).find(s => normalizePhone(s.phone) === phone);
+  if (!sub) return res.json({ success: true, active: false, found: false });
+  const now = new Date();
+  const exp = new Date(sub.expiresAt);
+  const active = sub.active !== false && exp > now;
+  res.json({ success: true, active, found: true, subscriber: sub });
+});
+
+// POST /api/subscribers — add (or extend if exists)
+app.post('/api/subscribers', (req, res) => {
+  const { phone, name, plan, startDate } = req.body || {};
+  const p = normalizePhone(phone);
+  if (!p) return res.status(400).json({ success: false, error: 'phone required' });
+  const db = readDB();
+  if (!db.subscribers) db.subscribers = [];
+  const existingIdx = db.subscribers.findIndex(s => normalizePhone(s.phone) === p);
+  const start = startDate || new Date().toISOString();
+  const expiresAt = computeExpiry(plan || '30d', start);
+  const record = { phone: p, name: name || '', plan: plan || '30d', startDate: start, expiresAt, active: true };
+  if (existingIdx >= 0) db.subscribers[existingIdx] = record;
+  else db.subscribers.push(record);
+  writeDB(db);
+  res.json({ success: true, subscriber: record });
+});
+
+// PUT /api/subscribers/:phone — update fields
+app.put('/api/subscribers/:phone', (req, res) => {
+  const p = normalizePhone(req.params.phone);
+  const db = readDB();
+  const i = (db.subscribers || []).findIndex(s => normalizePhone(s.phone) === p);
+  if (i < 0) return res.status(404).json({ success: false, error: 'not found' });
+  const body = req.body || {};
+  const current = db.subscribers[i];
+  const plan = body.plan || current.plan;
+  const startDate = body.startDate || current.startDate;
+  const updated = {
+    ...current,
+    ...body,
+    phone: p,
+    plan,
+    startDate,
+    expiresAt: body.expiresAt || computeExpiry(plan, startDate),
+  };
+  db.subscribers[i] = updated;
+  writeDB(db);
+  res.json({ success: true, subscriber: updated });
+});
+
+// DELETE /api/subscribers/:phone
+app.delete('/api/subscribers/:phone', (req, res) => {
+  const p = normalizePhone(req.params.phone);
+  const db = readDB();
+  const before = (db.subscribers || []).length;
+  db.subscribers = (db.subscribers || []).filter(s => normalizePhone(s.phone) !== p);
+  writeDB(db);
+  res.json({ success: true, deleted: before - db.subscribers.length });
+});
+
 // ─── Serve Expo web build ─────────────────────────────────────
 const WEB_DIST = path.join(__dirname, '..', 'dist');
 if (fs.existsSync(WEB_DIST)) {

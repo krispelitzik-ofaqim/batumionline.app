@@ -197,6 +197,14 @@ const TAG_GROUPS: { group: string; icon: string; tags: { key: string; label: str
   { group: 'מידע חובה', icon: '📜', tags: [{ key: 'legal', label: 'מידע חובה' }] },
   { group: 'תמונות', icon: '🖼️', tags: [{ key: 'icon', label: 'אייקון' },{ key: 'gallery', label: 'גלריה' },{ key: 'home', label: 'גלריית בית' }] },
   { group: 'גלריה', icon: '🎞️', tags: [{ key: 'gallery_main', label: 'גלריה ראשית' }] },
+  { group: 'טיסות', icon: '✈️', tags: [
+    { key: 'airline_LY', label: 'אל על (LY)' },
+    { key: 'airline_UP', label: 'סאן דור (UP)' },
+    { key: 'airline_6H', label: 'ישראייר (6H)' },
+    { key: 'airline_W6', label: 'וויז אייר (W6)' },
+    { key: 'airline_U2', label: 'איזיג׳ט (U2)' },
+    { key: 'airline_IZ', label: 'ארקיע (IZ)' },
+  ]},
 ];
 const TAG_OPTIONS = TAG_GROUPS.flatMap(g => g.tags);
 
@@ -1100,7 +1108,7 @@ export default function AdminDashboard() {
   const [mediaVersion, setMediaVersion] = useState(0);
   const [ratings, setRatings] = useState<Record<string, { sum: number; count: number }>>({});
   const [subBlock, setSubBlock] = useState<any>(null);
-  const [subTab, setSubTab] = useState<'banner' | 'dashboard' | 'crm' | 'paywall' | 'marketing' | 'accounting' | 'cancels'>('dashboard');
+  const [subTab, setSubTab] = useState<'banner' | 'dashboard' | 'crm' | 'paywall' | 'marketing' | 'accounting' | 'cancels' | 'subscribers'>('dashboard');
 
   const refreshMedia = useCallback(async () => {
     try {
@@ -1343,6 +1351,10 @@ export default function AdminDashboard() {
         ))}
       </ScrollView>
       <View style={ns.navFooter}>
+        <TouchableOpacity style={ns.navFooterBtn} onPress={() => { if (Platform.OS === 'web') (window as any).open('/preview/phones', '_blank'); else router.push('/preview/phones' as any); }}>
+          <Text style={ns.navFooterIcon}>📱</Text>
+          <Text style={ns.navFooterTxt}>תצוגת 10 ניידים</Text>
+        </TouchableOpacity>
         <TouchableOpacity style={ns.navFooterBtn} onPress={() => router.replace('/')}>
           <Text style={ns.navFooterIcon}>←</Text>
           <Text style={ns.navFooterTxt}>חזרה לאפליקציה</Text>
@@ -1437,7 +1449,110 @@ export default function AdminDashboard() {
     } catch {}
   };
 
-  const tabColors: Record<string, string> = { dashboard: '#1A6B8A', crm: '#8b5cf6', paywall: '#e91e63', marketing: '#f59e0b', accounting: '#3b82f6', cancels: '#dc2626', banner: '#64748b' };
+  const tabColors: Record<string, string> = { subscribers: '#10b981', dashboard: '#1A6B8A', crm: '#8b5cf6', paywall: '#e91e63', marketing: '#f59e0b', accounting: '#3b82f6', cancels: '#dc2626', banner: '#64748b' };
+
+  const [subsList, setSubsList] = useState<any[]>([]);
+  const [subForm, setSubForm] = useState<{ phone: string; name: string; plan: '30d' | 'year' }>({ phone: '', name: '', plan: '30d' });
+  const [subsLoading, setSubsLoading] = useState(false);
+
+  const loadSubs = async () => {
+    setSubsLoading(true);
+    try {
+      const r = await fetch(`${API_BASE}/api/subscribers`);
+      const j = await r.json();
+      setSubsList(j.subscribers || []);
+    } catch {}
+    setSubsLoading(false);
+  };
+  useEffect(() => { loadSubs(); }, []);
+
+  const addSub = async () => {
+    if (!subForm.phone) return;
+    await fetch(`${API_BASE}/api/subscribers`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(subForm),
+    });
+    setSubForm({ phone: '', name: '', plan: '30d' });
+    loadSubs();
+  };
+
+  const delSub = async (phone: string) => {
+    await fetch(`${API_BASE}/api/subscribers/${encodeURIComponent(phone)}`, { method: 'DELETE' });
+    loadSubs();
+  };
+
+  const renderSubscribers = () => {
+    const fmtDate = (iso: string) => { try { return new Date(iso).toLocaleDateString('he-IL'); } catch { return iso; } };
+    const activeCount = subsList.filter(s => s.active !== false && new Date(s.expiresAt) > new Date()).length;
+    const expiredCount = subsList.length - activeCount;
+    return (
+      <View style={{ gap: 14 }}>
+        <View style={{ flexDirection: 'row-reverse', gap: 10 }}>
+          <View style={{ flex: 1, backgroundColor: '#ecfdf5', borderRadius: 12, padding: 14, alignItems: 'center' }}>
+            <Text style={{ fontSize: 11, color: '#047857', fontWeight: '700', writingDirection: 'rtl' }}>פעילים</Text>
+            <Text style={{ fontSize: 24, fontWeight: '900', color: '#10b981' }}>{activeCount}</Text>
+          </View>
+          <View style={{ flex: 1, backgroundColor: '#fef2f2', borderRadius: 12, padding: 14, alignItems: 'center' }}>
+            <Text style={{ fontSize: 11, color: '#b91c1c', fontWeight: '700', writingDirection: 'rtl' }}>פג תוקף</Text>
+            <Text style={{ fontSize: 24, fontWeight: '900', color: '#dc2626' }}>{expiredCount}</Text>
+          </View>
+          <View style={{ flex: 1, backgroundColor: '#f0f9ff', borderRadius: 12, padding: 14, alignItems: 'center' }}>
+            <Text style={{ fontSize: 11, color: '#0369a1', fontWeight: '700', writingDirection: 'rtl' }}>סה״כ</Text>
+            <Text style={{ fontSize: 24, fontWeight: '900', color: '#0ea5e9' }}>{subsList.length}</Text>
+          </View>
+        </View>
+
+        <View style={{ backgroundColor: '#fff', borderRadius: 14, padding: 14, borderWidth: 1, borderColor: '#e2e8f0' }}>
+          <Text style={{ fontSize: 14, fontWeight: '900', color: '#1C2B35', textAlign: 'right', writingDirection: 'rtl', marginBottom: 10 }}>➕ הוסף מנוי חדש</Text>
+          <View style={{ gap: 8 }}>
+            <TextInput style={{ borderWidth: 1, borderColor: '#cbd5e1', borderRadius: 10, padding: 10, fontSize: 14, textAlign: 'right' }} placeholder="טלפון (חובה)" value={subForm.phone} onChangeText={v => setSubForm(p => ({ ...p, phone: v }))} keyboardType="phone-pad" />
+            <TextInput style={{ borderWidth: 1, borderColor: '#cbd5e1', borderRadius: 10, padding: 10, fontSize: 14, textAlign: 'right' }} placeholder="שם" value={subForm.name} onChangeText={v => setSubForm(p => ({ ...p, name: v }))} />
+            <View style={{ flexDirection: 'row-reverse', gap: 8 }}>
+              {(['30d', 'year'] as const).map(pl => (
+                <TouchableOpacity key={pl} onPress={() => setSubForm(p => ({ ...p, plan: pl }))} style={{ flex: 1, padding: 10, borderRadius: 10, backgroundColor: subForm.plan === pl ? '#10b981' : '#f1f5f9', alignItems: 'center' }}>
+                  <Text style={{ fontSize: 13, fontWeight: '800', color: subForm.plan === pl ? '#fff' : '#475569' }}>{pl === '30d' ? '30 יום' : 'שנה'}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+            <TouchableOpacity onPress={addSub} style={{ padding: 12, borderRadius: 10, backgroundColor: '#10b981', alignItems: 'center', marginTop: 4 }}>
+              <Text style={{ fontSize: 14, fontWeight: '900', color: '#fff' }}>הוסף / חדש תוקף</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        <View style={{ backgroundColor: '#fff', borderRadius: 14, padding: 14, borderWidth: 1, borderColor: '#e2e8f0' }}>
+          <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+            <Text style={{ fontSize: 14, fontWeight: '900', color: '#1C2B35', writingDirection: 'rtl' }}>📋 רשימת מנויים</Text>
+            <TouchableOpacity onPress={loadSubs} style={{ paddingVertical: 4, paddingHorizontal: 10, borderRadius: 8, backgroundColor: '#f1f5f9' }}>
+              <Text style={{ fontSize: 11, fontWeight: '700', color: '#475569' }}>{subsLoading ? '...' : '↻ רענן'}</Text>
+            </TouchableOpacity>
+          </View>
+          {subsList.length === 0 ? (
+            <Text style={{ fontSize: 12, color: '#94a3b8', textAlign: 'center', padding: 20, writingDirection: 'rtl' }}>אין מנויים עדיין</Text>
+          ) : (
+            <View style={{ gap: 6 }}>
+              {subsList.map(s => {
+                const isActive = s.active !== false && new Date(s.expiresAt) > new Date();
+                return (
+                  <View key={s.phone} style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 10, padding: 10, borderRadius: 10, backgroundColor: isActive ? '#f0fdf4' : '#fef2f2' }}>
+                    <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: isActive ? '#10b981' : '#dc2626' }} />
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ fontSize: 13, fontWeight: '800', color: '#1C2B35', textAlign: 'right', writingDirection: 'rtl' }}>{s.name || '(ללא שם)'} · {s.phone}</Text>
+                      <Text style={{ fontSize: 11, color: '#64748b', textAlign: 'right', writingDirection: 'rtl' }}>{s.plan === 'year' ? 'שנתי' : '30 יום'} · תוקף: {fmtDate(s.expiresAt)}</Text>
+                    </View>
+                    <TouchableOpacity onPress={() => delSub(s.phone)} style={{ paddingVertical: 4, paddingHorizontal: 8, borderRadius: 6, backgroundColor: '#fee2e2' }}>
+                      <Text style={{ fontSize: 11, fontWeight: '800', color: '#dc2626' }}>✕</Text>
+                    </TouchableOpacity>
+                  </View>
+                );
+              })}
+            </View>
+          )}
+        </View>
+      </View>
+    );
+  };
 
   const renderPaywall = () => {
     const pw = paywallData;
@@ -1583,7 +1698,8 @@ export default function AdminDashboard() {
             })}
           </View>
         )}
-        {subTab === 'banner' ? renderSubBanner()
+        {subTab === 'subscribers' ? renderSubscribers()
+          : subTab === 'banner' ? renderSubBanner()
           : subTab === 'dashboard' ? renderSubDashboard()
           : subTab === 'crm' ? renderSubCrm()
           : subTab === 'paywall' ? renderPaywall()

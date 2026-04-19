@@ -17,20 +17,10 @@ import { PreviewContext, PreviewMode } from '../constants/previewContext';
 
 // Set Assistant as the default font for all Text and TextInput components
 const defaultTextStyle = { fontFamily: 'Assistant_400Regular' };
-const originalTextRender = (Text as any).render;
-(Text as any).render = function (...args: any[]) {
-  const origin = originalTextRender.call(this, ...args);
-  return React.cloneElement(origin, {
-    style: [defaultTextStyle, origin.props.style],
-  });
-};
-const originalTextInputRender = (TextInput as any).render;
-(TextInput as any).render = function (...args: any[]) {
-  const origin = originalTextInputRender.call(this, ...args);
-  return React.cloneElement(origin, {
-    style: [defaultTextStyle, origin.props.style],
-  });
-};
+(Text as any).defaultProps = (Text as any).defaultProps || {};
+(Text as any).defaultProps.style = [defaultTextStyle, (Text as any).defaultProps.style];
+(TextInput as any).defaultProps = (TextInput as any).defaultProps || {};
+(TextInput as any).defaultProps.style = [defaultTextStyle, (TextInput as any).defaultProps.style];
 
 const PREVIEW_WIDTHS: Record<string, number> = { mobile: 375, tablet: 768, desktop: 1024 };
 

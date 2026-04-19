@@ -22,12 +22,16 @@ function darken(hex: string, amount = 0.45): string {
   return `rgb(${r},${g},${b})`;
 }
 
+const SPEEDS = [1, 1.5, 2];
+
 export default function AudioPlayer({ tracks: initialTracks, title, compact, onNavigate, tint, onActiveChange, onTimeReached }: Props) {
   const [tracks, setTracks] = useState(initialTracks);
   const [activeIdx, setActiveIdx] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [pos, setPos] = useState(0);
   const [dur, setDur] = useState(0);
+  const [speedIdx, setSpeedIdx] = useState(0);
+  const [volume, setVolumeState] = useState(1);
   const [dragIdx, setDragIdx] = useState<number | null>(null);
   const timeTriggered = useRef(false);
   const soundRef = useRef<any>(null);
@@ -54,10 +58,55 @@ export default function AudioPlayer({ tracks: initialTracks, title, compact, onN
 
   const current = tracks[activeIdx];
 
+  // Preload metadata so duration shows before play
+  useEffect(() => {
+    if (!current?.url) return;
+    if (Platform.OS === 'web') {
+      const el = new (window as any).Audio();
+      el.preload = 'metadata';
+      el.src = current.url;
+      const onMeta = () => setDur((el.duration || 0) * 1000);
+      el.addEventListener('loadedmetadata', onMeta);
+      return () => { el.removeEventListener('loadedmetadata', onMeta); el.src = ''; };
+    }
+  }, [current?.url]);
+
+  const skip = (deltaSec: number) => {
+    if (Platform.OS === 'web' && audioElRef.current) {
+      const t = Math.max(0, Math.min((audioElRef.current.duration || 0), (audioElRef.current.currentTime || 0) + deltaSec));
+      audioElRef.current.currentTime = t;
+      setPos(t * 1000);
+    } else if (soundRef.current) {
+      soundRef.current.getStatusAsync().then((st: any) => {
+        if (!st.isLoaded) return;
+        const newMs = Math.max(0, Math.min(st.durationMillis || 0, (st.positionMillis || 0) + deltaSec * 1000));
+        soundRef.current.setPositionAsync(newMs);
+      });
+    }
+  };
+
+  const setVolume = (v: number) => {
+    const nv = Math.max(0, Math.min(1, v));
+    setVolumeState(nv);
+    if (Platform.OS === 'web' && audioElRef.current) audioElRef.current.volume = nv;
+    else if (soundRef.current) soundRef.current.setVolumeAsync(nv).catch(() => {});
+  };
+
+  const setSpeed = (idx: number) => {
+    setSpeedIdx(idx);
+    const rate = SPEEDS[idx];
+    if (Platform.OS === 'web' && audioElRef.current) {
+      audioElRef.current.playbackRate = rate;
+    } else if (soundRef.current) {
+      soundRef.current.setRateAsync(rate, true).catch(() => {});
+    }
+  };
+
   const toggle = async () => {
     if (Platform.OS === 'web') {
       if (!audioElRef.current) {
         audioElRef.current = new (window as any).Audio(current.url);
+        audioElRef.current.playbackRate = SPEEDS[speedIdx];
         audioElRef.current.ontimeupdate = () => {
           setPos((audioElRef.current.currentTime || 0) * 1000);
           setDur((audioElRef.current.duration || 0) * 1000);
@@ -127,22 +176,60 @@ export default function AudioPlayer({ tracks: initialTracks, title, compact, onN
   return (
     <View style={[styles.card, compact && styles.cardCompact, tint && { backgroundColor: tint, borderColor: 'rgba(0,0,0,0.1)' }]}>
       {title && <Text style={styles.header}>{title}</Text>}
-      <Text style={[styles.nowTitle, compact && styles.nowTitleCompact]}>{current?.title || `שיר ${activeIdx + 1}`}</Text>
 
-      <View style={styles.row}>
-        <TouchableOpacity style={[styles.playBtn, compact && styles.playBtnCompact]} onPress={toggle} activeOpacity={0.85}>
-          <Text style={[styles.playIcon, compact && styles.playIconCompact]}>{playing ? '❚❚' : '▶'}</Text>
-        </TouchableOpacity>
-        <View style={styles.progressWrap}>
+      {compact ? (
+        <>
+          <View style={styles.topRow}>
+            <Text style={styles.titleText} numberOfLines={1}>{current?.title || `שיר ${activeIdx + 1}`}</Text>
+            <View style={styles.topBtns}>
+              <TouchableOpacity style={styles.skipCircle} onPress={() => skip(10)} activeOpacity={0.7}>
+                <Text style={styles.skipTxt}>+10</Text>
+                <Text style={styles.skipDirArrow}>⟶</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.playBtnSmall} onPress={toggle} activeOpacity={0.85}>
+                <Text style={styles.playIconSmall}>{playing ? '❚❚' : '▶'}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.skipCircle} onPress={() => skip(-10)} activeOpacity={0.7}>
+                <Text style={styles.skipTxt}>−10</Text>
+                <Text style={styles.skipDirArrow}>⟵</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
           <View style={styles.progressBg}>
             <View style={[styles.progressFill, { width: `${pct}%` }]} />
           </View>
           <View style={styles.timeRow}>
             <Text style={styles.time}>{fmt(pos)}</Text>
+            <View style={styles.speedInline}>
+              {SPEEDS.map((sp, i) => (
+                <TouchableOpacity key={sp} onPress={() => setSpeed(i)} activeOpacity={0.7}>
+                  <Text style={[styles.speedInlineTxt, i === speedIdx && styles.speedInlineTxtActive]}>{sp}x</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
             <Text style={styles.time}>{fmt(dur)}</Text>
           </View>
-        </View>
-      </View>
+        </>
+      ) : (
+        <>
+          <Text style={styles.nowTitle}>{current?.title || `שיר ${activeIdx + 1}`}</Text>
+          <View style={styles.row}>
+            <TouchableOpacity style={styles.playBtn} onPress={toggle} activeOpacity={0.85}>
+              <Text style={styles.playIcon}>{playing ? '❚❚' : '▶'}</Text>
+            </TouchableOpacity>
+            <View style={styles.progressWrap}>
+              <View style={styles.progressBg}>
+                <View style={[styles.progressFill, { width: `${pct}%` }]} />
+              </View>
+              <View style={styles.timeRow}>
+                <Text style={styles.time}>{fmt(pos)}</Text>
+                <Text style={styles.time}>{fmt(dur)}</Text>
+              </View>
+            </View>
+          </View>
+        </>
+      )}
 
       {tracks.length > 1 && (
         <View style={styles.list}>
@@ -243,6 +330,28 @@ const styles = StyleSheet.create({
   progressFill: { height: '100%', backgroundColor: Colors.SECONDARY, borderRadius: 3 },
   timeRow: { flexDirection: 'row-reverse', justifyContent: 'space-between', marginTop: 6 },
   time: { fontSize: 11, color: '#888', fontVariant: ['tabular-nums'] },
+  speedInline: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  speedInlineTxt: { fontSize: 11, color: Colors.SECONDARY, fontWeight: '700', fontVariant: ['tabular-nums'] },
+  speedInlineTxtActive: { color: Colors.ACCENT, fontWeight: '900' },
+  topRow: { flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10, gap: 10 },
+  titleText: { flex: 1, fontSize: 14, fontWeight: '800', color: Colors.TEXT, writingDirection: 'rtl', textAlign: 'right' },
+  topBtns: { flexDirection: 'row-reverse', alignItems: 'center', gap: 10 },
+  skipCircle: { paddingHorizontal: 4, alignItems: 'center', justifyContent: 'center' },
+  skipTxt: { fontSize: 11, fontWeight: '700', color: '#999', fontVariant: ['tabular-nums'] },
+  skipDirArrow: { fontSize: 14, color: '#bbb', marginTop: -1, letterSpacing: -1 },
+  bottomRow: { flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', marginTop: 8 },
+  volumeWrap: { flexDirection: 'row-reverse', alignItems: 'center', gap: 6 },
+  volIcon: { fontSize: 14 },
+  playBtnSmall: {
+    width: 32, height: 32, borderRadius: 16,
+    backgroundColor: Colors.PRIMARY,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  playIconSmall: { color: Colors.WHITE, fontSize: 12, fontWeight: '900', marginLeft: 2 },
+  speedGroup: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  speedOpt: { paddingHorizontal: 4, paddingVertical: 2 },
+  speedOptTxt: { fontSize: 12, fontWeight: '700', color: '#999', fontVariant: ['tabular-nums'] },
+  speedOptTxtActive: { color: Colors.ACCENT, fontWeight: '900', fontSize: 13 },
   list: { marginTop: 16, gap: 6 },
   listItem: {
     flexDirection: 'row-reverse', alignItems: 'center', gap: 10,

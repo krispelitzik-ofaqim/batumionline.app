@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import {
-  View, Text, Modal, TouchableOpacity, StyleSheet, ActivityIndicator, ScrollView, Animated,
+  View, Text, Modal, TouchableOpacity, StyleSheet, ActivityIndicator, ScrollView, Animated, Image,
 } from 'react-native';
 import { Colors } from '../constants/colors';
 import { API_BASE } from '../constants/api';
@@ -33,6 +33,15 @@ type FlightDetails = {
   depRevised?: string;
   arrScheduled?: string;
   arrRevised?: string;
+};
+
+const AIRLINE_LOGOS: Record<string, any> = {
+  LY: require('../assets/images/flights/LY.png'),
+  UP: require('../assets/images/flights/UP.png'),
+  '6H': require('../assets/images/flights/6H.png'),
+  W6: require('../assets/images/flights/W6.png'),
+  U2: require('../assets/images/flights/U2.png'),
+  IZ: require('../assets/images/flights/IZ.png'),
 };
 
 export default function FlightsModal({ visible, onClose, bgColor }: { visible: boolean; onClose: () => void; bgColor: string }) {
@@ -317,16 +326,28 @@ export default function FlightsModal({ visible, onClose, bgColor }: { visible: b
               {/* Table header */}
               {filtered.length > 0 && (
                 <View style={s.tableHeader}>
+                  <Text style={[s.thCell, { width: 36, textAlign: 'center' }]}></Text>
                   <Text style={[s.thCell, { flex: 1, textAlign: 'right' }]}>טיסה</Text>
                   <Text style={[s.thCell, { width: 48, textAlign: 'center' }]}>המראה</Text>
                   <Text style={[s.thCell, { width: 16, marginHorizontal: 2 }]}></Text>
                   <Text style={[s.thCell, { width: 48, textAlign: 'center' }]}>נחיתה</Text>
-                  <Text style={[s.thCell, { width: 70, textAlign: 'center' }]}>סטטוס</Text>
+                  <Text style={[s.thCell, { textAlign: 'center' }]}>סטטוס</Text>
                 </View>
               )}
 
               {filtered.map((f, i) => (
                 <TouchableOpacity key={i} style={s.flightRow} activeOpacity={0.7} onPress={() => setSelected(f)}>
+                  <View style={s.logo}>
+                    {AIRLINE_LOGOS[getAirlineIATA(f.flight)] ? (
+                      <Image
+                        source={AIRLINE_LOGOS[getAirlineIATA(f.flight)]}
+                        style={{ width: '100%', height: '100%' }}
+                        resizeMode="contain"
+                      />
+                    ) : (
+                      <Text style={{ fontSize: 9, color: 'yellow', textAlign: 'center' }}>{getAirlineIATA(f.flight) || '?'}</Text>
+                    )}
+                  </View>
                   <View style={{ flex: 1 }}>
                     <Text style={s.flightNum}>{f.flight}</Text>
                     <Text style={s.airline}>{f.airline}</Text>
@@ -434,6 +455,11 @@ function translateStatus(status: string): string {
   if (s === 'cancelled' || s === 'canceled') return 'בוטלה';
   if (s === 'diverted') return 'הופנתה';
   return 'בזמן';
+}
+
+function getAirlineIATA(flight: string): string {
+  const m = flight.match(/^([A-Z0-9]{2,3})(?=\s|\d)/i);
+  return m ? m[1].toUpperCase() : '';
 }
 
 function formatTime(dateStr: string | undefined): string {
@@ -558,6 +584,7 @@ const s = StyleSheet.create({
     flexDirection: 'row-reverse', alignItems: 'center', gap: 6,
     backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 12, padding: 14, marginBottom: 6,
   },
+  logo: { width: 36, height: 36, borderRadius: 6, backgroundColor: 'rgba(255,255,255,0.1)' },
   flightNum: { fontSize: 15, fontWeight: '700', color: Colors.WHITE, textAlign: 'right' },
   airline: { fontSize: 11, color: Colors.WHITE, opacity: 0.5, textAlign: 'right' },
   timeCol: { alignItems: 'center', width: 48 },
@@ -565,7 +592,7 @@ const s = StyleSheet.create({
   timeDateLabel: { fontSize: 10, color: Colors.WHITE, opacity: 0.6, marginTop: 1 },
   timeLabel: { fontSize: 10, color: Colors.WHITE, opacity: 0.4, marginTop: 1 },
   timeArrow: { fontSize: 12, color: Colors.WHITE, opacity: 0.3, marginHorizontal: 2 },
-  statusBadge: { width: 70, paddingVertical: 5, borderRadius: 8, alignItems: 'center' },
+  statusBadge: { paddingVertical: 5, paddingHorizontal: 10, borderRadius: 8, alignItems: 'center', alignSelf: 'center' },
   statusTxt: { fontSize: 11, fontWeight: '700', color: Colors.WHITE, writingDirection: 'rtl' },
 
   detailsOverlay: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(10,20,30,0.96)', zIndex: 100 },
