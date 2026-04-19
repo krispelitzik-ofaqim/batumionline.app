@@ -1599,32 +1599,44 @@ export default function AdminDashboard() {
                   if (cat.parent !== 'ראשיות' && cat.parent !== 'נוספות') groups[g].push(cat);
                 });
                 const parentCats = pwCategories.filter(c => c.parent === 'ראשיות' || c.parent === 'נוספות');
+                const Toggle = ({ on, onPress, small }: { on: boolean; onPress: () => void; small?: boolean }) => (
+                  <TouchableOpacity onPress={onPress} activeOpacity={0.8}
+                    style={{ width: small ? 36 : 44, height: small ? 20 : 24, borderRadius: small ? 10 : 12, backgroundColor: on ? '#dc2626' : '#10b981', padding: 2, flexDirection: 'row', alignItems: 'center' }}>
+                    <View style={{ width: small ? 16 : 20, height: small ? 16 : 20, borderRadius: small ? 8 : 10, backgroundColor: '#fff', marginLeft: on ? (small ? 16 : 20) : 0 }} />
+                  </TouchableOpacity>
+                );
                 return parentCats.map(pc => {
                   const children = groups[pc.title] || [];
                   const pcLocked = pw.lockedCategories.includes(pc.id);
+                  const allChildIds = children.map(c => c.id);
+                  const toggleParent = () => {
+                    const idsToRemove = new Set([pc.id, ...allChildIds]);
+                    if (pcLocked) {
+                      savePaywall({ ...pw, lockedCategories: pw.lockedCategories.filter((id: string) => !idsToRemove.has(id)) });
+                    } else {
+                      const merged = Array.from(new Set([...pw.lockedCategories, pc.id, ...allChildIds]));
+                      savePaywall({ ...pw, lockedCategories: merged });
+                    }
+                  };
                   return (
                     <View key={pc.id} style={{ borderRadius: 12, overflow: 'hidden', borderWidth: 1, borderColor: '#e0e0e0' }}>
-                      <TouchableOpacity onPress={() => savePaywall({ ...pw, lockedCategories: pcLocked ? pw.lockedCategories.filter((id: string) => id !== pc.id) : [...pw.lockedCategories, pc.id] })}
-                        style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 10, backgroundColor: pcLocked ? '#fef2f2' : '#f0fdf4', padding: 12 }}>
+                      <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 10, backgroundColor: pcLocked ? '#fef2f2' : '#f0fdf4', padding: 12 }}>
                         <Text style={{ fontSize: 16 }}>{pcLocked ? '🔒' : '🔓'}</Text>
                         <Text style={{ flex: 1, fontSize: 14, fontWeight: '900', color: '#1C2B35', writingDirection: 'rtl' }}>{pc.title}</Text>
-                        <View style={{ paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8, backgroundColor: pcLocked ? '#fee2e2' : '#dcfce7' }}>
-                          <Text style={{ fontSize: 10, fontWeight: '800', color: pcLocked ? '#dc2626' : '#16a34a' }}>{pcLocked ? 'נעול' : 'חינם'}</Text>
-                        </View>
-                      </TouchableOpacity>
+                        <Text style={{ fontSize: 10, fontWeight: '800', color: pcLocked ? '#dc2626' : '#16a34a' }}>{pcLocked ? 'נעול' : 'חינם'}</Text>
+                        <Toggle on={pcLocked} onPress={toggleParent} />
+                      </View>
                       {children.length > 0 && (
                         <View style={{ backgroundColor: '#fff', padding: 6, gap: 4 }}>
                           {children.map(ch => {
                             const chLocked = pw.lockedCategories.includes(ch.id);
                             return (
-                              <TouchableOpacity key={ch.id} onPress={() => savePaywall({ ...pw, lockedCategories: chLocked ? pw.lockedCategories.filter((id: string) => id !== ch.id) : [...pw.lockedCategories, ch.id] })}
-                                style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 8, paddingVertical: 8, paddingHorizontal: 10, borderBottomWidth: 1, borderBottomColor: '#f5f5f5' }}>
+                              <View key={ch.id} style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 8, paddingVertical: 8, paddingHorizontal: 10, borderBottomWidth: 1, borderBottomColor: '#f5f5f5' }}>
                                 <Text style={{ fontSize: 14 }}>{chLocked ? '🔒' : '🔓'}</Text>
                                 <Text style={{ flex: 1, fontSize: 12, fontWeight: '700', color: '#555', writingDirection: 'rtl' }}>{ch.title}</Text>
-                                <View style={{ paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6, backgroundColor: chLocked ? '#fee2e2' : '#dcfce7' }}>
-                                  <Text style={{ fontSize: 9, fontWeight: '800', color: chLocked ? '#dc2626' : '#16a34a' }}>{chLocked ? 'נעול' : 'חינם'}</Text>
-                                </View>
-                              </TouchableOpacity>
+                                <Text style={{ fontSize: 9, fontWeight: '800', color: chLocked ? '#dc2626' : '#16a34a' }}>{chLocked ? 'נעול' : 'חינם'}</Text>
+                                <Toggle small on={chLocked} onPress={() => savePaywall({ ...pw, lockedCategories: chLocked ? pw.lockedCategories.filter((id: string) => id !== ch.id) : [...pw.lockedCategories, ch.id] })} />
+                              </View>
                             );
                           })}
                         </View>
@@ -2660,16 +2672,20 @@ export default function AdminDashboard() {
           </View>
           {activeNav === 'extra' && !childrenOf && (
             <TouchableOpacity
-              style={{ paddingHorizontal: 14, paddingVertical: 10, borderRadius: 10, backgroundColor: extraGroupVisible ? '#10b981' : '#9ca3af', marginLeft: 8 }}
+              activeOpacity={0.8}
+              style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 8, paddingHorizontal: 12, paddingVertical: 8, marginLeft: 8 }}
               onPress={async () => {
                 const next = !extraGroupVisible;
                 setExtraGroupVisible(next);
                 try { await fetch(`${API_BASE}/api/content/extraGroupVisible`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(next) }); } catch {}
               }}
             >
-              <Text style={{ color: Colors.WHITE, fontWeight: '800', fontSize: 13 }}>
-                {extraGroupVisible ? '👁 הקבוצה גלויה' : '🚫 הקבוצה חבויה'}
+              <Text style={{ fontSize: 12, fontWeight: '700', color: extraGroupVisible ? '#10b981' : '#9ca3af' }}>
+                {extraGroupVisible ? 'גלוי' : 'חבוי'}
               </Text>
+              <View style={{ width: 44, height: 24, borderRadius: 12, backgroundColor: extraGroupVisible ? '#10b981' : '#cbd5e1', padding: 2, flexDirection: 'row', alignItems: 'center' }}>
+                <View style={{ width: 20, height: 20, borderRadius: 10, backgroundColor: '#fff', marginLeft: extraGroupVisible ? 20 : 0 }} />
+              </View>
             </TouchableOpacity>
           )}
           <TouchableOpacity style={cs.addBtn} onPress={addItem}>

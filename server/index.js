@@ -23,7 +23,7 @@ if (!fs.existsSync(DB_PATH)) {
 
 // Middleware
 app.use(cors());
-app.use(express.json({ limit: '50mb' }));
+app.use(express.json({ limit: '50mb', strict: false }));
 app.use('/uploads', express.static(UPLOADS_DIR));
 
 // ─── Helpers ───────────────────────────────────────────────────

@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { View, Text, useWindowDimensions } from 'react-native';
 import { Tabs } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, FontAwesome } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '../../constants/colors';
 import { ThemeContext } from '../../constants/theme';
@@ -59,7 +59,7 @@ export default function TabLayout() {
           options={{
             title: 'WhatsApp',
             tabBarIcon: ({ color, size }) => (
-              <Ionicons name="chatbubble-ellipses" size={isMobile ? 22 : size} color="#25D366" />
+              <FontAwesome name="whatsapp" size={isMobile ? 22 : size} color="#25D366" />
             ),
           }}
         />
