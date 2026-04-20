@@ -1,21 +1,24 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Image, ImageBackground, Linking } from 'react-native';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Image, ImageBackground, Linking, useWindowDimensions } from 'react-native';
 import { router } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../../constants/colors';
 import { fetchContent, API_BASE } from '../../constants/api';
 import BusinessServicesSlider from '../../components/BusinessServicesSlider';
 import RealEstateGallery from '../../components/RealEstateGallery';
 import CurrencyTicker from '../../components/CurrencyTicker';
+import BottomTabBar from '../../components/BottomTabBar';
+import FinanceStats from '../../components/FinanceStats';
 
 type TopButton = { id: string; label: string };
 type Article = { id: string; title: string; summary: string; image?: string; link?: string; date?: string };
 type Listing = { id: string; title: string; image: string; price: string; features: string[]; cta: string; link?: string; size?: 'full' | 'half' };
 
 const DEFAULT_TOP_BUTTONS: TopButton[] = [
-  { id: 'new-hotels', label: 'פרויקטים מלונאיים חדשים' },
-  { id: 'running-hotels', label: 'פרויקטים מלונאיים רצים' },
-  { id: 'apartments', label: 'דירות בעיר חדשות ויד 2' },
+  { id: 'hotels', label: 'פרויקטים מלונאיים' },
+  { id: 'sale', label: 'דירות למכירה' },
+  { id: 'rent', label: 'דירות להשכרה' },
   { id: 'future', label: 'עתיד הנדל״ן' },
 ];
 
@@ -44,10 +47,15 @@ const LISTINGS_BY_TOP: Record<string, Listing[]> = {
     { id: 'rh1', title: 'Pullman Batumi', image: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=800&q=80', price: '$95,000', features: ['דירת נופש מלונאית', 'ניהול בינלאומי', 'תשואה 7-8%', 'מוכן למגורים'], cta: 'לפרטים עם המתווך' },
     { id: 'rh2', title: 'Wyndham Grand Batumi', image: 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=800&q=80', price: '$110,000', features: ['2 חדרים', 'מלון 5 כוכבים', 'חוזה 10 שנים', 'ניהול רשת'], cta: 'לפרטים עם המתווך' },
   ],
-  'apartments': [
-    { id: 'ap1', title: 'דירת 2 חדרים - מרכז', image: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80', price: '$72,000', features: ['65 מ"ר', 'קומה 8', 'משופצת', 'מרפסת'], cta: 'לפרטים עם המתווך' },
-    { id: 'ap2', title: 'דירת 3 חדרים - טיילת', image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80', price: '$125,000', features: ['95 מ"ר', 'נוף ים', 'חניה', 'מרוהטת'], cta: 'לפרטים עם המתווך' },
-    { id: 'ap3', title: 'סטודיו - שכונת אלברס', image: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80', price: '$38,000', features: ['28 מ"ר', 'משופץ', 'מרוהט', 'מוכן להשכרה'], cta: 'לפרטים עם המתווך' },
+  'sale': [
+    { id: 'ap1', title: 'דירת 2 חדרים - מרכז', image: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80', price: '$72,000', features: ['65 מ"ר', 'קומה 8', 'משופצת', 'מרפסת'], cta: 'לפרטים עם המתווך', size: 'full' },
+    { id: 'ap2', title: 'דירת 3 חדרים - טיילת', image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80', price: '$125,000', features: ['95 מ"ר', 'נוף ים', 'חניה', 'מרוהטת'], cta: 'לפרטים עם המתווך', size: 'half' },
+    { id: 'ap3', title: 'סטודיו - שכונת אלברס', image: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80', price: '$38,000', features: ['28 מ"ר', 'משופץ', 'מרוהט', 'מוכן להשכרה'], cta: 'לפרטים עם המתווך', size: 'half' },
+  ],
+  'rent': [
+    { id: 'rt1', title: 'דירת 2 חדרים להשכרה - מרכז', image: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80', price: '$650/חודש', features: ['60 מ"ר', 'מרוהטת', 'קומה 5', 'מיזוג'], cta: 'לפרטים עם המתווך', size: 'full' },
+    { id: 'rt2', title: 'דירת 3 חדרים - טיילת', image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80', price: '$1,200/חודש', features: ['90 מ"ר', 'נוף ים', 'מרוהטת', 'חניה'], cta: 'לפרטים עם המתווך', size: 'half' },
+    { id: 'rt3', title: 'סטודיו - שכונת אלברס', image: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80', price: '$400/חודש', features: ['28 מ"ר', 'מרוהט', 'מיני מטבח', 'וויי-פיי'], cta: 'לפרטים עם המתווך', size: 'half' },
   ],
   'future': [
     { id: 'fu1', title: 'פארק עסקים החדש', image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&q=80', price: 'החל מ-$1,400/מ"ר', features: ['אזור עסקים מתוכנן', 'תשתיות חדשות 2028', 'פוטנציאל עליית מחירים'], cta: 'מידע נוסף' },
@@ -81,7 +89,7 @@ export default function RealEstatePortal() {
     fetchContent()
       .then(data => {
         if (data?.realEstate?.topButtons?.length) setTopButtons(data.realEstate.topButtons);
-        if (data?.realEstate?.news?.length) setNews(data.realEstate.news);
+        if (data?.realEstate?.news?.length) setNews(data.realEstate.news.filter((n: Article) => !!n.image));
         const side = data?.sideBanners || [];
         const re = side.find((b: any) => b.id === 'realestate');
         if (re?.icon?.startsWith('http')) setRealEstateImage(re.icon);
@@ -104,10 +112,6 @@ export default function RealEstatePortal() {
 
   return (
     <View style={s.container}>
-      <TouchableOpacity style={s.backBtn} onPress={() => router.back()}>
-        <Text style={s.backX}>‹</Text>
-      </TouchableOpacity>
-
       <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
         {/* Hero */}
         <ImageBackground
@@ -121,16 +125,19 @@ export default function RealEstatePortal() {
             end={{ x: 0, y: 1 }}
             style={s.heroOverlay}
           >
+            <TouchableOpacity onPress={() => router.back()} style={s.heroBackBtn}>
+              <Ionicons name="arrow-back" size={22} color={Colors.WHITE} />
+            </TouchableOpacity>
             <Text style={s.heroKicker}>BATUMI REAL ESTATE</Text>
             <Text style={s.heroTitle}>פורטל הנדל״ן</Text>
             <Text style={s.heroSub}>כל העסקאות, הפרויקטים והמידע במקום אחד</Text>
           </LinearGradient>
         </ImageBackground>
 
-        {/* Top buttons - horizontal scroll */}
+        {/* Top buttons - horizontal slider */}
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.topRow}>
           <TouchableOpacity
-            style={[s.topBtn, s.homeBtn, activeTop === null && s.topBtnActive]}
+            style={[s.topBtnRect, s.homeBtn, activeTop === null && s.topBtnActive]}
             onPress={() => setActiveTop(null)}
           >
             <Text style={[s.topBtnTxt, activeTop === null && s.topBtnTxtActive]}>🏠 פורטל הנדל״ן</Text>
@@ -138,7 +145,7 @@ export default function RealEstatePortal() {
           {topButtons.map(b => (
             <TouchableOpacity
               key={b.id}
-              style={[s.topBtn, activeTop === b.id && s.topBtnActive]}
+              style={[s.topBtnRect, activeTop === b.id && s.topBtnActive]}
               onPress={() => setActiveTop(activeTop === b.id ? null : b.id)}
             >
               <Text style={[s.topBtnTxt, activeTop === b.id && s.topBtnTxtActive]}>{b.label}</Text>
@@ -148,10 +155,9 @@ export default function RealEstatePortal() {
 
         {activeTop ? (
           <>
-            <BusinessServicesSlider variant="small" onPressService={handleService} />
             {/* Listings grid - size per listing set by editor (admin) */}
             <View style={s.listingsGrid}>
-              {(LISTINGS_BY_TOP[activeTop] || []).map(lst => (
+              {(LISTINGS_BY_TOP[activeTop] || []).filter(lst => !!lst.image).map(lst => (
                 <TouchableOpacity
                   key={lst.id}
                   activeOpacity={0.85}
@@ -175,43 +181,44 @@ export default function RealEstatePortal() {
                 </TouchableOpacity>
               ))}
             </View>
+
+            {(activeTop === 'sale' || activeTop === 'rent') && (
+              <View style={{ paddingHorizontal: 16, gap: 10, marginTop: 14 }}>
+                {(LISTINGS_BY_TOP[activeTop] || []).filter(lst => !!lst.image).map(lst => (
+                  <TouchableOpacity
+                    key={`h-${lst.id}`}
+                    activeOpacity={0.85}
+                    onPress={() => lst.link && Linking.openURL(lst.link)}
+                    style={s.hBanner}
+                  >
+                    <Image source={{ uri: lst.image }} style={s.hBannerImg} />
+                    <View style={s.hBannerBody}>
+                      <Text style={s.hBannerTitle} numberOfLines={1}>{lst.title}</Text>
+                      <Text style={s.hBannerInfo} numberOfLines={1}>{lst.features.slice(0, 2).join(' · ')}</Text>
+                      <View style={s.hBannerBottom}>
+                        <Text style={s.hBannerPrice}>{lst.price}</Text>
+                        <View style={s.hBannerBtnSmall}>
+                          <Text style={s.hBannerBtnSmallTxt}>{lst.cta}</Text>
+                        </View>
+                      </View>
+                    </View>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
           </>
         ) : (
           <>
             {/* Section 1 — News slider */}
             <Section title="חדשות נדל״ן" icon="📰">
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.newsRow}>
-                {news.map(n => (
-                  <TouchableOpacity key={n.id} style={s.newsSlide} activeOpacity={0.8} onPress={() => n.link && Linking.openURL(n.link)}>
-                    {n.image ? (
-                      <Image source={{ uri: n.image }} style={s.newsSlideImg} />
-                    ) : (
-                      <View style={[s.newsSlideImg, s.newsImgPlaceholder]}>
-                        <Text style={s.newsImgEmoji}>🏙️</Text>
-                      </View>
-                    )}
-                    <View style={s.newsSlideBody}>
-                      <Text style={s.newsTitle} numberOfLines={2}>{n.title}</Text>
-                      <Text style={s.newsSummary} numberOfLines={3}>{n.summary}</Text>
-                      {n.date && <Text style={s.newsDate}>{n.date}</Text>}
-                    </View>
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
+              <NewsSliderArrows news={news} />
             </Section>
 
             <RealEstateGallery />
 
-            {/* Section 2 — Money index */}
+            {/* Section 2 — Finance stats */}
             <Section title="מדד הכסף" icon="💰">
-              <View style={s.indexGrid}>
-                {moneyIndex.map((m, i) => (
-                  <View key={i} style={s.indexCard}>
-                    <Text style={s.indexValue}>{m.value}</Text>
-                    <Text style={s.indexLabel}>{m.label}</Text>
-                  </View>
-                ))}
-              </View>
+              <FinanceStats />
             </Section>
 
             {/* Section 3 — Tips before buying */}
@@ -231,6 +238,7 @@ export default function RealEstatePortal() {
 
         <View style={{ height: 40 }} />
       </ScrollView>
+      <BottomTabBar />
     </View>
   );
 }
@@ -247,8 +255,59 @@ function Section({ title, icon, children }: { title: string; icon: string; child
   );
 }
 
+function NewsSliderArrows({ news }: { news: Article[] }) {
+  const SLIDE_W = 340;
+  const GAP = 12;
+  const { width } = useWindowDimensions();
+  const sidePad = Math.max(16, (width - SLIDE_W) / 2);
+  const scrollRef = useRef<ScrollView>(null);
+  const [idx, setIdx] = useState(0);
+  const scrollTo = (i: number) => {
+    const next = Math.max(0, Math.min(news.length - 1, i));
+    setIdx(next);
+    scrollRef.current?.scrollTo({ x: next * (SLIDE_W + GAP), animated: true });
+  };
+  return (
+    <View style={[s.newsSliderWrap, { width: SLIDE_W, alignSelf: 'center', overflow: 'hidden' }]}>
+      <ScrollView
+        ref={scrollRef}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        snapToInterval={SLIDE_W + GAP}
+        decelerationRate="fast"
+        contentContainerStyle={{ gap: GAP }}
+        onMomentumScrollEnd={(e) => setIdx(Math.round(e.nativeEvent.contentOffset.x / (SLIDE_W + GAP)))}
+      >
+        {news.map(n => (
+          <TouchableOpacity key={n.id} activeOpacity={0.85} style={[s.newsCardLike, { width: SLIDE_W, height: 200 }]} onPress={() => n.link && Linking.openURL(n.link)}>
+            {n.image ? (
+              <Image source={{ uri: n.image }} style={{ width: SLIDE_W, height: 100 }} />
+            ) : (
+              <View style={{ width: SLIDE_W, height: 100, backgroundColor: '#e2e8f0', alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: 30 }}>🏙️</Text></View>
+            )}
+            <View style={{ height: 100, padding: 10, backgroundColor: Colors.WHITE, justifyContent: 'space-between' }}>
+              <View>
+                <Text style={{ fontSize: 14, fontWeight: '900', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl' }} numberOfLines={1}>{n.title}</Text>
+                <Text style={{ fontSize: 12, color: '#555', textAlign: 'right', writingDirection: 'rtl', marginTop: 4 }} numberOfLines={2}>{n.summary}</Text>
+              </View>
+              {n.date && <Text style={{ fontSize: 11, color: '#94a3b8', textAlign: 'right', writingDirection: 'rtl' }}>{n.date}</Text>}
+            </View>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+      <TouchableOpacity style={[s.arrowBtn, { right: 12, top: 32 }]} onPress={() => scrollTo(idx - 1)} disabled={idx === 0}>
+        <Text style={[s.arrowTxt, idx === 0 && { opacity: 0.3 }]}>›</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={[s.arrowBtn, { left: 12, top: 32 }]} onPress={() => scrollTo(idx + 1)} disabled={idx === news.length - 1}>
+        <Text style={[s.arrowTxt, idx === news.length - 1 && { opacity: 0.3 }]}>‹</Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
+
 const s = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.BACKGROUND },
+  heroBackBtn: { position: 'absolute', top: 16, left: 16, width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(0,0,0,0.4)', alignItems: 'center', justifyContent: 'center', zIndex: 5 },
   backBtn: {
     position: 'absolute', top: 50, right: 16, zIndex: 10,
     width: 40, height: 40, borderRadius: 20,
@@ -264,10 +323,13 @@ const s = StyleSheet.create({
   heroSub: { fontSize: 14, color: Colors.WHITE, opacity: 0.85, textAlign: 'right', writingDirection: 'rtl', marginTop: 4 },
 
   topRow: { flexDirection: 'row', gap: 8, paddingHorizontal: 16, paddingVertical: 14 },
+  topBtnRect: { backgroundColor: Colors.WHITE, paddingHorizontal: 14, paddingVertical: 10, borderRadius: 10, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.08, shadowRadius: 4, elevation: 2 },
+  topGrid: { flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 6, paddingHorizontal: 16, paddingVertical: 14, justifyContent: 'center' },
+  topBtnGrid: { width: '32%', backgroundColor: Colors.WHITE, paddingHorizontal: 6, paddingVertical: 10, borderRadius: 10, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.08, shadowRadius: 4, elevation: 2, alignItems: 'center', justifyContent: 'center', minHeight: 50 },
   topBtn: { backgroundColor: Colors.WHITE, paddingHorizontal: 14, paddingVertical: 10, borderRadius: 22, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.08, shadowRadius: 4, elevation: 2 },
   homeBtn: { backgroundColor: Colors.ACCENT + '30' },
   topBtnActive: { backgroundColor: Colors.PRIMARY },
-  topBtnTxt: { fontSize: 13, fontWeight: '700', color: Colors.TEXT, writingDirection: 'rtl' },
+  topBtnTxt: { fontSize: 11, fontWeight: '700', color: Colors.TEXT, writingDirection: 'rtl', textAlign: 'center' },
   topBtnTxtActive: { color: Colors.WHITE },
 
   layoutToggle: { flexDirection: 'row-reverse', gap: 8, paddingHorizontal: 16, marginBottom: 10 },
@@ -283,6 +345,15 @@ const s = StyleSheet.create({
     shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.08, shadowRadius: 8, elevation: 3,
   },
   listingCardHalf: { width: '48.8%' },
+  hBanner: { flexDirection: 'row-reverse', alignItems: 'stretch', width: 340, height: 100, alignSelf: 'center', backgroundColor: Colors.WHITE, borderRadius: 12, overflow: 'hidden', borderWidth: 1, borderColor: '#e2e8f0' },
+  hBannerImg: { width: 100, height: 100 },
+  hBannerBody: { flex: 1, padding: 8, justifyContent: 'space-between' },
+  hBannerTitle: { fontSize: 13, fontWeight: '800', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl' },
+  hBannerInfo: { fontSize: 11, color: '#64748b', textAlign: 'right', writingDirection: 'rtl' },
+  hBannerBottom: { flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' },
+  hBannerPrice: { fontSize: 13, fontWeight: '900', color: '#10b981', textAlign: 'right' },
+  hBannerBtnSmall: { paddingHorizontal: 10, paddingVertical: 4, backgroundColor: Colors.PRIMARY, borderRadius: 6 },
+  hBannerBtnSmallTxt: { color: Colors.WHITE, fontSize: 10, fontWeight: '800', writingDirection: 'rtl' },
   listingImage: { width: '100%', height: 160 },
   listingBody: { padding: 14 },
   listingTitle: { fontSize: 16, fontWeight: '800', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl', marginBottom: 8 },
@@ -302,6 +373,10 @@ const s = StyleSheet.create({
   newsImg: { width: '100%', height: 140 },
   newsRow: { gap: 12 },
   newsSlide: { width: 260, backgroundColor: Colors.WHITE, borderRadius: 14, overflow: 'hidden', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.08, shadowRadius: 6, elevation: 2 },
+  newsSliderWrap: { position: 'relative' },
+  newsCardLike: { borderRadius: 16, overflow: 'hidden', shadowColor: '#000', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.15, shadowRadius: 8, elevation: 4 },
+  arrowBtn: { position: 'absolute', width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(0,0,0,0.5)', alignItems: 'center', justifyContent: 'center', zIndex: 5 },
+  arrowTxt: { fontSize: 26, fontWeight: '300', color: Colors.WHITE, lineHeight: 28 },
   newsSlideImg: { width: '100%', height: 140 },
   newsSlideBody: { padding: 12 },
   newsImgPlaceholder: { backgroundColor: '#E8EEF2', alignItems: 'center', justifyContent: 'center' },

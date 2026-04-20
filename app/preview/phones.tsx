@@ -26,34 +26,34 @@ export default function PhonesPreview() {
     );
   }
   return (
-    <View style={{ flex: 1, backgroundColor: '#0f172a' }}>
-      <View style={{ padding: 12, flexDirection: 'row-reverse', alignItems: 'center', gap: 10, backgroundColor: '#1e293b', borderBottomWidth: 1, borderBottomColor: '#334155' }}>
-        <Text style={{ fontSize: 16, fontWeight: '900', color: '#fff', writingDirection: 'rtl' }}>📱 תצוגת 10 ניידים</Text>
+    <View style={{ flex: 1, backgroundColor: '#ffffff' }}>
+      <View style={{ padding: 12, flexDirection: 'row-reverse', alignItems: 'center', gap: 10, backgroundColor: '#f1f5f9', borderBottomWidth: 1, borderBottomColor: '#e2e8f0' }}>
+        <Text style={{ fontSize: 16, fontWeight: '900', color: Colors.TEXT, writingDirection: 'rtl' }}>📱 תצוגת 10 ניידים</Text>
         <View style={{ flex: 1 }} />
-        <Text style={{ fontSize: 11, color: '#94a3b8' }}>נתיב:</Text>
+        <Text style={{ fontSize: 11, color: '#64748b' }}>נתיב:</Text>
         <TextInput
           value={path}
           onChangeText={setPath}
-          style={{ borderWidth: 1, borderColor: '#475569', color: '#fff', backgroundColor: '#0f172a', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 4, fontSize: 12, minWidth: 120 }}
+          style={{ borderWidth: 1, borderColor: '#cbd5e1', color: Colors.TEXT, backgroundColor: '#ffffff', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 4, fontSize: 12, minWidth: 120 }}
           placeholder="/"
-          placeholderTextColor="#64748b"
+          placeholderTextColor="#94a3b8"
         />
-        <Text style={{ fontSize: 11, color: '#94a3b8' }}>זום:</Text>
+        <Text style={{ fontSize: 11, color: '#64748b' }}>זום:</Text>
         {[0.5, 0.65, 0.8, 1].map(s => (
-          <TouchableOpacity key={s} onPress={() => setScale(s)} style={{ paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6, backgroundColor: scale === s ? Colors.PRIMARY : '#334155' }}>
-            <Text style={{ fontSize: 11, fontWeight: '800', color: '#fff' }}>{Math.round(s * 100)}%</Text>
+          <TouchableOpacity key={s} onPress={() => setScale(s)} style={{ paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6, backgroundColor: scale === s ? Colors.PRIMARY : '#e2e8f0' }}>
+            <Text style={{ fontSize: 11, fontWeight: '800', color: scale === s ? '#fff' : Colors.TEXT }}>{Math.round(s * 100)}%</Text>
           </TouchableOpacity>
         ))}
       </View>
 
-      <ScrollView horizontal showsHorizontalScrollIndicator style={{ flex: 1 }} contentContainerStyle={{ padding: 20, gap: 16, alignItems: 'flex-end' }}>
+      <ScrollView horizontal showsHorizontalScrollIndicator style={{ flex: 1 }} contentContainerStyle={{ padding: 38, gap: 38, alignItems: 'flex-end' }}>
         {PHONES.map((p, i) => {
           const scaledW = p.w * scale;
           const scaledH = p.h * scale;
           return (
             <View key={i} style={{ alignItems: 'center', gap: 6 }}>
-              <Text style={{ fontSize: 12, fontWeight: '800', color: '#e2e8f0' }}>{p.name}</Text>
-              <Text style={{ fontSize: 10, color: '#94a3b8' }}>{p.w} × {p.h}</Text>
+              <Text style={{ fontSize: 12, fontWeight: '800', color: Colors.TEXT, marginBottom: 38 }}>{p.name}</Text>
+              <Text style={{ fontSize: 10, color: '#64748b', marginBottom: 38 }}>{p.w} × {p.h}</Text>
               {React.createElement('div', {
                 style: { width: scaledW + 12, height: scaledH + 12, backgroundColor: '#000', borderRadius: 28, padding: 6, boxSizing: 'border-box' },
               }, React.createElement('div', {

@@ -1634,12 +1634,12 @@ function ArticleView({ cat, darkCat }: { cat: Item; darkCat: boolean }) {
       )}
 
       {art.sections.map((sec, i) => (
-        <View key={i} style={[artSt.card, { backgroundColor: (art.color || '#f0f4f8') + '60' }]}>
+        <View key={i} style={[artSt.card, { backgroundColor: darkCat ? 'rgba(255,255,255,0.08)' : (art.color || '#f0f4f8') + '60' }]}>
           <View style={artSt.cardHeader}>
             <Text style={artSt.cardIcon}>{sec.icon}</Text>
-            <Text style={artSt.cardTitle}>{sec.title}</Text>
+            <Text style={[artSt.cardTitle, darkCat && { color: '#f1f5f9' }]}>{sec.title}</Text>
           </View>
-          <Text style={artSt.cardTip}>{sec.tip}</Text>
+          <Text style={[artSt.cardTip, darkCat && { color: '#cbd5e1' }]}>{sec.tip}</Text>
           {sec.image ? <Image source={{ uri: sec.image }} style={artSt.cardImg} resizeMode="cover" /> : null}
           {sec.actionLabel && sec.actionUrl ? (
             <TouchableOpacity style={[artSt.cardBtn, { backgroundColor: art.color || Colors.PRIMARY }]} onPress={() => Linking.openURL(sec.actionUrl!)}>

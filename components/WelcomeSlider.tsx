@@ -59,7 +59,7 @@ export default function WelcomeSlider() {
 
   useEffect(() => {
     fetchContent().then(data => {
-      if (Array.isArray(data.welcome)) setItems(data.welcome);
+      if (Array.isArray(data.welcome)) setItems(data.welcome.filter((x: any) => x.visible !== false));
     }).catch(() => {});
   }, []);
 

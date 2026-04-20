@@ -102,7 +102,7 @@ export default function NewsModal({ visible, onClose, bgColor }: { visible: bool
           }));
         })
       );
-      const all: NewsItem[] = results.flat().sort((a, b) => {
+      const all: NewsItem[] = results.flat().filter(n => !!n.image).sort((a, b) => {
         // Sort newest first by rough date comparison
         return (b.date === 'עכשיו' ? 1 : 0) - (a.date === 'עכשיו' ? 1 : 0);
       });
@@ -139,7 +139,7 @@ export default function NewsModal({ visible, onClose, bgColor }: { visible: bool
           }
         })
       );
-      const all: NewsItem[] = results.flat();
+      const all: NewsItem[] = results.flat().filter(n => !!n.image);
       if (all.length > 0) {
         setNews(all);
       } else {

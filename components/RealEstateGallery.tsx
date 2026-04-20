@@ -16,27 +16,37 @@ const SLIDES: Slide[] = [
 export default function RealEstateGallery() {
   const { width } = useWindowDimensions();
   const [idx, setIdx] = useState(0);
+  const [failed, setFailed] = useState<Set<number>>(new Set());
   const timer = useRef<any>(null);
+
+  const validSlides = SLIDES.map((s, i) => ({ ...s, _origIdx: i })).filter((_, i) => !failed.has(i));
 
   useEffect(() => {
     timer.current = setInterval(() => {
-      setIdx(i => (i + 1) % SLIDES.length);
+      setIdx(i => (i + 1) % Math.max(1, validSlides.length));
     }, 4000);
     return () => clearInterval(timer.current);
-  }, []);
+  }, [validSlides.length]);
 
-  const current = SLIDES[idx];
+  if (validSlides.length === 0) return null;
+  const safeIdx = idx % validSlides.length;
+  const current = validSlides[safeIdx];
 
   return (
     <View style={[s.wrap, { width: width - 32 }]}>
-      <Image source={{ uri: current.uri }} style={StyleSheet.absoluteFillObject} resizeMode="cover" />
+      <Image
+        source={{ uri: current.uri }}
+        style={StyleSheet.absoluteFillObject}
+        resizeMode="cover"
+        onError={() => setFailed(prev => new Set(prev).add(current._origIdx))}
+      />
       <View style={s.captionWrap}>
         <Text style={s.caption}>{current.caption}</Text>
       </View>
       <View style={s.dots}>
-        {SLIDES.map((_, i) => (
+        {validSlides.map((_, i) => (
           <TouchableOpacity key={i} onPress={() => setIdx(i)}>
-            <View style={[s.dot, i === idx && s.dotActive]} />
+            <View style={[s.dot, i === safeIdx && s.dotActive]} />
           </TouchableOpacity>
         ))}
       </View>

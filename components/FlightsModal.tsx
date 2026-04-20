@@ -291,10 +291,11 @@ export default function FlightsModal({ visible, onClose, bgColor }: { visible: b
 
             {/* 7-segment clock - center */}
             <View style={s.clockWrap}>
+              <Text style={s.clockLabelTop}>שעון בטומי</Text>
               <View style={s.clockBoard}>
                 <Text style={s.clockDigits}>{batumiTime}</Text>
               </View>
-              <Text style={s.clockLabel}>שעון בטומי UTC+4</Text>
+              <Text style={s.clockLabel}>UTC+4</Text>
             </View>
 
             {/* Green blinking LED + last updated - right */}
@@ -556,6 +557,7 @@ const s = StyleSheet.create({
     fontFamily: 'Courier', fontVariant: ['tabular-nums'],
   },
   clockLabel: { fontSize: 10, color: Colors.WHITE, opacity: 0.5, marginTop: 4, writingDirection: 'rtl' },
+  clockLabelTop: { fontSize: 11, color: Colors.WHITE, opacity: 0.55, fontWeight: '200', marginBottom: 4, writingDirection: 'rtl', letterSpacing: 1 },
   ledWrap: { alignItems: 'center', gap: 4 },
   led: {
     width: 12, height: 12, borderRadius: 6, backgroundColor: '#00ff44',

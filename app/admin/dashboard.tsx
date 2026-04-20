@@ -748,7 +748,7 @@ function EditModal({
               <View style={ms.fieldGroup}>
                 <Text style={[ms.label, { fontSize: 16, marginBottom: 10 }]}>בלוקי מלונות ({form.hotels.length})</Text>
                 {form.hotels.map((hb, idx) => (
-                  <View key={hb.id} style={{ borderWidth: 1, borderColor: '#e8e8e8', borderRadius: 12, padding: 12, marginBottom: 12, backgroundColor: '#fafafa' }}>
+                  <View key={hb.id} style={{ borderWidth: 1, borderColor: '#e8e8e8', borderRadius: 12, padding: 12, marginBottom: 12, backgroundColor: idx % 2 === 0 ? '#fafafa' : '#e2e8f0' }}>
                     <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
                       <View style={{ flexDirection: 'row-reverse', gap: 8, alignItems: 'center' }}>
                         <Text style={{ fontSize: 13, fontWeight: '800', color: Colors.PRIMARY }}>מיקום</Text>
@@ -908,7 +908,7 @@ function EditModal({
               <View style={ms.fieldGroup}>
                 <Text style={[ms.label, { fontSize: 16, marginBottom: 10 }]}>📝 עריכת מאמר</Text>
                 {(form.article.sections || []).map((sec: any, idx: number) => (
-                  <View key={idx} style={{ borderWidth: 1, borderColor: '#e8e8e8', borderRadius: 12, padding: 12, marginBottom: 12, backgroundColor: '#fafafa' }}>
+                  <View key={idx} style={{ borderWidth: 1, borderColor: '#e8e8e8', borderRadius: 12, padding: 12, marginBottom: 12, backgroundColor: idx % 2 === 0 ? '#fafafa' : '#e2e8f0' }}>
                     <Text style={{ fontSize: 13, fontWeight: '800', color: Colors.PRIMARY, marginBottom: 6 }}>סקשן {idx + 1}</Text>
                     <TextInput style={[ms.input, { marginBottom: 6 }]} value={sec.icon || ''} onChangeText={(v: string) => { const a={...form.article}; const s=[...(a.sections||[])]; s[idx]={...s[idx],icon:v}; a.sections=s; setForm((p: any)=>({...p,article:a})); }} placeholder="אייקון" placeholderTextColor="#bbb" textAlign="right" />
                     <TextInput style={[ms.input, { marginBottom: 6 }]} value={sec.title || ''} onChangeText={(v: string) => { const a={...form.article}; const s=[...(a.sections||[])]; s[idx]={...s[idx],title:v}; a.sections=s; setForm((p: any)=>({...p,article:a})); }} placeholder="כותרת" placeholderTextColor="#bbb" textAlign="right" />
@@ -1099,7 +1099,9 @@ export default function AdminDashboard() {
   const [showMobileNav, setShowMobileNav] = useState(false);
   const [childrenOf, setChildrenOf] = useState<DataItem | null>(null);
   const [extraGroupVisible, setExtraGroupVisible] = useState(true);
+  const [groupVisibility, setGroupVisibility] = useState<Record<string, boolean>>({});
   const [showDevBar, setShowDevBar] = useState(true);
+  const [finStats, setFinStats] = useState<any>({ inflation: { current: '', date: '' }, lendingRate: { current: '', date: '' }, gdp: { current: '', date: '' } });
   const [mediaFiles, setMediaFiles] = useState<{ filename: string; originalName?: string; url: string; tags?: string[] }[]>([]);
   const [galleryFiles, setGalleryFiles] = useState<{ filename: string; url: string }[]>([]);
   const [mediaFilter, setMediaFilter] = useState<string>('');
@@ -1158,7 +1160,13 @@ export default function AdminDashboard() {
         setData(loaded);
         if (apiData.texts) setTexts(apiData.texts);
         if (typeof apiData.extraGroupVisible === 'boolean') setExtraGroupVisible(apiData.extraGroupVisible);
+        if (apiData.groupVisibility && typeof apiData.groupVisibility === 'object') setGroupVisibility(apiData.groupVisibility);
         if (typeof apiData.showDevBar === 'boolean') setShowDevBar(apiData.showDevBar);
+        if (apiData.financeStats) setFinStats({
+          inflation: { current: apiData.financeStats.inflation?.current ?? '', date: apiData.financeStats.inflation?.date ?? '' },
+          lendingRate: { current: apiData.financeStats.lendingRate?.current ?? '', date: apiData.financeStats.lendingRate?.date ?? '' },
+          gdp: { current: apiData.financeStats.gdp?.current ?? '', date: apiData.financeStats.gdp?.date ?? '' },
+        });
         try { const r = await fetchRatings(); setRatings(r); } catch {}
         if (apiData.subscriptionBlock) setSubBlock(apiData.subscriptionBlock);
         // Clear stale AsyncStorage
@@ -1390,6 +1398,7 @@ export default function AdminDashboard() {
             <View style={{ width: 20, height: 20, borderRadius: 10, backgroundColor: '#fff', marginLeft: showDevBar ? 20 : 0 }} />
           </TouchableOpacity>
         </View>
+
         {Platform.OS === 'web' && (
           <View style={{ alignItems: 'center', marginTop: 20 }}>
             <View style={{
@@ -1935,7 +1944,7 @@ export default function AdminDashboard() {
       <View style={{ backgroundColor: '#fff', borderRadius: 14, padding: 16, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 }}>
         <Text style={{ fontSize: 15, fontWeight: '800', color: Colors.TEXT, textAlign: 'right', marginBottom: 12, writingDirection: 'rtl' }}>🤝 כרטיסי לקוחות</Text>
         {demoCrmContacts.map((c, i) => (
-          <View key={i} style={{ backgroundColor: '#fafafa', borderRadius: 12, padding: 12, marginBottom: 8 }}>
+          <View key={i} style={{ backgroundColor: i % 2 === 0 ? '#fafafa' : '#e2e8f0', borderRadius: 12, padding: 12, marginBottom: 8 }}>
             <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
               <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 8 }}>
                 <View style={{ width: 34, height: 34, borderRadius: 17, backgroundColor: '#e8f4f8', alignItems: 'center', justifyContent: 'center' }}>
@@ -2235,7 +2244,7 @@ export default function AdminDashboard() {
       <View style={{ backgroundColor: '#fff', borderRadius: 14, padding: 16, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 }}>
         <Text style={{ fontSize: 15, fontWeight: '800', color: Colors.TEXT, textAlign: 'right', marginBottom: 12, writingDirection: 'rtl' }}>❌ בקשות ביטול</Text>
         {demoCancels.map((c, i) => (
-          <View key={i} style={{ backgroundColor: '#fafafa', borderRadius: 12, padding: 12, marginBottom: 8 }}>
+          <View key={i} style={{ backgroundColor: i % 2 === 0 ? '#fafafa' : '#e2e8f0', borderRadius: 12, padding: 12, marginBottom: 8 }}>
             <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
               <Text style={{ fontSize: 14, fontWeight: '800', color: Colors.TEXT, writingDirection: 'rtl' }}>{c.name}</Text>
               <View style={{ paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8, backgroundColor: c.status === 'הוחזר' ? '#dcfce7' : '#fef3c7' }}>
@@ -2675,6 +2684,49 @@ export default function AdminDashboard() {
     if (!currentSection) return null;
     return (
       <View style={cs.contentCard}>
+        {activeNav === 'side' && !childrenOf && (
+          <View style={{ padding: 12, marginBottom: 14, backgroundColor: '#f8fafc', borderRadius: 10, borderWidth: 1, borderColor: '#e2e8f0' }}>
+            <Text style={{ fontSize: 13, fontWeight: '900', color: '#1C2B35', writingDirection: 'rtl', textAlign: 'right', marginBottom: 10 }}>💰 מדד הכסף - ערך ידני עדכני</Text>
+            {([
+              { key: 'inflation', label: 'אינפלציה (%)' },
+              { key: 'lendingRate', label: 'ריבית הלוואות (%)' },
+              { key: 'gdp', label: 'צמיחת תמ"ג (%)' },
+            ] as const).map(f => (
+              <View key={f.key} style={{ flexDirection: 'row-reverse', gap: 6, marginBottom: 6 }}>
+                <Text style={{ width: 130, fontSize: 12, fontWeight: '700', color: '#475569', textAlign: 'right', writingDirection: 'rtl', alignSelf: 'center' }}>{f.label}</Text>
+                <TextInput
+                  style={{ flex: 1, borderWidth: 1, borderColor: '#cbd5e1', borderRadius: 8, padding: 6, fontSize: 13, textAlign: 'left' }}
+                  value={String(finStats[f.key]?.current ?? '')}
+                  onChangeText={v => setFinStats((p: any) => ({ ...p, [f.key]: { ...p[f.key], current: v } }))}
+                  keyboardType="numeric"
+                  placeholder="ערך"
+                  placeholderTextColor="#bbb"
+                />
+                <TextInput
+                  style={{ width: 90, borderWidth: 1, borderColor: '#cbd5e1', borderRadius: 8, padding: 6, fontSize: 13, textAlign: 'center' }}
+                  value={String(finStats[f.key]?.date ?? '')}
+                  onChangeText={v => setFinStats((p: any) => ({ ...p, [f.key]: { ...p[f.key], date: v } }))}
+                  placeholder="MM/YY"
+                  placeholderTextColor="#bbb"
+                />
+              </View>
+            ))}
+            <TouchableOpacity
+              style={{ backgroundColor: '#10b981', borderRadius: 8, paddingVertical: 8, alignItems: 'center', marginTop: 6 }}
+              onPress={async () => {
+                const toSave = {
+                  inflation: { current: finStats.inflation.current === '' ? null : parseFloat(finStats.inflation.current), date: finStats.inflation.date },
+                  lendingRate: { current: finStats.lendingRate.current === '' ? null : parseFloat(finStats.lendingRate.current), date: finStats.lendingRate.date },
+                  gdp: { current: finStats.gdp.current === '' ? null : parseFloat(finStats.gdp.current), date: finStats.gdp.date },
+                };
+                try { await fetch(`${API_BASE}/api/content/financeStats`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(toSave) }); } catch {}
+              }}
+            >
+              <Text style={{ color: '#fff', fontWeight: '800', fontSize: 13 }}>שמור מדד הכסף</Text>
+            </TouchableOpacity>
+            <Text style={{ fontSize: 10, color: '#94a3b8', textAlign: 'right', writingDirection: 'rtl', marginTop: 6 }}>השאר ריק כדי להשתמש בערך השנתי של World Bank</Text>
+          </View>
+        )}
         {childrenOf && (
           <TouchableOpacity onPress={() => setChildrenOf(null)} style={{ marginBottom: 10, alignSelf: 'flex-end' }}>
             <Text style={{ color: Colors.PRIMARY, fontSize: 14, fontWeight: '600' }}>→ חזרה ל{currentSection.label}</Text>
@@ -2687,24 +2739,35 @@ export default function AdminDashboard() {
             </Text>
             <Text style={cs.contentSub}>{currentItems.length} {toursMode ? 'בלוקים' : 'פריטים'}</Text>
           </View>
-          {activeNav === 'extra' && !childrenOf && (
-            <TouchableOpacity
-              activeOpacity={0.8}
-              style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 8, paddingHorizontal: 12, paddingVertical: 8, marginLeft: 8 }}
-              onPress={async () => {
-                const next = !extraGroupVisible;
+          {!childrenOf && ['main','extra','welcome','info','bottom','side'].includes(activeNav) && (() => {
+            const isExtra = activeNav === 'extra';
+            const on = isExtra ? extraGroupVisible : groupVisibility[activeNav] !== false;
+            const toggle = async () => {
+              const next = !on;
+              if (isExtra) {
                 setExtraGroupVisible(next);
                 try { await fetch(`${API_BASE}/api/content/extraGroupVisible`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(next) }); } catch {}
-              }}
-            >
-              <Text style={{ fontSize: 12, fontWeight: '700', color: extraGroupVisible ? '#10b981' : '#9ca3af' }}>
-                {extraGroupVisible ? 'גלוי' : 'חבוי'}
-              </Text>
-              <View style={{ width: 44, height: 24, borderRadius: 12, backgroundColor: extraGroupVisible ? '#10b981' : '#cbd5e1', padding: 2, flexDirection: 'row', alignItems: 'center' }}>
-                <View style={{ width: 20, height: 20, borderRadius: 10, backgroundColor: '#fff', marginLeft: extraGroupVisible ? 20 : 0 }} />
-              </View>
-            </TouchableOpacity>
-          )}
+              } else {
+                const updated = { ...groupVisibility, [activeNav]: next };
+                setGroupVisibility(updated);
+                try { await fetch(`${API_BASE}/api/content/groupVisibility`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(updated) }); } catch {}
+              }
+            };
+            return (
+              <TouchableOpacity
+                activeOpacity={0.8}
+                style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 8, paddingHorizontal: 12, paddingVertical: 8, marginLeft: 8 }}
+                onPress={toggle}
+              >
+                <Text style={{ fontSize: 11, fontWeight: '800', color: on ? '#dc2626' : '#9ca3af', letterSpacing: 0.5 }}>
+                  {on ? 'קבוצה גלויה' : 'כל הקבוצה חבויה'}
+                </Text>
+                <View style={{ width: 44, height: 24, borderRadius: 12, backgroundColor: on ? '#dc2626' : '#cbd5e1', padding: 2, flexDirection: 'row', alignItems: 'center' }}>
+                  <View style={{ width: 20, height: 20, borderRadius: 10, backgroundColor: '#fff', marginLeft: on ? 20 : 0 }} />
+                </View>
+              </TouchableOpacity>
+            );
+          })()}
           <TouchableOpacity style={cs.addBtn} onPress={addItem}>
             <Text style={cs.addBtnTxt}>+ הוסף פריט</Text>
           </TouchableOpacity>
@@ -2725,8 +2788,9 @@ export default function AdminDashboard() {
         )}
 
         {currentItems.map((item, idx) => {
+          const stripe = idx % 2 === 0 ? { backgroundColor: '#fafafa' } : { backgroundColor: '#e2e8f0' };
           const rowInner = (
-            <View style={[cs.itemRow, isWide && cs.itemRowWide]}>
+            <View style={[cs.itemRow, isWide && cs.itemRowWide, stripe]}>
               <View style={cs.orderBtns}>
                 <Text style={{ fontSize: 18, color: '#999', ...(Platform.OS === 'web' ? ({ cursor: 'grab' } as any) : {}) }}>⋮⋮</Text>
                 <Text style={cs.orderNum}>{idx + 1}</Text>
@@ -2775,6 +2839,41 @@ export default function AdminDashboard() {
                   </Text>
                 </TouchableOpacity>
               )}
+
+              <TouchableOpacity
+                activeOpacity={0.8}
+                onPress={() => {
+                  const isVisible = (item as any).visible !== false;
+                  const next = !isVisible;
+                  if (toursMode && childrenOf) {
+                    const ti = (item as any)._tourIdx as number;
+                    const tours = [...(childrenOf.tours || [])];
+                    tours[ti] = { ...tours[ti], visible: next } as any;
+                    const updatedCat = { ...childrenOf, tours };
+                    setChildrenOf(updatedCat);
+                    const items = [...(data[activeNav] || [])];
+                    const pIdx = items.findIndex(x => x.id === childrenOf.id);
+                    if (pIdx >= 0) {
+                      items[pIdx] = updatedCat as any;
+                      saveSection(activeNav, items);
+                    }
+                  } else if (childrenOf) {
+                    const children = [...(childrenOf.children || [])];
+                    const ci = children.findIndex(x => x.id === item.id);
+                    if (ci >= 0) {
+                      children[ci] = { ...children[ci], visible: next } as any;
+                      saveChildren(children);
+                    }
+                  } else {
+                    const items = [...(data[activeNav] || [])];
+                    items[idx] = { ...items[idx], visible: next } as any;
+                    saveSection(activeNav, items);
+                  }
+                }}
+                style={{ width: 40, height: 22, borderRadius: 11, backgroundColor: (item as any).visible !== false ? '#10b981' : '#cbd5e1', padding: 2, flexDirection: 'row', alignItems: 'center', marginHorizontal: 6 }}
+              >
+                <View style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: '#fff', marginLeft: (item as any).visible !== false ? 18 : 0 }} />
+              </TouchableOpacity>
 
               <TouchableOpacity
                 style={cs.editBtn}
