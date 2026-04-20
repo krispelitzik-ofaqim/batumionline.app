@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Modal, TouchableOpacity, StyleSheet, ActivityIndicator, ScrollView } from 'react-native';
 import { Colors } from '../constants/colors';
+import CamerasModal from './CamerasModal';
 
 const DAYS_HE = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
 const OWM_KEY = ''; // Add your OpenWeatherMap API key here
@@ -17,6 +18,7 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
   const [current, setCurrent] = useState<CurrentWeather | null>(null);
   const [forecast, setForecast] = useState<DayForecast[]>([]);
   const [loading, setLoading] = useState(true);
+  const [camerasOpen, setCamerasOpen] = useState(false);
 
   useEffect(() => {
     if (!visible) return;
@@ -181,6 +183,12 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
         <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
           <Text style={s.title}>מזג האוויר בבטומי</Text>
 
+          <TouchableOpacity style={s.camBanner} activeOpacity={0.85} onPress={() => setCamerasOpen(true)}>
+            <Text style={s.camBannerIcon}>📹</Text>
+            <Text style={s.camBannerTxt}>צפה במצלמות חיות מבטומי</Text>
+            <Text style={s.camBannerArrow}>‹</Text>
+          </TouchableOpacity>
+
           {loading ? (
             <ActivityIndicator size="large" color={Colors.WHITE} style={{ marginTop: 40 }} />
           ) : (
@@ -264,6 +272,7 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
             </>
           )}
         </ScrollView>
+        <CamerasModal visible={camerasOpen} onClose={() => setCamerasOpen(false)} bgColor={bgColor} />
       </View>
     </Modal>
   );
@@ -344,6 +353,16 @@ const s = StyleSheet.create({
   closeBtn: { position: 'absolute', top: 54, right: 20, zIndex: 10, width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(0,0,0,0.2)', justifyContent: 'center', alignItems: 'center' },
   closeX: { fontSize: 18, color: Colors.WHITE, fontWeight: '700' },
   content: { paddingHorizontal: 24, paddingBottom: 40 },
+  camBanner: {
+    flexDirection: 'row-reverse', alignItems: 'center', gap: 10,
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    borderRadius: 14, paddingVertical: 14, paddingHorizontal: 16,
+    marginBottom: 16,
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)',
+  },
+  camBannerIcon: { fontSize: 20 },
+  camBannerTxt: { flex: 1, fontSize: 15, fontWeight: '800', color: '#fff', textAlign: 'right', writingDirection: 'rtl' },
+  camBannerArrow: { fontSize: 22, color: '#fff', opacity: 0.7 },
   title: { fontSize: 28, fontWeight: '800', color: Colors.WHITE, textAlign: 'center', marginBottom: 24, writingDirection: 'rtl' },
 
   currentCard: { backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 24, padding: 32, alignItems: 'center', marginBottom: 28 },

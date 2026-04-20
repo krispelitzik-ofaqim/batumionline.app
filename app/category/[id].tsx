@@ -3,6 +3,7 @@ import { View, Text, ScrollView, StyleSheet, useWindowDimensions, TouchableOpaci
 import { useLocalSearchParams, Stack, router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../../constants/colors';
 import { ThemeContext } from '../../constants/theme';
 import { PreviewContext } from '../../constants/previewContext';
@@ -13,6 +14,8 @@ import { fetchContent, fetchRatings, submitRating, API_BASE } from '../../consta
 type MapPoint = { name: string; lat: number; lng: number; description?: string };
 import AudioPlayer from '../../components/AudioPlayer';
 import FlightsModal from '../../components/FlightsModal';
+import BottomTabBar from '../../components/BottomTabBar';
+import Breadcrumb from '../../components/Breadcrumb';
 
 type Hotel = { id: string; title: string; titleEn?: string; text: string; image: string; mapUrl?: string; pageUrl?: string; coords?: { lat: number; lng: number }; visible?: boolean; images?: string[]; amenities?: string[]; price?: string; audio?: string };
 type TourBlock = { id: string; title: string; subtitle?: string; text: string; color: string; images: string[]; audios: { title?: string; url: string }[]; visible?: boolean; coords?: { lat: number; lng: number } };
@@ -826,6 +829,7 @@ export default function CategoryScreen() {
   const cardW = (w - 48) / 2;
 
   const [cat, setCat] = useState<Item | null>(null);
+  const [crumbs, setCrumbs] = useState<{ title: string; path?: string }[]>([]);
   const [selectedTour, setSelectedTour] = useState<TourBlock | null>(null);
   const scrollRef = useRef<ScrollView>(null);
   const [tourMapOpen, setTourMapOpen] = useState(false);
@@ -895,6 +899,25 @@ export default function CategoryScreen() {
         ? all.find((c: Item) => c.id === aliased)
         : findDeep(all);
       if (found) setCat(found);
+
+      const findPath = (list: Item[], targetId: string, trail: Item[] = []): Item[] | null => {
+        for (const c of list) {
+          const next = [...trail, c];
+          if (c.id === targetId) return next;
+          if (c.children) {
+            const r = findPath(c.children, targetId, next);
+            if (r) return r;
+          }
+        }
+        return null;
+      };
+      const targetId = aliased || (id as string);
+      const path = findPath(all, targetId) || [];
+      const computed = path.map((c, i) => ({
+        title: c.title,
+        path: i < path.length - 1 ? `/category/${c.id}` : undefined,
+      }));
+      setCrumbs(computed);
       if (data.paywall) {
         setPaywall(data.paywall);
         if (data.paywall.mode === 'premium' && data.paywall.lockedCategories.includes(id as string)) {
@@ -977,7 +1000,7 @@ export default function CategoryScreen() {
   if (cat.modal === 'flights') {
     return (
       <SafeAreaView style={[st.safe, darkCat && { backgroundColor: cat.heroBg || '#0f1419' }]}>
-        <Stack.Screen options={{ headerShown: true, title: cat.title, headerBackTitle: 'חזרה' }} />
+        <Stack.Screen options={{ headerShown: false }} />
         <FlightsModal visible={true} onClose={() => router.back()} bgColor="#2D4A5E" />
       </SafeAreaView>
     );
@@ -985,8 +1008,14 @@ export default function CategoryScreen() {
 
   return (
     <SafeAreaView style={[st.safe, darkCat && { backgroundColor: cat.heroBg || '#0f1419' }]}>
-      <Stack.Screen options={{ headerShown: true, title: cat.title, headerBackTitle: 'חזרה' }} />
+      <Stack.Screen options={{ headerShown: false }} />
       <DevicePreviewBar />
+      <View style={{ flexDirection: 'row-reverse', alignItems: 'center', paddingHorizontal: 8, paddingVertical: 8, gap: 4, borderBottomWidth: 1, borderBottomColor: 'rgba(0,0,0,0.06)' }}>
+        {crumbs.length > 0 && <View style={{ flex: 1 }}><Breadcrumb crumbs={crumbs} /></View>}
+        <TouchableOpacity onPress={() => router.back()} style={{ paddingHorizontal: 8, paddingVertical: 4 }}>
+          <Ionicons name="arrow-back" size={24} color={Colors.PRIMARY} />
+        </TouchableOpacity>
+      </View>
       {lockedOverlay}
       <ScrollView ref={scrollRef} showsVerticalScrollIndicator={false} style={{ maxWidth: w, alignSelf: 'center', width: '100%' }}>
         {cat.heroImage ? (
@@ -1277,6 +1306,7 @@ export default function CategoryScreen() {
           </TouchableOpacity>
         )}
       </ScrollView>
+      <BottomTabBar />
     </SafeAreaView>
   );
 }

@@ -1099,6 +1099,7 @@ export default function AdminDashboard() {
   const [showMobileNav, setShowMobileNav] = useState(false);
   const [childrenOf, setChildrenOf] = useState<DataItem | null>(null);
   const [extraGroupVisible, setExtraGroupVisible] = useState(true);
+  const [showDevBar, setShowDevBar] = useState(true);
   const [mediaFiles, setMediaFiles] = useState<{ filename: string; originalName?: string; url: string; tags?: string[] }[]>([]);
   const [galleryFiles, setGalleryFiles] = useState<{ filename: string; url: string }[]>([]);
   const [mediaFilter, setMediaFilter] = useState<string>('');
@@ -1157,6 +1158,7 @@ export default function AdminDashboard() {
         setData(loaded);
         if (apiData.texts) setTexts(apiData.texts);
         if (typeof apiData.extraGroupVisible === 'boolean') setExtraGroupVisible(apiData.extraGroupVisible);
+        if (typeof apiData.showDevBar === 'boolean') setShowDevBar(apiData.showDevBar);
         try { const r = await fetchRatings(); setRatings(r); } catch {}
         if (apiData.subscriptionBlock) setSubBlock(apiData.subscriptionBlock);
         // Clear stale AsyncStorage
@@ -1373,6 +1375,21 @@ export default function AdminDashboard() {
       <View style={cs.contentCard}>
         <Text style={cs.contentTitle}>דף הבית</Text>
         <Text style={cs.contentSub}>תצוגה מקדימה של דף הבית כפי שהגולש רואה</Text>
+
+        <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 12, padding: 12, marginTop: 12, backgroundColor: '#f8fafc', borderRadius: 10, borderWidth: 1, borderColor: '#e2e8f0' }}>
+          <Text style={{ flex: 1, fontSize: 13, fontWeight: '700', color: '#1C2B35', writingDirection: 'rtl', textAlign: 'right' }}>הצג סרגל תצוגה (נייד/אייפד/מחשב)</Text>
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={async () => {
+              const next = !showDevBar;
+              setShowDevBar(next);
+              try { await fetch(`${API_BASE}/api/content/showDevBar`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(next) }); } catch {}
+            }}
+            style={{ width: 44, height: 24, borderRadius: 12, backgroundColor: showDevBar ? '#10b981' : '#cbd5e1', padding: 2, flexDirection: 'row', alignItems: 'center' }}
+          >
+            <View style={{ width: 20, height: 20, borderRadius: 10, backgroundColor: '#fff', marginLeft: showDevBar ? 20 : 0 }} />
+          </TouchableOpacity>
+        </View>
         {Platform.OS === 'web' && (
           <View style={{ alignItems: 'center', marginTop: 20 }}>
             <View style={{

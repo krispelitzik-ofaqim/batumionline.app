@@ -40,7 +40,7 @@ export default function HeaderBar() {
           <Image source={require('../assets/images/batumi_icon.png')} style={styles.logo} resizeMode="contain" />
         </View>
       ) : (
-        <TouchableOpacity style={styles.btn} onPress={() => router.back()}>
+        <TouchableOpacity style={styles.btn} onPress={() => router.replace('/')}>
           <Text style={{ fontSize: 28, color: fg, fontWeight: '300' }}>‹</Text>
         </TouchableOpacity>
       )}

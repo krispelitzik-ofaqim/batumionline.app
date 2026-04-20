@@ -1,5 +1,5 @@
-import React, { useContext } from 'react';
-import { View, Text, useWindowDimensions } from 'react-native';
+import React, { useContext, useState } from 'react';
+import { View, Text, useWindowDimensions, TouchableOpacity } from 'react-native';
 import { Tabs } from 'expo-router';
 import { Ionicons, FontAwesome } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -8,12 +8,14 @@ import { ThemeContext } from '../../constants/theme';
 import { PreviewContext } from '../../constants/previewContext';
 import HeaderBar from '../../components/HeaderBar';
 import DevicePreviewBar from '../../components/DevicePreviewBar';
+import SearchModal from '../../components/SearchModal';
 
 export default function TabLayout() {
   const { dark } = useContext(ThemeContext);
   const { simulatedWidth } = useContext(PreviewContext);
   const { width: realWidth } = useWindowDimensions();
   const outerBg = dark ? Colors.TEXT : Colors.BACKGROUND;
+  const [searchOpen, setSearchOpen] = useState(false);
 
   const effectiveWidth = simulatedWidth ? Math.min(simulatedWidth, realWidth) : realWidth;
   const isMobile = effectiveWidth < 768;
@@ -27,6 +29,7 @@ export default function TabLayout() {
         </View>
       </SafeAreaView>
       <Tabs
+        initialRouteName="index"
         screenOptions={{
           headerShown: false,
           tabBarActiveTintColor: dark ? Colors.ACCENT : Colors.PRIMARY,
@@ -82,6 +85,21 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
+          name="search"
+          options={{
+            title: 'חיפוש',
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="search" size={isMobile ? 22 : size} color={color} />
+            ),
+            tabBarButton: (props: any) => (
+              <TouchableOpacity
+                {...props}
+                onPress={(e) => { e.preventDefault?.(); setSearchOpen(true); }}
+              />
+            ),
+          }}
+        />
+        <Tabs.Screen
           name="index"
           options={{
             title: 'בית',
@@ -91,6 +109,7 @@ export default function TabLayout() {
           }}
         />
       </Tabs>
+      <SearchModal visible={searchOpen} onClose={() => setSearchOpen(false)} />
     </View>
   );
 }
