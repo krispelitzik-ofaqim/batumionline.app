@@ -1024,9 +1024,15 @@ export default function CategoryScreen() {
       <DevicePreviewBar />
       <View style={{ flexDirection: 'row-reverse', alignItems: 'center', paddingHorizontal: 8, paddingVertical: 8, gap: 4, borderBottomWidth: 1, borderBottomColor: 'rgba(0,0,0,0.06)' }}>
         {crumbs.length > 0 && <View style={{ flex: 1 }}><Breadcrumb crumbs={crumbs} /></View>}
-        <TouchableOpacity onPress={() => router.back()} style={{ paddingHorizontal: 8, paddingVertical: 4 }}>
-          <Ionicons name="arrow-back" size={24} color={Colors.PRIMARY} />
-        </TouchableOpacity>
+        {id === '1' ? (
+          <TouchableOpacity onPress={() => router.back()} style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: '#f1f5f9', alignItems: 'center', justifyContent: 'center' }}>
+            <Ionicons name="arrow-back" size={20} color="#1A6B8A" />
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity onPress={() => router.back()} style={{ paddingHorizontal: 8, paddingVertical: 4 }}>
+            <Ionicons name="arrow-back" size={24} color={Colors.PRIMARY} />
+          </TouchableOpacity>
+        )}
       </View>
       {lockedOverlay}
       <ScrollView ref={scrollRef} showsVerticalScrollIndicator={false} style={{ maxWidth: w, alignSelf: 'center', width: '100%' }}>

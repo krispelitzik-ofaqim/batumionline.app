@@ -13,6 +13,7 @@ const PHONES = [
   { name: 'Pixel 7', w: 412, h: 915 },
   { name: 'OnePlus 10', w: 412, h: 919 },
   { name: 'iPhone 15 Pro Max', w: 430, h: 932 },
+  { name: 'iPad Pro 12.9"', w: 1024, h: 1366 },
 ];
 
 export default function PhonesPreview() {
