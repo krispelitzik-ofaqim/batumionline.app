@@ -61,6 +61,44 @@ const BOTTOM_BANNERS = [
   { id: 'flights', title: 'לוח המראות ונחיתות', icon: '✈️', bg: '#2D4A5E' },
 ];
 
+const DEV_PALETTE = [
+  '#1C2B35', '#2D4A5E', '#1A6B8A', '#3DA5C4', '#7ECFC0', '#5BC0DE',
+  '#0ea5e9', '#3b82f6', '#6366f1', '#8b5cf6', '#a855f7', '#d946ef',
+  '#ec4899', '#f43f5e', '#ef4444', '#f97316', '#f59e0b', '#F4A94E',
+  '#eab308', '#84cc16', '#22c55e', '#10b981', '#14b8a6', '#06b6d4',
+  '#0f172a', '#1e293b', '#334155', '#475569', '#64748b', '#94a3b8',
+  '#cbd5e1', '#e2e8f0', '#f1f5f9', '#ffffff', '#fef3c7', '#fed7aa',
+  '#fecaca', '#fbcfe8', '#e9d5ff', '#c7d2fe', '#bfdbfe', '#a5f3fc',
+  '#bbf7d0', '#d9f99d', '#fef08a', '#fde68a', '#fdba74', '#fca5a5',
+];
+
+function DevColorPalette() {
+  const [copied, setCopied] = useState('');
+  const copy = (c: string) => {
+    if (Platform.OS === 'web') {
+      try { (navigator as any).clipboard.writeText(c); } catch {}
+    }
+    setCopied(c);
+    setTimeout(() => setCopied(''), 1500);
+  };
+  return (
+    <View style={{ paddingHorizontal: 16, marginBottom: 6 }}>
+      <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 2, padding: 4, backgroundColor: '#1C2B35', borderRadius: 6 }}>
+        {DEV_PALETTE.map(c => (
+          <TouchableOpacity
+            key={c}
+            onPress={() => copy(c)}
+            style={{ width: 16, height: 16, backgroundColor: c, borderRadius: 2, borderWidth: copied === c ? 2 : 0, borderColor: '#fff' }}
+          />
+        ))}
+      </View>
+      <Text style={{ fontSize: 10, color: copied ? '#10b981' : '#94a3b8', textAlign: 'center', marginTop: 2, writingDirection: 'rtl' }}>
+        {copied ? `✓ ${copied} הועתק` : '🎨 לחץ צבע להעתיק קוד'}
+      </Text>
+    </View>
+  );
+}
+
 function isDark(bg: string) {
   return bg.startsWith('#2') || bg.startsWith('#1');
 }
@@ -97,6 +135,11 @@ export default function HomeScreen() {
   const { width: screenW } = useWindowDimensions();
   const [showExtra, setShowExtra] = useState(false);
   const [extraGroupVisible, setExtraGroupVisible] = useState(true);
+  const [sideGroupVisible, setSideGroupVisible] = useState(true);
+  const [welcomeGroupVisible, setWelcomeGroupVisible] = useState(true);
+  const [infoGroupVisible, setInfoGroupVisible] = useState(true);
+  const [bottomGroupVisible, setBottomGroupVisible] = useState(true);
+  const [mainGroupVisible, setMainGroupVisible] = useState(true);
   const [editMode, setEditMode] = useState(false);
   const [activeModal, setActiveModal] = useState<string | null>(null);
   const [editHeaderTitle, setEditHeaderTitle] = useState('Batumi Online');
@@ -123,6 +166,13 @@ export default function HomeScreen() {
         if (data.mainCategories) setEditMainCats(data.mainCategories);
         if (data.extraCategories) setEditExtraCats(data.extraCategories);
         if (typeof data.extraGroupVisible === 'boolean') setExtraGroupVisible(data.extraGroupVisible);
+        if (data.groupVisibility && typeof data.groupVisibility === 'object') {
+          if (typeof data.groupVisibility.side === 'boolean') setSideGroupVisible(data.groupVisibility.side);
+          if (typeof data.groupVisibility.welcome === 'boolean') setWelcomeGroupVisible(data.groupVisibility.welcome);
+          if (typeof data.groupVisibility.info === 'boolean') setInfoGroupVisible(data.groupVisibility.info);
+          if (typeof data.groupVisibility.bottom === 'boolean') setBottomGroupVisible(data.groupVisibility.bottom);
+          if (typeof data.groupVisibility.main === 'boolean') setMainGroupVisible(data.groupVisibility.main);
+        }
         if (data.bottomBanners) setEditBottomBanners(data.bottomBanners);
         const side = data.sideBanners || [];
         const re = side.find((b: any) => b.id === 'realestate');
@@ -178,16 +228,18 @@ export default function HomeScreen() {
         <HomeGallery />
 
         {/* 1. קטגוריות ראשיות — 6 קארדים, 2 בשורה */}
-        <View style={styles.section}>
-          <View style={styles.grid}>
-            {editMainCats.map((cat, idx) => (
-              <View key={cat.id} style={{ position: 'relative' }}>
-                {editMode && <ReorderControls index={idx} total={editMainCats.length} onMove={(dir) => moveMainCat(idx, dir)} />}
-                <CatCard item={cat} width={cardW} />
-              </View>
-            ))}
+        {mainGroupVisible && (
+          <View style={styles.section}>
+            <View style={styles.grid}>
+              {editMainCats.filter((c: any) => c.visible !== false).map((cat, idx) => (
+                <View key={cat.id} style={{ position: 'relative' }}>
+                  {editMode && <ReorderControls index={idx} total={editMainCats.length} onMove={(dir) => moveMainCat(idx, dir)} />}
+                  <CatCard item={cat} width={cardW} />
+                </View>
+              ))}
+            </View>
           </View>
-        </View>
+        )}
 
         {/* 2. קטגוריות נוספות — דרופדאון */}
         {extraGroupVisible && (
@@ -197,7 +249,7 @@ export default function HomeScreen() {
             </TouchableOpacity>
             {showExtra && (
               <View style={styles.grid}>
-                {editExtraCats.map((cat) => (
+                {editExtraCats.filter((c: any) => c.visible !== false).map((cat) => (
                   <CatCard key={cat.id} item={cat} width={cardW} />
                 ))}
               </View>
@@ -206,50 +258,58 @@ export default function HomeScreen() {
         )}
 
         {/* 3. סליידר ברוכים הבאים */}
-        <View style={styles.section}>
-          <WelcomeSlider />
-        </View>
+        {welcomeGroupVisible && (
+          <View style={styles.section}>
+            <WelcomeSlider />
+          </View>
+        )}
 
         {/* 4. פורטל המידע */}
-        <View style={styles.section}>
-          <InfoPortal />
-        </View>
+        {infoGroupVisible && (
+          <View style={styles.section}>
+            <InfoPortal />
+          </View>
+        )}
 
         {/* 5. באנר — פורטל הנדל"ן והעסקים */}
-        <View style={styles.section}>
-          <TouchableOpacity activeOpacity={0.85} style={styles.megaBannerWrap} onPress={() => router.push('/portal/realestate')}>
-            <ImageBackground
-              source={{ uri: realEstateImg || 'https://images.unsplash.com/photo-1519677100203-a0e668c92439?w=800&q=80' }}
-              style={styles.megaBanner}
-              imageStyle={{ borderRadius: 18 }}
-            >
-              <LinearGradient
-                colors={['rgba(26,107,138,0.25)', 'rgba(10,30,50,0.85)']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 0, y: 1 }}
-                style={styles.megaBannerOverlay}
+        {sideGroupVisible && (
+          <View style={styles.section}>
+            <TouchableOpacity activeOpacity={0.85} style={styles.megaBannerWrap} onPress={() => router.push('/portal/realestate')}>
+              <ImageBackground
+                source={{ uri: realEstateImg || 'https://images.unsplash.com/photo-1519677100203-a0e668c92439?w=800&q=80' }}
+                style={styles.megaBanner}
+                imageStyle={{ borderRadius: 18 }}
               >
-                <Text style={styles.megaBannerKicker}>BATUMI</Text>
-                <Text style={styles.megaBannerTitle}>פורטל הנדל״ן והעסקים</Text>
-                <Text style={styles.megaBannerSub}>כל העסקים והנכסים של בטומי במקום אחד</Text>
-              </LinearGradient>
-            </ImageBackground>
-          </TouchableOpacity>
-        </View>
+                <LinearGradient
+                  colors={['rgba(26,107,138,0.25)', 'rgba(10,30,50,0.85)']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 0, y: 1 }}
+                  style={styles.megaBannerOverlay}
+                >
+                  <Text style={styles.megaBannerKicker}>BATUMI</Text>
+                  <Text style={styles.megaBannerTitle}>פורטל הנדל״ן והעסקים</Text>
+                  <Text style={styles.megaBannerSub}>כל העסקים והנכסים של בטומי במקום אחד</Text>
+                </LinearGradient>
+              </ImageBackground>
+            </TouchableOpacity>
+          </View>
+        )}
 
         {/* 6. באנרים רוחביים */}
-        <View style={styles.section}>
-          <Text style={styles.bottomSectionTitle}>מידע On Line</Text>
-          {editBottomBanners.map((b, idx) => (
-            <View key={b.id} style={{ position: 'relative' }}>
-              {editMode && <ReorderControls index={idx} total={editBottomBanners.length} onMove={(dir) => moveBottomBanner(idx, dir)} />}
-              <TouchableOpacity style={[styles.bottomBanner, { backgroundColor: b.bg }]} activeOpacity={0.7} onPress={() => setActiveModal(b.id)}>
-                <Text style={styles.bottomBannerTitle}>{b.title}</Text>
-                <Text style={styles.bottomBannerIcon}>{b.icon}</Text>
-              </TouchableOpacity>
-            </View>
-          ))}
-        </View>
+        {bottomGroupVisible && (
+          <View style={styles.section}>
+            <Text style={styles.bottomSectionTitle}>מידע On Line</Text>
+            {editBottomBanners.filter((b: any) => b.visible !== false).map((b, idx) => (
+              <View key={b.id} style={{ position: 'relative' }}>
+                {editMode && <ReorderControls index={idx} total={editBottomBanners.length} onMove={(dir) => moveBottomBanner(idx, dir)} />}
+                <TouchableOpacity style={[styles.bottomBanner, { backgroundColor: b.bg }]} activeOpacity={0.7} onPress={() => setActiveModal(b.id)}>
+                  <Text style={styles.bottomBannerTitle}>{b.title}</Text>
+                  <Text style={styles.bottomBannerIcon}>{b.icon}</Text>
+                </TouchableOpacity>
+              </View>
+            ))}
+          </View>
+        )}
 
         <View style={{ height: 24 }} />
       </ScrollView>

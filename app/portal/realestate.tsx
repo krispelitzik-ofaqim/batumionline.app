@@ -10,6 +10,33 @@ import RealEstateGallery from '../../components/RealEstateGallery';
 import CurrencyTicker from '../../components/CurrencyTicker';
 import BottomTabBar from '../../components/BottomTabBar';
 import FinanceStats from '../../components/FinanceStats';
+import ListingForm from '../../components/ListingForm';
+import ListingsList from '../../components/ListingsList';
+import DeveloperCard, { Developer } from '../../components/DeveloperCard';
+import DeveloperForm from '../../components/DeveloperForm';
+import { Modal } from 'react-native';
+
+const DEMO_DEVELOPERS: Developer[] = [
+  {
+    id: 'dev1',
+    logo: 'https://placehold.co/120x120/1E3A8A/ffffff/png?text=ORBI',
+    company: 'Orbi Group',
+    projectName: 'Orbi Sea Towers Phase 4',
+    brandColor: '#1E3A8A',
+    location: 'Batumi Seafront',
+    deliveryDate: '2028',
+    whatsapp: '995555123456',
+    website: 'https://orbigroup.ge',
+    package: 'premium',
+    units: [
+      { id: 'u1', title: 'פנטהאוז 120 מ"ר', image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&q=80', price: '$180,000', size: '120 מ"ר · 3 חדרים', description: 'פנטהאוז מפואר עם נוף פנורמי לים, 3 חדרים + סלון, מרפסת גדולה, עיצוב מודרני.' },
+      { id: 'u2', title: 'דירת 2 חד׳ 65 מ"ר', image: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80', price: '$82,000', size: '65 מ"ר' },
+      { id: 'u3', title: 'דירת 1 חד׳ 45 מ"ר', image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80', price: '$64,000', size: '45 מ"ר', sold: true },
+      { id: 'u4', title: 'סטודיו 25 מ"ר', image: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&q=80', price: '$48,000', size: '25 מ"ר' },
+      { id: 'u5', title: 'דירת 3 חד׳ 95 מ"ר', image: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80', price: '$135,000', size: '95 מ"ר' },
+    ],
+  },
+];
 
 type TopButton = { id: string; label: string };
 type Article = { id: string; title: string; summary: string; image?: string; link?: string; date?: string };
@@ -19,7 +46,6 @@ const DEFAULT_TOP_BUTTONS: TopButton[] = [
   { id: 'hotels', label: 'פרויקטים מלונאיים' },
   { id: 'sale', label: 'דירות למכירה' },
   { id: 'rent', label: 'דירות להשכרה' },
-  { id: 'future', label: 'עתיד הנדל״ן' },
 ];
 
 const FALLBACK_NEWS: Article[] = [
@@ -39,27 +65,27 @@ const FALLBACK_MONEY_INDEX = [
 
 const LISTINGS_BY_TOP: Record<string, Listing[]> = {
   'new-hotels': [
-    { id: 'nh1', title: 'Orbi Sea Towers Phase 4', image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80', price: '$65,000', features: ['אולפנים החל מ-22 מ"ר', 'מסירה 2028', 'בריכה ו-SPA', 'מרחק 50 מ׳ מהים'], cta: 'לפרטים עם המתווך', size: 'full' },
-    { id: 'nh2', title: 'Batumi Riviera Residence', image: 'https://images.unsplash.com/photo-1582407947092-45795aba4166?w=800&q=80', price: '$82,000', features: ['דירת 1 חדר', 'תשואה 9% מובטחת'], cta: 'לפרטים', size: 'half' },
-    { id: 'nh3', title: 'Palm Tower by Sea', image: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&q=80', price: '$54,000', features: ['אולפן 25 מ"ר', 'קו ראשון לים'], cta: 'לפרטים', size: 'half' },
+    { id: 'nh1', title: 'Orbi Sea Towers Phase 4', image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80', price: '$65,000', features: ['אולפנים החל מ-22 מ"ר', 'מסירה 2028', 'בריכה ו-SPA', 'מרחק 50 מ׳ מהים'], cta: 'פרטים נוספים', size: 'full' },
+    { id: 'nh2', title: 'Batumi Riviera Residence', image: 'https://images.unsplash.com/photo-1582407947092-45795aba4166?w=800&q=80', price: '$82,000', features: ['דירת 1 חדר', 'תשואה 9% מובטחת'], cta: 'פרטים נוספים', size: 'half' },
+    { id: 'nh3', title: 'Palm Tower by Sea', image: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&q=80', price: '$54,000', features: ['אולפן 25 מ"ר', 'קו ראשון לים'], cta: 'פרטים נוספים', size: 'half' },
   ],
   'running-hotels': [
-    { id: 'rh1', title: 'Pullman Batumi', image: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=800&q=80', price: '$95,000', features: ['דירת נופש מלונאית', 'ניהול בינלאומי', 'תשואה 7-8%', 'מוכן למגורים'], cta: 'לפרטים עם המתווך' },
-    { id: 'rh2', title: 'Wyndham Grand Batumi', image: 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=800&q=80', price: '$110,000', features: ['2 חדרים', 'מלון 5 כוכבים', 'חוזה 10 שנים', 'ניהול רשת'], cta: 'לפרטים עם המתווך' },
+    { id: 'rh1', title: 'Pullman Batumi', image: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=800&q=80', price: '$95,000', features: ['דירת נופש מלונאית', 'ניהול בינלאומי', 'תשואה 7-8%', 'מוכן למגורים'], cta: 'פרטים נוספים' },
+    { id: 'rh2', title: 'Wyndham Grand Batumi', image: 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=800&q=80', price: '$110,000', features: ['2 חדרים', 'מלון 5 כוכבים', 'חוזה 10 שנים', 'ניהול רשת'], cta: 'פרטים נוספים' },
   ],
   'sale': [
-    { id: 'ap1', title: 'דירת 2 חדרים - מרכז', image: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80', price: '$72,000', features: ['65 מ"ר', 'קומה 8', 'משופצת', 'מרפסת'], cta: 'לפרטים עם המתווך', size: 'full' },
-    { id: 'ap2', title: 'דירת 3 חדרים - טיילת', image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80', price: '$125,000', features: ['95 מ"ר', 'נוף ים', 'חניה', 'מרוהטת'], cta: 'לפרטים עם המתווך', size: 'half' },
-    { id: 'ap3', title: 'סטודיו - שכונת אלברס', image: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80', price: '$38,000', features: ['28 מ"ר', 'משופץ', 'מרוהט', 'מוכן להשכרה'], cta: 'לפרטים עם המתווך', size: 'half' },
+    { id: 'ap1', title: 'דירת 2 חדרים - מרכז', image: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80', price: '$72,000', features: ['65 מ"ר', 'קומה 8', 'משופצת', 'מרפסת'], cta: 'פרטים נוספים', size: 'full' },
+    { id: 'ap2', title: 'דירת 3 חדרים - טיילת', image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80', price: '$125,000', features: ['95 מ"ר', 'נוף ים', 'חניה', 'מרוהטת'], cta: 'פרטים נוספים', size: 'half' },
+    { id: 'ap3', title: 'סטודיו - שכונת אלברס', image: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80', price: '$38,000', features: ['28 מ"ר', 'משופץ', 'מרוהט', 'מוכן להשכרה'], cta: 'פרטים נוספים', size: 'half' },
   ],
   'rent': [
-    { id: 'rt1', title: 'דירת 2 חדרים להשכרה - מרכז', image: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80', price: '$650/חודש', features: ['60 מ"ר', 'מרוהטת', 'קומה 5', 'מיזוג'], cta: 'לפרטים עם המתווך', size: 'full' },
-    { id: 'rt2', title: 'דירת 3 חדרים - טיילת', image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80', price: '$1,200/חודש', features: ['90 מ"ר', 'נוף ים', 'מרוהטת', 'חניה'], cta: 'לפרטים עם המתווך', size: 'half' },
-    { id: 'rt3', title: 'סטודיו - שכונת אלברס', image: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80', price: '$400/חודש', features: ['28 מ"ר', 'מרוהט', 'מיני מטבח', 'וויי-פיי'], cta: 'לפרטים עם המתווך', size: 'half' },
+    { id: 'rt1', title: 'דירת 2 חדרים להשכרה - מרכז', image: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80', price: '$650/חודש', features: ['60 מ"ר', 'מרוהטת', 'קומה 5', 'מיזוג'], cta: 'פרטים נוספים', size: 'full' },
+    { id: 'rt2', title: 'דירת 3 חדרים - טיילת', image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80', price: '$1,200/חודש', features: ['90 מ"ר', 'נוף ים', 'מרוהטת', 'חניה'], cta: 'פרטים נוספים', size: 'half' },
+    { id: 'rt3', title: 'סטודיו - שכונת אלברס', image: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80', price: '$400/חודש', features: ['28 מ"ר', 'מרוהט', 'מיני מטבח', 'וויי-פיי'], cta: 'פרטים נוספים', size: 'half' },
   ],
   'future': [
-    { id: 'fu1', title: 'פארק עסקים החדש', image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&q=80', price: 'החל מ-$1,400/מ"ר', features: ['אזור עסקים מתוכנן', 'תשתיות חדשות 2028', 'פוטנציאל עליית מחירים'], cta: 'מידע נוסף' },
-    { id: 'fu2', title: 'קו רכבת קל עתידי', image: 'https://images.unsplash.com/photo-1565881545969-15d1c0dee1c2?w=800&q=80', price: 'מיליארד דולר השקעה', features: ['פרויקט ממשלתי', 'תחילת עבודות 2027', 'יעלה ערך נכסים לאורך הקו'], cta: 'מידע נוסף' },
+    { id: 'fu1', title: 'פארק עסקים החדש', image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&q=80', price: 'החל מ-$1,400/מ"ר', features: ['אזור עסקים מתוכנן', 'תשתיות חדשות 2028', 'פוטנציאל עליית מחירים'], cta: 'פרטים נוספים' },
+    { id: 'fu2', title: 'קו רכבת קל עתידי', image: 'https://images.unsplash.com/photo-1565881545969-15d1c0dee1c2?w=800&q=80', price: 'מיליארד דולר השקעה', features: ['פרויקט ממשלתי', 'תחילת עבודות 2027', 'יעלה ערך נכסים לאורך הקו'], cta: 'פרטים נוספים' },
   ],
 };
 
@@ -72,6 +98,12 @@ const FALLBACK_TIPS: Article[] = [
 export default function RealEstatePortal() {
   const [topButtons, setTopButtons] = useState<TopButton[]>(DEFAULT_TOP_BUTTONS);
   const [activeTop, setActiveTop] = useState<string | null>(null);
+  const [rentPeriod, setRentPeriod] = useState<'daily' | 'yearly'>('daily');
+  const [formOpen, setFormOpen] = useState(false);
+  const [choiceOpen, setChoiceOpen] = useState(false);
+  const [devFormOpen, setDevFormOpen] = useState(false);
+  const [listingsKey, setListingsKey] = useState(0);
+  const [expandedFixedId, setExpandedFixedId] = useState<string | null>(null);
   const [news, setNews] = useState<Article[]>(FALLBACK_NEWS);
   const [moneyIndex] = useState(FALLBACK_MONEY_INDEX);
   const [tips] = useState<Article[]>(FALLBACK_TIPS);
@@ -134,13 +166,13 @@ export default function RealEstatePortal() {
           </LinearGradient>
         </ImageBackground>
 
-        {/* Top buttons - horizontal slider */}
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.topRow}>
+        {/* Top buttons - fit in one row */}
+        <View style={s.topRow}>
           <TouchableOpacity
             style={[s.topBtnRect, s.homeBtn, activeTop === null && s.topBtnActive]}
             onPress={() => setActiveTop(null)}
           >
-            <Text style={[s.topBtnTxt, activeTop === null && s.topBtnTxtActive]}>🏠 פורטל הנדל״ן</Text>
+            <Text style={[s.topBtnTxt, activeTop === null && s.topBtnTxtActive]} numberOfLines={2}>🏠 פורטל</Text>
           </TouchableOpacity>
           {topButtons.map(b => (
             <TouchableOpacity
@@ -148,41 +180,93 @@ export default function RealEstatePortal() {
               style={[s.topBtnRect, activeTop === b.id && s.topBtnActive]}
               onPress={() => setActiveTop(activeTop === b.id ? null : b.id)}
             >
-              <Text style={[s.topBtnTxt, activeTop === b.id && s.topBtnTxtActive]}>{b.label}</Text>
+              <Text style={[s.topBtnTxt, activeTop === b.id && s.topBtnTxtActive]} numberOfLines={2}>{b.label}</Text>
             </TouchableOpacity>
           ))}
-        </ScrollView>
+        </View>
 
         {activeTop ? (
           <>
-            {/* Listings grid - size per listing set by editor (admin) */}
+            {activeTop === 'hotels' && (
+              <View style={{ paddingHorizontal: 16, marginBottom: 14 }}>
+                {DEMO_DEVELOPERS.map(d => <DeveloperCard key={d.id} d={d} />)}
+              </View>
+            )}
+
+            {(activeTop === 'sale' || activeTop === 'rent' || activeTop === 'hotels') && (
+              <View style={{ marginBottom: 14 }}>
+                <TouchableOpacity onPress={() => activeTop === 'hotels' ? setChoiceOpen(true) : setFormOpen(true)} style={s.uploadCard}>
+                  <Text style={s.uploadIcon}>📝</Text>
+                  <View style={{ flex: 1 }}>
+                    <Text style={s.uploadTitle}>פרסם מודעה חדשה</Text>
+                    <Text style={s.uploadSub}>{activeTop === 'sale' ? 'למכירה' : activeTop === 'rent' ? 'להשכרה' : 'פרויקט מלונאי'} · חינם · אישור תוך 3 שעות</Text>
+                  </View>
+                  <Text style={s.uploadArrow}>‹</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+
+            {/* Listings grid - admin-curated */}
             <View style={s.listingsGrid}>
               {(LISTINGS_BY_TOP[activeTop] || []).filter(lst => !!lst.image).map(lst => (
-                <TouchableOpacity
-                  key={lst.id}
-                  activeOpacity={0.85}
-                  style={[s.listingCard, lst.size === 'half' && s.listingCardHalf]}
-                  onPress={() => lst.link && Linking.openURL(lst.link)}
-                >
-                  <Image source={{ uri: lst.image }} style={s.listingImage} />
-                  <View style={s.listingBody}>
-                    <Text style={s.listingTitle} numberOfLines={2}>{lst.title}</Text>
-                    {lst.features.map((f, i) => (
-                      <View key={i} style={s.listingFeature}>
-                        <Text style={s.listingFeatureCheck}>✓</Text>
-                        <Text style={s.listingFeatureTxt} numberOfLines={2}>{f}</Text>
+                <React.Fragment key={lst.id}>
+                  <TouchableOpacity
+                    activeOpacity={0.85}
+                    style={[s.listingCard, lst.size === 'half' && s.listingCardHalf]}
+                    onPress={() => setExpandedFixedId(expandedFixedId === lst.id ? null : lst.id)}
+                  >
+                    <Image source={{ uri: lst.image }} style={s.listingImage} />
+                    <View style={s.listingBody}>
+                      <Text style={s.listingTitle} numberOfLines={2}>{lst.title}</Text>
+                      {lst.features.map((f, i) => (
+                        <View key={i} style={s.listingFeature}>
+                          <Text style={s.listingFeatureCheck}>✓</Text>
+                          <Text style={s.listingFeatureTxt} numberOfLines={2}>{f}</Text>
+                        </View>
+                      ))}
+                      <Text style={s.listingPrice}>{lst.price}</Text>
+                      <View style={s.listingCta}>
+                        <Text style={s.listingCtaTxt}>{lst.cta}</Text>
                       </View>
-                    ))}
-                    <Text style={s.listingPrice}>{lst.price}</Text>
-                    <View style={s.listingCta}>
-                      <Text style={s.listingCtaTxt}>{lst.cta}</Text>
                     </View>
-                  </View>
-                </TouchableOpacity>
+                  </TouchableOpacity>
+                  {expandedFixedId === lst.id && (
+                    <View style={s.fixedExpanded}>
+                      <View style={s.fixedExpandedHeader}>
+                        <TouchableOpacity onPress={() => setExpandedFixedId(null)} style={s.fixedCloseBtn}>
+                          <Text style={s.fixedCloseTxt}>✕</Text>
+                        </TouchableOpacity>
+                        <Text style={s.fixedExpandedTitle} numberOfLines={1}>{lst.title}</Text>
+                      </View>
+                      <Image source={{ uri: lst.image }} style={{ width: '100%', aspectRatio: 16 / 10 }} resizeMode="cover" />
+                      <View style={{ padding: 12 }}>
+                        {lst.features.map((f, i) => (
+                          <View key={i} style={{ flexDirection: 'row-reverse', gap: 6, marginBottom: 4 }}>
+                            <Text style={{ color: '#4ade80' }}>✓</Text>
+                            <Text style={{ fontSize: 13, color: '#e2e8f0', textAlign: 'right', writingDirection: 'rtl' }}>{f}</Text>
+                          </View>
+                        ))}
+                        <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginTop: 10 }}>
+                          <Text style={{ fontSize: 18, fontWeight: '900', color: '#10b981' }}>{lst.price}</Text>
+                          {lst.link && (
+                            <TouchableOpacity onPress={() => Linking.openURL(lst.link!)} style={{ paddingHorizontal: 14, paddingVertical: 8, backgroundColor: Colors.PRIMARY, borderRadius: 8 }}>
+                              <Text style={{ color: '#fff', fontSize: 12, fontWeight: '800' }}>{lst.cta}</Text>
+                            </TouchableOpacity>
+                          )}
+                        </View>
+                      </View>
+                    </View>
+                  )}
+                </React.Fragment>
               ))}
             </View>
 
-            {(activeTop === 'sale' || activeTop === 'rent') && (
+            {(activeTop === 'sale' || activeTop === 'rent' || activeTop === 'hotels') && (
+              <View style={{ marginTop: 14 }}>
+                <ListingsList type={activeTop as 'sale' | 'rent' | 'hotels'} reloadKey={listingsKey} />
+              </View>
+            )}
+            {false && (activeTop === 'sale' || activeTop === 'rent') && (
               <View style={{ paddingHorizontal: 16, gap: 10, marginTop: 14 }}>
                 {(LISTINGS_BY_TOP[activeTop] || []).filter(lst => !!lst.image).map(lst => (
                   <TouchableOpacity
@@ -232,6 +316,12 @@ export default function RealEstatePortal() {
             </Section>
 
             <BusinessServicesSlider variant="large" onPressService={handleService} />
+
+            {/* Section - Future real estate (between services and currency) */}
+            <Section title="עתיד הנדל״ן" icon="🔮">
+              <FutureSlider projects={LISTINGS_BY_TOP['future'] || []} />
+            </Section>
+
             <CurrencyTicker />
           </>
         )}
@@ -239,6 +329,49 @@ export default function RealEstatePortal() {
         <View style={{ height: 40 }} />
       </ScrollView>
       <BottomTabBar />
+      <ListingForm
+        visible={formOpen}
+        onClose={() => setFormOpen(false)}
+        defaultType={activeTop === 'sale' ? 'sale' : activeTop === 'hotels' ? 'hotels' : 'rent'}
+        onSubmitted={() => setListingsKey(k => k + 1)}
+      />
+      <DeveloperForm
+        visible={devFormOpen}
+        onClose={() => setDevFormOpen(false)}
+        onSubmitted={() => setListingsKey(k => k + 1)}
+      />
+      <Modal visible={choiceOpen} animationType="fade" transparent onRequestClose={() => setChoiceOpen(false)}>
+        <View style={s.choiceBackdrop}>
+          <View style={s.choiceSheet}>
+            <View style={s.choiceHeader}>
+              <TouchableOpacity onPress={() => setChoiceOpen(false)}><Text style={s.choiceClose}>✕</Text></TouchableOpacity>
+              <Text style={s.choiceTitle}>מי אתה?</Text>
+            </View>
+            <TouchableOpacity
+              onPress={() => { setChoiceOpen(false); setFormOpen(true); }}
+              style={s.choiceBtn}
+            >
+              <Text style={s.choiceBtnIcon}>👤</Text>
+              <View style={{ flex: 1 }}>
+                <Text style={s.choiceBtnTitle}>לקוח פרטי</Text>
+                <Text style={s.choiceBtnSub}>מודעה בודדת · קטן חינם / גדול $10/חודש</Text>
+              </View>
+              <Text style={s.choiceArrow}>‹</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => { setChoiceOpen(false); setDevFormOpen(true); }}
+              style={[s.choiceBtn, s.choiceBtnDev]}
+            >
+              <Text style={s.choiceBtnIcon}>🏗️</Text>
+              <View style={{ flex: 1 }}>
+                <Text style={s.choiceBtnTitle}>יזם / מתווך</Text>
+                <Text style={s.choiceBtnSub}>מיני-פורטל · Basic $100 / Premium $180 לחודש</Text>
+              </View>
+              <Text style={s.choiceArrow}>‹</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -251,6 +384,59 @@ function Section({ title, icon, children }: { title: string; icon: string; child
         <Text style={s.sectionTitle}>{title}</Text>
       </View>
       {children}
+    </View>
+  );
+}
+
+function FutureSlider({ projects }: { projects: Listing[] }) {
+  const SLIDE_W = 340;
+  const GAP = 12;
+  const { width } = useWindowDimensions();
+  const scrollRef = useRef<ScrollView>(null);
+  const [idx, setIdx] = useState(0);
+  const goTo = (i: number) => {
+    const next = Math.max(0, Math.min(projects.length - 1, i));
+    setIdx(next);
+    scrollRef.current?.scrollTo({ x: next * (SLIDE_W + GAP), animated: true });
+  };
+  if (projects.length === 0) return null;
+  return (
+    <View style={{ width: SLIDE_W, alignSelf: 'center', overflow: 'hidden', position: 'relative' }}>
+      <ScrollView
+        ref={scrollRef}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        snapToInterval={SLIDE_W + GAP}
+        decelerationRate="fast"
+        contentContainerStyle={{ gap: GAP }}
+        onMomentumScrollEnd={(e) => setIdx(Math.round(e.nativeEvent.contentOffset.x / (SLIDE_W + GAP)))}
+      >
+        {projects.map(p => (
+          <TouchableOpacity key={p.id} activeOpacity={0.85} style={{ width: SLIDE_W, height: 260, borderRadius: 14, overflow: 'hidden', backgroundColor: Colors.WHITE, borderWidth: 1, borderColor: '#e2e8f0' }} onPress={() => p.link && Linking.openURL(p.link)}>
+            {p.image && <Image source={{ uri: p.image }} style={{ width: SLIDE_W, height: 140 }} />}
+            <View style={{ padding: 12, flex: 1, justifyContent: 'space-between' }}>
+              <View>
+                <Text style={{ fontSize: 15, fontWeight: '900', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl' }} numberOfLines={1}>{p.title}</Text>
+                <Text style={{ fontSize: 12, color: '#64748b', textAlign: 'right', writingDirection: 'rtl', marginTop: 2 }} numberOfLines={1}>{p.price || ''}</Text>
+                <Text style={{ fontSize: 11, color: '#475569', textAlign: 'right', writingDirection: 'rtl', marginTop: 6 }} numberOfLines={3}>{(p.features || []).join(' · ')}</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+      {projects.length > 1 && (
+        <>
+          <TouchableOpacity style={{ position: 'absolute', top: 60, right: 12, width: 32, height: 32, borderRadius: 16, backgroundColor: 'rgba(0,0,0,0.5)', alignItems: 'center', justifyContent: 'center', zIndex: 5 }} onPress={() => goTo(idx - 1)}>
+            <Text style={{ fontSize: 20, color: '#fff', fontWeight: '300' }}>›</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={{ position: 'absolute', top: 60, left: 12, width: 32, height: 32, borderRadius: 16, backgroundColor: 'rgba(0,0,0,0.5)', alignItems: 'center', justifyContent: 'center', zIndex: 5 }} onPress={() => goTo(idx + 1)}>
+            <Text style={{ fontSize: 20, color: '#fff', fontWeight: '300' }}>‹</Text>
+          </TouchableOpacity>
+          <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 5, marginTop: 8 }}>
+            {projects.map((_, i) => <View key={i} style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: i === idx ? Colors.PRIMARY : '#cbd5e1' }} />)}
+          </View>
+        </>
+      )}
     </View>
   );
 }
@@ -322,14 +508,14 @@ const s = StyleSheet.create({
   heroTitle: { fontSize: 32, fontWeight: '900', color: Colors.WHITE, textAlign: 'right', writingDirection: 'rtl', marginTop: 4 },
   heroSub: { fontSize: 14, color: Colors.WHITE, opacity: 0.85, textAlign: 'right', writingDirection: 'rtl', marginTop: 4 },
 
-  topRow: { flexDirection: 'row', gap: 8, paddingHorizontal: 16, paddingVertical: 14 },
-  topBtnRect: { backgroundColor: Colors.WHITE, paddingHorizontal: 14, paddingVertical: 10, borderRadius: 10, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.08, shadowRadius: 4, elevation: 2 },
+  topRow: { flexDirection: 'row-reverse', gap: 4, paddingHorizontal: 6, paddingVertical: 10, justifyContent: 'center' },
+  topBtnRect: { flex: 1, backgroundColor: Colors.WHITE, paddingHorizontal: 6, paddingVertical: 10, borderRadius: 10, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.08, shadowRadius: 4, elevation: 2, alignItems: 'center' },
   topGrid: { flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 6, paddingHorizontal: 16, paddingVertical: 14, justifyContent: 'center' },
   topBtnGrid: { width: '32%', backgroundColor: Colors.WHITE, paddingHorizontal: 6, paddingVertical: 10, borderRadius: 10, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.08, shadowRadius: 4, elevation: 2, alignItems: 'center', justifyContent: 'center', minHeight: 50 },
   topBtn: { backgroundColor: Colors.WHITE, paddingHorizontal: 14, paddingVertical: 10, borderRadius: 22, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.08, shadowRadius: 4, elevation: 2 },
   homeBtn: { backgroundColor: Colors.ACCENT + '30' },
   topBtnActive: { backgroundColor: Colors.PRIMARY },
-  topBtnTxt: { fontSize: 11, fontWeight: '700', color: Colors.TEXT, writingDirection: 'rtl', textAlign: 'center' },
+  topBtnTxt: { fontSize: 10, fontWeight: '700', color: Colors.TEXT, writingDirection: 'rtl', textAlign: 'center' },
   topBtnTxtActive: { color: Colors.WHITE },
 
   layoutToggle: { flexDirection: 'row-reverse', gap: 8, paddingHorizontal: 16, marginBottom: 10 },
@@ -339,6 +525,11 @@ const s = StyleSheet.create({
   layoutBtnTxtActive: { color: Colors.WHITE },
 
   listingsGrid: { paddingHorizontal: 16, flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 8 },
+  fixedExpanded: { width: '100%', backgroundColor: '#0f172a', borderRadius: 14, overflow: 'hidden', marginTop: 2 },
+  fixedExpandedHeader: { flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', padding: 12, backgroundColor: '#1e293b' },
+  fixedExpandedTitle: { flex: 1, fontSize: 14, fontWeight: '900', color: '#fff', textAlign: 'right', writingDirection: 'rtl' },
+  fixedCloseBtn: { width: 30, height: 30, borderRadius: 15, backgroundColor: 'rgba(255,255,255,0.2)', alignItems: 'center', justifyContent: 'center' },
+  fixedCloseTxt: { color: '#fff', fontSize: 14, fontWeight: '900' },
   listingCard: {
     width: '100%',
     backgroundColor: Colors.WHITE, borderRadius: 16, overflow: 'hidden',
@@ -354,6 +545,22 @@ const s = StyleSheet.create({
   hBannerPrice: { fontSize: 13, fontWeight: '900', color: '#10b981', textAlign: 'right' },
   hBannerBtnSmall: { paddingHorizontal: 10, paddingVertical: 4, backgroundColor: Colors.PRIMARY, borderRadius: 6 },
   hBannerBtnSmallTxt: { color: Colors.WHITE, fontSize: 10, fontWeight: '800', writingDirection: 'rtl' },
+  uploadCard: { marginHorizontal: 16, flexDirection: 'row-reverse', alignItems: 'center', gap: 12, padding: 16, borderRadius: 14, backgroundColor: '#10b981', shadowColor: '#000', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.15, shadowRadius: 8, elevation: 3 },
+  uploadIcon: { fontSize: 28 },
+  uploadTitle: { fontSize: 15, fontWeight: '900', color: Colors.WHITE, textAlign: 'right', writingDirection: 'rtl' },
+  uploadSub: { fontSize: 11, color: Colors.WHITE, opacity: 0.9, textAlign: 'right', writingDirection: 'rtl', marginTop: 2 },
+  uploadArrow: { fontSize: 22, color: Colors.WHITE, fontWeight: '300' },
+  choiceBackdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.55)', alignItems: 'center', justifyContent: 'center', padding: 20 },
+  choiceSheet: { width: '100%', maxWidth: 400, backgroundColor: '#fff', borderRadius: 16, padding: 16, gap: 10 },
+  choiceHeader: { flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 },
+  choiceTitle: { fontSize: 17, fontWeight: '900', color: Colors.TEXT, writingDirection: 'rtl' },
+  choiceClose: { fontSize: 20, color: '#64748b', padding: 4 },
+  choiceBtn: { flexDirection: 'row-reverse', alignItems: 'center', gap: 10, padding: 14, borderRadius: 12, backgroundColor: '#f1f5f9', borderWidth: 1, borderColor: '#e2e8f0' },
+  choiceBtnDev: { backgroundColor: '#fef3c7', borderColor: '#f59e0b' },
+  choiceBtnIcon: { fontSize: 30 },
+  choiceBtnTitle: { fontSize: 15, fontWeight: '900', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl' },
+  choiceBtnSub: { fontSize: 11, color: '#64748b', textAlign: 'right', writingDirection: 'rtl', marginTop: 2 },
+  choiceArrow: { fontSize: 22, color: '#64748b', fontWeight: '300' },
   listingImage: { width: '100%', height: 160 },
   listingBody: { padding: 14 },
   listingTitle: { fontSize: 16, fontWeight: '800', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl', marginBottom: 8 },

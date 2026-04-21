@@ -353,6 +353,490 @@ function RichEditor({ value, onChange }: { value: string; onChange: (v: string) 
   ]);
 }
 
+// ─── Finance World Bank Table ──────────────────────────────────
+function FinanceWorldBankTable() {
+  const INDICATORS = [
+    { key: 'inflation', label: 'אינפלציה', code: 'FP.CPI.TOTL.ZG', country: 'GE', unit: '%' },
+    { key: 'lending', label: 'ריבית הלוואות', code: 'FR.INR.LEND', country: 'GE', unit: '%' },
+    { key: 'gdp', label: 'צמיחת תמ״ג', code: 'NY.GDP.MKTP.KD.ZG', country: 'GE', unit: '%' },
+    { key: 'unemp', label: 'אבטלה', code: 'SL.UEM.TOTL.ZS', country: 'GE', unit: '%' },
+    { key: 'gdpPcGE', label: 'תמ״ג לנפש (GE)', code: 'NY.GDP.PCAP.CD', country: 'GE', unit: '$' },
+    { key: 'gdpPcIL', label: 'תמ״ג לנפש (IL)', code: 'NY.GDP.PCAP.CD', country: 'IL', unit: '$' },
+  ] as const;
+  type Row = { key: string; label: string; unit: string; series: { year: number; value: number | null }[] };
+  const [rows, setRows] = useState<Row[]>([]);
+  const [years, setYears] = useState<number[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
+      try {
+        const fetched: Row[] = await Promise.all(INDICATORS.map(async (ind) => {
+          const r = await fetch(`https://api.worldbank.org/v2/country/${ind.country}/indicator/${ind.code}?format=json&per_page=12`);
+          const j = await r.json();
+          const arr = Array.isArray(j) && j[1] ? j[1] : [];
+          const series = arr
+            .filter((x: any) => x.value != null)
+            .map((x: any) => ({ year: parseInt(x.date, 10), value: Number(x.value) }))
+            .sort((a: any, b: any) => b.year - a.year)
+            .slice(0, 4)
+            .sort((a: any, b: any) => a.year - b.year);
+          return { key: ind.key, label: ind.label, unit: ind.unit, series };
+        }));
+        setRows(fetched);
+        const allYears = new Set<number>();
+        fetched.forEach(r => r.series.forEach(s => allYears.add(s.year)));
+        setYears(Array.from(allYears).sort((a, b) => a - b).slice(-4));
+      } catch {}
+      setLoading(false);
+    })();
+  }, []);
+
+  const formatVal = (v: number | null | undefined, unit: string) => {
+    if (v == null) return '—';
+    if (unit === '$') return v >= 1000 ? `$${Math.round(v).toLocaleString()}` : `$${v.toFixed(0)}`;
+    return `${v.toFixed(1)}${unit}`;
+  };
+
+  const sparkline = (series: { year: number; value: number | null }[], color: string) => {
+    if (Platform.OS !== 'web' || series.length < 2) return null;
+    const vals = series.map(s => s.value ?? 0);
+    const min = Math.min(...vals);
+    const max = Math.max(...vals);
+    const range = max - min || 1;
+    const w = 80;
+    const h = 24;
+    const pts = vals.map((v, i) => {
+      const x = (i / (vals.length - 1)) * w;
+      const y = h - ((v - min) / range) * h;
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    }).join(' ');
+    return React.createElement('svg', { width: w, height: h },
+      React.createElement('polyline', { points: pts, fill: 'none', stroke: color, strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' }),
+      ...vals.map((v, i) => {
+        const x = (i / (vals.length - 1)) * w;
+        const y = h - ((v - min) / range) * h;
+        return React.createElement('circle', { key: i, cx: x, cy: y, r: 2, fill: color });
+      })
+    );
+  };
+
+  return (
+    <View style={{ marginBottom: 14, backgroundColor: '#fff', borderRadius: 10, borderWidth: 1, borderColor: '#e2e8f0', overflow: 'hidden' }}>
+      <View style={{ padding: 12, borderBottomWidth: 1, borderBottomColor: '#e2e8f0', backgroundColor: '#f8fafc' }}>
+        <Text style={{ fontSize: 13, fontWeight: '900', color: '#1C2B35', writingDirection: 'rtl', textAlign: 'right' }}>📊 טבלת נתונים אוטומטיים (World Bank)</Text>
+        <Text style={{ fontSize: 10, color: '#64748b', writingDirection: 'rtl', textAlign: 'right', marginTop: 2 }}>🔒 כל הערכים מסונכרנים אוטומטית ונעולים לעריכה</Text>
+      </View>
+      {loading ? (
+        <Text style={{ textAlign: 'center', color: '#94a3b8', padding: 20 }}>טוען נתונים...</Text>
+      ) : (
+        <>
+          <View style={{ flexDirection: 'row-reverse', paddingVertical: 8, paddingHorizontal: 10, backgroundColor: '#f1f5f9', gap: 6 }}>
+            <Text style={{ flex: 1.8, fontSize: 11, fontWeight: '800', color: '#475569', textAlign: 'right', writingDirection: 'rtl' }}>מדד</Text>
+            {years.map(y => (
+              <Text key={y} style={{ flex: 1, fontSize: 11, fontWeight: '800', color: '#475569', textAlign: 'center' }}>{y}</Text>
+            ))}
+            <Text style={{ width: 90, fontSize: 11, fontWeight: '800', color: '#475569', textAlign: 'center' }}>מגמה</Text>
+          </View>
+          {rows.map((row, idx) => (
+            <View key={row.key} style={{ flexDirection: 'row-reverse', paddingVertical: 10, paddingHorizontal: 10, gap: 6, backgroundColor: idx % 2 === 0 ? '#fff' : '#fafafa', borderTopWidth: 1, borderTopColor: '#f1f5f9', alignItems: 'center' }}>
+              <Text style={{ flex: 1.8, fontSize: 12, color: '#1C2B35', textAlign: 'right', writingDirection: 'rtl', fontWeight: '700' }}>🔒 {row.label}</Text>
+              {years.map(y => {
+                const p = row.series.find(s => s.year === y);
+                return (
+                  <Text key={y} style={{ flex: 1, fontSize: 11, color: '#64748b', textAlign: 'center' }}>{formatVal(p?.value, row.unit)}</Text>
+                );
+              })}
+              <View style={{ width: 90, alignItems: 'center' }}>
+                {sparkline(row.series, '#1A6B8A')}
+              </View>
+            </View>
+          ))}
+        </>
+      )}
+    </View>
+  );
+}
+
+// ─── Source Links Bar ──────────────────────────────────────────
+function SourceLinksBar({ links, accentColor }: { links: Array<{ label: string; url: string; icon: string }>; accentColor: string }) {
+  const open = (url: string) => {
+    if (Platform.OS === 'web') (window as any).open(url, '_blank');
+    else Linking.openURL(url);
+  };
+  return (
+    <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 6, marginBottom: 10 }}>
+      <Text style={{ fontSize: 11, color: '#64748b', writingDirection: 'rtl', alignSelf: 'center' }}>📎 מקורות:</Text>
+      {links.map((l, i) => (
+        <TouchableOpacity key={i} onPress={() => open(l.url)} style={{ paddingHorizontal: 10, paddingVertical: 6, borderRadius: 6, backgroundColor: accentColor + '15', borderWidth: 1, borderColor: accentColor + '40' }}>
+          <Text style={{ fontSize: 11, fontWeight: '700', color: accentColor }}>{l.icon} {l.label}</Text>
+        </TouchableOpacity>
+      ))}
+    </View>
+  );
+}
+
+// ─── Tourism World Bank Table ──────────────────────────────────
+function TourismWorldBankTable() {
+  const INDICATORS = [
+    { key: 'arrivals', label: 'כניסות תיירים לגאורגיה', code: 'ST.INT.ARVL', country: 'GE', unit: '' },
+    { key: 'receipts', label: 'הכנסות מתיירות ($)', code: 'ST.INT.RCPT.CD', country: 'GE', unit: '$' },
+    { key: 'departures', label: 'יציאות תיירים', code: 'ST.INT.DPRT', country: 'GE', unit: '' },
+  ] as const;
+  type Row = { key: string; label: string; unit: string; series: { year: number; value: number | null }[] };
+  const [rows, setRows] = useState<Row[]>([]);
+  const [years, setYears] = useState<number[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
+      try {
+        const fetched: Row[] = await Promise.all(INDICATORS.map(async (ind) => {
+          const r = await fetch(`https://api.worldbank.org/v2/country/${ind.country}/indicator/${ind.code}?format=json&per_page=12`);
+          const j = await r.json();
+          const arr = Array.isArray(j) && j[1] ? j[1] : [];
+          const series = arr.filter((x: any) => x.value != null).map((x: any) => ({ year: parseInt(x.date, 10), value: Number(x.value) })).sort((a: any, b: any) => b.year - a.year).slice(0, 4).sort((a: any, b: any) => a.year - b.year);
+          return { key: ind.key, label: ind.label, unit: ind.unit, series };
+        }));
+        setRows(fetched);
+        const allYears = new Set<number>();
+        fetched.forEach(r => r.series.forEach(s => allYears.add(s.year)));
+        setYears(Array.from(allYears).sort((a, b) => a - b).slice(-4));
+      } catch {}
+      setLoading(false);
+    })();
+  }, []);
+
+  const formatVal = (v: number | null | undefined, unit: string) => {
+    if (v == null) return '—';
+    if (unit === '$') return `$${Math.round(v / 1e6)}M`;
+    return Math.round(v).toLocaleString();
+  };
+
+  const sparkline = (series: { year: number; value: number | null }[]) => {
+    if (Platform.OS !== 'web' || series.length < 2) return null;
+    const vals = series.map(s => s.value ?? 0);
+    const min = Math.min(...vals);
+    const max = Math.max(...vals);
+    const range = max - min || 1;
+    const w = 80;
+    const h = 24;
+    const pts = vals.map((v, i) => {
+      const x = (i / (vals.length - 1)) * w;
+      const y = h - ((v - min) / range) * h;
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    }).join(' ');
+    return React.createElement('svg', { width: w, height: h },
+      React.createElement('polyline', { points: pts, fill: 'none', stroke: '#22c55e', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' }),
+      ...vals.map((v, i) => {
+        const x = (i / (vals.length - 1)) * w;
+        const y = h - ((v - min) / range) * h;
+        return React.createElement('circle', { key: i, cx: x, cy: y, r: 2, fill: '#22c55e' });
+      })
+    );
+  };
+
+  return (
+    <View style={{ marginBottom: 14, backgroundColor: '#fff', borderRadius: 10, borderWidth: 1, borderColor: '#e2e8f0', overflow: 'hidden' }}>
+      <View style={{ padding: 12, borderBottomWidth: 1, borderBottomColor: '#e2e8f0', backgroundColor: '#f0fdf4' }}>
+        <Text style={{ fontSize: 13, fontWeight: '900', color: '#15803d', writingDirection: 'rtl', textAlign: 'right' }}>📊 נתוני תיירות אוטומטיים (World Bank)</Text>
+        <Text style={{ fontSize: 10, color: '#16a34a', writingDirection: 'rtl', textAlign: 'right', marginTop: 2 }}>🔒 מסונכרן אוטומטית</Text>
+      </View>
+      {loading ? (
+        <Text style={{ textAlign: 'center', color: '#94a3b8', padding: 20 }}>טוען...</Text>
+      ) : (
+        <>
+          <View style={{ flexDirection: 'row-reverse', paddingVertical: 8, paddingHorizontal: 10, backgroundColor: '#f1f5f9', gap: 6 }}>
+            <Text style={{ flex: 1.8, fontSize: 11, fontWeight: '800', color: '#475569', textAlign: 'right', writingDirection: 'rtl' }}>מדד</Text>
+            {years.map(y => (<Text key={y} style={{ flex: 1, fontSize: 11, fontWeight: '800', color: '#475569', textAlign: 'center' }}>{y}</Text>))}
+            <Text style={{ width: 90, fontSize: 11, fontWeight: '800', color: '#475569', textAlign: 'center' }}>מגמה</Text>
+          </View>
+          {rows.map((row, idx) => (
+            <View key={row.key} style={{ flexDirection: 'row-reverse', paddingVertical: 10, paddingHorizontal: 10, gap: 6, backgroundColor: idx % 2 === 0 ? '#fff' : '#fafafa', borderTopWidth: 1, borderTopColor: '#f1f5f9', alignItems: 'center' }}>
+              <Text style={{ flex: 1.8, fontSize: 12, color: '#1C2B35', textAlign: 'right', writingDirection: 'rtl', fontWeight: '700' }}>🔒 {row.label}</Text>
+              {years.map(y => {
+                const p = row.series.find(s => s.year === y);
+                return (<Text key={y} style={{ flex: 1, fontSize: 11, color: '#64748b', textAlign: 'center' }}>{formatVal(p?.value, row.unit)}</Text>);
+              })}
+              <View style={{ width: 90, alignItems: 'center' }}>{sparkline(row.series)}</View>
+            </View>
+          ))}
+        </>
+      )}
+    </View>
+  );
+}
+
+// ─── Manual Indicators Table (generic) ─────────────────────────
+type ManualRow = { id: string; label: string; unit: string; values: Record<string, string> };
+
+function ManualIndicatorsTable({ title, subtitle, storageField, accentColor, headerBg, lineColor, cellBg }: { title: string; subtitle: string; storageField: string; accentColor: string; headerBg: string; lineColor: string; cellBg: string }) {
+  const [rows, setRows] = useState<ManualRow[]>([]);
+  const [years, setYears] = useState<number[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
+      try {
+        const r = await fetch('https://api.worldbank.org/v2/country/GE/indicator/FP.CPI.TOTL.ZG?format=json&per_page=12');
+        const j = await r.json();
+        const arr = Array.isArray(j) && j[1] ? j[1] : [];
+        const ys = arr.filter((x: any) => x.value != null).map((x: any) => parseInt(x.date, 10)).sort((a: number, b: number) => b - a).slice(0, 4).sort((a: number, b: number) => a - b);
+        setYears(ys);
+      } catch {
+        const now = new Date().getFullYear();
+        setYears([now - 3, now - 2, now - 1, now]);
+      }
+      try {
+        const r = await fetch(`${API_BASE}/api/content`);
+        const d = await r.json();
+        if (Array.isArray(d[storageField])) setRows(d[storageField]);
+      } catch {}
+      setLoading(false);
+    })();
+  }, [storageField]);
+
+  const addRow = () => setRows(prev => [...prev, { id: 'm_' + Math.random().toString(36).slice(2, 8), label: '', unit: '%', values: {} }]);
+  const deleteRow = (id: string) => setRows(prev => prev.filter(r => r.id !== id));
+  const updateRow = (id: string, patch: Partial<ManualRow>) => setRows(prev => prev.map(r => r.id === id ? { ...r, ...patch } : r));
+  const updateCell = (id: string, year: number, val: string) => setRows(prev => prev.map(r => r.id === id ? { ...r, values: { ...r.values, [year]: val } } : r));
+
+  const save = async () => {
+    setSaving(true);
+    try {
+      await fetch(`${API_BASE}/api/content/${storageField}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(rows),
+      });
+    } catch {}
+    setSaving(false);
+  };
+
+  const sparkline = (row: ManualRow) => {
+    if (Platform.OS !== 'web') return null;
+    const vals = years.map(y => parseFloat(row.values[y] || '')).filter(v => !isNaN(v));
+    if (vals.length < 2) return null;
+    const min = Math.min(...vals);
+    const max = Math.max(...vals);
+    const range = max - min || 1;
+    const w = 80;
+    const h = 24;
+    const pts = vals.map((v, i) => {
+      const x = (i / (vals.length - 1)) * w;
+      const y = h - ((v - min) / range) * h;
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    }).join(' ');
+    return React.createElement('svg', { width: w, height: h },
+      React.createElement('polyline', { points: pts, fill: 'none', stroke: lineColor, strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' }),
+      ...vals.map((v, i) => {
+        const x = (i / (vals.length - 1)) * w;
+        const y = h - ((v - min) / range) * h;
+        return React.createElement('circle', { key: i, cx: x, cy: y, r: 2, fill: lineColor });
+      })
+    );
+  };
+
+  return (
+    <View style={{ marginBottom: 14, backgroundColor: '#fff', borderRadius: 10, borderWidth: 1, borderColor: '#e2e8f0', overflow: 'hidden' }}>
+      <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', padding: 12, borderBottomWidth: 1, borderBottomColor: '#e2e8f0', backgroundColor: headerBg }}>
+        <View>
+          <Text style={{ fontSize: 13, fontWeight: '900', color: accentColor, writingDirection: 'rtl', textAlign: 'right' }}>{title}</Text>
+          <Text style={{ fontSize: 10, color: accentColor, writingDirection: 'rtl', textAlign: 'right', marginTop: 2, opacity: 0.8 }}>{subtitle}</Text>
+        </View>
+        <TouchableOpacity onPress={addRow} style={{ paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8, backgroundColor: accentColor }}>
+          <Text style={{ fontSize: 11, fontWeight: '800', color: '#fff' }}>➕ הוסף מדד</Text>
+        </TouchableOpacity>
+      </View>
+      {loading ? (
+        <Text style={{ textAlign: 'center', color: '#94a3b8', padding: 20 }}>טוען...</Text>
+      ) : (
+        <>
+          <View style={{ flexDirection: 'row-reverse', paddingVertical: 8, paddingHorizontal: 10, backgroundColor: '#f1f5f9', gap: 6 }}>
+            <Text style={{ flex: 1.8, fontSize: 11, fontWeight: '800', color: '#475569', textAlign: 'right', writingDirection: 'rtl' }}>מדד</Text>
+            <Text style={{ width: 50, fontSize: 11, fontWeight: '800', color: '#475569', textAlign: 'center' }}>יחידה</Text>
+            {years.map(y => (
+              <Text key={y} style={{ flex: 1, fontSize: 11, fontWeight: '800', color: '#475569', textAlign: 'center' }}>{y}</Text>
+            ))}
+            <Text style={{ width: 90, fontSize: 11, fontWeight: '800', color: '#475569', textAlign: 'center' }}>מגמה</Text>
+            <Text style={{ width: 30 }}></Text>
+          </View>
+          {rows.length === 0 ? (
+            <Text style={{ textAlign: 'center', color: '#94a3b8', padding: 20, writingDirection: 'rtl' }}>אין מדדים. לחץ "➕ הוסף מדד"</Text>
+          ) : rows.map((row, idx) => (
+            <View key={row.id} style={{ flexDirection: 'row-reverse', paddingVertical: 8, paddingHorizontal: 10, gap: 6, backgroundColor: idx % 2 === 0 ? '#fff' : '#fafafa', borderTopWidth: 1, borderTopColor: '#f1f5f9', alignItems: 'center' }}>
+              <TextInput style={{ flex: 1.8, fontSize: 12, color: accentColor, textAlign: 'right', writingDirection: 'rtl', fontWeight: '700', borderWidth: 1, borderColor: cellBg, borderRadius: 6, padding: 6 }} value={row.label} onChangeText={v => updateRow(row.id, { label: v })} placeholder="שם המדד" placeholderTextColor="#93c5fd" />
+              <TextInput style={{ width: 50, fontSize: 11, textAlign: 'center', borderWidth: 1, borderColor: cellBg, borderRadius: 6, padding: 6 }} value={row.unit} onChangeText={v => updateRow(row.id, { unit: v })} placeholder="%" placeholderTextColor="#93c5fd" />
+              {years.map(y => (
+                <TextInput key={y} style={{ flex: 1, fontSize: 11, textAlign: 'center', borderWidth: 1, borderColor: cellBg, borderRadius: 6, padding: 6, backgroundColor: cellBg + '40' }} value={row.values[y] || ''} onChangeText={v => updateCell(row.id, y, v)} placeholder="—" placeholderTextColor="#93c5fd" keyboardType="numeric" />
+              ))}
+              <View style={{ width: 90, alignItems: 'center' }}>{sparkline(row)}</View>
+              <TouchableOpacity onPress={() => deleteRow(row.id)} style={{ width: 30, alignItems: 'center' }}>
+                <Text style={{ fontSize: 14, color: '#dc2626' }}>🗑</Text>
+              </TouchableOpacity>
+            </View>
+          ))}
+          {rows.length > 0 && (
+            <TouchableOpacity onPress={save} disabled={saving} style={{ margin: 10, paddingVertical: 10, borderRadius: 8, backgroundColor: '#10b981', alignItems: 'center', opacity: saving ? 0.5 : 1 }}>
+              <Text style={{ color: '#fff', fontWeight: '900', fontSize: 13 }}>{saving ? 'שומר...' : '💾 שמור מדדים'}</Text>
+            </TouchableOpacity>
+          )}
+        </>
+      )}
+    </View>
+  );
+}
+
+function FinanceManualTable() {
+  const [rows, setRows] = useState<ManualRow[]>([]);
+  const [years, setYears] = useState<number[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
+      try {
+        const r = await fetch('https://api.worldbank.org/v2/country/GE/indicator/FP.CPI.TOTL.ZG?format=json&per_page=12');
+        const j = await r.json();
+        const arr = Array.isArray(j) && j[1] ? j[1] : [];
+        const ys = arr
+          .filter((x: any) => x.value != null)
+          .map((x: any) => parseInt(x.date, 10))
+          .sort((a: number, b: number) => b - a)
+          .slice(0, 4)
+          .sort((a: number, b: number) => a - b);
+        setYears(ys);
+      } catch {
+        const now = new Date().getFullYear();
+        setYears([now - 3, now - 2, now - 1, now]);
+      }
+      try {
+        const r = await fetch(`${API_BASE}/api/content`);
+        const d = await r.json();
+        if (Array.isArray(d.financeStatsCustom)) setRows(d.financeStatsCustom);
+      } catch {}
+      setLoading(false);
+    })();
+  }, []);
+
+  const addRow = () => {
+    setRows(prev => [...prev, { id: 'm_' + Math.random().toString(36).slice(2, 8), label: '', unit: '%', values: {} }]);
+  };
+  const deleteRow = (id: string) => setRows(prev => prev.filter(r => r.id !== id));
+  const updateRow = (id: string, patch: Partial<ManualRow>) => setRows(prev => prev.map(r => r.id === id ? { ...r, ...patch } : r));
+  const updateCell = (id: string, year: number, val: string) => setRows(prev => prev.map(r => r.id === id ? { ...r, values: { ...r.values, [year]: val } } : r));
+
+  const save = async () => {
+    setSaving(true);
+    try {
+      await fetch(`${API_BASE}/api/content/financeStatsCustom`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(rows),
+      });
+    } catch {}
+    setSaving(false);
+  };
+
+  const sparkline = (row: ManualRow) => {
+    if (Platform.OS !== 'web') return null;
+    const vals = years.map(y => parseFloat(row.values[y] || '')).filter(v => !isNaN(v));
+    if (vals.length < 2) return null;
+    const min = Math.min(...vals);
+    const max = Math.max(...vals);
+    const range = max - min || 1;
+    const w = 80;
+    const h = 24;
+    const pts = vals.map((v, i) => {
+      const x = (i / (vals.length - 1)) * w;
+      const y = h - ((v - min) / range) * h;
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    }).join(' ');
+    return React.createElement('svg', { width: w, height: h },
+      React.createElement('polyline', { points: pts, fill: 'none', stroke: '#3b82f6', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' }),
+      ...vals.map((v, i) => {
+        const x = (i / (vals.length - 1)) * w;
+        const y = h - ((v - min) / range) * h;
+        return React.createElement('circle', { key: i, cx: x, cy: y, r: 2, fill: '#3b82f6' });
+      })
+    );
+  };
+
+  return (
+    <View style={{ marginBottom: 14, backgroundColor: '#fff', borderRadius: 10, borderWidth: 1, borderColor: '#e2e8f0', overflow: 'hidden' }}>
+      <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', padding: 12, borderBottomWidth: 1, borderBottomColor: '#e2e8f0', backgroundColor: '#eff6ff' }}>
+        <View>
+          <Text style={{ fontSize: 13, fontWeight: '900', color: '#1e40af', writingDirection: 'rtl', textAlign: 'right' }}>✏️ מדדים ידניים</Text>
+          <Text style={{ fontSize: 10, color: '#3b82f6', writingDirection: 'rtl', textAlign: 'right', marginTop: 2 }}>מדדים שאינם זמינים ב-World Bank או שבתשלום</Text>
+        </View>
+        <TouchableOpacity onPress={addRow} style={{ paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8, backgroundColor: '#3b82f6' }}>
+          <Text style={{ fontSize: 11, fontWeight: '800', color: '#fff' }}>➕ הוסף מדד</Text>
+        </TouchableOpacity>
+      </View>
+      {loading ? (
+        <Text style={{ textAlign: 'center', color: '#94a3b8', padding: 20 }}>טוען...</Text>
+      ) : (
+        <>
+          <View style={{ flexDirection: 'row-reverse', paddingVertical: 8, paddingHorizontal: 10, backgroundColor: '#f1f5f9', gap: 6 }}>
+            <Text style={{ flex: 1.8, fontSize: 11, fontWeight: '800', color: '#475569', textAlign: 'right', writingDirection: 'rtl' }}>מדד</Text>
+            <Text style={{ width: 50, fontSize: 11, fontWeight: '800', color: '#475569', textAlign: 'center' }}>יחידה</Text>
+            {years.map(y => (
+              <Text key={y} style={{ flex: 1, fontSize: 11, fontWeight: '800', color: '#475569', textAlign: 'center' }}>{y}</Text>
+            ))}
+            <Text style={{ width: 90, fontSize: 11, fontWeight: '800', color: '#475569', textAlign: 'center' }}>מגמה</Text>
+            <Text style={{ width: 30 }}></Text>
+          </View>
+          {rows.length === 0 ? (
+            <Text style={{ textAlign: 'center', color: '#94a3b8', padding: 20, writingDirection: 'rtl' }}>אין מדדים ידניים. לחץ "➕ הוסף מדד"</Text>
+          ) : rows.map((row, idx) => (
+            <View key={row.id} style={{ flexDirection: 'row-reverse', paddingVertical: 8, paddingHorizontal: 10, gap: 6, backgroundColor: idx % 2 === 0 ? '#fff' : '#fafafa', borderTopWidth: 1, borderTopColor: '#f1f5f9', alignItems: 'center' }}>
+              <TextInput
+                style={{ flex: 1.8, fontSize: 12, color: '#1e40af', textAlign: 'right', writingDirection: 'rtl', fontWeight: '700', borderWidth: 1, borderColor: '#bfdbfe', borderRadius: 6, padding: 6 }}
+                value={row.label}
+                onChangeText={v => updateRow(row.id, { label: v })}
+                placeholder="שם המדד"
+                placeholderTextColor="#93c5fd"
+              />
+              <TextInput
+                style={{ width: 50, fontSize: 11, textAlign: 'center', borderWidth: 1, borderColor: '#bfdbfe', borderRadius: 6, padding: 6 }}
+                value={row.unit}
+                onChangeText={v => updateRow(row.id, { unit: v })}
+                placeholder="%"
+                placeholderTextColor="#93c5fd"
+              />
+              {years.map(y => (
+                <TextInput
+                  key={y}
+                  style={{ flex: 1, fontSize: 11, textAlign: 'center', borderWidth: 1, borderColor: '#bfdbfe', borderRadius: 6, padding: 6, backgroundColor: '#eff6ff' }}
+                  value={row.values[y] || ''}
+                  onChangeText={v => updateCell(row.id, y, v)}
+                  placeholder="—"
+                  placeholderTextColor="#93c5fd"
+                  keyboardType="numeric"
+                />
+              ))}
+              <View style={{ width: 90, alignItems: 'center' }}>{sparkline(row)}</View>
+              <TouchableOpacity onPress={() => deleteRow(row.id)} style={{ width: 30, alignItems: 'center' }}>
+                <Text style={{ fontSize: 14, color: '#dc2626' }}>🗑</Text>
+              </TouchableOpacity>
+            </View>
+          ))}
+          {rows.length > 0 && (
+            <TouchableOpacity onPress={save} disabled={saving} style={{ margin: 10, paddingVertical: 10, borderRadius: 8, backgroundColor: '#10b981', alignItems: 'center', opacity: saving ? 0.5 : 1 }}>
+              <Text style={{ color: '#fff', fontWeight: '900', fontSize: 13 }}>{saving ? 'שומר...' : '💾 שמור מדדים ידניים'}</Text>
+            </TouchableOpacity>
+          )}
+        </>
+      )}
+    </View>
+  );
+}
+
 // ─── Edit Modal ────────────────────────────────────────────────
 function EditModal({
   visible, item, section, onSave, onDelete, onClose, isWide, onMoveSection, allMedia, ratings,
@@ -619,6 +1103,45 @@ function EditModal({
                   </View>
               )}
             </View>
+
+            {['main','extra','welcome','info','bottom'].includes(section.key) && (
+              <View style={ms.fieldGroup}>
+                <Text style={ms.label}>🎨 צבעי רקע הקארד</Text>
+                <View style={{ flexDirection: 'row-reverse', gap: 8 }}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 11, color: '#64748b', marginBottom: 4, textAlign: 'right' }}>צבע 1 (התחלה)</Text>
+                    <TextInput style={ms.input} value={form.bg || ''} onChangeText={v => set('bg', v)} textAlign="left" placeholder="#1C2B35" placeholderTextColor="#bbb" />
+                    <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 3, marginTop: 6, padding: 4, backgroundColor: '#1C2B35', borderRadius: 6 }}>
+                      {['#1C2B35','#2D4A5E','#1A6B8A','#3DA5C4','#7ECFC0','#5BC0DE','#0ea5e9','#3b82f6','#6366f1','#8b5cf6','#a855f7','#ec4899','#ef4444','#f97316','#F4A94E','#eab308','#84cc16','#22c55e','#10b981','#14b8a6','#06b6d4','#0f172a','#1e293b','#334155','#475569','#64748b','#94a3b8','#cbd5e1','#e2e8f0','#ffffff','#fef3c7','#fdba74'].map(c => (
+                        <TouchableOpacity key={c} onPress={() => set('bg', c)} style={{ width: 14, height: 14, backgroundColor: c, borderRadius: 2, borderWidth: form.bg === c ? 2 : 0, borderColor: '#fff' }} />
+                      ))}
+                    </View>
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 11, color: '#64748b', marginBottom: 4, textAlign: 'right' }}>צבע 2 (סיום)</Text>
+                    <TextInput style={ms.input} value={(form as any).bgDark || ''} onChangeText={v => set('bgDark', v)} textAlign="left" placeholder="#2D4A5E" placeholderTextColor="#bbb" />
+                    <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 3, marginTop: 6, padding: 4, backgroundColor: '#1C2B35', borderRadius: 6 }}>
+                      {['#1C2B35','#2D4A5E','#1A6B8A','#3DA5C4','#7ECFC0','#5BC0DE','#0ea5e9','#3b82f6','#6366f1','#8b5cf6','#a855f7','#ec4899','#ef4444','#f97316','#F4A94E','#eab308','#84cc16','#22c55e','#10b981','#14b8a6','#06b6d4','#0f172a','#1e293b','#334155','#475569','#64748b','#94a3b8','#cbd5e1','#e2e8f0','#ffffff','#fef3c7','#fdba74'].map(c => (
+                        <TouchableOpacity key={c} onPress={() => set('bgDark', c)} style={{ width: 14, height: 14, backgroundColor: c, borderRadius: 2, borderWidth: (form as any).bgDark === c ? 2 : 0, borderColor: '#fff' }} />
+                      ))}
+                    </View>
+                  </View>
+                </View>
+                {Platform.OS === 'web' && React.createElement('div', {
+                  style: {
+                    marginTop: 10,
+                    height: 100,
+                    borderRadius: 10,
+                    background: `linear-gradient(135deg, ${form.bg || '#1C2B35'} 0%, ${(form as any).bgDark || form.bg || '#1C2B35'} 100%)`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: 48,
+                  },
+                }, form.icon && !form.icon.startsWith('http') && !form.icon.startsWith('data:') ? form.icon : '🎨')}
+                <Text style={{ fontSize: 10, color: '#94a3b8', marginTop: 4, textAlign: 'center' }}>תצוגה מקדימה של הקארד</Text>
+              </View>
+            )}
 
             {section.hasImage && (
               <View style={ms.fieldGroup}>
@@ -1102,6 +1625,22 @@ export default function AdminDashboard() {
   const [groupVisibility, setGroupVisibility] = useState<Record<string, boolean>>({});
   const [showDevBar, setShowDevBar] = useState(true);
   const [finStats, setFinStats] = useState<any>({ inflation: { current: '', date: '' }, lendingRate: { current: '', date: '' }, gdp: { current: '', date: '' } });
+  const [sideTab, setSideTab] = useState<'dashboard' | 'blocks' | 'listings' | 'finance' | 'tourism' | 'realestate'>('dashboard');
+  const [sideTabOrder, setSideTabOrder] = useState<Array<'dashboard' | 'blocks' | 'listings' | 'finance' | 'tourism' | 'realestate'>>(['dashboard', 'blocks', 'listings', 'finance', 'tourism', 'realestate']);
+  const [sideTabDragIdx, setSideTabDragIdx] = useState(-1);
+  useEffect(() => {
+    AsyncStorage.getItem('@admin_sideTabOrder').then(raw => {
+      if (!raw) return;
+      try {
+        const arr = JSON.parse(raw);
+        const valid = ['dashboard', 'blocks', 'listings', 'finance', 'tourism', 'realestate'];
+        if (Array.isArray(arr) && arr.length === 6 && arr.every(k => valid.includes(k))) setSideTabOrder(arr);
+      } catch {}
+    });
+  }, []);
+  useEffect(() => {
+    AsyncStorage.setItem('@admin_sideTabOrder', JSON.stringify(sideTabOrder)).catch(() => {});
+  }, [sideTabOrder]);
   const [mediaFiles, setMediaFiles] = useState<{ filename: string; originalName?: string; url: string; tags?: string[] }[]>([]);
   const [galleryFiles, setGalleryFiles] = useState<{ filename: string; url: string }[]>([]);
   const [mediaFilter, setMediaFilter] = useState<string>('');
@@ -1328,6 +1867,7 @@ export default function AdminDashboard() {
         subtitle: t.text ? t.text.slice(0, 60) : '',
         icon: '🎧',
         bg: t.color,
+        visible: t.visible,
         _tourIdx: i,
       } as DataItem & { _tourIdx: number })))
     : childrenOf
@@ -1354,6 +1894,11 @@ export default function AdminDashboard() {
           >
             <Text style={ns.navIcon}>{item.icon}</Text>
             <Text style={[ns.navLabel, activeNav === item.key && ns.navLabelActive]}>{item.label}</Text>
+            {item.key === 'side' && listings.filter(l => !l.approved).length > 0 && (
+              <View style={{ position: 'absolute', top: 6, left: 6, minWidth: 20, paddingHorizontal: 6, height: 20, borderRadius: 10, backgroundColor: '#dc2626', alignItems: 'center', justifyContent: 'center' }}>
+                <Text style={{ fontSize: 10, color: '#fff', fontWeight: '900' }}>{listings.filter(l => !l.approved).length}</Text>
+              </View>
+            )}
             {item.key !== 'texts' && (
               <Text key={`${item.key}-${mediaVersion}`} style={ns.navBadge}>{item.key === 'media' ? mediaFiles.length : item.key === 'gallery' ? galleryFiles.length : item.key === 'audio' ? mediaFiles.filter(f => /\.(mp3|wav|m4a|aac)$/i.test(f.filename)).length : (data[item.key] || []).length}</Text>
             )}
@@ -1700,9 +2245,8 @@ export default function AdminDashboard() {
         {/* Tabs */}
         {Platform.OS === 'web' ? (
           React.createElement('div', {
-            style: { display: 'flex', flexDirection: 'row-reverse', gap: 4, marginBottom: 16, flexWrap: 'wrap', background: '#f1f5f9', borderRadius: 14, padding: 4 },
+            style: { display: 'flex', flexDirection: 'row-reverse', gap: 6, marginBottom: 16, flexWrap: 'wrap', background: '#f1f5f9', borderRadius: 10, padding: 4 },
           }, subTabOrder.map((t, i) => {
-            const tc = tabColors[t.key] || '#1A6B8A';
             const on = subTab === t.key;
             return React.createElement('div', {
               key: t.key,
@@ -1714,23 +2258,22 @@ export default function AdminDashboard() {
               onDrop: (e: any) => { e.preventDefault(); setDragTabIdx(-1); const from = parseInt(e.dataTransfer.getData('text/plain'), 10); if (!isNaN(from) && from !== i) { const arr = [...subTabOrder]; const [moved] = arr.splice(from, 1); arr.splice(i, 0, moved); setSubTabOrder(arr); } },
               onDragEnd: () => setDragTabIdx(-1),
               style: {
-                padding: '8px 14px', borderRadius: 10, cursor: 'grab', userSelect: 'none',
-                backgroundColor: on ? tc : 'transparent',
-                borderTop: dragTabIdx === i ? `3px solid ${tc}` : '3px solid transparent',
-                fontSize: 12, fontWeight: 800, color: on ? '#fff' : '#475569',
+                padding: '8px 14px', borderRadius: 8, cursor: 'grab', userSelect: 'none',
+                backgroundColor: on ? '#fff' : 'transparent',
+                borderTop: dragTabIdx === i ? `3px solid ${Colors.PRIMARY}` : '3px solid transparent',
+                fontSize: 12, fontWeight: 800, color: on ? Colors.PRIMARY : '#64748b',
                 fontFamily: 'Arial, sans-serif',
                 transition: 'all 0.15s ease',
               },
             }, `${t.icon} ${t.label}`);
           }))
         ) : (
-          <View style={{ flexDirection: 'row-reverse', gap: 4, marginBottom: 16, flexWrap: 'wrap', backgroundColor: '#f1f5f9', borderRadius: 14, padding: 4 }}>
+          <View style={{ flexDirection: 'row-reverse', gap: 6, marginBottom: 16, flexWrap: 'wrap', backgroundColor: '#f1f5f9', borderRadius: 10, padding: 4 }}>
             {subTabOrder.map(t => {
-              const tc = tabColors[t.key] || '#1A6B8A';
               const on = subTab === t.key;
               return (
-                <TouchableOpacity key={t.key} onPress={() => setSubTab(t.key)} style={{ paddingVertical: 8, paddingHorizontal: 14, borderRadius: 10, backgroundColor: on ? tc : 'transparent' }}>
-                  <Text style={{ fontSize: 12, fontWeight: '800', color: on ? '#fff' : '#475569' }}>{t.icon} {t.label}</Text>
+                <TouchableOpacity key={t.key} onPress={() => setSubTab(t.key)} style={{ paddingVertical: 8, paddingHorizontal: 14, borderRadius: 8, backgroundColor: on ? '#fff' : 'transparent' }}>
+                  <Text style={{ fontSize: 12, fontWeight: '800', color: on ? Colors.PRIMARY : '#64748b' }}>{t.icon} {t.label}</Text>
                 </TouchableOpacity>
               );
             })}
@@ -2679,12 +3222,362 @@ export default function AdminDashboard() {
     );
   };
 
+  const [listings, setListings] = useState<any[]>([]);
+  const loadListings = async () => {
+    try {
+      const r = await fetch(`${API_BASE}/api/listings?all=1`);
+      const j = await r.json();
+      setListings(j.listings || []);
+    } catch {}
+  };
+  useEffect(() => { loadListings(); }, [activeNav]);
+
+  const [mapBackups, setMapBackups] = useState<{ backups: Record<string, { timestamp: string; pointsCount: number }[]>; current: { name: string; pointsCount: number }[] }>({ backups: {}, current: [] });
+  const [expandedLayer, setExpandedLayer] = useState<string | null>(null);
+  const loadMapBackups = async () => {
+    try {
+      const r = await fetch(`${API_BASE}/api/map-backups`);
+      const j = await r.json();
+      if (j.success) setMapBackups({ backups: j.backups || {}, current: j.current || [] });
+    } catch {}
+  };
+  useEffect(() => { if (activeNav === 'locations') loadMapBackups(); }, [activeNav]);
+
+  const restoreBackup = async (layerName: string, timestamp: string) => {
+    if (Platform.OS === 'web' && !(window as any).confirm(`לשחזר את שכבת "${layerName}" מ-${new Date(timestamp).toLocaleString('he-IL')}?`)) return;
+    try {
+      await fetch(`${API_BASE}/api/map-backups/restore`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ layerName, timestamp }),
+      });
+      await loadMapBackups();
+    } catch {}
+  };
+
+  const deleteBackup = async (layerName: string, timestamp: string) => {
+    if (Platform.OS === 'web' && !(window as any).confirm(`למחוק את הגיבוי?`)) return;
+    try {
+      await fetch(`${API_BASE}/api/map-backups/${encodeURIComponent(layerName)}/${encodeURIComponent(timestamp)}`, { method: 'DELETE' });
+      await loadMapBackups();
+    } catch {}
+  };
+
+  const renderLocations = () => {
+    const layerNames = Object.keys(mapBackups.backups).sort();
+    const currentByName = Object.fromEntries(mapBackups.current.map(c => [c.name, c.pointsCount]));
+    return (
+      <View style={cs.contentCard}>
+        <View style={{ padding: 16 }}>
+          <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+            <Text style={{ fontSize: 18, fontWeight: '900', color: Colors.TEXT, writingDirection: 'rtl' }}>📍 גיבוי מפות ונקודות</Text>
+            <TouchableOpacity onPress={loadMapBackups} style={{ paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8, backgroundColor: Colors.PRIMARY }}>
+              <Text style={{ color: '#fff', fontSize: 12, fontWeight: '800' }}>רענן</Text>
+            </TouchableOpacity>
+          </View>
+
+          <Text style={{ fontSize: 12, color: '#64748b', writingDirection: 'rtl', textAlign: 'right', marginBottom: 10 }}>
+            לפני כל סנכרון מ-Google My Maps נשמרים 5 גרסאות אחרונות לכל שכבה. אם משהו נמחק בטעות מ-Google, ניתן לשחזר כאן.
+          </Text>
+
+          {layerNames.length === 0 && (
+            <Text style={{ textAlign: 'center', color: '#94a3b8', padding: 20, writingDirection: 'rtl' }}>אין עדיין גיבויים. הגיבוי הראשון ייווצר בסנכרון הבא.</Text>
+          )}
+
+          {layerNames.map(name => {
+            const versions = mapBackups.backups[name] || [];
+            const currentCount = currentByName[name];
+            const isOpen = expandedLayer === name;
+            return (
+              <View key={name} style={{ borderWidth: 1, borderColor: '#e2e8f0', borderRadius: 10, marginBottom: 8, overflow: 'hidden' }}>
+                <TouchableOpacity onPress={() => setExpandedLayer(isOpen ? null : name)} style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', padding: 12, backgroundColor: '#f8fafc' }}>
+                  <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 8 }}>
+                    <Text style={{ fontSize: 14, fontWeight: '800', color: Colors.TEXT, writingDirection: 'rtl' }}>{name}</Text>
+                    {currentCount != null && (
+                      <View style={{ paddingHorizontal: 8, paddingVertical: 2, borderRadius: 10, backgroundColor: '#10b981' }}>
+                        <Text style={{ fontSize: 10, color: '#fff', fontWeight: '800' }}>נוכחי: {currentCount}</Text>
+                      </View>
+                    )}
+                    <Text style={{ fontSize: 11, color: '#64748b' }}>{versions.length} גיבויים</Text>
+                  </View>
+                  <Text style={{ fontSize: 16, color: '#64748b' }}>{isOpen ? '▲' : '▼'}</Text>
+                </TouchableOpacity>
+                {isOpen && versions.map(v => (
+                  <View key={v.timestamp} style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', padding: 10, borderTopWidth: 1, borderTopColor: '#e2e8f0', backgroundColor: '#fff' }}>
+                    <View>
+                      <Text style={{ fontSize: 12, fontWeight: '700', color: Colors.TEXT, writingDirection: 'rtl' }}>{new Date(v.timestamp).toLocaleString('he-IL')}</Text>
+                      <Text style={{ fontSize: 10, color: '#64748b', writingDirection: 'rtl' }}>{v.pointsCount} נקודות</Text>
+                    </View>
+                    <View style={{ flexDirection: 'row-reverse', gap: 6 }}>
+                      <TouchableOpacity onPress={() => restoreBackup(name, v.timestamp)} style={{ paddingHorizontal: 10, paddingVertical: 6, borderRadius: 6, backgroundColor: '#1A6B8A' }}>
+                        <Text style={{ color: '#fff', fontSize: 11, fontWeight: '800' }}>שחזר</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity onPress={() => deleteBackup(name, v.timestamp)} style={{ paddingHorizontal: 10, paddingVertical: 6, borderRadius: 6, backgroundColor: '#fee2e2' }}>
+                        <Text style={{ color: '#dc2626', fontSize: 11, fontWeight: '800' }}>מחק</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                ))}
+              </View>
+            );
+          })}
+        </View>
+      </View>
+    );
+  };
+
+  const renderListings = () => {
+    const typeLabel = (t: string) => t === 'sale' ? 'למכירה' : t === 'rent-daily' ? 'יומי' : t === 'rent-yearly' ? 'שנתי' : t;
+    const pending = listings.filter(l => !l.approved);
+    const approved = listings.filter(l => l.approved);
+    return (
+      <View style={cs.contentCard}>
+        <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+          <Text style={cs.contentTitle}>🏠 מודעות נדל"ן</Text>
+          <TouchableOpacity onPress={loadListings} style={{ paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8, backgroundColor: '#f1f5f9' }}>
+            <Text style={{ fontSize: 12, fontWeight: '700', color: '#475569' }}>↻ רענן</Text>
+          </TouchableOpacity>
+        </View>
+
+        {pending.length > 0 && (
+          <View style={{ marginBottom: 16 }}>
+            <Text style={{ fontSize: 13, fontWeight: '800', color: '#b91c1c', marginBottom: 8, writingDirection: 'rtl', textAlign: 'right' }}>⏳ ממתינות לאישור ({pending.length})</Text>
+            {pending.map(l => (
+              <View key={l.id} style={{ backgroundColor: '#fef3c7', borderRadius: 10, padding: 12, marginBottom: 8, borderWidth: 1, borderColor: '#fbbf24' }}>
+                <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 10, marginBottom: 6 }}>
+                  {l.images && l.images[0] && <Image source={{ uri: l.images[0] }} style={{ width: 60, height: 60, borderRadius: 6 }} />}
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 13, fontWeight: '900', color: '#1C2B35', textAlign: 'right', writingDirection: 'rtl' }}>{l.title}</Text>
+                    <Text style={{ fontSize: 11, color: '#475569', textAlign: 'right', writingDirection: 'rtl' }}>{typeLabel(l.type)} · {l.location || ''} · ${l.price || '—'}</Text>
+                    <Text style={{ fontSize: 11, color: '#64748b', textAlign: 'right', writingDirection: 'rtl' }}>📞 {l.phone}</Text>
+                  </View>
+                </View>
+                {l.description && <Text style={{ fontSize: 12, color: '#334155', writingDirection: 'rtl', textAlign: 'right', marginVertical: 6 }}>{l.description}</Text>}
+                <View style={{ flexDirection: 'row-reverse', gap: 8 }}>
+                  <TouchableOpacity
+                    style={{ flex: 1, backgroundColor: '#10b981', borderRadius: 8, paddingVertical: 8, alignItems: 'center' }}
+                    onPress={async () => {
+                      await fetch(`${API_BASE}/api/listings/${l.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ approved: true }) });
+                      loadListings();
+                    }}
+                  >
+                    <Text style={{ color: '#fff', fontSize: 12, fontWeight: '900' }}>✓ אשר</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={{ flex: 1, backgroundColor: '#dc2626', borderRadius: 8, paddingVertical: 8, alignItems: 'center' }}
+                    onPress={async () => {
+                      await fetch(`${API_BASE}/api/listings/${l.id}`, { method: 'DELETE' });
+                      loadListings();
+                    }}
+                  >
+                    <Text style={{ color: '#fff', fontSize: 12, fontWeight: '900' }}>✕ מחק</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            ))}
+          </View>
+        )}
+
+        <Text style={{ fontSize: 13, fontWeight: '800', color: '#10b981', marginBottom: 8, writingDirection: 'rtl', textAlign: 'right' }}>✓ מאושרות ({approved.length})</Text>
+        {approved.length === 0 && <Text style={{ fontSize: 12, color: '#94a3b8', textAlign: 'center', writingDirection: 'rtl', padding: 20 }}>אין מודעות מאושרות</Text>}
+        {approved.map(l => (
+          <View key={l.id} style={{ backgroundColor: '#f0fdf4', borderRadius: 10, padding: 10, marginBottom: 6, borderWidth: 1, borderColor: '#bbf7d0' }}>
+            <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 8 }}>
+              {l.images && l.images[0] && <Image source={{ uri: l.images[0] }} style={{ width: 44, height: 44, borderRadius: 6 }} />}
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: 12, fontWeight: '800', color: '#1C2B35', textAlign: 'right', writingDirection: 'rtl' }}>{l.title}</Text>
+                <Text style={{ fontSize: 10, color: '#64748b', textAlign: 'right', writingDirection: 'rtl' }}>{typeLabel(l.type)} · ${l.price || '—'} · 📞 {l.phone}</Text>
+              </View>
+              <TouchableOpacity
+                onPress={async () => { await fetch(`${API_BASE}/api/listings/${l.id}`, { method: 'DELETE' }); loadListings(); }}
+                style={{ paddingHorizontal: 10, paddingVertical: 4, borderRadius: 6, backgroundColor: '#fee2e2' }}
+              >
+                <Text style={{ fontSize: 11, color: '#dc2626', fontWeight: '800' }}>✕</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        ))}
+      </View>
+    );
+  };
+
   // ─── Items List ─────────────────────────────────────────────
   const renderItems = () => {
     if (!currentSection) return null;
+    const pendingCount = listings.filter(l => !l.approved).length;
     return (
       <View style={cs.contentCard}>
-        {activeNav === 'side' && !childrenOf && (
+        {activeNav === 'side' && !childrenOf && (() => {
+          const tabLabels: Record<string, string> = {
+            dashboard: '📊 דשבורד',
+            blocks: '📦 בלוקים',
+            listings: `🏠 מודעות${pendingCount > 0 ? ' (' + pendingCount + ')' : ''}`,
+            finance: '💰 מדד הכסף',
+            tourism: '🧳 מדד התיירים',
+            realestate: '🏠 מדד הנדל״ן',
+          };
+          return Platform.OS === 'web'
+            ? React.createElement('div', { style: { display: 'flex', flexDirection: 'row-reverse', gap: 6, marginBottom: 14, background: '#f1f5f9', borderRadius: 10, padding: 4 } },
+                sideTabOrder.map((k, i) => React.createElement('div', {
+                  key: k,
+                  draggable: true,
+                  onClick: () => setSideTab(k),
+                  onDragStart: (e: any) => { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', String(i)); },
+                  onDragOver: (e: any) => { e.preventDefault(); setSideTabDragIdx(i); },
+                  onDragLeave: () => setSideTabDragIdx(-1),
+                  onDrop: (e: any) => {
+                    e.preventDefault();
+                    setSideTabDragIdx(-1);
+                    const from = parseInt(e.dataTransfer.getData('text/plain'), 10);
+                    if (!isNaN(from) && from !== i) {
+                      const arr = [...sideTabOrder];
+                      const [moved] = arr.splice(from, 1);
+                      arr.splice(i, 0, moved);
+                      setSideTabOrder(arr);
+                    }
+                  },
+                  onDragEnd: () => setSideTabDragIdx(-1),
+                  style: {
+                    flex: 1, padding: '8px 12px', borderRadius: 8, cursor: 'grab', userSelect: 'none', textAlign: 'center',
+                    background: sideTab === k ? '#fff' : 'transparent',
+                    borderTop: sideTabDragIdx === i ? `3px solid ${Colors.PRIMARY}` : '3px solid transparent',
+                    fontSize: 12, fontWeight: 800, color: sideTab === k ? Colors.PRIMARY : '#64748b',
+                    fontFamily: 'Arial, sans-serif',
+                    transition: 'all 0.15s ease',
+                  },
+                }, tabLabels[k])))
+            : (
+              <View style={{ flexDirection: 'row-reverse', gap: 6, marginBottom: 14, backgroundColor: '#f1f5f9', borderRadius: 10, padding: 4 }}>
+                {sideTabOrder.map(k => (
+                  <TouchableOpacity key={k} onPress={() => setSideTab(k)} style={{ flex: 1, paddingVertical: 8, borderRadius: 8, backgroundColor: sideTab === k ? Colors.WHITE : 'transparent', alignItems: 'center' }}>
+                    <Text style={{ fontSize: 12, fontWeight: '800', color: sideTab === k ? Colors.PRIMARY : '#64748b' }}>{tabLabels[k]}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            );
+        })()}
+        {activeNav === 'side' && !childrenOf && sideTab === 'dashboard' && (() => {
+          const approved = listings.filter(l => l.approved);
+          const pending = listings.filter(l => !l.approved);
+          const totalListings = listings.length;
+          const activeBigCount = approved.filter(l => l.size === 'full').length;
+          const activeBannerCount = approved.filter(l => l.size !== 'full').length;
+          const monthlyRevenue = activeBigCount * 10;
+          const daysSince = (iso: string) => { try { return Math.floor((Date.now() - new Date(iso).getTime()) / 86400000); } catch { return 0; } };
+          const expiryDays = (iso: string) => Math.max(0, 30 - daysSince(iso));
+          return (
+            <View>
+              <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 10, marginBottom: 14 }}>
+                {[
+                  { label: 'סה"כ מודעות', value: totalListings, color: '#1A6B8A', icon: '📋' },
+                  { label: 'ממתינות לאישור', value: pending.length, color: '#f59e0b', icon: '⏳' },
+                  { label: 'פעילות', value: approved.length, color: '#10b981', icon: '✓' },
+                  { label: 'הכנסה חודשית משוערת', value: `$${monthlyRevenue}`, color: '#8b5cf6', icon: '💰' },
+                  { label: 'מודעות גדולות ($10)', value: activeBigCount, color: '#ec4899', icon: '📏' },
+                  { label: 'באנרים (חינם)', value: activeBannerCount, color: '#64748b', icon: '🆓' },
+                ].map((c, i) => (
+                  <View key={i} style={{ flex: 1, minWidth: 160, backgroundColor: c.color + '15', borderRadius: 10, padding: 12, borderLeftWidth: 4, borderLeftColor: c.color }}>
+                    <Text style={{ fontSize: 11, color: '#64748b', writingDirection: 'rtl', textAlign: 'right' }}>{c.icon} {c.label}</Text>
+                    <Text style={{ fontSize: 22, fontWeight: '900', color: c.color, textAlign: 'right', marginTop: 4 }}>{c.value}</Text>
+                  </View>
+                ))}
+              </View>
+
+              <View style={{ backgroundColor: '#fff', borderRadius: 10, borderWidth: 1, borderColor: '#e2e8f0', overflow: 'hidden' }}>
+                <View style={{ flexDirection: 'row-reverse', paddingVertical: 8, paddingHorizontal: 12, backgroundColor: '#f1f5f9', gap: 6 }}>
+                  <Text style={{ flex: 2, fontSize: 11, fontWeight: '800', color: '#475569', textAlign: 'right', writingDirection: 'rtl' }}>מודעה</Text>
+                  <Text style={{ flex: 1, fontSize: 11, fontWeight: '800', color: '#475569', textAlign: 'center' }}>סוג</Text>
+                  <Text style={{ flex: 1, fontSize: 11, fontWeight: '800', color: '#475569', textAlign: 'center' }}>גודל</Text>
+                  <Text style={{ flex: 1, fontSize: 11, fontWeight: '800', color: '#475569', textAlign: 'center' }}>מחיר</Text>
+                  <Text style={{ flex: 1, fontSize: 11, fontWeight: '800', color: '#475569', textAlign: 'center' }}>תוקף</Text>
+                  <Text style={{ flex: 1, fontSize: 11, fontWeight: '800', color: '#475569', textAlign: 'center' }}>תשלום חודשי</Text>
+                </View>
+                {approved.length === 0 ? (
+                  <Text style={{ textAlign: 'center', color: '#94a3b8', padding: 20, writingDirection: 'rtl' }}>אין מודעות פעילות</Text>
+                ) : approved.map((l, idx) => {
+                  const days = expiryDays(l.createdAt || '');
+                  const revenue = l.size === 'full' ? 10 : 0;
+                  return (
+                    <View key={l.id} style={{ flexDirection: 'row-reverse', paddingVertical: 10, paddingHorizontal: 12, gap: 6, backgroundColor: idx % 2 === 0 ? '#fff' : '#fafafa', borderTopWidth: 1, borderTopColor: '#f1f5f9' }}>
+                      <Text style={{ flex: 2, fontSize: 12, color: '#1C2B35', textAlign: 'right', writingDirection: 'rtl' }} numberOfLines={1}>{l.title}</Text>
+                      <Text style={{ flex: 1, fontSize: 11, color: '#64748b', textAlign: 'center' }}>{l.type === 'sale' ? 'מכירה' : l.type === 'rent' ? 'שכירות' : l.type === 'hotels' ? 'מלונאי' : l.type}</Text>
+                      <Text style={{ flex: 1, fontSize: 11, color: '#64748b', textAlign: 'center' }}>{l.size === 'full' ? 'גדולה' : 'קטנה'}</Text>
+                      <Text style={{ flex: 1, fontSize: 11, color: '#1C2B35', textAlign: 'center', fontWeight: '700' }}>${l.price || '—'}</Text>
+                      <Text style={{ flex: 1, fontSize: 11, color: days <= 5 ? '#dc2626' : days <= 10 ? '#f59e0b' : '#10b981', textAlign: 'center', fontWeight: '700' }}>{days > 0 ? `${days} ימים` : 'פג'}</Text>
+                      <Text style={{ flex: 1, fontSize: 11, color: revenue > 0 ? '#10b981' : '#94a3b8', textAlign: 'center', fontWeight: '700' }}>${revenue}</Text>
+                    </View>
+                  );
+                })}
+              </View>
+
+              <Text style={{ fontSize: 10, color: '#94a3b8', textAlign: 'center', marginTop: 10, writingDirection: 'rtl' }}>
+                * חישוב משוער. תוקף = 30 ימים מהפרסום. לידים והקפצות יתווספו בהמשך.
+              </Text>
+            </View>
+          );
+        })()}
+        {activeNav === 'side' && !childrenOf && sideTab === 'finance' && (
+          <FinanceWorldBankTable />
+        )}
+        {activeNav === 'side' && !childrenOf && sideTab === 'finance' && (
+          <SourceLinksBar
+            accentColor="#1A6B8A"
+            links={[
+              { icon: '🏦', label: 'NBG', url: 'https://nbg.gov.ge/en/statistics' },
+              { icon: '📊', label: 'Geostat', url: 'https://www.geostat.ge/en' },
+              { icon: '💰', label: 'משרד האוצר', url: 'https://mof.ge/en' },
+              { icon: '📈', label: 'בורסה (GSE)', url: 'https://gse.ge/en' },
+            ]}
+          />
+        )}
+        {activeNav === 'side' && !childrenOf && sideTab === 'finance' && (
+          <FinanceManualTable />
+        )}
+        {activeNav === 'side' && !childrenOf && sideTab === 'tourism' && (
+          <TourismWorldBankTable />
+        )}
+        {activeNav === 'side' && !childrenOf && sideTab === 'tourism' && (
+          <SourceLinksBar
+            accentColor="#15803d"
+            links={[
+              { icon: '🧳', label: 'GNTA', url: 'https://gnta.ge/statistics' },
+              { icon: '🌊', label: 'Visit Batumi', url: 'https://visitbatumi.com/en/statistics' },
+            ]}
+          />
+        )}
+        {activeNav === 'side' && !childrenOf && sideTab === 'tourism' && (
+          <ManualIndicatorsTable
+            title="🧳 מדדי תיירות ידניים"
+            subtitle="ישראלים, תיירים לבטומי, וכל מדד שתרצה"
+            storageField="tourismStatsCustom"
+            accentColor="#15803d"
+            headerBg="#f0fdf4"
+            lineColor="#22c55e"
+            cellBg="#bbf7d0"
+          />
+        )}
+        {activeNav === 'side' && !childrenOf && sideTab === 'realestate' && (
+          <SourceLinksBar
+            accentColor="#1C2B35"
+            links={[
+              { icon: '🏢', label: 'Galt & Taggart', url: 'https://galtandtaggart.com/research/real-estate' },
+              { icon: '🏗️', label: 'Colliers', url: 'https://www.colliers.com/en-ge/research' },
+              { icon: '🏠', label: 'MyHome', url: 'https://www.myhome.ge/en' },
+            ]}
+          />
+        )}
+        {activeNav === 'side' && !childrenOf && sideTab === 'realestate' && (
+          <ManualIndicatorsTable
+            title="🏠 מדדי נדל״ן ידניים"
+            subtitle="מחירי דירות, עלויות בנייה, תשואה, וכל מדד שתרצה"
+            storageField="realestateStatsCustom"
+            accentColor="#1C2B35"
+            headerBg="#f1f5f9"
+            lineColor="#334155"
+            cellBg="#cbd5e1"
+          />
+        )}
+        {false && activeNav === 'side' && !childrenOf && sideTab === 'finance' && (
           <View style={{ padding: 12, marginBottom: 14, backgroundColor: '#f8fafc', borderRadius: 10, borderWidth: 1, borderColor: '#e2e8f0' }}>
             <Text style={{ fontSize: 13, fontWeight: '900', color: '#1C2B35', writingDirection: 'rtl', textAlign: 'right', marginBottom: 10 }}>💰 מדד הכסף - ערך ידני עדכני</Text>
             {([
@@ -2727,6 +3620,71 @@ export default function AdminDashboard() {
             <Text style={{ fontSize: 10, color: '#94a3b8', textAlign: 'right', writingDirection: 'rtl', marginTop: 6 }}>השאר ריק כדי להשתמש בערך השנתי של World Bank</Text>
           </View>
         )}
+
+        {activeNav === 'side' && !childrenOf && sideTab === 'listings' && (() => {
+          const typeLabel = (t: string) => t === 'sale' ? 'למכירה' : t === 'rent-daily' ? 'יומי' : t === 'rent-yearly' ? 'שנתי' : t;
+          const pending = listings.filter(l => !l.approved);
+          const approved = listings.filter(l => l.approved);
+          return (
+            <View style={{ padding: 12, marginBottom: 14, backgroundColor: '#f8fafc', borderRadius: 10, borderWidth: 1, borderColor: '#e2e8f0' }}>
+              <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                <Text style={{ fontSize: 13, fontWeight: '900', color: '#1C2B35', writingDirection: 'rtl', textAlign: 'right' }}>🏠 מודעות נדל"ן - אישור ופרסום</Text>
+                <TouchableOpacity onPress={loadListings} style={{ paddingHorizontal: 10, paddingVertical: 4, borderRadius: 6, backgroundColor: '#e2e8f0' }}>
+                  <Text style={{ fontSize: 11, fontWeight: '700', color: '#475569' }}>↻ רענן</Text>
+                </TouchableOpacity>
+              </View>
+              {pending.length > 0 && (
+                <View style={{ marginBottom: 10 }}>
+                  <Text style={{ fontSize: 12, fontWeight: '800', color: '#b91c1c', marginBottom: 6, writingDirection: 'rtl', textAlign: 'right' }}>⏳ ממתינות ({pending.length})</Text>
+                  {pending.map(l => (
+                    <View key={l.id} style={{ backgroundColor: '#fef3c7', borderRadius: 8, padding: 10, marginBottom: 6, borderWidth: 1, borderColor: '#fbbf24' }}>
+                      <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                        {l.images && l.images[0] && <Image source={{ uri: l.images[0] }} style={{ width: 50, height: 50, borderRadius: 6 }} />}
+                        <View style={{ flex: 1 }}>
+                          <Text style={{ fontSize: 12, fontWeight: '900', color: '#1C2B35', textAlign: 'right', writingDirection: 'rtl' }}>{l.title}</Text>
+                          <Text style={{ fontSize: 10, color: '#475569', textAlign: 'right', writingDirection: 'rtl' }}>{typeLabel(l.type)} · {l.location || ''} · ${l.price || '—'}</Text>
+                          <Text style={{ fontSize: 10, color: '#64748b', textAlign: 'right', writingDirection: 'rtl' }}>📞 {l.phone}</Text>
+                        </View>
+                      </View>
+                      {l.description && <Text style={{ fontSize: 11, color: '#334155', writingDirection: 'rtl', textAlign: 'right', marginVertical: 4 }}>{l.description}</Text>}
+                      <View style={{ flexDirection: 'row-reverse', gap: 6 }}>
+                        <TouchableOpacity
+                          style={{ flex: 1, backgroundColor: '#10b981', borderRadius: 6, paddingVertical: 6, alignItems: 'center' }}
+                          onPress={async () => { await fetch(`${API_BASE}/api/listings/${l.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ approved: true }) }); loadListings(); }}
+                        >
+                          <Text style={{ color: '#fff', fontSize: 11, fontWeight: '900' }}>✓ אשר</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          style={{ flex: 1, backgroundColor: '#dc2626', borderRadius: 6, paddingVertical: 6, alignItems: 'center' }}
+                          onPress={async () => { await fetch(`${API_BASE}/api/listings/${l.id}`, { method: 'DELETE' }); loadListings(); }}
+                        >
+                          <Text style={{ color: '#fff', fontSize: 11, fontWeight: '900' }}>✕ מחק</Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  ))}
+                </View>
+              )}
+              <Text style={{ fontSize: 12, fontWeight: '800', color: '#10b981', marginBottom: 6, writingDirection: 'rtl', textAlign: 'right' }}>✓ מאושרות ({approved.length})</Text>
+              {approved.length === 0 && <Text style={{ fontSize: 11, color: '#94a3b8', textAlign: 'center', writingDirection: 'rtl', padding: 10 }}>אין מודעות מאושרות</Text>}
+              {approved.map(l => (
+                <View key={l.id} style={{ backgroundColor: '#f0fdf4', borderRadius: 8, padding: 8, marginBottom: 4, borderWidth: 1, borderColor: '#bbf7d0', flexDirection: 'row-reverse', alignItems: 'center', gap: 8 }}>
+                  {l.images && l.images[0] && <Image source={{ uri: l.images[0] }} style={{ width: 36, height: 36, borderRadius: 4 }} />}
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 11, fontWeight: '800', color: '#1C2B35', textAlign: 'right', writingDirection: 'rtl' }}>{l.title}</Text>
+                    <Text style={{ fontSize: 10, color: '#64748b', textAlign: 'right', writingDirection: 'rtl' }}>{typeLabel(l.type)} · ${l.price || '—'} · 📞 {l.phone}</Text>
+                  </View>
+                  <TouchableOpacity onPress={async () => { await fetch(`${API_BASE}/api/listings/${l.id}`, { method: 'DELETE' }); loadListings(); }} style={{ paddingHorizontal: 8, paddingVertical: 3, borderRadius: 4, backgroundColor: '#fee2e2' }}>
+                    <Text style={{ fontSize: 10, color: '#dc2626', fontWeight: '800' }}>✕</Text>
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </View>
+          );
+        })()}
+
+        {(activeNav !== 'side' || childrenOf || sideTab === 'blocks') && (
+        <>
         {childrenOf && (
           <TouchableOpacity onPress={() => setChildrenOf(null)} style={{ marginBottom: 10, alignSelf: 'flex-end' }}>
             <Text style={{ color: Colors.PRIMARY, fontSize: 14, fontWeight: '600' }}>→ חזרה ל{currentSection.label}</Text>
@@ -2932,6 +3890,8 @@ export default function AdminDashboard() {
             </TouchableOpacity>
           </View>
         )}
+        </>
+        )}
       </View>
     );
   };
@@ -2988,6 +3948,7 @@ export default function AdminDashboard() {
               : activeNav === 'media' ? renderMedia()
               : activeNav === 'gallery' ? renderGallery()
               : activeNav === 'subscription' ? renderSubscription()
+              : activeNav === 'locations' ? renderLocations()
               : renderItems()}
 
             <View style={{ height: 40 }} />

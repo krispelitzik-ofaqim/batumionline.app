@@ -541,13 +541,14 @@ async function syncMapData() {
             let pmMatch;
             while ((pmMatch = pmRegex.exec(folderContent)) !== null) {
               const pm = pmMatch[1];
-              const pnameMatch = pm.match(/<name>(.*?)<\/name>/);
+              const pnameMatch = pm.match(/<name>([\s\S]*?)<\/name>/);
               const coordsMatch = pm.match(/<coordinates>([\s\S]*?)<\/coordinates>/);
               const descMatch = pm.match(/<description><!\[CDATA\[([\s\S]*?)\]\]><\/description>/);
               if (pnameMatch && coordsMatch) {
                 const c = coordsMatch[1].trim().split(',');
+                const cleanName = pnameMatch[1].replace(/[\u200E\u200F]/g, '').replace(/\s+/g, ' ').trim();
                 points.push({
-                  name: pnameMatch[1].trim(),
+                  name: cleanName,
                   lat: parseFloat(c[1]),
                   lng: parseFloat(c[0]),
                   description: descMatch ? descMatch[1].trim() : '',
@@ -559,13 +560,21 @@ async function syncMapData() {
           if (layers.length > 0) {
             const db = readDB();
             const oldLayers = db.mapLayers || [];
+            if (!db.mapLayersBackup) db.mapLayersBackup = {};
+            const ts = new Date().toISOString();
+            for (const ol of oldLayers) {
+              if (!Array.isArray(ol.points) || ol.points.length === 0) continue;
+              const arr = db.mapLayersBackup[ol.name] || [];
+              arr.unshift({ timestamp: ts, points: ol.points, color: ol.color || '' });
+              db.mapLayersBackup[ol.name] = arr.slice(0, 5);
+            }
             for (const nl of layers) {
               const old = oldLayers.find(o => o.name === nl.name);
               if (old && old.color) nl.color = old.color;
             }
             db.mapLayers = layers;
             writeDB(db);
-            console.log(`🗺️ Map synced: ${layers.length} layers, ${layers.reduce((s,l) => s + l.points.length, 0)} points`);
+            console.log(`🗺️ Map synced: ${layers.length} layers, ${layers.reduce((s,l) => s + l.points.length, 0)} points (backup kept)`);
           }
           resolve(true);
         } catch (e) {
@@ -587,6 +596,194 @@ app.get('/api/sync-map', async (req, res) => {
   const db = readDB();
   const layers = db.mapLayers || [];
   res.json({ success: true, layers: layers.length, points: layers.reduce((s, l) => s + l.points.length, 0) });
+});
+
+// GET /api/map-backups — list all layer backups with metadata
+app.get('/api/map-backups', (req, res) => {
+  const db = readDB();
+  const backups = db.mapLayersBackup || {};
+  const current = db.mapLayers || [];
+  const out = {};
+  for (const [layerName, versions] of Object.entries(backups)) {
+    out[layerName] = (versions || []).map(v => ({
+      timestamp: v.timestamp,
+      pointsCount: Array.isArray(v.points) ? v.points.length : 0,
+    }));
+  }
+  const currentSummary = current.map(l => ({ name: l.name, pointsCount: (l.points || []).length }));
+  res.json({ success: true, backups: out, current: currentSummary });
+});
+
+// POST /api/map-backups/restore — body: { layerName, timestamp }
+app.post('/api/map-backups/restore', (req, res) => {
+  const { layerName, timestamp } = req.body || {};
+  if (!layerName || !timestamp) return res.status(400).json({ success: false, error: 'layerName and timestamp required' });
+  const db = readDB();
+  const versions = (db.mapLayersBackup || {})[layerName] || [];
+  const snap = versions.find(v => v.timestamp === timestamp);
+  if (!snap) return res.status(404).json({ success: false, error: 'backup not found' });
+  if (!Array.isArray(db.mapLayers)) db.mapLayers = [];
+  const idx = db.mapLayers.findIndex(l => l.name === layerName);
+  const restored = { name: layerName, points: snap.points, color: snap.color || '' };
+  if (idx >= 0) db.mapLayers[idx] = { ...db.mapLayers[idx], ...restored };
+  else db.mapLayers.push(restored);
+  writeDB(db);
+  res.json({ success: true, restored: { layerName, timestamp, pointsCount: snap.points.length } });
+});
+
+// DELETE /api/map-backups/:layerName/:timestamp
+app.delete('/api/map-backups/:layerName/:timestamp', (req, res) => {
+  const { layerName, timestamp } = req.params;
+  const db = readDB();
+  if (!db.mapLayersBackup || !db.mapLayersBackup[layerName]) return res.status(404).json({ success: false });
+  const before = db.mapLayersBackup[layerName].length;
+  db.mapLayersBackup[layerName] = db.mapLayersBackup[layerName].filter(v => v.timestamp !== timestamp);
+  if (db.mapLayersBackup[layerName].length === 0) delete db.mapLayersBackup[layerName];
+  writeDB(db);
+  res.json({ success: true, deleted: before - (db.mapLayersBackup[layerName]?.length || 0) });
+});
+
+// ─── Listings (user-submitted real-estate ads) ────────────────
+
+// GET /api/listings — public list (approved + visible)
+app.get('/api/listings', (req, res) => {
+  const db = readDB();
+  const all = db.listings || [];
+  const type = req.query.type;
+  const publicOnly = req.query.all !== '1';
+  let rows = all;
+  if (publicOnly) rows = rows.filter(l => l.approved && l.visible !== false);
+  if (type) rows = rows.filter(l => l.type === type);
+  rows = rows.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+  res.json({ success: true, listings: rows });
+});
+
+// POST /api/listings — submit new listing
+app.post('/api/listings', (req, res) => {
+  const body = req.body || {};
+  if (!body.title || !body.type || !body.phone) {
+    return res.status(400).json({ success: false, error: 'title, type, phone required' });
+  }
+  const db = readDB();
+  if (!db.listings) db.listings = [];
+  const rec = {
+    id: 'lst_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+    type: body.type,
+    title: String(body.title).slice(0, 120),
+    description: String(body.description || '').slice(0, 1000),
+    price: body.price || '',
+    location: body.location || '',
+    phone: normalizePhone(body.phone),
+    images: Array.isArray(body.images) ? body.images.slice(0, 8) : [],
+    size: body.size || 'half',
+    period: body.period || '',
+    createdAt: new Date().toISOString(),
+    approved: false,
+    visible: true,
+  };
+  db.listings.push(rec);
+  writeDB(db);
+  res.json({ success: true, listing: rec });
+});
+
+// PUT /api/listings/:id — update (admin approve / edit)
+app.put('/api/listings/:id', (req, res) => {
+  const db = readDB();
+  const i = (db.listings || []).findIndex(l => l.id === req.params.id);
+  if (i < 0) return res.status(404).json({ success: false, error: 'not found' });
+  db.listings[i] = { ...db.listings[i], ...req.body };
+  writeDB(db);
+  res.json({ success: true, listing: db.listings[i] });
+});
+
+// DELETE /api/listings/:id
+app.delete('/api/listings/:id', (req, res) => {
+  const db = readDB();
+  const before = (db.listings || []).length;
+  db.listings = (db.listings || []).filter(l => l.id !== req.params.id);
+  writeDB(db);
+  res.json({ success: true, deleted: before - db.listings.length });
+});
+
+// ─── Developers (mini-portals for real-estate builders) ────────
+
+// GET /api/developers — public list (approved + visible)
+app.get('/api/developers', (req, res) => {
+  const db = readDB();
+  const all = db.developers || [];
+  const publicOnly = req.query.all !== '1';
+  let rows = all;
+  if (publicOnly) rows = rows.filter(d => d.approved && d.visible !== false);
+  rows = rows.sort((a, b) => {
+    const pa = a.package === 'premium' ? 0 : 1;
+    const pb = b.package === 'premium' ? 0 : 1;
+    if (pa !== pb) return pa - pb;
+    const ba = a.bumpUntil && new Date(a.bumpUntil) > new Date() ? 0 : 1;
+    const bb = b.bumpUntil && new Date(b.bumpUntil) > new Date() ? 0 : 1;
+    if (ba !== bb) return ba - bb;
+    return (b.createdAt || '').localeCompare(a.createdAt || '');
+  });
+  res.json({ success: true, developers: rows });
+});
+
+// POST /api/developers — submit new developer
+app.post('/api/developers', (req, res) => {
+  const body = req.body || {};
+  if (!body.company || !body.projectName || !body.phone || !body.package) {
+    return res.status(400).json({ success: false, error: 'company, projectName, phone, package required' });
+  }
+  const maxUnits = body.package === 'premium' ? 10 : 5;
+  const db = readDB();
+  if (!db.developers) db.developers = [];
+  const rec = {
+    id: 'dev_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+    package: body.package === 'premium' ? 'premium' : 'basic',
+    company: String(body.company).slice(0, 80),
+    projectName: String(body.projectName).slice(0, 120),
+    logo: body.logo || '',
+    brandColor: body.brandColor || '',
+    location: body.location || '',
+    deliveryDate: body.deliveryDate || '',
+    description: String(body.description || '').slice(0, 1000),
+    phone: normalizePhone(body.phone),
+    whatsapp: body.whatsapp ? normalizePhone(body.whatsapp) : '',
+    website: body.website || '',
+    units: Array.isArray(body.units) ? body.units.slice(0, maxUnits).map(u => ({
+      id: u.id || 'u_' + Math.random().toString(36).slice(2, 8),
+      title: String(u.title || '').slice(0, 80),
+      image: u.image || '',
+      price: u.price || '',
+      size: u.size || '',
+      description: String(u.description || '').slice(0, 500),
+      images: Array.isArray(u.images) ? u.images.slice(0, 8) : [],
+    })) : [],
+    createdAt: new Date().toISOString(),
+    approved: false,
+    visible: true,
+    bumpUntil: '',
+  };
+  db.developers.push(rec);
+  writeDB(db);
+  res.json({ success: true, developer: rec });
+});
+
+// PUT /api/developers/:id — admin approve / edit
+app.put('/api/developers/:id', (req, res) => {
+  const db = readDB();
+  const i = (db.developers || []).findIndex(d => d.id === req.params.id);
+  if (i < 0) return res.status(404).json({ success: false, error: 'not found' });
+  db.developers[i] = { ...db.developers[i], ...req.body };
+  writeDB(db);
+  res.json({ success: true, developer: db.developers[i] });
+});
+
+// DELETE /api/developers/:id
+app.delete('/api/developers/:id', (req, res) => {
+  const db = readDB();
+  const before = (db.developers || []).length;
+  db.developers = (db.developers || []).filter(d => d.id !== req.params.id);
+  writeDB(db);
+  res.json({ success: true, deleted: before - db.developers.length });
 });
 
 // ─── Subscribers (phone-based access) ─────────────────────────

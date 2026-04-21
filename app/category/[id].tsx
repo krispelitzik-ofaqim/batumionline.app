@@ -568,23 +568,35 @@ function TourCard({ t, onRate, nearbyRestaurants }: { t: TourBlock; onRate: (id:
   );
 }
 
-function CategoryMapModal({ visible, points, focusName, layerColor, onClose }: { visible: boolean; points: MapPoint[]; focusName: string; layerColor?: string; onClose: () => void }) {
+function CategoryMapModal({ visible, points, focusName, focusCoords, layerColor, onClose }: { visible: boolean; points: MapPoint[]; focusName: string; focusCoords?: { lat: number; lng: number }; layerColor?: string; onClose: () => void }) {
   const [focus, setFocus] = useState<MapPoint | null>(null);
   const [listOpen, setListOpen] = useState(false);
 
   useEffect(() => {
-    if (visible && focusName) {
-      const p = points.find(pt => pt.name === focusName) || points[0];
-      if (p) setFocus(p);
+    if (!visible) return;
+    if (focusCoords) {
+      setFocus({ name: focusName || '', lat: focusCoords.lat, lng: focusCoords.lng });
+      return;
     }
-  }, [visible, focusName]);
+    if (focusName) {
+      const norm = (s: string) => s.trim().toLowerCase().replace(/\s+/g, ' ');
+      const target = norm(focusName);
+      const p = points.find(pt => norm(pt.name) === target)
+        || points.find(pt => norm(pt.name).includes(target) || target.includes(norm(pt.name)));
+      setFocus(p || null);
+      return;
+    }
+    setFocus(null);
+  }, [visible, focusName, focusCoords?.lat, focusCoords?.lng]);
 
   if (!visible || points.length === 0) return null;
 
   const color = layerColor || Colors.PRIMARY;
+  const centerLat = points.reduce((s, p) => s + p.lat, 0) / points.length;
+  const centerLng = points.reduce((s, p) => s + p.lng, 0) / points.length;
   const mapSrc = focus
     ? `https://www.google.com/maps?q=${focus.lat},${focus.lng}(${encodeURIComponent(focus.name)})&hl=iw&z=16&output=embed`
-    : `https://www.google.com/maps?q=${points[0].lat},${points[0].lng}&hl=iw&z=14&output=embed`;
+    : `https://www.google.com/maps?q=${centerLat},${centerLng}&hl=iw&z=13&output=embed`;
 
   return (
     <Modal visible={visible} transparent animationType="fade">
@@ -637,8 +649,8 @@ function CategoryMapModal({ visible, points, focusName, layerColor, onClose }: {
                 }, '▼'),
                 listOpen && React.createElement('div', { key: 'close',
                   onClick: () => setListOpen(false),
-                  style: { cursor: 'pointer', fontSize: 12, color: '#fff', fontWeight: 800, textAlign: 'center', userSelect: 'none', padding: '6px 0', marginTop: 4, backgroundColor: color, borderRadius: 8 },
-                }, '▲ סגור תפריט'),
+                  style: { cursor: 'pointer', fontSize: 32, color: '#dc2626', fontWeight: 900, textAlign: 'center', userSelect: 'none', padding: '6px 0', marginTop: 4, lineHeight: 1 },
+                }, '▲'),
               ])}
             </View>
           )}
@@ -728,7 +740,7 @@ function HotelCard({ h, dark, pageBtnLabel, mapPoints, layerColor }: { h: Hotel;
           >
             <Text style={[st.hotelBtnTxt, !h.coords && !(mapPoints && mapPoints.length > 0) && st.hotelBtnTxtDisabled]}>{showMap ? 'הסתר מפה' : 'איפה זה'}</Text>
           </TouchableOpacity>
-          <CategoryMapModal visible={showCatMapModal} points={mapPoints || []} focusName={h.title} layerColor={layerColor} onClose={() => setShowCatMapModal(false)} />
+          <CategoryMapModal visible={showCatMapModal} points={mapPoints || []} focusName={h.title} focusCoords={h.coords} layerColor={layerColor} onClose={() => setShowCatMapModal(false)} />
           <TouchableOpacity
             style={[st.hotelBtn, st.hotelBtnPrimary, !btnEnabled && st.hotelBtnDisabled]}
             activeOpacity={btnEnabled ? 0.7 : 1}
@@ -972,7 +984,7 @@ export default function CategoryScreen() {
     );
   }
 
-  const children = cat.children || [];
+  const children = (cat.children || []).filter((c: any) => c.visible !== false);
   const darkCat = cat.theme === 'dark' || dark;
 
   const lockedOverlay = isLocked ? (
@@ -1030,6 +1042,7 @@ export default function CategoryScreen() {
         ) : (
           <View style={[st.hero, { backgroundColor: cat.heroBg || cat.bg || (darkCat ? '#1a1a2e' : '#3DA5C4') }]}>
             <Text style={[st.heroTitle, darkCat && { color: '#F4A94E' }]}>{cat.title}</Text>
+            {cat.icon ? <Text style={{ fontSize: 40, textAlign: 'center', marginTop: 4 }}>{cat.icon}</Text> : null}
             {cat.subtitle ? <Text style={[st.heroSub, darkCat && { color: '#d4af37' }]}>{cat.subtitle}</Text> : null}
           </View>
         )}
@@ -1173,6 +1186,14 @@ export default function CategoryScreen() {
               <View style={{ paddingBottom: 16 }}>
                 {React.createElement('div', {
                   dangerouslySetInnerHTML: { __html: cat.longText },
+                  style: { direction: 'rtl', textAlign: 'right' },
+                })}
+              </View>
+            )}
+            {(cat as any).longTextBottom && Platform.OS === 'web' && (
+              <View style={{ paddingHorizontal: 16, paddingBottom: 16, paddingTop: 8 }}>
+                {React.createElement('div', {
+                  dangerouslySetInnerHTML: { __html: (cat as any).longTextBottom },
                   style: { direction: 'rtl', textAlign: 'right' },
                 })}
               </View>

@@ -5,6 +5,56 @@ import { fetchContent } from '../constants/api';
 
 type Point = { year: string; value: number };
 
+function GdpBars({ ge, il }: { ge: Point[]; il: Point[] }) {
+  if (ge.length === 0 || il.length === 0) return null;
+  const W = 300;
+  const H = 160;
+  const padT = 10;
+  const padB = 40;
+  const padL = 8;
+  const padR = 8;
+  const years = ge.map(g => g.year);
+  const maxVal = Math.max(...ge.map(g => g.value), ...il.map(i => i.value));
+  const innerH = H - padT - padB;
+  const innerW = W - padL - padR;
+  const groupW = innerW / years.length;
+  const barW = (groupW - 8) / 2;
+  const GE = '#8b5cf6', IL = '#0ea5e9';
+
+  if (Platform.OS !== 'web') return <View style={{ height: H, backgroundColor: '#f1f5f9', borderRadius: 6 }} />;
+  return React.createElement('div', { style: { width: '100%' } },
+    React.createElement('div', { style: { display: 'flex', gap: 10, marginBottom: 6, justifyContent: 'flex-end' } },
+      React.createElement('div', { style: { display: 'flex', alignItems: 'center', gap: 4 } },
+        React.createElement('span', { style: { display: 'inline-block', width: 10, height: 10, background: GE, borderRadius: 2 } }),
+        React.createElement('span', { style: { fontSize: 10, color: '#475569' } }, '🇬🇪 גאורגיה')
+      ),
+      React.createElement('div', { style: { display: 'flex', alignItems: 'center', gap: 4 } },
+        React.createElement('span', { style: { display: 'inline-block', width: 10, height: 10, background: IL, borderRadius: 2 } }),
+        React.createElement('span', { style: { fontSize: 10, color: '#475569' } }, '🇮🇱 ישראל')
+      ),
+    ),
+    React.createElement('svg', { width: W, height: H },
+      ...years.flatMap((year, i) => {
+        const x0 = padL + i * groupW + 4;
+        const vge = ge[i]?.value || 0;
+        const vil = il[i]?.value || 0;
+        const hge = (vge / maxVal) * innerH;
+        const hil = (vil / maxVal) * innerH;
+        return [
+          // Georgia bar (right in RTL display, left in SVG since SVG is LTR)
+          React.createElement('rect', { key: `ge-${i}`, x: x0, y: padT + innerH - hge, width: barW, height: hge, fill: GE, rx: 2 }),
+          React.createElement('text', { key: `geL-${i}`, x: x0 + barW / 2, y: padT + innerH - hge - 3, fontSize: 8, fill: GE, fontWeight: '700', textAnchor: 'middle' }, `${(vge / 1000).toFixed(1)}K`),
+          // Israel bar
+          React.createElement('rect', { key: `il-${i}`, x: x0 + barW + 2, y: padT + innerH - hil, width: barW, height: hil, fill: IL, rx: 2 }),
+          React.createElement('text', { key: `ilL-${i}`, x: x0 + barW + 2 + barW / 2, y: padT + innerH - hil - 3, fontSize: 8, fill: IL, fontWeight: '700', textAnchor: 'middle' }, `${(vil / 1000).toFixed(1)}K`),
+          // Year label
+          React.createElement('text', { key: `y-${i}`, x: padL + i * groupW + groupW / 2, y: H - padB + 14, fontSize: 9, fill: '#64748b', textAnchor: 'middle' }, year),
+        ];
+      })
+    )
+  );
+}
+
 function Sparkline({ data, color, unit }: { data: Point[]; color: string; unit: string }) {
   if (data.length === 0) return null;
   const W = 300;
@@ -66,6 +116,11 @@ export default function FinanceStats() {
   const [mortgageHistory, setMortgageHistory] = useState<Point[]>([]);
   const [gdpHistory, setGdpHistory] = useState<Point[]>([]);
   const [gdpCurrent, setGdpCurrent] = useState<number | null>(null);
+  const [unemployment, setUnemployment] = useState<Point[]>([]);
+  const [unemploymentCurrent, setUnemploymentCurrent] = useState<number | null>(null);
+  const [gdpCapita, setGdpCapita] = useState<Point[]>([]);
+  const [gdpCapitaCurrent, setGdpCapitaCurrent] = useState<number | null>(null);
+  const [gdpCapitaIL, setGdpCapitaIL] = useState<Point[]>([]);
   const [updatedAt, setUpdatedAt] = useState<string>('');
   const [manual, setManual] = useState<any>({});
 
@@ -97,14 +152,43 @@ export default function FinanceStats() {
         if (pts.length > 0) setGdpCurrent(pts[pts.length - 1].value);
       } catch {}
 
+      try {
+        const r = await fetch('https://api.worldbank.org/v2/country/GE/indicator/SL.UEM.TOTL.ZS?format=json&per_page=12');
+        const j = await r.json();
+        const rows = (j[1] || []).filter((x: any) => x.value !== null).reverse();
+        const pts: Point[] = rows.slice(-4).map((x: any) => ({ year: x.date, value: Number(x.value.toFixed(2)) }));
+        setUnemployment(pts);
+        if (pts.length > 0) setUnemploymentCurrent(pts[pts.length - 1].value);
+      } catch {}
+
+      try {
+        const r = await fetch('https://api.worldbank.org/v2/country/GE/indicator/NY.GDP.PCAP.CD?format=json&per_page=12');
+        const j = await r.json();
+        const rows = (j[1] || []).filter((x: any) => x.value !== null).reverse();
+        const pts: Point[] = rows.slice(-6).map((x: any) => ({ year: x.date, value: Number(x.value.toFixed(0)) }));
+        setGdpCapita(pts);
+        if (pts.length > 0) setGdpCapitaCurrent(pts[pts.length - 1].value);
+      } catch {}
+
+      try {
+        const r = await fetch('https://api.worldbank.org/v2/country/IL/indicator/NY.GDP.PCAP.CD?format=json&per_page=12');
+        const j = await r.json();
+        const rows = (j[1] || []).filter((x: any) => x.value !== null).reverse();
+        const pts: Point[] = rows.slice(-6).map((x: any) => ({ year: x.date, value: Number(x.value.toFixed(0)) }));
+        setGdpCapitaIL(pts);
+      } catch {}
+
       setUpdatedAt(fmtDate(new Date()));
 
       try {
         const d: any = await fetchContent();
         if (d.financeStats) setManual(d.financeStats);
+        if (Array.isArray(d.financeStatsCustom)) setCustomIndicators(d.financeStatsCustom);
       } catch {}
     })();
   }, []);
+
+  const [customIndicators, setCustomIndicators] = useState<Array<{ id: string; label: string; unit: string; values: Record<string, string> }>>([]);
 
   const lastInflation = inflation.length > 0 ? inflation[inflation.length - 1] : null;
 
@@ -133,6 +217,42 @@ export default function FinanceStats() {
       color: '#10b981',
       date: manual?.gdp?.date,
     },
+    {
+      key: 'unemployment',
+      label: 'אבטלה',
+      value: unemploymentCurrent,
+      data: unemployment,
+      color: '#f59e0b',
+      date: null,
+    },
+    {
+      key: 'gdpCapita',
+      label: 'תמ"ג לנפש ($)',
+      value: gdpCapitaCurrent,
+      data: gdpCapita,
+      color: '#8b5cf6',
+      date: null,
+      unit: '$',
+    },
+    ...customIndicators
+      .filter(ci => ci.label && Object.values(ci.values).some(v => v !== ''))
+      .map((ci, i) => {
+        const series = Object.entries(ci.values)
+          .map(([y, v]) => ({ year: parseInt(y, 10), value: parseFloat(v) }))
+          .filter(s => !isNaN(s.year) && !isNaN(s.value))
+          .sort((a, b) => a.year - b.year);
+        const last = series.length > 0 ? series[series.length - 1].value : null;
+        const palette = ['#ec4899', '#06b6d4', '#84cc16', '#f97316', '#6366f1', '#14b8a6'];
+        return {
+          key: ci.id,
+          label: ci.label,
+          value: last,
+          data: series,
+          color: palette[i % palette.length],
+          date: null,
+          unit: ci.unit === '$' ? '$' : ci.unit,
+        };
+      }),
   ];
 
   const { width } = useWindowDimensions();
@@ -159,9 +279,13 @@ export default function FinanceStats() {
           <View key={c.key} style={[s.card, { width: SLIDE_W }]}>
             <View style={s.row}>
               <Text style={s.label}>{c.label}</Text>
-              {c.value != null && <Text style={s.value}>{c.value}%</Text>}
+              {c.value != null && c.key !== 'gdpCapita' && <Text style={s.value}>{(c as any).unit === '$' ? `$${Number(c.value).toLocaleString()}` : `${c.value}%`}</Text>}
             </View>
-            <Sparkline data={c.data} color={c.color} unit="%" />
+            {c.key === 'gdpCapita' ? (
+              <GdpBars ge={gdpCapita} il={gdpCapitaIL} />
+            ) : (
+              <Sparkline data={c.data} color={c.color} unit={(c as any).unit || '%'} />
+            )}
             <View style={s.footer}>
               <Text style={s.footerTxt}>{c.data.length > 0 ? `${c.data[0].year}–${c.data[c.data.length - 1].year}` : 'טוען…'}</Text>
               <Text style={s.footerTxt}>{c.date ? `עודכן ידנית: ${c.date}` : `עודכן: ${updatedAt}`}</Text>

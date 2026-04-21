@@ -28,7 +28,7 @@ export default function InfoPortal() {
 
   useEffect(() => {
     fetchContent().then(data => {
-      if (Array.isArray(data.infoPortal) && data.infoPortal.length) setItems(data.infoPortal);
+      if (Array.isArray(data.infoPortal) && data.infoPortal.length) setItems(data.infoPortal.filter((x: any) => x.visible !== false));
     }).catch(() => {});
   }, []);
 

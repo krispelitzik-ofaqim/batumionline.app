@@ -12,6 +12,7 @@ export default function CurrencyModal({ visible, onClose, bgColor }: { visible: 
   const [loading, setLoading] = useState(true);
   const [amount, setAmount] = useState('100');
   const [from, setFrom] = useState<keyof Rates>('ILS');
+  const [lastUpdate, setLastUpdate] = useState('');
 
   const loadRates = () => {
     setLoading(true);
@@ -20,6 +21,14 @@ export default function CurrencyModal({ visible, onClose, bgColor }: { visible: 
       .then(data => {
         if (data.rates) {
           setRates({ ILS: data.rates.ILS, GEL: data.rates.GEL, USD: 1, EUR: data.rates.EUR });
+        }
+        const src = data.time_last_update_utc || data.time_last_update_unix;
+        if (src) {
+          const d = typeof src === 'number' ? new Date(src * 1000) : new Date(src);
+          if (!isNaN(d.getTime())) {
+            const pad = (n: number) => String(n).padStart(2, '0');
+            setLastUpdate(`${pad(d.getDate())}/${pad(d.getMonth() + 1)} ${pad(d.getHours())}:${pad(d.getMinutes())}`);
+          }
         }
         setLoading(false);
       })
@@ -53,6 +62,7 @@ export default function CurrencyModal({ visible, onClose, bgColor }: { visible: 
         <View style={s.content}>
           <Text style={s.title}>המרת מטבעות</Text>
           <Text style={s.subtitle}>שערים מתעדכנים בזמן אמת</Text>
+          {lastUpdate ? <Text style={s.updatedTxt}>עודכן: {lastUpdate}</Text> : null}
           <TouchableOpacity style={s.refreshBtn} onPress={loadRates} disabled={loading}>
             {loading ? (
               <ActivityIndicator size="small" color={Colors.WHITE} />
@@ -125,7 +135,8 @@ const s = StyleSheet.create({
   closeX: { fontSize: 18, color: Colors.WHITE, fontWeight: '700' },
   content: { paddingHorizontal: 24, width: '100%', maxWidth: 480, alignSelf: 'center' },
   title: { fontSize: 28, fontWeight: '800', color: Colors.WHITE, textAlign: 'center', marginBottom: 4, writingDirection: 'rtl' },
-  subtitle: { fontSize: 14, color: Colors.WHITE, opacity: 0.7, textAlign: 'center', marginBottom: 12, writingDirection: 'rtl' },
+  subtitle: { fontSize: 14, color: Colors.WHITE, opacity: 0.7, textAlign: 'center', marginBottom: 4, writingDirection: 'rtl' },
+  updatedTxt: { fontSize: 11, color: Colors.WHITE, opacity: 0.6, textAlign: 'center', marginBottom: 12, writingDirection: 'rtl' },
   refreshBtn: {
     flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'center', gap: 8,
     alignSelf: 'center', backgroundColor: 'rgba(255,255,255,0.15)',
