@@ -439,7 +439,7 @@
               "text": "פרויקט ענק בבניין הקרוי בפי הישראלים הביצה. במבנה דירות המנוהלות על ידי חברת אליאנס אך ניתן גם לשכור דירות דרך אדם פרטי.",
               "image": "http://localhost:3001/uploads/alliance_palace_batumi.png",
               "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.64152,41.61598",
-              "pageUrl": "",
+              "pageUrl": "https://www.booking.com/searchresults.html?ss=Alliance%20Palace%20Batumi&nflt=ht_id%3D201",
               "coords": {
                 "lat": 41.64152,
                 "lng": 41.61598
@@ -452,7 +452,7 @@
               "text": "מתחם ענק של בניינים המציעים דירות להשכרה, לכל תקופה. חלקם מוצעים על ידי אנשים פרטיים וחלקם על ידי חברה המנהלת אותם מהלובי.",
               "image": "http://localhost:3001/uploads/orbi_city_correct.png",
               "mapUrl": "https://www.google.com/maps/dir//orbi+city",
-              "pageUrl": "",
+              "pageUrl": "https://www.booking.com/searchresults.html?ss=Orbi%20City%20Batumi&nflt=ht_id%3D201",
               "coords": {
                 "lat": 41.643,
                 "lng": 41.614
@@ -465,7 +465,7 @@
               "text": "מתחם הכולל שלושה בניינים על חוף הים. במתחם דירות סטודיו, דירות חדר ודירות עם מרפסת לים.",
               "image": "http://localhost:3001/uploads/batumi_view_correct.png",
               "mapUrl": "https://www.google.com/maps/dir//Batumi+View+Luxury",
-              "pageUrl": "",
+              "pageUrl": "https://www.booking.com/searchresults.html?ss=Batumi%20View%20Luxury%20Batumi&nflt=ht_id%3D201",
               "coords": {
                 "lat": 41.638,
                 "lng": 41.61
@@ -478,7 +478,7 @@
               "text": "פרויקט הכולל שני בניינים מרכזיים. בניין A מכיל את מלון הולידיי אין הבינלאומי. בניין B מכיל כולו דירות המושכרות באופן פרטי.",
               "image": "http://localhost:3001/uploads/blue_sky_correct.png",
               "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.63818,41.61828",
-              "pageUrl": "",
+              "pageUrl": "https://www.booking.com/searchresults.html?ss=Blue%20Sky%20Batumi&nflt=ht_id%3D201",
               "coords": {
                 "lat": 41.63818,
                 "lng": 41.61828
@@ -491,7 +491,7 @@
               "text": "מתחם נופש הכולל כמה בניינים מנוהלים, הפרויקט בנוי בצורה של חצי גורן (צורת U) שעוטפת חצר פנימית ענקית.",
               "image": "http://localhost:3001/uploads/white_sails_correct.png",
               "mapUrl": "https://www.google.com/maps/dir//White+Sails+Residential+Hotel",
-              "pageUrl": "",
+              "pageUrl": "https://www.booking.com/searchresults.html?ss=White%20Sails%20Batumi&nflt=ht_id%3D201",
               "coords": {
                 "lat": 41.635,
                 "lng": 41.608
@@ -504,7 +504,7 @@
               "text": "פרויקט המכיל שני בניינים. בניין A הינו הבניין השמאלי ויכיל בקומות הראשונות את מלון המפטון מרשת הילטון. בניין B כולו בית דירות פרטיות לטווח קצר וארוך.",
               "image": "http://localhost:3001/uploads/calligraphy_correct.png",
               "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.63615,41.62077",
-              "pageUrl": "",
+              "pageUrl": "https://www.booking.com/searchresults.html?ss=Calligraphy%20Batumi&nflt=ht_id%3D201",
               "coords": {
                 "lat": 41.63615,
                 "lng": 41.62077
@@ -517,7 +517,7 @@
               "text": "בניין שכולו דירות מנוהלות על ידי חברת ניהול. נמצא ברחוב שריף קימשאשווילי, על חוף הים מצד אחד ועל פארק העירוני מהצד השני.",
               "image": "http://localhost:3001/uploads/orbi_beach_correct.png",
               "mapUrl": "https://www.google.com/maps/dir//Orbi+Beach+Tower+Hotel",
-              "pageUrl": "",
+              "pageUrl": "https://www.booking.com/searchresults.html?ss=Orbi%20Beach%20Tower%20Batumi&nflt=ht_id%3D201",
               "coords": {
                 "lat": 41.6445,
                 "lng": 41.6155
@@ -530,7 +530,7 @@
               "text": "חברה המחזיקה דירות רבות בבטומי. במבנה זה שני פרויקטים. הבניין העגול ברובו הינו מלון ביליונר (לשעבר רמדה). הכניסה למלון מהחזית מרחוב פירוסמני.",
               "image": "http://localhost:3001/uploads/dar_correct.png",
               "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6420,41.6130",
-              "pageUrl": "",
+              "pageUrl": "https://www.booking.com/searchresults.html?ss=Dar%20Building%20Batumi&nflt=ht_id%3D201",
               "coords": {
                 "lat": 41.642,
                 "lng": 41.613
@@ -543,7 +543,7 @@
               "text": "פרויקט יוקרה הכולל מלון ודירות אירוח. מתחם ענק על חוף הים עם בריכת מי ים הנקראת פאלם לגונה.",
               "image": "http://localhost:3001/uploads/palm_apartments_batumi.png",
               "mapUrl": "https://www.google.com/maps/dir//PALM+APARTMENTS",
-              "pageUrl": "",
+              "pageUrl": "https://www.booking.com/searchresults.html?ss=Palm%20Apartments%20Batumi&nflt=ht_id%3D201",
               "coords": {
                 "lat": 41.633,
                 "lng": 41.606
@@ -556,7 +556,7 @@
               "text": "מגדל מגורים עם דירות להשכרה, חלקן מנוהלות על ידי Nova Concierge או Nova Luxe. הדירות ידועות כגדולות ומאובזרות, מתאימות מאוד למשפחות ולשהיות ארוכות.",
               "image": "http://localhost:3001/uploads/nova_correct2.png",
               "mapUrl": "https://www.google.com/maps/dir/?api=1&destination=41.6390,41.6110",
-              "pageUrl": "",
+              "pageUrl": "https://www.booking.com/searchresults.html?ss=Nova%20Apartments%20Batumi&nflt=ht_id%3D201",
               "coords": {
                 "lat": 41.639,
                 "lng": 41.611
@@ -569,7 +569,7 @@
               "text": "בית דירות מודרני ויפה סמוך לשדה התעופה, דבר שעלול לגרום לרעש. מתאים לחובבי תעופה או לכאלה שהרעש אינו מפריע. יתרון: מבודד וקרוב לחוף הים.",
               "image": "http://localhost:3001/uploads/aqua_correct.png",
               "mapUrl": "https://www.google.com/maps/dir//Aqua+Batumi+Hotel+%26+Apartments",
-              "pageUrl": "",
+              "pageUrl": "https://www.booking.com/searchresults.html?ss=Aqua%20Hotel%20%26%20Apartments%20Batumi&nflt=ht_id%3D201",
               "coords": {
                 "lat": 41.627,
                 "lng": 41.6
@@ -582,7 +582,7 @@
               "text": "בית דירות המכונה הבניין עם הגלים. ממוקם סמוך לקניון הגראנד וצופה לים. פרויקט של חברת אורבי.",
               "image": "http://localhost:3001/uploads/orbi_residence_batumi.png",
               "mapUrl": "https://www.google.com/maps/dir//Orbi+Residence+rooms+in+Batumi",
-              "pageUrl": "",
+              "pageUrl": "https://www.booking.com/searchresults.html?ss=Orbi%20Residence%20Batumi&nflt=ht_id%3D201",
               "coords": {
                 "lat": 41.646,
                 "lng": 41.6165
@@ -595,7 +595,7 @@
               "text": "מתחם הכולל מספר בניינים. אם מחפשים יוקרה ופינוק - Horizon Deluxe. אם מחפשים דירה פונקציונלית לשינה במחיר משתלם ליד הים - Horizon 1.",
               "image": "http://localhost:3001/uploads/horizon_towers_batumi.png",
               "mapUrl": "https://www.google.com/maps/dir//Horizon+Apart+Hotel+Official",
-              "pageUrl": "",
+              "pageUrl": "https://www.booking.com/searchresults.html?ss=Horizon%20Towers%20Batumi&nflt=ht_id%3D201",
               "coords": {
                 "lat": 41.634,
                 "lng": 41.607
@@ -608,7 +608,7 @@
               "text": "בניין מגורים עם דירות נופש רבות סמוך למגדל האלפאבית, על חוף הים עם חנייה תת קרקעית. אין קבלה מרכזית - דירות בבעלות פרטית דרך Airbnb.",
               "image": "http://localhost:3001/uploads/porta_correct.png",
               "mapUrl": "https://www.google.com/maps/dir//Porta+Batumi+Tower",
-              "pageUrl": "",
+              "pageUrl": "https://www.booking.com/searchresults.html?ss=Porta%20Batumi%20Tower%20Batumi&nflt=ht_id%3D201",
               "coords": {
                 "lat": 41.649,
                 "lng": 41.632
@@ -621,7 +621,7 @@
               "text": "בניין המגורים המרכזי של החברה. כולל בריכה על הגג ועיצוב מודרני. מזוהה עם הצבע הצהוב בלוגו, לכן מכונה Next Yellow באופן לא רשמי.",
               "image": "http://localhost:3001/uploads/next_correct.png",
               "mapUrl": "https://www.google.com/maps/dir//Next+Apartments",
-              "pageUrl": "",
+              "pageUrl": "https://www.booking.com/searchresults.html?ss=Next%20Apartments%20Batumi&nflt=ht_id%3D201",
               "coords": {
                 "lat": 41.64,
                 "lng": 41.612
@@ -638,7 +638,8 @@
                 "lat": 41.6455,
                 "lng": 41.616
               },
-              "visible": true
+              "visible": true,
+              "pageUrl": "https://www.booking.com/searchresults.html?ss=Orbi%20Sky%20Batumi&nflt=ht_id%3D201"
             }
           ],
           "longText": "<div style=\"font-family:Arial,sans-serif;background:#fff8e1;border-radius:12px;padding:12px;border:2px solid #f4a94e;margin-top:12px;direction:rtl;text-align:right;font-size:12px;line-height:1.5;color:#444\"><h3 style=\"color:#e65100;margin:0 0 8px;font-size:13px\">⚠️ לפני הזמנת דירת אירוח יש לבדוק:</h3><p style=\"margin:0 0 8px\">האם שם הפרויקט תואם את שם החברה, ישנם פרויקטים רבים המשתמשים כאמצעי שיווק בשמות של פרויקטים מוכרים, בפועל אין קשר ביניהם.</p><p style=\"margin:0 0 8px\">יש לוודא כי הפרויקט שבחרתם מתאים לציפיות: גודל הדירה, המרחק ליעדים שחיפשתם, מחיר, זמינות מעליות, נוף מוסתר על ידי בניין, תוספות מחיר לא צפויות, קזינו לא פעיל ועוד...</p><p style=\"margin:0\">יש לוודא כי בתקופת השהייה שלכם המתחם פעיל ב 100%, לעיתים לאחר ההזמנה נמסר כי הבריכה מושבתת או שהמעליות עובדות ב 50% ואפילו מקרים בהם התברר לנופשים כי המקום בשיפוצים, דבר הגורם לעוגמת נפש גדולה.</p></div>",
