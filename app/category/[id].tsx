@@ -1022,17 +1022,11 @@ export default function CategoryScreen() {
     <SafeAreaView style={[st.safe, darkCat && { backgroundColor: cat.heroBg || '#0f1419' }]}>
       <Stack.Screen options={{ headerShown: false }} />
       <DevicePreviewBar />
-      <View style={{ flexDirection: 'row-reverse', alignItems: 'center', paddingHorizontal: 8, paddingVertical: 8, gap: 4, borderBottomWidth: 1, borderBottomColor: 'rgba(0,0,0,0.06)' }}>
+      <View style={{ flexDirection: 'row-reverse', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 10, gap: 10, borderBottomWidth: 1, borderBottomColor: 'rgba(0,0,0,0.08)', backgroundColor: '#fff' }}>
+        <TouchableOpacity onPress={() => router.back()} style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: '#f1f5f9', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: '#e2e8f0' }}>
+          <Text style={{ fontSize: 22, color: '#1A6B8A', fontWeight: '900', lineHeight: 22 }}>←</Text>
+        </TouchableOpacity>
         {crumbs.length > 0 && <View style={{ flex: 1 }}><Breadcrumb crumbs={crumbs} /></View>}
-        {id === '1' ? (
-          <TouchableOpacity onPress={() => router.back()} style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: '#f1f5f9', alignItems: 'center', justifyContent: 'center' }}>
-            <Ionicons name="arrow-back" size={20} color="#1A6B8A" />
-          </TouchableOpacity>
-        ) : (
-          <TouchableOpacity onPress={() => router.back()} style={{ paddingHorizontal: 8, paddingVertical: 4 }}>
-            <Ionicons name="arrow-back" size={24} color={Colors.PRIMARY} />
-          </TouchableOpacity>
-        )}
       </View>
       {lockedOverlay}
       <ScrollView ref={scrollRef} showsVerticalScrollIndicator={false} style={{ maxWidth: w, alignSelf: 'center', width: '100%' }}>
