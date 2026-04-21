@@ -25,6 +25,8 @@ if (!fs.existsSync(DB_PATH)) {
 app.use(cors());
 app.use(express.json({ limit: '50mb', strict: false }));
 app.use('/uploads', express.static(UPLOADS_DIR));
+// Fallback: serve git-committed uploads when file not found in persistent volume
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // ─── Helpers ───────────────────────────────────────────────────
 
