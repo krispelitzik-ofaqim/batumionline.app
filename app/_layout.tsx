@@ -15,12 +15,9 @@ import { ThemeContext } from '../constants/theme';
 import { AdminContext } from '../constants/adminContext';
 import { PreviewContext, PreviewMode } from '../constants/previewContext';
 
-// Set Assistant as the default font for all Text and TextInput components
-const defaultTextStyle = { fontFamily: 'Assistant_400Regular' };
-(Text as any).defaultProps = (Text as any).defaultProps || {};
-(Text as any).defaultProps.style = [defaultTextStyle, (Text as any).defaultProps.style];
-(TextInput as any).defaultProps = (TextInput as any).defaultProps || {};
-(TextInput as any).defaultProps.style = [defaultTextStyle, (TextInput as any).defaultProps.style];
+// Note: Previously set Assistant font via Text.defaultProps — removed because
+// defaultProps is deprecated in React 19 and caused iOS crash on launch under
+// newArchEnabled=true. System font is used as fallback until we add a wrapper.
 
 const PREVIEW_WIDTHS: Record<string, number> = { mobile: 375, tablet: 768, desktop: 1024 };
 
