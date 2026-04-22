@@ -179,7 +179,7 @@ export default function AudioPlayer({ tracks: initialTracks, title, compact, onN
 
       {compact ? (
         <>
-          <View style={styles.topRow}>
+          {!playOnLeft && (<View style={styles.topRow}>
             <Text style={styles.titleText} numberOfLines={1}>{current?.title || `שיר ${activeIdx + 1}`}</Text>
             <View style={styles.topBtns}>
               <TouchableOpacity style={styles.skipCircle} onPress={() => skip(10)} activeOpacity={0.7}>
@@ -194,12 +194,38 @@ export default function AudioPlayer({ tracks: initialTracks, title, compact, onN
                 <Text style={styles.skipDirArrow}>⟵</Text>
               </TouchableOpacity>
             </View>
-          </View>
+          </View>)}
 
-          <View style={styles.progressBg}>
-            <View style={[styles.progressFill, { width: `${pct}%` }]} />
-          </View>
-          <View style={styles.timeRow}>
+          {playOnLeft ? (
+            <View style={styles.compactPlayRow}>
+              <TouchableOpacity style={styles.playBtnSmall} onPress={toggle} activeOpacity={0.85}>
+                <Text style={styles.playIconSmall}>{playing ? '❚❚' : '▶'}</Text>
+              </TouchableOpacity>
+              <View style={styles.compactProgressWrap}>
+                <Text style={[styles.titleText, { marginBottom: 2 }]} numberOfLines={1}>{current?.title || `שיר ${activeIdx + 1}`}</Text>
+                <View style={styles.progressBg}>
+                  <View style={[styles.progressFill, { width: `${pct}%` }]} />
+                </View>
+                <View style={styles.timeRowInline}>
+                  <Text style={styles.time}>{fmt(pos)}</Text>
+                  <View style={styles.speedInline}>
+                    {SPEEDS.map((sp, i) => (
+                      <TouchableOpacity key={sp} onPress={() => setSpeed(i)} activeOpacity={0.7}>
+                        <Text style={[styles.speedInlineTxt, i === speedIdx && styles.speedInlineTxtActive]}>{sp}x</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                  <Text style={styles.time}>{fmt(dur)}</Text>
+                </View>
+              </View>
+            </View>
+          ) : (
+            <View style={styles.progressBg}>
+              <View style={[styles.progressFill, { width: `${pct}%` }]} />
+            </View>
+          )}
+
+          {!playOnLeft && (<View style={styles.timeRow}>
             <Text style={styles.time}>{fmt(pos)}</Text>
             <View style={styles.speedInline}>
               {SPEEDS.map((sp, i) => (
@@ -209,7 +235,7 @@ export default function AudioPlayer({ tracks: initialTracks, title, compact, onN
               ))}
             </View>
             <Text style={styles.time}>{fmt(dur)}</Text>
-          </View>
+          </View>)}
         </>
       ) : (
         <>
@@ -347,6 +373,9 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.PRIMARY,
     alignItems: 'center', justifyContent: 'center',
   },
+  compactPlayRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 'auto' as any },
+  compactProgressWrap: { flex: 1 },
+  timeRowInline: { flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 },
   playIconSmall: { color: Colors.WHITE, fontSize: 12, fontWeight: '900', marginLeft: 2 },
   speedGroup: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   speedOpt: { paddingHorizontal: 4, paddingVertical: 2 },

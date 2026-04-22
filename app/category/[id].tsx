@@ -1168,7 +1168,7 @@ export default function CategoryScreen() {
             )}
             {cat.introAudio && (
               <View style={{ paddingHorizontal: 16, paddingTop: 4, paddingBottom: 8 }}>
-                <AudioPlayer tracks={[{ title: cat.title, url: cat.introAudio }]} compact />
+                <AudioPlayer tracks={[{ title: cat.title, url: cat.introAudio }]} compact playOnLeft={cat.id === 'casino'} />
               </View>
             )}
             {cat.hotels.filter(h => h.visible !== false).map(h => (
