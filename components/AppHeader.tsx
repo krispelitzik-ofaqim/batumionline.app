@@ -16,7 +16,7 @@ export default function AppHeader({ crumbs = [], dark = false }: { crumbs?: Crum
   return (
     <View style={[s.container, { backgroundColor: bg, borderBottomColor: borderColor }]}>
       <View style={s.crumbs}>
-        <Breadcrumb crumbs={crumbs} />
+        <Breadcrumb crumbs={crumbs} dark={dark} />
       </View>
     </View>
   );

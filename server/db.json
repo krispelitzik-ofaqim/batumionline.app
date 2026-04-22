@@ -9312,7 +9312,7 @@
   },
   "subscribers": [],
   "extraGroupVisible": false,
-  "showDevBar": true,
+  "showDevBar": false,
   "groupVisibility": {
     "welcome": true,
     "side": false,
