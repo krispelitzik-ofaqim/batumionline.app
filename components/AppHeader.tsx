@@ -17,7 +17,7 @@ export default function AppHeader({ crumbs = [], dark = false }: { crumbs?: Crum
     <View style={[s.container, { backgroundColor: bg, borderBottomColor: borderColor }]}>
       <TouchableOpacity
         onPress={() => router.back()}
-        style={[s.backBtn, { backgroundColor: buttonBg, borderColor: arrowBorder }]}
+        style={s.backBtn}
         accessibilityLabel="חזור"
       >
         <Text style={[s.arrow, { color: arrowColor }]}>←</Text>
@@ -46,19 +46,17 @@ const s = StyleSheet.create({
   backBtn: {
     position: 'absolute',
     left: 12,
-    top: 6,
+    top: 0,
+    bottom: 0,
     width: 40,
-    height: 40,
-    borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
     zIndex: 10,
   },
   arrow: {
-    fontSize: 22,
+    fontSize: 26,
     fontWeight: '900',
-    lineHeight: 22,
+    lineHeight: 26,
   },
   backBtn: {
     width: 40,
