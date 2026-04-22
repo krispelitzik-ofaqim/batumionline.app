@@ -9401,7 +9401,7 @@
   },
   "subscribers": [],
   "extraGroupVisible": false,
-  "showDevBar": false,
+  "showDevBar": true,
   "groupVisibility": {
     "welcome": true,
     "side": false,

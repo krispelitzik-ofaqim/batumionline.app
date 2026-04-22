@@ -13,9 +13,10 @@ const PLACEHOLDER_IMAGES: Record<Topic, string> = {
   food: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600&q=80',
   entertainment: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=600&q=80',
   general: 'https://images.unsplash.com/photo-1555993539-1732b0258235?w=600&q=80',
+  israel: 'https://images.unsplash.com/photo-1544866092-1935c5ef2a8f?w=600&q=80',
 };
 
-type Topic = 'tourism' | 'realestate' | 'food' | 'entertainment' | 'general';
+type Topic = 'tourism' | 'realestate' | 'food' | 'entertainment' | 'general' | 'israel';
 
 const TOPIC_COLORS: Record<Topic, string> = {
   tourism: '#2ecc71',
@@ -23,6 +24,7 @@ const TOPIC_COLORS: Record<Topic, string> = {
   food: '#F4A94E',
   entertainment: '#9b59b6',
   general: '#1A6B8A',
+  israel: '#0038b8',
 };
 
 const TOPIC_LABELS: Record<Topic, string> = {
@@ -31,6 +33,7 @@ const TOPIC_LABELS: Record<Topic, string> = {
   food: 'אוכל ומסעדות',
   entertainment: 'בילוי ואירועים',
   general: 'כללי',
+  israel: '🇮🇱 מישראל',
 };
 
 type NewsItem = {
@@ -78,6 +81,7 @@ export default function NewsModal({ visible, onClose, bgColor }: { visible: bool
     food: 'Batumi restaurants food',
     entertainment: 'Batumi events nightlife',
     general: 'Batumi Georgia news',
+    israel: 'בטומי site:ynet.co.il OR site:walla.co.il OR site:mako.co.il OR site:globes.co.il OR site:calcalist.co.il OR site:israelhayom.co.il',
   };
 
   // ─── NewsAPI — fetch per topic ──────────────────────────────
