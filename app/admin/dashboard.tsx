@@ -952,7 +952,7 @@ function EditModal({
             <View style={ms.fieldGroup}>
               <Text style={ms.label}>אייקון (תמונה)</Text>
               <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 12 }}>
-                {form.icon && (form.icon.startsWith('data:') || form.icon.startsWith('http')) ? (
+                {form.icon && (form.icon.startsWith('data:') || form.icon.startsWith('http') || form.icon.startsWith('/')) ? (
                   React.createElement('img', {
                     src: form.icon,
                     style: {
@@ -1313,7 +1313,7 @@ function EditModal({
                         </TouchableOpacity>
                       </View>
                     </View>
-                    {hb.image && (hb.image.startsWith('http') || hb.image.startsWith('data:')) ? (
+                    {hb.image && (hb.image.startsWith('http') || hb.image.startsWith('data:') || hb.image.startsWith('/')) ? (
                       React.createElement('img', { src: hb.image, style: { width: '100%', height: 120, objectFit: 'cover', borderRadius: 8, marginBottom: 8 }, alt: '' })
                     ) : (
                       <View style={{ width: '100%', height: 120, backgroundColor: '#fee2e2', borderRadius: 8, marginBottom: 8, alignItems: 'center', justifyContent: 'center' }}>
@@ -3765,7 +3765,7 @@ export default function AdminDashboard() {
               </View>
 
               <View style={[cs.colorBar, { backgroundColor: item.bg }]} />
-              {item.icon && (item.icon.startsWith('data:') || item.icon.startsWith('http'))
+              {item.icon && (item.icon.startsWith('data:') || item.icon.startsWith('http') || item.icon.startsWith('/'))
                 ? (Platform.OS === 'web'
                     ? React.createElement('img', { src: item.icon, style: { width: 60, height: 36, objectFit: 'cover', borderRadius: 6 }, alt: '' })
                     : null)
