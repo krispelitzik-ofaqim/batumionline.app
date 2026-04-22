@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, Platform, Image, TouchableOpacity, Linking } from 'react-native';
-import { useLocalSearchParams, Stack } from 'expo-router';
+import { useLocalSearchParams, Stack, router } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '../../constants/colors';
@@ -69,7 +69,10 @@ export default function WelcomeScreen() {
 
   return (
     <SafeAreaView style={styles.safe}>
-      <Stack.Screen options={{ headerShown: true, title: item.title, headerBackTitle: 'חזרה' }} />
+      <Stack.Screen options={{ headerShown: false }} />
+      <TouchableOpacity onPress={() => router.back()} style={styles.backFab} accessibilityLabel="חזור">
+        <Text style={styles.backFabArrow}>←</Text>
+      </TouchableOpacity>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
         <View style={styles.heroWrap}>
           {item.icon && (item.icon.startsWith('http') || item.icon.startsWith('data:') || item.icon.startsWith('/')) ? (
@@ -168,6 +171,8 @@ export default function WelcomeScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.BACKGROUND },
+  backFab: { position: 'absolute', top: 50, left: 12, zIndex: 50, width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.95)', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: '#e2e8f0', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 4 },
+  backFabArrow: { fontSize: 22, color: Colors.PRIMARY, fontWeight: '900', lineHeight: 22 },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   loadTxt: { fontSize: 16, color: '#999' },
   content: { padding: 16, paddingBottom: 40 },
