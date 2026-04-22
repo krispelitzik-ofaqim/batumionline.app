@@ -171,8 +171,8 @@ export default function WelcomeScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.BACKGROUND },
-  backFab: { position: 'absolute', top: 50, left: 12, zIndex: 50, width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.95)', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: '#e2e8f0', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 4 },
-  backFabArrow: { fontSize: 22, color: Colors.PRIMARY, fontWeight: '900', lineHeight: 22 },
+  backFab: { position: 'absolute', top: 16, left: 16, zIndex: 50, width: 38, height: 38, borderRadius: 19, backgroundColor: 'rgba(0,0,0,0.4)', alignItems: 'center', justifyContent: 'center' },
+  backFabArrow: { fontSize: 22, color: '#fff', fontWeight: '900' },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   loadTxt: { fontSize: 16, color: '#999' },
   content: { padding: 16, paddingBottom: 40 },
