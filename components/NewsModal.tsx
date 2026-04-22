@@ -125,7 +125,7 @@ export default function NewsModal({ visible, onClose, bgColor }: { visible: bool
               `https://api.rss2json.com/v1/api.json?rss_url=https://news.google.com/rss/search?q=${q}%26hl=he%26gl=IL%26ceid=IL:he`
             );
             const data = await res.json();
-            return (data.items || []).slice(0, 4).map((item: any) => ({
+            return (data.items || []).slice(0, 8).map((item: any) => ({
               title: item.title || '',
               summary: item.description?.replace(/<[^>]+>/g, '').slice(0, 250) || '',
               image: item.enclosure?.link || item.thumbnail || '',
@@ -159,7 +159,7 @@ export default function NewsModal({ visible, onClose, bgColor }: { visible: bool
   };
 
   const baseFiltered = filter === 'all' ? news : news.filter(n => n.topic === filter);
-  const MIN_ITEMS = 3;
+  const MIN_ITEMS = 5;
   const filtered = baseFiltered.length >= MIN_ITEMS
     ? baseFiltered
     : [
