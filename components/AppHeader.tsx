@@ -37,7 +37,7 @@ const s = StyleSheet.create({
     alignItems: 'center',
     paddingLeft: 12,
     paddingRight: 0,
-    gap: 10,
+    gap: 24,
     borderBottomWidth: 1,
   },
   backBtn: {
