@@ -42,6 +42,7 @@ const AIRLINE_LOGOS: Record<string, any> = {
   W6: require('../assets/images/flights/W6.png'),
   U2: require('../assets/images/flights/U2.png'),
   IZ: require('../assets/images/flights/IZ.png'),
+  TK: require('../assets/images/flights/TK.png'),
 };
 
 export default function FlightsModal({ visible, onClose, bgColor }: { visible: boolean; onClose: () => void; bgColor: string }) {
@@ -115,7 +116,6 @@ export default function FlightsModal({ visible, onClose, bgColor }: { visible: b
       });
 
       const arrivals: Flight[] = (data.arrivals || [])
-        .filter((f: any) => f.departure?.airport?.iata === 'TLV')
         .map((f: any) => ({
           flight: f.number || '—',
           airline: f.airline?.name || '',
@@ -129,7 +129,6 @@ export default function FlightsModal({ visible, onClose, bgColor }: { visible: b
         }));
 
       const departures: Flight[] = (data.departures || [])
-        .filter((f: any) => f.arrival?.airport?.iata === 'TLV')
         .map((f: any) => ({
           flight: f.number || '—',
           airline: f.airline?.name || '',
@@ -328,11 +327,11 @@ export default function FlightsModal({ visible, onClose, bgColor }: { visible: b
               {filtered.length > 0 && (
                 <View style={s.tableHeader}>
                   <Text style={[s.thCell, { width: 36, textAlign: 'center' }]}></Text>
-                  <Text style={[s.thCell, { flex: 1, textAlign: 'right' }]}>טיסה</Text>
+                  <Text style={[s.thCell, { flex: 1, textAlign: 'right', paddingLeft: 4 }]}>טיסה</Text>
                   <Text style={[s.thCell, { width: 48, textAlign: 'center' }]}>המראה</Text>
-                  <Text style={[s.thCell, { width: 16, marginHorizontal: 2 }]}></Text>
+                  <Text style={[s.thCell, { width: 16, marginHorizontal: 2, textAlign: 'center' }]}></Text>
                   <Text style={[s.thCell, { width: 48, textAlign: 'center' }]}>נחיתה</Text>
-                  <Text style={[s.thCell, { textAlign: 'center' }]}>סטטוס</Text>
+                  <Text style={[s.thCell, { width: 80, textAlign: 'center' }]}>סטטוס</Text>
                 </View>
               )}
 
@@ -594,7 +593,7 @@ const s = StyleSheet.create({
   timeDateLabel: { fontSize: 10, color: Colors.WHITE, opacity: 0.6, marginTop: 1 },
   timeLabel: { fontSize: 10, color: Colors.WHITE, opacity: 0.4, marginTop: 1 },
   timeArrow: { fontSize: 12, color: Colors.WHITE, opacity: 0.3, marginHorizontal: 2 },
-  statusBadge: { paddingVertical: 5, paddingHorizontal: 10, borderRadius: 8, alignItems: 'center', alignSelf: 'center' },
+  statusBadge: { paddingVertical: 5, paddingHorizontal: 6, borderRadius: 8, alignItems: 'center', alignSelf: 'center', width: 80 },
   statusTxt: { fontSize: 11, fontWeight: '700', color: Colors.WHITE, writingDirection: 'rtl' },
 
   detailsOverlay: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(10,20,30,0.96)', zIndex: 100 },
