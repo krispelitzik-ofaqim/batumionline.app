@@ -16,6 +16,7 @@ import AudioPlayer from '../../components/AudioPlayer';
 import FlightsModal from '../../components/FlightsModal';
 import BottomTabBar from '../../components/BottomTabBar';
 import Breadcrumb from '../../components/Breadcrumb';
+import AppHeader from '../../components/AppHeader';
 
 type Hotel = { id: string; title: string; titleEn?: string; text: string; image: string; mapUrl?: string; pageUrl?: string; coords?: { lat: number; lng: number }; visible?: boolean; images?: string[]; amenities?: string[]; price?: string; audio?: string };
 type TourBlock = { id: string; title: string; subtitle?: string; text: string; color: string; images: string[]; audios: { title?: string; url: string }[]; visible?: boolean; coords?: { lat: number; lng: number } };
@@ -1022,19 +1023,7 @@ export default function CategoryScreen() {
     <SafeAreaView style={[st.safe, darkCat && { backgroundColor: cat.heroBg || '#0f1419' }]}>
       <Stack.Screen options={{ headerShown: false }} />
       <DevicePreviewBar />
-      <View style={{ flexDirection: 'row-reverse', alignItems: 'center', paddingHorizontal: id === '1' ? 12 : 8, paddingVertical: id === '1' ? 10 : 8, gap: id === '1' ? 10 : 4, borderBottomWidth: 1, borderBottomColor: id === '1' ? 'rgba(0,0,0,0.08)' : 'rgba(0,0,0,0.06)', backgroundColor: id === '1' ? '#fff' : undefined }}>
-        {id === '1' ? (
-          <TouchableOpacity onPress={() => router.back()} style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: '#f1f5f9', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: '#e2e8f0' }}>
-            <Text style={{ fontSize: 22, color: '#1A6B8A', fontWeight: '900', lineHeight: 22 }}>←</Text>
-          </TouchableOpacity>
-        ) : null}
-        {crumbs.length > 0 && <View style={{ flex: 1 }}><Breadcrumb crumbs={crumbs} /></View>}
-        {id !== '1' && (
-          <TouchableOpacity onPress={() => router.back()} style={{ paddingHorizontal: 8, paddingVertical: 4 }}>
-            <Ionicons name="arrow-back" size={24} color={Colors.PRIMARY} />
-          </TouchableOpacity>
-        )}
-      </View>
+      <AppHeader crumbs={crumbs} dark={darkCat} />
       {lockedOverlay}
       <ScrollView ref={scrollRef} showsVerticalScrollIndicator={false} style={{ maxWidth: w, alignSelf: 'center', width: '100%' }}>
         {cat.heroImage ? (
