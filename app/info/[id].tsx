@@ -53,8 +53,8 @@ export default function InfoPage() {
     const hasImage = portalItem.image && (portalItem.image.startsWith('http') || portalItem.image.startsWith('data:') || portalItem.image.startsWith('/'));
     return (
       <View style={styles.container}>
-        <TouchableOpacity style={{ position: 'absolute', top: 16, right: 16, zIndex: 10, width: 38, height: 38, borderRadius: 19, backgroundColor: 'rgba(0,0,0,0.4)', alignItems: 'center', justifyContent: 'center' }} onPress={() => router.back()}>
-          <Text style={{ fontSize: 26, color: '#fff', fontWeight: '800', marginTop: -2 }}>‹</Text>
+        <TouchableOpacity style={{ position: 'absolute', top: 16, left: 16, zIndex: 10, width: 38, height: 38, borderRadius: 19, backgroundColor: 'rgba(0,0,0,0.4)', alignItems: 'center', justifyContent: 'center' }} onPress={() => router.back()}>
+          <Text style={{ fontSize: 22, color: '#fff', fontWeight: '900' }}>←</Text>
         </TouchableOpacity>
         <ScrollView contentContainerStyle={{ paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
           <View style={{ position: 'relative' }}>
