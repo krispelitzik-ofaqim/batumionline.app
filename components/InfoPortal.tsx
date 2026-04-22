@@ -62,7 +62,7 @@ export default function InfoPortal() {
 
   if (total === 0) return null;
 
-  const selectedIsImage = !!selected && (selected.icon.startsWith('data:') || selected.icon.startsWith('http'));
+  const selectedIsImage = !!selected && (selected.icon.startsWith('data:') || selected.icon.startsWith('http') || selected.icon.startsWith('/'));
 
   return (
     <View>
@@ -79,7 +79,7 @@ export default function InfoPortal() {
           scrollEventThrottle={16}
         >
           {tripled.map((item, i) => {
-            const isImage = !!item.icon && (item.icon.startsWith('data:') || item.icon.startsWith('http'));
+            const isImage = !!item.icon && (item.icon.startsWith('data:') || item.icon.startsWith('http') || item.icon.startsWith('/'));
             return (
               <TouchableOpacity key={`${item.id}-${i}`} activeOpacity={0.85} style={styles.card} onPress={() => router.push(`/info/${item.id}` as any)}>
                 <View style={[styles.cardTop, { backgroundColor: item.bg || Colors.SECONDARY + '25' }]}>

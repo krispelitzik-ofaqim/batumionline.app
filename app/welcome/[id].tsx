@@ -72,7 +72,7 @@ export default function WelcomeScreen() {
       <Stack.Screen options={{ headerShown: true, title: item.title, headerBackTitle: 'חזרה' }} />
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
         <View style={styles.heroWrap}>
-          {item.icon && (item.icon.startsWith('http') || item.icon.startsWith('data:')) ? (
+          {item.icon && (item.icon.startsWith('http') || item.icon.startsWith('data:') || item.icon.startsWith('/')) ? (
             Platform.OS === 'web' ? (
               React.createElement('img', {
                 src: item.icon,

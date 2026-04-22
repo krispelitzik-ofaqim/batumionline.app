@@ -83,7 +83,7 @@ export default function WelcomeSlider() {
   }, [singleWidth]);
 
   const renderCard = (item: Item, idx: number) => {
-    const isImage = !!item.icon && (item.icon.startsWith('data:') || item.icon.startsWith('http'));
+    const isImage = !!item.icon && (item.icon.startsWith('data:') || item.icon.startsWith('http') || item.icon.startsWith('/'));
     return (
       <TouchableOpacity key={`${item.id}-${idx}`} style={styles.card} activeOpacity={0.7} onPress={() => { if (item.id === '1') fireConfetti(); router.push(`/welcome/${item.id}` as any); }}>
         {isImage ? (

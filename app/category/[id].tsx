@@ -789,7 +789,7 @@ function HotelMap({ coords, title, onClose }: { coords: { lat: number; lng: numb
 }
 
 function SubCard({ item, width, onPress }: { item: Item; width: number; onPress: () => void }) {
-  const iconIsImage = !!item.icon && (item.icon.startsWith('data:') || item.icon.startsWith('http'));
+  const iconIsImage = !!item.icon && (item.icon.startsWith('data:') || item.icon.startsWith('http') || item.icon.startsWith('/'));
   const bg = item.bg || '#3DA5C4';
   const bgDark = item.bgDark || '#1A6B8A';
   return (
@@ -810,7 +810,7 @@ function SubCard({ item, width, onPress }: { item: Item; width: number; onPress:
 }
 
 function SubBanner({ item, width, onPress }: { item: Item; width: number; onPress: () => void }) {
-  const iconIsImage = !!item.icon && (item.icon.startsWith('data:') || item.icon.startsWith('http'));
+  const iconIsImage = !!item.icon && (item.icon.startsWith('data:') || item.icon.startsWith('http') || item.icon.startsWith('/'));
   const bg = item.bg || '#3DA5C4';
   const bgDark = item.bgDark || '#1A6B8A';
   return (

@@ -104,7 +104,7 @@ function isDark(bg: string) {
 }
 
 function CatCard({ item, width }: { item: CatItem; width: number }) {
-  const iconIsImage = !!item.icon && (item.icon.startsWith('data:') || item.icon.startsWith('http'));
+  const iconIsImage = !!item.icon && (item.icon.startsWith('data:') || item.icon.startsWith('http') || item.icon.startsWith('/'));
   return (
     <TouchableOpacity
       style={[styles.card, { width }]}

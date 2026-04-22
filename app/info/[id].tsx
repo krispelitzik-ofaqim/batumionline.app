@@ -50,7 +50,7 @@ export default function InfoPage() {
   }, [id]);
 
   if (!isLegal && portalItem) {
-    const hasImage = portalItem.image && (portalItem.image.startsWith('http') || portalItem.image.startsWith('data:'));
+    const hasImage = portalItem.image && (portalItem.image.startsWith('http') || portalItem.image.startsWith('data:') || portalItem.image.startsWith('/'));
     return (
       <View style={styles.container}>
         <TouchableOpacity style={{ position: 'absolute', top: 16, right: 16, zIndex: 10, width: 38, height: 38, borderRadius: 19, backgroundColor: 'rgba(0,0,0,0.4)', alignItems: 'center', justifyContent: 'center' }} onPress={() => router.back()}>
