@@ -313,7 +313,7 @@ const styles = StyleSheet.create({
   },
   header: { fontSize: 13, color: '#888', fontWeight: '700', writingDirection: 'rtl', textAlign: 'right', marginBottom: 6 },
   nowTitle: { fontSize: 17, fontWeight: '900', color: Colors.TEXT, writingDirection: 'rtl', textAlign: 'right', marginBottom: 14 },
-  row: { flexDirection: 'row-reverse', alignItems: 'center', gap: 14 },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 14 },
   playBtn: {
     width: 54, height: 54, borderRadius: 27,
     backgroundColor: Colors.PRIMARY,
