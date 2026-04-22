@@ -38,7 +38,7 @@ export default function Breadcrumb({ crumbs }: { crumbs: Crumb[] }) {
 
 const s = StyleSheet.create({
   bar: { backgroundColor: 'transparent', maxHeight: 48 },
-  content: { flexDirection: 'row-reverse', alignItems: 'center', paddingHorizontal: 4, paddingVertical: 4, gap: 2 },
+  content: { flexDirection: 'row-reverse', alignItems: 'center', paddingLeft: 4, paddingRight: 8, paddingVertical: 4, gap: 2 },
   row: { flexDirection: 'row-reverse', alignItems: 'center' },
   crumb: { fontSize: 17, color: Colors.TEXT + '99', fontWeight: '600', writingDirection: 'rtl' },
   link: { color: Colors.PRIMARY },
