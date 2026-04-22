@@ -58,17 +58,4 @@ const s = StyleSheet.create({
     fontWeight: '900',
     lineHeight: 26,
   },
-  backBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-  },
-  arrow: {
-    fontSize: 22,
-    fontWeight: '900',
-    lineHeight: 22,
-  },
 });
