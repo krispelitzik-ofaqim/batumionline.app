@@ -8,6 +8,7 @@ import {
   useWindowDimensions,
   Image,
   ImageBackground,
+  Platform,
 } from 'react-native';
 import { ThemeContext } from '../../constants/theme';
 import { AdminContext } from '../../constants/adminContext';
