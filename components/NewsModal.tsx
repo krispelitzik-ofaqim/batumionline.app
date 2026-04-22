@@ -12,18 +12,16 @@ const PLACEHOLDER_IMAGES: Record<Topic, string> = {
   realestate: 'https://images.unsplash.com/photo-1582407947092-45795aba4166?w=600&q=80',
   food: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600&q=80',
   entertainment: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=600&q=80',
-  general: 'https://images.unsplash.com/photo-1555993539-1732b0258235?w=600&q=80',
   israel: 'https://images.unsplash.com/photo-1544866092-1935c5ef2a8f?w=600&q=80',
 };
 
-type Topic = 'tourism' | 'realestate' | 'food' | 'entertainment' | 'general' | 'israel';
+type Topic = 'tourism' | 'realestate' | 'food' | 'entertainment' | 'israel';
 
 const TOPIC_COLORS: Record<Topic, string> = {
   tourism: '#2ecc71',
   realestate: '#3498db',
   food: '#F4A94E',
   entertainment: '#9b59b6',
-  general: '#1A6B8A',
   israel: '#0038b8',
 };
 
@@ -32,7 +30,6 @@ const TOPIC_LABELS: Record<Topic, string> = {
   realestate: 'נדל״ן',
   food: 'אוכל ומסעדות',
   entertainment: 'בילוי ואירועים',
-  general: 'כללי',
   israel: '🇮🇱 מישראל',
 };
 
@@ -53,7 +50,7 @@ function detectTopic(text: string): Topic {
   if (/real.?estate|נדל.?ן|דירה|בנייה|השקע|invest|property|apartment/.test(t)) return 'realestate';
   if (/restaurant|food|wine|יין|מסעד|אוכל|קולינר|שף|chef|cuisine/.test(t)) return 'food';
   if (/festival|concert|nightlife|בילוי|אירוע|פסטיבל|מופע|מסיב|club|bar/.test(t)) return 'entertainment';
-  return 'general';
+  return 'tourism';
 }
 
 export default function NewsModal({ visible, onClose, bgColor }: { visible: boolean; onClose: () => void; bgColor: string }) {
@@ -80,7 +77,6 @@ export default function NewsModal({ visible, onClose, bgColor }: { visible: bool
     realestate: 'Batumi real estate property',
     food: 'Batumi restaurants food',
     entertainment: 'Batumi events nightlife',
-    general: 'Batumi Georgia news',
     israel: 'בטומי site:ynet.co.il OR site:walla.co.il OR site:mako.co.il OR site:globes.co.il OR site:calcalist.co.il OR site:israelhayom.co.il',
   };
 
@@ -335,7 +331,7 @@ const FALLBACK_NEWS: NewsItem[] = [
   {
     title: 'גאורגיה מקלה על תנאי הכניסה: ללא ויזה לישראלים עד שנה',
     summary: 'ממשלת גאורגיה הודיעה על הארכת פטור הוויזה לאזרחי ישראל לתקופה של עד 365 ימים. המהלך נועד לעודד תיירות והשקעות. בנוסף, הושק מסלול מהיר חדש בנמל התעופה בבטומי לתיירים מישראל.',
-    image: '', link: '', source: 'Ynet', date: formatDate(daysAgoISO(2)), topic: 'general',
+    image: '', link: '', source: 'Ynet', date: formatDate(daysAgoISO(2)), topic: 'israel',
   },
   {
     title: 'קו רכבל חדש יחבר את בטומי להרי הקווקז',
