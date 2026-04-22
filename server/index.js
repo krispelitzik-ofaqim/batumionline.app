@@ -4,6 +4,9 @@ const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
 const multer = require('multer');
+let Expo = null;
+try { Expo = require('expo-server-sdk').Expo; } catch (e) { console.warn('expo-server-sdk not available'); }
+const expoClient = Expo ? new Expo() : null;
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -133,6 +136,113 @@ app.put('/api/content/:section', (req, res) => {
     res.json({ success: true, message: `Section "${section}" updated` });
   } catch (err) {
     res.status(500).json({ success: false, error: 'Failed to write database' });
+  }
+});
+
+app.post('/api/push/register', (req, res) => {
+  try {
+    const { token, platform } = req.body || {};
+    if (!token || !String(token).startsWith('ExponentPushToken')) return res.status(400).json({ success: false, error: 'invalid token' });
+    const data = readDB();
+    const tokens = Array.isArray(data.pushTokens) ? data.pushTokens : [];
+    const now = new Date().toISOString();
+    const existing = tokens.find(t => t.token === token);
+    if (existing) { existing.lastSeen = now; if (platform) existing.platform = platform; }
+    else tokens.push({ token, platform: platform || 'unknown', registeredAt: now, lastSeen: now });
+    data.pushTokens = tokens;
+    writeDB(data);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ success: false, error: 'server error' });
+  }
+});
+
+app.post('/api/push/send', async (req, res) => {
+  try {
+    if (!expoClient) return res.status(500).json({ success: false, error: 'push server not available' });
+    const { title, body, data: extra } = req.body || {};
+    if (!title || !body) return res.status(400).json({ success: false, error: 'title and body required' });
+    const db = readDB();
+    const tokens = Array.isArray(db.pushTokens) ? db.pushTokens : [];
+    const messages = [];
+    for (const t of tokens) {
+      if (!Expo.isExpoPushToken(t.token)) continue;
+      messages.push({ to: t.token, sound: 'default', title, body, data: extra || {} });
+    }
+    if (messages.length === 0) return res.json({ success: true, sent: 0 });
+    const chunks = expoClient.chunkPushNotifications(messages);
+    const tickets = [];
+    for (const chunk of chunks) {
+      try { const r = await expoClient.sendPushNotificationsAsync(chunk); tickets.push(...r); } catch (e) { console.warn('push chunk error', e); }
+    }
+    db.pushHistory = (db.pushHistory || []).concat([{ id: `ph_${Date.now()}`, title, body, data: extra || {}, sentAt: new Date().toISOString(), count: messages.length }]).slice(-50);
+    writeDB(db);
+    res.json({ success: true, sent: messages.length, tickets });
+  } catch (err) {
+    res.status(500).json({ success: false, error: String(err && err.message || err) });
+  }
+});
+
+app.get('/api/push/tokens', (req, res) => {
+  try {
+    const data = readDB();
+    res.json({ success: true, count: (data.pushTokens || []).length, history: data.pushHistory || [] });
+  } catch (err) { res.status(500).json({ success: false }); }
+});
+
+app.post('/api/coupons/validate', (req, res) => {
+  try {
+    const { code } = req.body || {};
+    if (!code || !String(code).trim()) return res.status(400).json({ success: false, error: 'code required' });
+    const data = readDB();
+    const list = Array.isArray(data.coupons) ? data.coupons : [];
+    const c = list.find(x => String(x.code || '').trim().toUpperCase() === String(code).trim().toUpperCase());
+    if (!c) return res.json({ success: false, error: 'קוד לא נמצא' });
+    if (!c.visible) return res.json({ success: false, error: 'קוד אינו פעיל' });
+    const now = new Date();
+    if (c.startAt && new Date(c.startAt) > now) return res.json({ success: false, error: 'הקוד עוד לא בתוקף' });
+    if (c.endAt && new Date(c.endAt + 'T23:59:59') < now) return res.json({ success: false, error: 'הקוד פג תוקף' });
+    if (typeof c.maxUses === 'number' && c.maxUses > 0 && (c.usedCount || 0) >= c.maxUses) return res.json({ success: false, error: 'הקוד נוצל במלואו' });
+    c.usedCount = (c.usedCount || 0) + 1;
+    c.lastUsedAt = new Date().toISOString();
+    data.coupons = list.map(x => x.id === c.id ? c : x);
+    writeDB(data);
+    res.json({ success: true, coupon: { id: c.id, code: c.code, type: c.type, value: c.value, label: c.label || '' } });
+  } catch (err) {
+    res.status(500).json({ success: false, error: 'server error' });
+  }
+});
+
+app.post('/api/contact', (req, res) => {
+  try {
+    const { name, email, message } = req.body || {};
+    if (!name || !String(name).trim() || !message || !String(message).trim()) {
+      return res.status(400).json({ success: false, error: 'name and message are required' });
+    }
+    const data = readDB();
+    const submissions = Array.isArray(data.contactSubmissions) ? data.contactSubmissions : [];
+    submissions.unshift({
+      id: `${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      name: String(name).trim(),
+      email: String(email || '').trim(),
+      message: String(message).trim(),
+      createdAt: new Date().toISOString(),
+      read: false,
+    });
+    data.contactSubmissions = submissions.slice(0, 500);
+    writeDB(data);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ success: false, error: 'Failed to save submission' });
+  }
+});
+
+app.get('/api/contact', (req, res) => {
+  try {
+    const data = readDB();
+    res.json({ success: true, data: Array.isArray(data.contactSubmissions) ? data.contactSubmissions : [] });
+  } catch (err) {
+    res.status(500).json({ success: false, error: 'Failed to read submissions' });
   }
 });
 

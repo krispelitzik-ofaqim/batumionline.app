@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, Linkin
 import { LinearGradient } from 'expo-linear-gradient';
 import { Colors } from '../../constants/colors';
 import { ThemeContext } from '../../constants/theme';
-import { fetchContent } from '../../constants/api';
+import { fetchContent, API_BASE } from '../../constants/api';
 
 type TabId = 'about' | 'terms' | 'privacy' | 'contact';
 type Tab = { id: TabId; title: string; icon: string; body: string };
@@ -26,6 +26,7 @@ export default function InfoScreen() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
+  const [sent, setSent] = useState(false);
 
   useEffect(() => {
     fetchContent()
@@ -44,14 +45,24 @@ export default function InfoScreen() {
   const current = tabs.find((t) => t.id === active) || tabs[0];
   const bg = dark ? Colors.TEXT : Colors.BACKGROUND;
 
-  const sendContact = () => {
+  const sendContact = async () => {
     if (!name.trim() || !message.trim()) {
       Alert.alert('חסרים פרטים', 'אנא מלאו שם והודעה');
       return;
     }
-    const subject = encodeURIComponent(`פנייה מהאפליקציה - ${name}`);
-    const body = encodeURIComponent(`שם: ${name}\nאימייל: ${email}\n\n${message}`);
-    Linking.openURL(`mailto:${EMAIL}?subject=${subject}&body=${body}`);
+    try {
+      const res = await fetch(`${API_BASE}/api/contact`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: name.trim(), email: email.trim(), message: message.trim() }),
+      });
+      const j = await res.json();
+      if (!j.success) throw new Error(j.error || 'שגיאה');
+      setName(''); setEmail(''); setMessage('');
+      setSent(true);
+    } catch (e: any) {
+      Alert.alert('שגיאה', e?.message || 'לא ניתן לשלוח כרגע');
+    }
   };
 
   return (
@@ -78,7 +89,20 @@ export default function InfoScreen() {
       </View>
 
       <ScrollView contentContainerStyle={styles.bodyWrap} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-        {active === 'contact' ? (
+        {active === 'contact' && sent ? (
+          <View style={{ paddingHorizontal: 20, paddingTop: 40, alignItems: 'center' }}>
+            <LinearGradient colors={['#10b981', '#059669']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={{ width: 120, height: 120, borderRadius: 60, alignItems: 'center', justifyContent: 'center', marginBottom: 24, shadowColor: '#10b981', shadowOpacity: 0.4, shadowRadius: 20, shadowOffset: { width: 0, height: 10 } }}>
+              <Text style={{ fontSize: 60 }}>🎉</Text>
+            </LinearGradient>
+            <Text style={{ fontSize: 26, fontWeight: '900', color: '#1C2B35', marginBottom: 12, writingDirection: 'rtl', textAlign: 'center' }}>ההודעה נשלחה בהצלחה!</Text>
+            <Text style={{ fontSize: 16, color: '#64748b', writingDirection: 'rtl', textAlign: 'center', lineHeight: 24, marginBottom: 32, paddingHorizontal: 20 }}>
+              תודה על פנייתך 🙏{'\n'}נחזור אליך בהקדם האפשרי
+            </Text>
+            <TouchableOpacity onPress={() => setSent(false)} style={{ backgroundColor: '#1A6B8A', paddingHorizontal: 32, paddingVertical: 14, borderRadius: 12, marginBottom: 12 }} activeOpacity={0.85}>
+              <Text style={{ color: '#fff', fontWeight: '800', fontSize: 15 }}>הודעה</Text>
+            </TouchableOpacity>
+          </View>
+        ) : active === 'contact' ? (
           <View>
             <LinearGradient colors={['#1A6B8A', '#3DA5C4']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.hero}>
               <Text style={styles.heroIcon}>✉️</Text>

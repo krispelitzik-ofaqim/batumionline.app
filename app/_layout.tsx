@@ -35,6 +35,7 @@ import { Colors } from '../constants/colors';
 import { ThemeContext } from '../constants/theme';
 import { AdminContext } from '../constants/adminContext';
 import { PreviewContext, PreviewMode } from '../constants/previewContext';
+import { registerForPushNotifications } from '../constants/push';
 
 // Note: Previously set Assistant font via Text.defaultProps — removed because
 // defaultProps is deprecated in React 19 and caused iOS crash on launch under
@@ -58,6 +59,10 @@ export default function RootLayout() {
   useEffect(() => {
     const t = setTimeout(() => setFontTimedOut(true), 1500);
     return () => clearTimeout(t);
+  }, []);
+
+  useEffect(() => {
+    registerForPushNotifications().catch(() => {});
   }, []);
   const fontsReady = fontsLoaded || fontError || fontTimedOut;
 

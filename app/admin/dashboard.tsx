@@ -1394,7 +1394,7 @@ function EditModal({
                             const fd = new FormData();
                             fd.append('file', f);
                             try {
-                              const res = await fetch('/api/upload', { method: 'POST', body: fd });
+                              const res = await fetch(`${API_BASE}/api/upload`, { method: 'POST', body: fd });
                               const json = await res.json();
                               if (json.success && json.url) uploaded.push(json.url);
                             } catch {}
@@ -1613,6 +1613,23 @@ export default function AdminDashboard() {
   const isTablet = width >= 768;
   const isWide = width >= 768;
 
+  useEffect(() => {
+    if (Platform.OS !== 'web' || typeof document === 'undefined') return;
+    const root = document.documentElement;
+    const prev = root.getAttribute('translate');
+    root.setAttribute('translate', 'no');
+    root.classList.add('notranslate');
+    let meta = document.querySelector('meta[name="google"]') as HTMLMetaElement | null;
+    const created = !meta;
+    if (!meta) { meta = document.createElement('meta'); meta.setAttribute('name', 'google'); document.head.appendChild(meta); }
+    meta.setAttribute('content', 'notranslate');
+    return () => {
+      if (prev) root.setAttribute('translate', prev); else root.removeAttribute('translate');
+      root.classList.remove('notranslate');
+      if (created && meta) meta.remove();
+    };
+  }, []);
+
   const [data, setData] = useState<Record<string, DataItem[]>>({});
   const [texts, setTexts] = useState(DEFAULT_TEXTS);
   const [activeNav, setActiveNav] = useState('texts');
@@ -1649,7 +1666,129 @@ export default function AdminDashboard() {
   const [mediaVersion, setMediaVersion] = useState(0);
   const [ratings, setRatings] = useState<Record<string, { sum: number; count: number }>>({});
   const [subBlock, setSubBlock] = useState<any>(null);
-  const [subTab, setSubTab] = useState<'banner' | 'dashboard' | 'crm' | 'paywall' | 'marketing' | 'accounting' | 'cancels' | 'subscribers'>('dashboard');
+  const [subTab, setSubTab] = useState<'banner' | 'dashboard' | 'crm' | 'paywall' | 'marketing' | 'accounting' | 'cancels' | 'subscribers' | 'messages' | 'popup' | 'auth'>('dashboard');
+  const [adminAuth, setAdminAuth] = useState<{ password: string; users: Array<{ id: string; name: string; phone: string; password: string; role: 'owner'|'editor'|'viewer' }> }>({ password: '', users: [] });
+  type ClientBanner = { id: string; client: string; mediaUrl: string; mediaType: 'image'|'video'; position: 'top'|'middle'|'bottom'; size: 'small'|'medium'|'large'; targetPage: string; clickUrl: string; startAt: string; endAt: string; visible: boolean };
+  const [clientBanners, setClientBanners] = useState<ClientBanner[]>([]);
+  const [cbForm, setCbForm] = useState<ClientBanner>({ id: '', client: '', mediaUrl: '', mediaType: 'image', position: 'middle', size: 'medium', targetPage: 'home', clickUrl: '', startAt: '', endAt: '', visible: true });
+  const [cbUploading, setCbUploading] = useState(false);
+
+  const [pushStats, setPushStats] = useState<{ count: number; history: Array<{ id: string; title: string; body: string; sentAt: string; count: number }> }>({ count: 0, history: [] });
+  const [pushForm, setPushForm] = useState<{ title: string; body: string; deepLink: string }>({ title: '', body: '', deepLink: '' });
+  const [pushSending, setPushSending] = useState(false);
+  const loadPushStats = useCallback(async () => {
+    try {
+      const r = await fetch(`${API_BASE}/api/push/tokens`);
+      const j = await r.json();
+      if (j.success) setPushStats({ count: j.count || 0, history: j.history || [] });
+    } catch {}
+  }, []);
+  useEffect(() => { loadPushStats(); }, [loadPushStats]);
+
+  type Coupon = { id: string; code: string; label: string; type: 'percent'|'fixed'; value: number; maxUses: number; usedCount: number; startAt: string; endAt: string; visible: boolean };
+  const [coupons, setCoupons] = useState<Coupon[]>([]);
+  const [couponForm, setCouponForm] = useState<Coupon>({ id: '', code: '', label: '', type: 'percent', value: 10, maxUses: 0, usedCount: 0, startAt: '', endAt: '', visible: true });
+  const loadCoupons = useCallback(async () => {
+    try {
+      const r = await fetch(`${API_BASE}/api/content`);
+      const j = await r.json();
+      if (j.success && Array.isArray(j.data?.coupons)) setCoupons(j.data.coupons);
+    } catch {}
+  }, []);
+  const saveCoupons = async (arr: Coupon[]) => {
+    setCoupons(arr);
+    await fetch(`${API_BASE}/api/content/coupons`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(arr) });
+  };
+  useEffect(() => { loadCoupons(); }, [loadCoupons]);
+
+  const loadClientBanners = useCallback(async () => {
+    try {
+      const r = await fetch(`${API_BASE}/api/content`);
+      const j = await r.json();
+      if (j.success && Array.isArray(j.data?.clientBanners)) setClientBanners(j.data.clientBanners);
+    } catch {}
+  }, []);
+
+  const saveClientBanners = async (arr: ClientBanner[]) => {
+    setClientBanners(arr);
+    await fetch(`${API_BASE}/api/content/clientBanners`, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(arr),
+    });
+  };
+
+  useEffect(() => { loadClientBanners(); }, [loadClientBanners]);
+  const [authForm, setAuthForm] = useState<{ id: string; name: string; phone: string; password: string; role: 'owner'|'editor'|'viewer' }>({ id: '', name: '', phone: '', password: '', role: 'viewer' });
+  const [authNewPassword, setAuthNewPassword] = useState('');
+
+  const loadAuth = useCallback(async () => {
+    try {
+      const r = await fetch(`${API_BASE}/api/content`);
+      const j = await r.json();
+      if (j.success && j.data?.adminAuth) setAdminAuth({ password: j.data.adminAuth.password || '', users: Array.isArray(j.data.adminAuth.users) ? j.data.adminAuth.users : [] });
+    } catch {}
+  }, []);
+
+  const saveAuth = async (next: typeof adminAuth) => {
+    setAdminAuth(next);
+    await fetch(`${API_BASE}/api/content/adminAuth`, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(next),
+    });
+  };
+
+  useEffect(() => { loadAuth(); }, [loadAuth]);
+  const [contactMessages, setContactMessages] = useState<Array<{ id: string; name: string; email: string; message: string; createdAt: string; read?: boolean; replied?: boolean; repliedAt?: string; replyNote?: string }>>([]);
+  const [popups, setPopups] = useState<Array<{ id: string; title: string; message: string; target: string; position: 'top'|'center'|'bottom'; visible: boolean; startAt?: string; endAt?: string; bgColor?: string; redeemCode?: string }>>([]);
+  const [popupForm, setPopupForm] = useState<{ id: string; title: string; message: string; target: string; position: 'top'|'center'|'bottom'; visible: boolean; startAt: string; endAt: string; bgColor: string; redeemCode: string }>({ id: '', title: '', message: '', target: 'home', position: 'center', visible: true, startAt: '', endAt: '', bgColor: '#ffffff', redeemCode: '' });
+  const [popupEditing, setPopupEditing] = useState(false);
+  const [popupPreview, setPopupPreview] = useState<typeof popups[number] | null>(null);
+
+  const loadPopups = useCallback(async () => {
+    try {
+      const r = await fetch(`${API_BASE}/api/content`);
+      const j = await r.json();
+      if (j.success && Array.isArray(j.data?.popups)) setPopups(j.data.popups);
+    } catch {}
+  }, []);
+
+  const savePopups = async (arr: typeof popups) => {
+    setPopups(arr);
+    await fetch(`${API_BASE}/api/content/popups`, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(arr),
+    });
+  };
+
+  useEffect(() => { loadPopups(); }, [loadPopups]);
+
+  const loadMessages = useCallback(async () => {
+    try {
+      const r = await fetch(`${API_BASE}/api/contact`);
+      const j = await r.json();
+      if (j.success) setContactMessages(j.data || []);
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    loadMessages();
+    const iv = setInterval(loadMessages, 30000);
+    return () => clearInterval(iv);
+  }, [loadMessages]);
+
+  const persistMessages = async (arr: typeof contactMessages) => {
+    setContactMessages(arr);
+    await fetch(`${API_BASE}/api/content/contactSubmissions`, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(arr),
+    });
+  };
+
+  const markMessageRead = (id: string) => persistMessages(contactMessages.map(m => m.id === id ? { ...m, read: true } : m));
+  const deleteMessage = (id: string) => persistMessages(contactMessages.filter(m => m.id !== id));
+  const markReplied = (id: string) => persistMessages(contactMessages.map(m => m.id === id ? { ...m, read: true, replied: true, repliedAt: m.repliedAt || new Date().toISOString() } : m));
+  const unmarkReplied = (id: string) => persistMessages(contactMessages.map(m => m.id === id ? { ...m, replied: false } : m));
+  const setReplyNote = (id: string, note: string) => persistMessages(contactMessages.map(m => m.id === id ? { ...m, replyNote: note } : m));
 
   const refreshMedia = useCallback(async () => {
     try {
@@ -1984,11 +2123,14 @@ export default function AdminDashboard() {
   const [subTabOrder, setSubTabOrder] = useState([
     { key: 'dashboard' as const, label: 'דשבורד לקוחות', icon: '👥' },
     { key: 'crm' as const, label: 'CRM', icon: '🤝' },
+    { key: 'messages' as const, label: 'הודעות', icon: '📨' },
+    { key: 'popup' as const, label: 'פופ אפ', icon: '💬' },
+    { key: 'banner' as const, label: 'באנר פרסום', icon: '📢' },
+    { key: 'marketing' as const, label: 'שיווק ופרסום', icon: '📣' },
     { key: 'paywall' as const, label: 'שליטה בתוכן', icon: '🔒' },
     { key: 'accounting' as const, label: 'הנה״ח', icon: '📊' },
     { key: 'cancels' as const, label: 'ביטולים', icon: '❌' },
-    { key: 'marketing' as const, label: 'שיווק ופרסום', icon: '📣' },
-    { key: 'banner' as const, label: 'באנר פרסום', icon: '📢' },
+    { key: 'auth' as const, label: 'סיסמאות והרשאות', icon: '🔑' },
   ]);
   const [dragTabIdx, setDragTabIdx] = useState(-1);
   const [demoMode, setDemoMode] = useState(true);
@@ -2019,7 +2161,7 @@ export default function AdminDashboard() {
     } catch {}
   };
 
-  const tabColors: Record<string, string> = { subscribers: '#10b981', dashboard: '#1A6B8A', crm: '#8b5cf6', paywall: '#e91e63', marketing: '#f59e0b', accounting: '#3b82f6', cancels: '#dc2626', banner: '#64748b' };
+  const tabColors: Record<string, string> = { subscribers: '#10b981', messages: '#0ea5e9', popup: '#a855f7', dashboard: '#1A6B8A', crm: '#8b5cf6', paywall: '#e91e63', marketing: '#f59e0b', accounting: '#3b82f6', cancels: '#dc2626', banner: '#64748b', auth: '#e11d48' };
 
   const [subsList, setSubsList] = useState<any[]>([]);
   const [subForm, setSubForm] = useState<{ phone: string; name: string; plan: '30d' | 'year' }>({ phone: '', name: '', plan: '30d' });
@@ -2050,6 +2192,381 @@ export default function AdminDashboard() {
   const delSub = async (phone: string) => {
     await fetch(`${API_BASE}/api/subscribers/${encodeURIComponent(phone)}`, { method: 'DELETE' });
     loadSubs();
+  };
+
+  const renderAuth = () => {
+    const roleLabel = (r: string) => ({ owner: '👑 בעלים', editor: '✏️ עורך', viewer: '👁️ צפייה בלבד' } as any)[r] || r;
+    const roleColor = (r: string) => ({ owner: '#e11d48', editor: '#f59e0b', viewer: '#64748b' } as any)[r] || '#64748b';
+    const fld = { padding: 12, border: '2px solid #fecdd3', borderRadius: 10, fontSize: 15, fontWeight: 500, direction: 'rtl' as const, textAlign: 'right' as const, background: '#fff', width: '100%' as const, boxSizing: 'border-box' as const, fontFamily: 'inherit' };
+    const saveNewPassword = () => {
+      if (!authNewPassword.trim()) { if (typeof window !== 'undefined') (window as any).alert('סיסמה ריקה'); return; }
+      saveAuth({ ...adminAuth, password: authNewPassword.trim() });
+      setAuthNewPassword('');
+      if (typeof window !== 'undefined') (window as any).alert('✅ הסיסמה עודכנה');
+    };
+    const saveUser = () => {
+      if (!authForm.name.trim() || !authForm.phone.trim()) { if (typeof window !== 'undefined') (window as any).alert('חסר שם או טלפון'); return; }
+      if (!authForm.id && !authForm.password.trim()) { if (typeof window !== 'undefined') (window as any).alert('חובה לקבוע סיסמה למשתמש חדש'); return; }
+      const id = authForm.id || `usr_${Date.now()}`;
+      const existing = adminAuth.users.find(u => u.id === id);
+      const password = authForm.password.trim() || (existing?.password || '');
+      const user = { ...authForm, id, password };
+      const users = authForm.id ? adminAuth.users.map(u => u.id === id ? user : u) : [...adminAuth.users, user];
+      saveAuth({ ...adminAuth, users });
+      setAuthForm({ id: '', name: '', phone: '', password: '', role: 'viewer' });
+    };
+    const delUser = (id: string) => {
+      if (typeof window !== 'undefined' && !(window as any).confirm('למחוק משתמש?')) return;
+      saveAuth({ ...adminAuth, users: adminAuth.users.filter(u => u.id !== id) });
+    };
+    return (
+      <View style={{ gap: 18 }}>
+        <Text style={{ fontSize: 22, fontWeight: '900', color: '#9f1239', writingDirection: 'rtl' }}>🔑 סיסמאות והרשאות</Text>
+
+        {/* Master password */}
+        <View style={{ backgroundColor: '#fff1f2', borderWidth: 2, borderColor: '#e11d48', borderRadius: 14, padding: 18, gap: 12 }}>
+          <Text style={{ fontSize: 17, fontWeight: '900', color: '#9f1239', writingDirection: 'rtl' }}>🔒 סיסמת מנהל ראשי</Text>
+          <Text style={{ fontSize: 14, color: '#4b5563', writingDirection: 'rtl' }}>סיסמה נוכחית: {adminAuth.password ? '••••••••' : '(לא הוגדרה)'}</Text>
+          {Platform.OS === 'web' ? (
+            React.createElement('input', { type: 'password', placeholder: 'סיסמה חדשה', value: authNewPassword, onChange: (e: any) => setAuthNewPassword(e.target.value), style: fld })
+          ) : (
+            <TextInput secureTextEntry placeholder="סיסמה חדשה" value={authNewPassword} onChangeText={setAuthNewPassword} textAlign="right" style={{ borderWidth: 2, borderColor: '#fecdd3', borderRadius: 10, padding: 12, fontSize: 15 }} />
+          )}
+          <TouchableOpacity onPress={saveNewPassword} style={{ backgroundColor: '#e11d48', paddingVertical: 14, borderRadius: 10, alignItems: 'center' }}>
+            <Text style={{ color: '#fff', fontWeight: '900', fontSize: 16 }}>💾 עדכן סיסמה</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Add/edit admin user */}
+        <View style={{ backgroundColor: '#fff7ed', borderWidth: 2, borderColor: '#f59e0b', borderRadius: 14, padding: 18, gap: 12 }}>
+          <Text style={{ fontSize: 17, fontWeight: '900', color: '#78350f', writingDirection: 'rtl' }}>{authForm.id ? '✏️ עריכת משתמש' : '➕ הוסף משתמש עם הרשאה'}</Text>
+          {Platform.OS === 'web' ? (
+            <>
+              {React.createElement('input', { placeholder: 'שם', value: authForm.name, onChange: (e: any) => setAuthForm({ ...authForm, name: e.target.value }), style: { ...fld, border: '2px solid #fed7aa' } })}
+              {React.createElement('input', { placeholder: 'טלפון (ישמש כשם משתמש)', value: authForm.phone, onChange: (e: any) => setAuthForm({ ...authForm, phone: e.target.value }), style: { ...fld, border: '2px solid #fed7aa' } })}
+              {React.createElement('input', { type: 'password', placeholder: authForm.id ? 'סיסמה חדשה (להשארת הישנה – השאר ריק)' : 'סיסמה למשתמש', value: authForm.password, onChange: (e: any) => setAuthForm({ ...authForm, password: e.target.value }), style: { ...fld, border: '2px solid #fed7aa' } })}
+              {React.createElement('select', { value: authForm.role, onChange: (e: any) => setAuthForm({ ...authForm, role: e.target.value as any }), style: { ...fld, border: '2px solid #fed7aa' } }, [
+                React.createElement('option', { key: 'v', value: 'viewer' }, '👁️ צפייה בלבד'),
+                React.createElement('option', { key: 'e', value: 'editor' }, '✏️ עורך'),
+                React.createElement('option', { key: 'o', value: 'owner' }, '👑 בעלים'),
+              ])}
+            </>
+          ) : (
+            <>
+              <TextInput placeholder="שם" value={authForm.name} onChangeText={v => setAuthForm({ ...authForm, name: v })} textAlign="right" style={{ borderWidth: 2, borderColor: '#fed7aa', borderRadius: 10, padding: 12, fontSize: 15 }} />
+              <TextInput placeholder="טלפון (ישמש כשם משתמש)" value={authForm.phone} onChangeText={v => setAuthForm({ ...authForm, phone: v })} textAlign="right" style={{ borderWidth: 2, borderColor: '#fed7aa', borderRadius: 10, padding: 12, fontSize: 15 }} />
+              <TextInput secureTextEntry placeholder={authForm.id ? 'סיסמה חדשה (השאר ריק – לשמירת הישנה)' : 'סיסמה'} value={authForm.password} onChangeText={v => setAuthForm({ ...authForm, password: v })} textAlign="right" style={{ borderWidth: 2, borderColor: '#fed7aa', borderRadius: 10, padding: 12, fontSize: 15 }} />
+            </>
+          )}
+          <View style={{ flexDirection: 'row-reverse', gap: 8 }}>
+            <TouchableOpacity onPress={saveUser} style={{ flex: 1, backgroundColor: '#f59e0b', paddingVertical: 12, borderRadius: 10, alignItems: 'center' }}>
+              <Text style={{ color: '#fff', fontWeight: '900', fontSize: 15 }}>{authForm.id ? '💾 עדכן' : '➕ הוסף'}</Text>
+            </TouchableOpacity>
+            {authForm.id && (
+              <TouchableOpacity onPress={() => setAuthForm({ id: '', name: '', phone: '', password: '', role: 'viewer' })} style={{ backgroundColor: '#475569', paddingHorizontal: 20, paddingVertical: 12, borderRadius: 10, alignItems: 'center' }}>
+                <Text style={{ color: '#fff', fontWeight: '900', fontSize: 15 }}>ביטול</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        </View>
+
+        {/* Users list */}
+        <View style={{ gap: 10 }}>
+          <Text style={{ fontSize: 17, fontWeight: '900', color: '#1C2B35', writingDirection: 'rtl' }}>👥 משתמשים מורשים · {adminAuth.users.length}</Text>
+          {adminAuth.users.length === 0 ? (
+            <View style={{ backgroundColor: '#f8fafc', padding: 24, borderRadius: 12, alignItems: 'center' }}>
+              <Text style={{ color: '#64748b', fontWeight: '700', writingDirection: 'rtl' }}>אין משתמשים נוספים</Text>
+            </View>
+          ) : adminAuth.users.map(u => (
+            <View key={u.id} style={{ backgroundColor: '#fff', borderWidth: 2, borderColor: '#e2e8f0', borderRadius: 12, padding: 14, flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: 16, fontWeight: '900', color: '#0f172a', writingDirection: 'rtl' }}>{u.name}</Text>
+                <Text style={{ fontSize: 14, color: '#475569', fontWeight: '700' }}>{u.phone}</Text>
+                <Text style={{ fontSize: 13, fontWeight: '900', color: roleColor(u.role), writingDirection: 'rtl', marginTop: 4 }}>{roleLabel(u.role)}</Text>
+              </View>
+              <View style={{ flexDirection: 'row-reverse', gap: 8 }}>
+                <TouchableOpacity onPress={() => setAuthForm({ id: u.id, name: u.name, phone: u.phone, password: '', role: u.role })} style={{ backgroundColor: '#2563eb', paddingHorizontal: 14, paddingVertical: 9, borderRadius: 8 }}>
+                  <Text style={{ color: '#fff', fontSize: 13, fontWeight: '900' }}>✏️</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => delUser(u.id)} style={{ backgroundColor: '#dc2626', paddingHorizontal: 14, paddingVertical: 9, borderRadius: 8 }}>
+                  <Text style={{ color: '#fff', fontSize: 13, fontWeight: '900' }}>🗑️</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          ))}
+        </View>
+      </View>
+    );
+  };
+
+  const renderPopups = () => {
+    const targetOptions = [
+      { val: 'home', label: 'דף הבית' },
+      { val: 'welcome', label: 'ברוכים הבאים' },
+      { val: 'info', label: 'פורטל מידע' },
+      { val: 'map', label: 'מפה' },
+      { val: 'category:1', label: 'קטגוריה: אירוח' },
+      { val: 'category:2', label: 'קטגוריה: אטרקציות' },
+      { val: 'category:3', label: 'קטגוריה: סיורים קוליים' },
+      { val: 'category:5', label: 'קטגוריה: תחבורה' },
+      { val: 'category:6', label: 'קטגוריה: מסעדות' },
+      { val: 'category:casino', label: 'קטגוריה: קזינו' },
+      { val: 'all', label: 'כל העמודים' },
+    ];
+    const genId = () => `pop_${Date.now()}_${Math.floor(Math.random()*1000)}`;
+    const resetForm = () => { setPopupForm({ id: '', title: '', message: '', target: 'home', position: 'center', visible: true, startAt: '', endAt: '', bgColor: '#ffffff', redeemCode: '' }); setPopupEditing(false); };
+    const startEdit = (p: typeof popups[number]) => { setPopupForm({ id: p.id, title: p.title, message: p.message, target: p.target, position: p.position, visible: p.visible, startAt: p.startAt || '', endAt: p.endAt || '', bgColor: (p as any).bgColor || '#ffffff', redeemCode: (p as any).redeemCode || '' }); setPopupEditing(true); };
+    const BG_PALETTE = ['#1C2B35','#2D4A5E','#1A6B8A','#3DA5C4','#7ECFC0','#5BC0DE','#0ea5e9','#3b82f6','#6366f1','#8b5cf6','#a855f7','#ec4899','#ef4444','#f97316','#F4A94E','#eab308','#84cc16','#22c55e','#10b981','#14b8a6','#06b6d4','#0f172a','#1e293b','#334155','#475569','#64748b','#94a3b8','#cbd5e1','#e2e8f0','#ffffff','#fef3c7','#fdba74'];
+    const saveForm = () => {
+      if (!popupForm.title.trim() || !popupForm.message.trim()) { if (typeof window !== 'undefined') (window as any).alert('חסרה כותרת או הודעה'); return; }
+      const payload = { ...popupForm, id: popupForm.id || genId() };
+      const arr = popupForm.id ? popups.map(p => p.id === payload.id ? payload : p) : [payload, ...popups];
+      savePopups(arr);
+      resetForm();
+    };
+    const removePopup = (id: string) => {
+      if (typeof window !== 'undefined' && !(window as any).confirm('למחוק פופ-אפ?')) return;
+      savePopups(popups.filter(p => p.id !== id));
+    };
+    const toggleVisible = (id: string) => {
+      savePopups(popups.map(p => p.id === id ? { ...p, visible: !p.visible } : p));
+    };
+    const targetLabel = (v: string) => targetOptions.find(o => o.val === v)?.label || v;
+    const positionLabel = (v: string) => ({ top: 'למעלה', center: 'מרכז', bottom: 'למטה' } as any)[v] || v;
+    const fld = { padding: 12, border: '2px solid #c4b5fd', borderRadius: 10, fontSize: 15, fontWeight: 500, direction: 'rtl' as const, textAlign: 'right' as const, background: '#fff', width: '100%' as const, boxSizing: 'border-box' as const, fontFamily: 'inherit' };
+    return (
+      <View style={{ gap: 18 }}>
+        <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Text style={{ fontSize: 22, fontWeight: '900', color: '#581c87', writingDirection: 'rtl' }}>
+            💬 פופ-אפים · {popups.length}
+          </Text>
+          {popupEditing && (
+            <TouchableOpacity onPress={resetForm} style={{ backgroundColor: '#475569', paddingHorizontal: 18, paddingVertical: 10, borderRadius: 10 }}>
+              <Text style={{ color: '#fff', fontWeight: '900', fontSize: 15 }}>✕ ביטול</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+
+        {/* Create/Edit form */}
+        <View style={{ backgroundColor: '#f3e8ff', borderWidth: 2, borderColor: '#a855f7', borderRadius: 14, padding: 18, gap: 14 }}>
+          <Text style={{ fontSize: 17, fontWeight: '900', color: '#6b21a8', writingDirection: 'rtl' }}>{popupEditing ? '✏️ עריכת פופ-אפ' : '➕ פופ-אפ חדש'}</Text>
+          {Platform.OS === 'web' ? (
+            <>
+              {React.createElement('input', { placeholder: 'כותרת', value: popupForm.title, onChange: (e: any) => setPopupForm({ ...popupForm, title: e.target.value }), style: fld })}
+              {React.createElement('textarea', { placeholder: 'תוכן ההודעה', value: popupForm.message, onChange: (e: any) => setPopupForm({ ...popupForm, message: e.target.value }), rows: 3, style: { ...fld, resize: 'vertical' } })}
+              <View style={{ flexDirection: 'row-reverse', gap: 10 }}>
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontSize: 14, color: '#6b21a8', fontWeight: '900', writingDirection: 'rtl', marginBottom: 6 }}>עמוד יעד</Text>
+                  {React.createElement('select', { value: popupForm.target, onChange: (e: any) => setPopupForm({ ...popupForm, target: e.target.value }), style: fld }, targetOptions.map(o => React.createElement('option', { key: o.val, value: o.val }, o.label)))}
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontSize: 14, color: '#6b21a8', fontWeight: '900', writingDirection: 'rtl', marginBottom: 6 }}>מיקום</Text>
+                  {React.createElement('select', { value: popupForm.position, onChange: (e: any) => setPopupForm({ ...popupForm, position: e.target.value as any }), style: fld }, [
+                    React.createElement('option', { key: 'top', value: 'top' }, 'למעלה'),
+                    React.createElement('option', { key: 'center', value: 'center' }, 'מרכז'),
+                    React.createElement('option', { key: 'bottom', value: 'bottom' }, 'למטה'),
+                  ])}
+                </View>
+              </View>
+              <View style={{ flexDirection: 'row-reverse', gap: 10 }}>
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontSize: 14, color: '#6b21a8', fontWeight: '900', writingDirection: 'rtl', marginBottom: 6 }}>תחילה (לא חובה)</Text>
+                  {React.createElement('input', { type: 'date', value: popupForm.startAt, onChange: (e: any) => setPopupForm({ ...popupForm, startAt: e.target.value }), style: fld })}
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontSize: 14, color: '#6b21a8', fontWeight: '900', writingDirection: 'rtl', marginBottom: 6 }}>סיום (לא חובה)</Text>
+                  {React.createElement('input', { type: 'date', value: popupForm.endAt, onChange: (e: any) => setPopupForm({ ...popupForm, endAt: e.target.value }), style: fld })}
+                </View>
+              </View>
+              <View>
+                <Text style={{ fontSize: 14, color: '#6b21a8', fontWeight: '900', writingDirection: 'rtl', marginBottom: 6 }}>קוד/ברקוד למימוש הטבה (לא חובה)</Text>
+                {React.createElement('input', { placeholder: 'לדוגמה: BATUMI25 או 1234567890', value: popupForm.redeemCode, onChange: (e: any) => setPopupForm({ ...popupForm, redeemCode: e.target.value }), style: { ...fld, letterSpacing: 2, fontWeight: 700 } })}
+              </View>
+              <View>
+                <Text style={{ fontSize: 14, color: '#6b21a8', fontWeight: '900', writingDirection: 'rtl', marginBottom: 6 }}>צבע רקע</Text>
+                <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 6 }}>
+                  {BG_PALETTE.map(c => {
+                    const on = popupForm.bgColor === c;
+                    return (
+                      <TouchableOpacity key={c} onPress={() => setPopupForm({ ...popupForm, bgColor: c })} style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: c, borderWidth: on ? 4 : 1, borderColor: on ? '#7e22ce' : '#cbd5e1' }} />
+                    );
+                  })}
+                </View>
+              </View>
+              <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 10 }}>
+                {React.createElement('input', { type: 'checkbox', checked: popupForm.visible, onChange: (e: any) => setPopupForm({ ...popupForm, visible: e.target.checked }), style: { width: 20, height: 20 } })}
+                <Text style={{ fontSize: 16, fontWeight: '900', color: '#6b21a8', writingDirection: 'rtl' }}>פעיל</Text>
+              </View>
+            </>
+          ) : (
+            <Text style={{ color: '#64748b', fontSize: 15 }}>עריכה זמינה רק ב-Web</Text>
+          )}
+          <TouchableOpacity onPress={saveForm} style={{ backgroundColor: '#7e22ce', paddingVertical: 14, borderRadius: 10, alignItems: 'center' }}>
+            <Text style={{ color: '#fff', fontWeight: '900', fontSize: 16 }}>{popupEditing ? '💾 עדכן' : '➕ הוסף'}</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* List */}
+        {popups.length === 0 ? (
+          <View style={{ backgroundColor: '#f8fafc', padding: 24, borderRadius: 12, alignItems: 'center' }}>
+            <Text style={{ fontSize: 40 }}>💬</Text>
+            <Text style={{ color: '#64748b', fontWeight: '700', marginTop: 8, writingDirection: 'rtl' }}>אין פופ-אפים פעילים</Text>
+          </View>
+        ) : (
+          popups.map(p => (
+            <View key={p.id} style={{ backgroundColor: '#fff', borderWidth: 2, borderColor: p.visible ? '#a855f7' : '#cbd5e1', borderRadius: 14, padding: 18 }}>
+              <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', marginBottom: 10 }}>
+                <Text style={{ fontSize: 19, fontWeight: '900', color: '#0f172a', writingDirection: 'rtl' }}>{p.title}</Text>
+                <Text style={{ fontSize: 14, color: p.visible ? '#15803d' : '#475569', fontWeight: '900' }}>{p.visible ? '● פעיל' : '○ כבוי'}</Text>
+              </View>
+              <Text style={{ fontSize: 16, color: '#1e293b', writingDirection: 'rtl', marginBottom: 10, lineHeight: 24, fontWeight: '500' }}>{p.message}</Text>
+              {!!(p as any).redeemCode && (
+                <View style={{ backgroundColor: '#fef3c7', borderWidth: 2, borderColor: '#f59e0b', borderRadius: 8, padding: 10, marginBottom: 10 }}>
+                  <Text style={{ fontSize: 13, fontWeight: '800', color: '#78350f', writingDirection: 'rtl', marginBottom: 2 }}>🎁 קוד מימוש:</Text>
+                  <Text selectable style={{ fontSize: 18, fontWeight: '900', color: '#b45309', letterSpacing: 2 }}>{(p as any).redeemCode}</Text>
+                </View>
+              )}
+              <Text style={{ fontSize: 14, color: '#334155', fontWeight: '700', writingDirection: 'rtl', marginBottom: 12 }}>📍 {targetLabel(p.target)} · {positionLabel(p.position)}{p.startAt ? ` · מ-${p.startAt}` : ''}{p.endAt ? ` · עד-${p.endAt}` : ''}</Text>
+              <View style={{ flexDirection: 'row-reverse', gap: 8, flexWrap: 'wrap' }}>
+                <TouchableOpacity onPress={() => setPopupPreview(p)} style={{ backgroundColor: '#a855f7', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 10 }}>
+                  <Text style={{ color: '#fff', fontSize: 15, fontWeight: '900' }}>👁️ הצג</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => toggleVisible(p.id)} style={{ backgroundColor: p.visible ? '#475569' : '#16a34a', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 10 }}>
+                  <Text style={{ color: '#fff', fontSize: 15, fontWeight: '900' }}>{p.visible ? '⏸️ כבה' : '▶️ הפעל'}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => startEdit(p)} style={{ backgroundColor: '#2563eb', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 10 }}>
+                  <Text style={{ color: '#fff', fontSize: 15, fontWeight: '900' }}>✏️ ערוך</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => removePopup(p.id)} style={{ backgroundColor: '#dc2626', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 10 }}>
+                  <Text style={{ color: '#fff', fontSize: 15, fontWeight: '900' }}>🗑️ מחק</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          ))
+        )}
+        {popupPreview && (() => {
+          const p = popupPreview;
+          const cardBg = p.bgColor || '#fff';
+          const hex = cardBg.replace('#','');
+          const r = parseInt(hex.slice(0,2) || 'ff', 16);
+          const g = parseInt(hex.slice(2,4) || 'ff', 16);
+          const b = parseInt(hex.slice(4,6) || 'ff', 16);
+          const isDark = (r * 299 + g * 587 + b * 114) / 1000 < 140;
+          const titleC = isDark ? '#ffffff' : '#1C2B35';
+          const msgC = isDark ? '#e2e8f0' : '#475569';
+          const sigC = isDark ? 'rgba(255,255,255,0.6)' : '#94a3b8';
+          const brandC = isDark ? '#F4A94E' : '#1A6B8A';
+          return (
+            <View style={{ position: Platform.OS === 'web' ? ('fixed' as any) : 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.6)', zIndex: 100000, alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+              <TouchableOpacity activeOpacity={1} onPress={() => setPopupPreview(null)} style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }} />
+              <View style={{ width: '100%', maxWidth: 420, backgroundColor: cardBg, borderRadius: 16, padding: 20, borderTopWidth: 4, borderTopColor: '#a855f7', shadowColor: '#000', shadowOpacity: 0.2, shadowRadius: 20, shadowOffset: { width: 0, height: 10 } }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 14, alignSelf: 'flex-start' }}>
+                  <Image source={isDark ? require('../../assets/images/batumi_icon_light.png') : require('../../assets/images/batumi_icon.png')} style={{ width: 36, height: 36 }} resizeMode="contain" />
+                  <Text style={{ fontSize: 16, fontWeight: '900', letterSpacing: 0.5, color: brandC }}>Batumionline</Text>
+                </View>
+                <TouchableOpacity onPress={() => setPopupPreview(null)} style={{ position: 'absolute', top: 10, right: 10, width: 28, height: 28, borderRadius: 14, backgroundColor: 'rgba(241,245,249,0.9)', alignItems: 'center', justifyContent: 'center', zIndex: 2 }}>
+                  <Text style={{ fontSize: 14, color: '#64748b', fontWeight: '900' }}>✕</Text>
+                </TouchableOpacity>
+                <Text style={{ fontSize: 18, fontWeight: '900', color: titleC, writingDirection: 'rtl', textAlign: 'right', marginBottom: 10 }}>{p.title}</Text>
+                <Text style={{ fontSize: 14, color: msgC, writingDirection: 'rtl', textAlign: 'right', lineHeight: 22 }}>{p.message}</Text>
+                {!!p.redeemCode && (
+                  <View style={{ marginTop: 16, padding: 14, borderRadius: 10, backgroundColor: '#fef3c7', borderWidth: 2, borderColor: '#f59e0b', alignItems: 'center' }}>
+                    <Text style={{ fontSize: 13, fontWeight: '800', color: '#78350f', writingDirection: 'rtl', marginBottom: 6 }}>🎁 קוד למימוש ההטבה</Text>
+                    <Text selectable style={{ fontSize: 22, fontWeight: '900', color: '#b45309', letterSpacing: 3 }}>{p.redeemCode}</Text>
+                  </View>
+                )}
+                <View style={{ marginTop: 14, paddingTop: 10, borderTopWidth: 1, borderTopColor: 'rgba(0,0,0,0.08)', alignItems: 'flex-start' }}>
+                  <Text style={{ fontSize: 12, fontWeight: '700', fontStyle: 'italic', color: sigC }}>— Batumionline.app</Text>
+                </View>
+              </View>
+            </View>
+          );
+        })()}
+      </View>
+    );
+  };
+
+  const renderMessages = () => {
+    const fmt = (iso: string) => { try { return new Date(iso).toLocaleString('he-IL'); } catch { return iso; } };
+    const unread = contactMessages.filter(m => !m.read).length;
+    return (
+      <View style={{ gap: 18 }}>
+        <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Text style={{ fontSize: 22, fontWeight: '900', color: '#0c4a6e', writingDirection: 'rtl' }}>
+            📨 הודעות מהאתר · {contactMessages.length}{unread > 0 ? ` · ${unread} חדשות` : ''}
+          </Text>
+          <TouchableOpacity onPress={loadMessages} style={{ backgroundColor: '#0284c7', paddingHorizontal: 18, paddingVertical: 10, borderRadius: 10 }}>
+            <Text style={{ color: '#fff', fontWeight: '900', fontSize: 15 }}>🔄 רענן</Text>
+          </TouchableOpacity>
+        </View>
+        {contactMessages.length === 0 ? (
+          <View style={{ backgroundColor: '#f8fafc', padding: 24, borderRadius: 12, alignItems: 'center' }}>
+            <Text style={{ fontSize: 40 }}>📭</Text>
+            <Text style={{ color: '#64748b', fontWeight: '700', marginTop: 8, writingDirection: 'rtl' }}>אין הודעות כרגע</Text>
+          </View>
+        ) : (
+          contactMessages.map(m => {
+            const bg = m.replied ? '#dcfce7' : (!m.read ? '#dbeafe' : '#fff');
+            const border = m.replied ? '#22c55e' : (!m.read ? '#3b82f6' : '#cbd5e1');
+            const statusBadge = m.replied ? '✅ הושב' : (!m.read ? '🔵 חדש' : '👁️ נקרא');
+            const statusColor = m.replied ? '#15803d' : (!m.read ? '#1d4ed8' : '#475569');
+            return (
+              <View key={m.id} style={{ backgroundColor: bg, borderWidth: 2, borderColor: border, borderRadius: 14, padding: 18 }}>
+                <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                  <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 10 }}>
+                    <Text style={{ fontSize: 19, fontWeight: '900', color: '#0f172a', writingDirection: 'rtl' }}>{m.name}</Text>
+                    <Text style={{ fontSize: 13, fontWeight: '900', color: statusColor }}>{statusBadge}</Text>
+                  </View>
+                  <Text style={{ fontSize: 13, color: '#334155', fontWeight: '700' }}>{fmt(m.createdAt)}</Text>
+                </View>
+                {!!m.email && (
+                  <Text style={{ fontSize: 15, color: '#0369a1', fontWeight: '700', marginBottom: 10 }} selectable>{m.email}</Text>
+                )}
+                <Text style={{ fontSize: 16, color: '#0f172a', writingDirection: 'rtl', lineHeight: 24, marginBottom: 14, fontWeight: '500' }} selectable>{m.message}</Text>
+                {!!m.repliedAt && (
+                  <Text style={{ fontSize: 13, color: '#15803d', fontWeight: '800', writingDirection: 'rtl', marginBottom: 10 }}>הושב: {fmt(m.repliedAt)}</Text>
+                )}
+                {Platform.OS === 'web' ? (
+                  React.createElement('textarea', {
+                    value: m.replyNote || '',
+                    onChange: (e: any) => setReplyNote(m.id, e.target.value),
+                    placeholder: 'תיעוד פנימי (לא נשלח ללקוח)…',
+                    rows: 2,
+                    style: { width: '100%', padding: 10, border: '2px solid #94a3b8', borderRadius: 10, fontSize: 15, direction: 'rtl', textAlign: 'right', background: '#fff', resize: 'vertical', marginBottom: 12, fontWeight: 500, boxSizing: 'border-box', fontFamily: 'inherit' },
+                  })
+                ) : (
+                  <TextInput value={m.replyNote || ''} onChangeText={v => setReplyNote(m.id, v)} placeholder="תיעוד פנימי…" multiline numberOfLines={2} textAlign="right" style={{ borderWidth: 2, borderColor: '#94a3b8', borderRadius: 10, padding: 10, fontSize: 15, marginBottom: 12, backgroundColor: '#fff' }} />
+                )}
+                <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 8 }}>
+                  {!!m.email && (
+                    <TouchableOpacity onPress={() => { Linking.openURL(`mailto:${m.email}?subject=${encodeURIComponent('תשובה לפנייתך - Batumionline')}`); markReplied(m.id); }} style={{ backgroundColor: '#2563eb', paddingHorizontal: 18, paddingVertical: 11, borderRadius: 10 }}>
+                      <Text style={{ color: '#fff', fontSize: 15, fontWeight: '900' }}>✉️ השב</Text>
+                    </TouchableOpacity>
+                  )}
+                  {m.replied ? (
+                    <TouchableOpacity onPress={() => unmarkReplied(m.id)} style={{ backgroundColor: '#475569', paddingHorizontal: 18, paddingVertical: 11, borderRadius: 10 }}>
+                      <Text style={{ color: '#fff', fontSize: 15, fontWeight: '900' }}>↩️ לא הושב</Text>
+                    </TouchableOpacity>
+                  ) : (
+                    <TouchableOpacity onPress={() => markReplied(m.id)} style={{ backgroundColor: '#16a34a', paddingHorizontal: 18, paddingVertical: 11, borderRadius: 10 }}>
+                      <Text style={{ color: '#fff', fontSize: 15, fontWeight: '900' }}>✅ סמן הושב</Text>
+                    </TouchableOpacity>
+                  )}
+                  {!m.read && !m.replied && (
+                    <TouchableOpacity onPress={() => markMessageRead(m.id)} style={{ backgroundColor: '#059669', paddingHorizontal: 18, paddingVertical: 11, borderRadius: 10 }}>
+                      <Text style={{ color: '#fff', fontSize: 15, fontWeight: '900' }}>👁️ סמן נקרא</Text>
+                    </TouchableOpacity>
+                  )}
+                  <TouchableOpacity onPress={() => { if (typeof window !== 'undefined' && !(window as any).confirm('למחוק את ההודעה?')) return; deleteMessage(m.id); }} style={{ backgroundColor: '#dc2626', paddingHorizontal: 18, paddingVertical: 11, borderRadius: 10 }}>
+                    <Text style={{ color: '#fff', fontSize: 15, fontWeight: '900' }}>🗑️ מחק</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            );
+          })
+        )}
+      </View>
+    );
   };
 
   const renderSubscribers = () => {
@@ -2244,9 +2761,11 @@ export default function AdminDashboard() {
         {/* Tabs */}
         {Platform.OS === 'web' ? (
           React.createElement('div', {
-            style: { display: 'flex', flexDirection: 'row-reverse', gap: 6, marginBottom: 16, flexWrap: 'wrap', background: '#f1f5f9', borderRadius: 10, padding: 4 },
+            style: { display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 8, marginBottom: 16 },
           }, subTabOrder.map((t, i) => {
             const on = subTab === t.key;
+            const unread = t.key === 'messages' ? contactMessages.filter(m => !m.read).length : 0;
+            const accent = tabColors[t.key] || '#64748b';
             return React.createElement('div', {
               key: t.key,
               draggable: true,
@@ -2257,28 +2776,55 @@ export default function AdminDashboard() {
               onDrop: (e: any) => { e.preventDefault(); setDragTabIdx(-1); const from = parseInt(e.dataTransfer.getData('text/plain'), 10); if (!isNaN(from) && from !== i) { const arr = [...subTabOrder]; const [moved] = arr.splice(from, 1); arr.splice(i, 0, moved); setSubTabOrder(arr); } },
               onDragEnd: () => setDragTabIdx(-1),
               style: {
-                padding: '8px 14px', borderRadius: 8, cursor: 'grab', userSelect: 'none',
-                backgroundColor: on ? '#fff' : 'transparent',
-                borderTop: dragTabIdx === i ? `3px solid ${Colors.PRIMARY}` : '3px solid transparent',
-                fontSize: 12, fontWeight: 800, color: on ? Colors.PRIMARY : '#64748b',
-                fontFamily: 'Arial, sans-serif',
+                position: 'relative',
+                padding: '8px 6px', borderRadius: 10, cursor: 'grab', userSelect: 'none',
+                backgroundColor: on ? accent : '#fff',
+                border: `1px solid ${on ? accent : '#e2e8f0'}`,
+                boxShadow: on ? `0 2px 8px ${accent}40` : '0 1px 2px rgba(0,0,0,0.04)',
+                borderTopWidth: dragTabIdx === i ? '3px' : '1px',
+                borderTopColor: dragTabIdx === i ? Colors.PRIMARY : (on ? accent : '#e2e8f0'),
+                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4,
+                minHeight: 56,
                 transition: 'all 0.15s ease',
+                fontFamily: 'Arial, sans-serif',
               },
-            }, `${t.icon} ${t.label}`);
+            }, [
+              React.createElement('span', { key: 'icon', style: { fontSize: 32, lineHeight: '1' } }, t.icon),
+              React.createElement('span', { key: 'txt', style: { fontSize: 15, fontWeight: 900, color: on ? '#fff' : '#1C2B35', textAlign: 'center', direction: 'rtl' } }, t.label),
+              React.createElement('span', {
+                key: 'badge',
+                style: {
+                  position: 'absolute', top: -8, left: -8,
+                  minWidth: 22, height: 22, borderRadius: 11,
+                  backgroundColor: '#dc2626', color: '#fff',
+                  fontSize: 12, fontWeight: 900,
+                  display: unread > 0 ? 'flex' : 'none',
+                  alignItems: 'center', justifyContent: 'center',
+                  padding: '0 6px',
+                  boxShadow: '0 2px 6px rgba(220,38,38,0.5), 0 0 0 3px #fff',
+                },
+              }, unread > 99 ? '99+' : String(unread)),
+            ]);
           }))
         ) : (
-          <View style={{ flexDirection: 'row-reverse', gap: 6, marginBottom: 16, flexWrap: 'wrap', backgroundColor: '#f1f5f9', borderRadius: 10, padding: 4 }}>
+          <View style={{ flexDirection: 'row-reverse', gap: 8, marginBottom: 20, flexWrap: 'wrap' }}>
             {subTabOrder.map(t => {
               const on = subTab === t.key;
+              const unread = t.key === 'messages' ? contactMessages.filter(m => !m.read).length : 0;
+              const accent = tabColors[t.key] || '#64748b';
               return (
-                <TouchableOpacity key={t.key} onPress={() => setSubTab(t.key)} style={{ paddingVertical: 8, paddingHorizontal: 14, borderRadius: 8, backgroundColor: on ? '#fff' : 'transparent' }}>
-                  <Text style={{ fontSize: 12, fontWeight: '800', color: on ? Colors.PRIMARY : '#64748b' }}>{t.icon} {t.label}</Text>
+                <TouchableOpacity key={t.key} onPress={() => setSubTab(t.key)} style={{ minWidth: 120, paddingVertical: 8, paddingHorizontal: 10, borderRadius: 10, backgroundColor: on ? accent : '#fff', borderWidth: 1, borderColor: on ? accent : '#e2e8f0', alignItems: 'center', gap: 3 }}>
+                  <Text style={{ fontSize: 26 }}>{t.icon}</Text>
+                  <Text style={{ fontSize: 13, fontWeight: '900', color: on ? '#fff' : '#1C2B35' }}>{t.label}{unread > 0 ? ` · ${unread}` : ''}</Text>
                 </TouchableOpacity>
               );
             })}
           </View>
         )}
         {subTab === 'subscribers' ? renderSubscribers()
+          : subTab === 'messages' ? renderMessages()
+          : subTab === 'popup' ? renderPopups()
+          : subTab === 'auth' ? renderAuth()
           : subTab === 'banner' ? renderSubBanner()
           : subTab === 'dashboard' ? renderSubDashboard()
           : subTab === 'crm' ? renderSubCrm()
@@ -2547,86 +3093,9 @@ export default function AdminDashboard() {
     );
     return (
     <View style={{ gap: 16 }}>
-      {/* Hero Stats Bar */}
-      <View style={{ borderRadius: 16, overflow: 'hidden' }}>
-        <View style={{ backgroundColor: '#1C2B35', padding: 18 }}>
-          <Text style={{ fontSize: 16, fontWeight: '900', color: '#F4A94E', textAlign: 'center', writingDirection: 'rtl', marginBottom: 14 }}>📣 מרכז שיווק ופרסום</Text>
-          <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-around' }}>
-            <View style={{ alignItems: 'center' }}>
-              <Text style={{ fontSize: 26, fontWeight: '900', color: '#fff' }}>1,151</Text>
-              <Text style={{ fontSize: 10, color: '#94a3b8' }}>חשיפות השבוע</Text>
-            </View>
-            <View style={{ width: 1, backgroundColor: '#334155' }} />
-            <View style={{ alignItems: 'center' }}>
-              <Text style={{ fontSize: 26, fontWeight: '900', color: '#10b981' }}>487</Text>
-              <Text style={{ fontSize: 10, color: '#94a3b8' }}>קליקים</Text>
-            </View>
-            <View style={{ width: 1, backgroundColor: '#334155' }} />
-            <View style={{ alignItems: 'center' }}>
-              <Text style={{ fontSize: 26, fontWeight: '900', color: '#F4A94E' }}>42%</Text>
-              <Text style={{ fontSize: 10, color: '#94a3b8' }}>המרה</Text>
-            </View>
-          </View>
-        </View>
-      </View>
-
-      {/* Push Notifications */}
-      <View style={{ borderRadius: 16, overflow: 'hidden', borderWidth: 2, borderColor: '#6366f1' }}>
-        <View style={{ backgroundColor: '#6366f1', paddingVertical: 10, paddingHorizontal: 16, flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Text style={{ fontSize: 14, fontWeight: '900', color: '#fff' }}>🔔 התראות פוש</Text>
-          <TouchableOpacity style={{ paddingVertical: 5, paddingHorizontal: 14, borderRadius: 20, backgroundColor: '#fff' }}>
-            <Text style={{ fontSize: 11, fontWeight: '800', color: '#6366f1' }}>+ שלח התראה</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={{ backgroundColor: '#faf5ff', padding: 12 }}>
-          {demoPushHistory.map((p, i) => (
-            <View key={i} style={{ flexDirection: 'row-reverse', alignItems: 'center', paddingVertical: 10, borderBottomWidth: i < demoPushHistory.length - 1 ? 1 : 0, borderBottomColor: '#e9d5ff', gap: 10 }}>
-              <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: '#6366f1', alignItems: 'center', justifyContent: 'center' }}>
-                <Text style={{ fontSize: 14, fontWeight: '900', color: '#fff' }}>{Math.round(p.opened / p.sent * 100)}%</Text>
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={{ fontSize: 13, fontWeight: '700', color: '#1C2B35', textAlign: 'right', writingDirection: 'rtl' }}>{p.title}</Text>
-                <Text style={{ fontSize: 10, color: '#888', textAlign: 'right' }}>{p.date} · נשלח ל-{p.sent} · נפתח {p.opened}</Text>
-              </View>
-            </View>
-          ))}
-        </View>
-      </View>
-
-      {/* Coupons */}
-      <View style={{ borderRadius: 16, overflow: 'hidden', borderWidth: 2, borderColor: '#F4A94E' }}>
-        <View style={{ backgroundColor: '#F4A94E', paddingVertical: 10, paddingHorizontal: 16, flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Text style={{ fontSize: 14, fontWeight: '900', color: '#fff' }}>🎟️ קופונים והנחות</Text>
-          <TouchableOpacity style={{ paddingVertical: 5, paddingHorizontal: 14, borderRadius: 20, backgroundColor: '#fff' }}>
-            <Text style={{ fontSize: 11, fontWeight: '800', color: '#F4A94E' }}>+ צור קופון</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={{ backgroundColor: '#fffbeb', padding: 12 }}>
-          {demoCoupons.map((c, i) => (
-            <View key={i} style={{ backgroundColor: '#fff', borderRadius: 12, padding: 12, marginBottom: 8, borderRightWidth: 4, borderRightColor: c.status === 'פעיל' ? '#10b981' : '#9ca3af' }}>
-              <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 8 }}>
-                  <View style={{ backgroundColor: '#1C2B35', paddingHorizontal: 12, paddingVertical: 5, borderRadius: 8 }}>
-                    <Text style={{ fontSize: 14, fontWeight: '900', color: '#F4A94E', letterSpacing: 2 }}>{c.code}</Text>
-                  </View>
-                  <Text style={{ fontSize: 14, fontWeight: '800', color: '#1C2B35' }}>{c.discount}</Text>
-                </View>
-                <View style={{ paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12, backgroundColor: c.status === 'פעיל' ? '#dcfce7' : '#fee2e2' }}>
-                  <Text style={{ fontSize: 11, fontWeight: '800', color: c.status === 'פעיל' ? '#16a34a' : '#dc2626' }}>{c.status}</Text>
-                </View>
-              </View>
-              <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', marginTop: 4 }}>
-                <Text style={{ fontSize: 11, color: '#666', writingDirection: 'rtl' }}>שימושים: {c.uses}/{c.maxUses}</Text>
-                <Text style={{ fontSize: 11, color: '#666', writingDirection: 'rtl' }}>תוקף: {c.expires}</Text>
-              </View>
-              <View style={{ height: 6, backgroundColor: '#e5e7eb', borderRadius: 3, marginTop: 8 }}>
-                <View style={{ height: '100%', width: `${(c.uses / c.maxUses) * 100}%`, backgroundColor: c.status === 'פעיל' ? '#F4A94E' : '#9ca3af', borderRadius: 3 } as any} />
-              </View>
-            </View>
-          ))}
-        </View>
-      </View>
-
+      <Text style={{ fontSize: 22, fontWeight: '900', color: '#1C2B35', textAlign: 'right', writingDirection: 'rtl' }}>📣 מרכז שיווק ופרסום</Text>
+      {false && (
+      <View>
       {/* Campaigns */}
       <View style={{ borderRadius: 16, overflow: 'hidden', borderWidth: 2, borderColor: '#10b981' }}>
         <View style={{ backgroundColor: '#10b981', paddingVertical: 10, paddingHorizontal: 16, flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -2687,12 +3156,337 @@ export default function AdminDashboard() {
           ))}
         </View>
       </View>
-
-      <View style={{ backgroundColor: '#fffbeb', borderRadius: 10, padding: 12, borderWidth: 1, borderColor: '#fde68a' }}>
-        <Text style={{ fontSize: 11, color: '#92400e', textAlign: 'center', writingDirection: 'rtl', fontWeight: '600' }}>📊 נתוני דמו — יתעדכנו אוטומטית עם חיבור מערכת תשלומים</Text>
       </View>
+      )}
+
+      {/* Push — real, sends to devices */}
+      {renderPush()}
+
+      {/* Client Banners — real, editable */}
+      {renderClientBanners()}
+
+      {/* Coupons — real, editable */}
+      {renderCoupons()}
     </View>
   );
+  };
+
+  const renderPush = () => {
+    const fld = { padding: 12, border: '2px solid #c7d2fe', borderRadius: 10, fontSize: 15, fontWeight: 500, direction: 'rtl' as const, textAlign: 'right' as const, background: '#fff', width: '100%' as const, boxSizing: 'border-box' as const, fontFamily: 'inherit' };
+    const send = async () => {
+      if (!pushForm.title.trim() || !pushForm.body.trim()) { (window as any).alert('חסר כותרת או טקסט'); return; }
+      setPushSending(true);
+      try {
+        const r = await fetch(`${API_BASE}/api/push/send`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title: pushForm.title.trim(), body: pushForm.body.trim(), data: pushForm.deepLink ? { url: pushForm.deepLink } : {} }),
+        });
+        const j = await r.json();
+        if (j.success) {
+          (window as any).alert(`✅ נשלח ל-${j.sent} מכשירים`);
+          setPushForm({ title: '', body: '', deepLink: '' });
+          loadPushStats();
+        } else (window as any).alert('שגיאה: ' + (j.error || 'לא ידוע'));
+      } catch (e: any) { (window as any).alert('שגיאת תקשורת'); }
+      setPushSending(false);
+    };
+    const fmt = (iso: string) => { try { return new Date(iso).toLocaleString('he-IL'); } catch { return iso; } };
+    return (
+      <View style={{ borderRadius: 16, overflow: 'hidden', borderWidth: 2, borderColor: '#6366f1' }}>
+        <View style={{ backgroundColor: '#6366f1', paddingVertical: 12, paddingHorizontal: 16, flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Text style={{ fontSize: 17, fontWeight: '900', color: '#fff', writingDirection: 'rtl' }}>🔔 התראות פוש · {pushStats.count} מכשירים רשומים</Text>
+          <TouchableOpacity onPress={loadPushStats} style={{ backgroundColor: '#fff', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8 }}>
+            <Text style={{ color: '#6366f1', fontSize: 13, fontWeight: '900' }}>🔄</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={{ backgroundColor: '#eef2ff', padding: 16, gap: 12 }}>
+          <View style={{ backgroundColor: '#fff', borderRadius: 12, padding: 16, gap: 10, borderWidth: 2, borderColor: '#c7d2fe' }}>
+            <Text style={{ fontSize: 16, fontWeight: '900', color: '#3730a3', writingDirection: 'rtl' }}>📤 שלח התראה חדשה</Text>
+            {Platform.OS === 'web' && (
+              <>
+                {React.createElement('input', { placeholder: 'כותרת', value: pushForm.title, onChange: (e: any) => setPushForm({ ...pushForm, title: e.target.value }), style: fld })}
+                {React.createElement('textarea', { placeholder: 'תוכן ההתראה', value: pushForm.body, onChange: (e: any) => setPushForm({ ...pushForm, body: e.target.value }), rows: 3, style: { ...fld, resize: 'vertical' } })}
+                {React.createElement('input', { placeholder: 'קישור פנימי (לא חובה, למשל /category/3)', value: pushForm.deepLink, onChange: (e: any) => setPushForm({ ...pushForm, deepLink: e.target.value }), style: fld })}
+              </>
+            )}
+            <TouchableOpacity onPress={send} disabled={pushSending || pushStats.count === 0} style={{ backgroundColor: pushStats.count === 0 ? '#94a3b8' : '#6366f1', paddingVertical: 14, borderRadius: 10, alignItems: 'center', opacity: pushSending ? 0.5 : 1 }}>
+              <Text style={{ color: '#fff', fontWeight: '900', fontSize: 16 }}>{pushSending ? '⏳ שולח…' : pushStats.count === 0 ? '📵 אין מכשירים רשומים עדיין' : '📤 שלח לכולם'}</Text>
+            </TouchableOpacity>
+            {pushStats.count === 0 && <Text style={{ fontSize: 12, color: '#475569', writingDirection: 'rtl' }}>⚠️ רישום אוטומטי יקרה כשמשתמשים יפתחו את האפליקציה (לאחר Build הבא)</Text>}
+          </View>
+          <View style={{ backgroundColor: '#fff', borderRadius: 12, padding: 14, gap: 8 }}>
+            <Text style={{ fontSize: 15, fontWeight: '900', color: '#1e293b', writingDirection: 'rtl' }}>📜 היסטוריית שליחה ({pushStats.history.length})</Text>
+            {pushStats.history.length === 0 ? (
+              <Text style={{ fontSize: 13, color: '#64748b', writingDirection: 'rtl', textAlign: 'center', paddingVertical: 14 }}>אין שליחות עדיין</Text>
+            ) : pushStats.history.slice().reverse().map(h => (
+              <View key={h.id} style={{ backgroundColor: '#f8fafc', padding: 10, borderRadius: 8, borderRightWidth: 3, borderRightColor: '#6366f1' }}>
+                <Text style={{ fontSize: 14, fontWeight: '900', color: '#1e293b', writingDirection: 'rtl' }}>{h.title}</Text>
+                <Text style={{ fontSize: 13, color: '#475569', writingDirection: 'rtl' }}>{h.body}</Text>
+                <Text style={{ fontSize: 11, color: '#64748b', fontWeight: '700', marginTop: 4 }}>{fmt(h.sentAt)} · {h.count} נמענים</Text>
+              </View>
+            ))}
+          </View>
+        </View>
+      </View>
+    );
+  };
+
+  const renderCoupons = () => {
+    const fld = { padding: 12, border: '2px solid #86efac', borderRadius: 10, fontSize: 15, fontWeight: 500, direction: 'rtl' as const, textAlign: 'right' as const, background: '#fff', width: '100%' as const, boxSizing: 'border-box' as const, fontFamily: 'inherit' };
+    const reset = () => setCouponForm({ id: '', code: '', label: '', type: 'percent', value: 10, maxUses: 0, usedCount: 0, startAt: '', endAt: '', visible: true });
+    const save = () => {
+      if (!couponForm.code.trim()) { (window as any).alert('חסר קוד קופון'); return; }
+      const id = couponForm.id || `cpn_${Date.now()}`;
+      const item = { ...couponForm, id, code: couponForm.code.trim().toUpperCase() };
+      const arr = couponForm.id ? coupons.map(c => c.id === id ? item : c) : [item, ...coupons];
+      saveCoupons(arr);
+      reset();
+    };
+    const del = (id: string) => { if ((window as any).confirm('למחוק קופון?')) saveCoupons(coupons.filter(c => c.id !== id)); };
+    const toggle = (id: string) => saveCoupons(coupons.map(c => c.id === id ? { ...c, visible: !c.visible } : c));
+    const resetUses = (id: string) => { if ((window as any).confirm('לאפס מונה שימושים?')) saveCoupons(coupons.map(c => c.id === id ? { ...c, usedCount: 0 } : c)); };
+    return (
+      <View style={{ borderRadius: 16, overflow: 'hidden', borderWidth: 2, borderColor: '#16a34a' }}>
+        <View style={{ backgroundColor: '#16a34a', paddingVertical: 12, paddingHorizontal: 16 }}>
+          <Text style={{ fontSize: 17, fontWeight: '900', color: '#fff', textAlign: 'right', writingDirection: 'rtl' }}>🎟️ קופונים והנחות · {coupons.length}</Text>
+        </View>
+        <View style={{ backgroundColor: '#f0fdf4', padding: 16, gap: 14 }}>
+          <View style={{ backgroundColor: '#fff', borderRadius: 12, padding: 16, gap: 10, borderWidth: 2, borderColor: '#86efac' }}>
+            <Text style={{ fontSize: 16, fontWeight: '900', color: '#14532d', writingDirection: 'rtl' }}>{couponForm.id ? '✏️ עריכת קופון' : '➕ קופון חדש'}</Text>
+            {Platform.OS === 'web' && (
+              <>
+                {React.createElement('input', { placeholder: 'קוד (לדוגמה: BATUMI25)', value: couponForm.code, onChange: (e: any) => setCouponForm({ ...couponForm, code: e.target.value.toUpperCase() }), style: { ...fld, letterSpacing: 2, fontWeight: 900, textTransform: 'uppercase' } })}
+                {React.createElement('input', { placeholder: 'תווית תצוגה (למשל: הנחת פתיחה)', value: couponForm.label, onChange: (e: any) => setCouponForm({ ...couponForm, label: e.target.value }), style: fld })}
+                <View style={{ flexDirection: 'row-reverse', gap: 10 }}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 13, fontWeight: '900', color: '#14532d', writingDirection: 'rtl', marginBottom: 4 }}>סוג הנחה</Text>
+                    {React.createElement('select', { value: couponForm.type, onChange: (e: any) => setCouponForm({ ...couponForm, type: e.target.value as any }), style: fld }, [
+                      React.createElement('option', { key: 'p', value: 'percent' }, 'אחוזים (%)'),
+                      React.createElement('option', { key: 'f', value: 'fixed' }, 'סכום קבוע (₪)'),
+                    ])}
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 13, fontWeight: '900', color: '#14532d', writingDirection: 'rtl', marginBottom: 4 }}>ערך</Text>
+                    {React.createElement('input', { type: 'number', value: String(couponForm.value), onChange: (e: any) => setCouponForm({ ...couponForm, value: parseFloat(e.target.value) || 0 }), style: fld })}
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 13, fontWeight: '900', color: '#14532d', writingDirection: 'rtl', marginBottom: 4 }}>מקסימום שימושים (0 = ללא הגבלה)</Text>
+                    {React.createElement('input', { type: 'number', value: String(couponForm.maxUses), onChange: (e: any) => setCouponForm({ ...couponForm, maxUses: parseInt(e.target.value) || 0 }), style: fld })}
+                  </View>
+                </View>
+                <View style={{ flexDirection: 'row-reverse', gap: 10 }}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 13, fontWeight: '900', color: '#14532d', writingDirection: 'rtl', marginBottom: 4 }}>תחילה</Text>
+                    {React.createElement('input', { type: 'date', value: couponForm.startAt, onChange: (e: any) => setCouponForm({ ...couponForm, startAt: e.target.value }), style: fld })}
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 13, fontWeight: '900', color: '#14532d', writingDirection: 'rtl', marginBottom: 4 }}>סיום</Text>
+                    {React.createElement('input', { type: 'date', value: couponForm.endAt, onChange: (e: any) => setCouponForm({ ...couponForm, endAt: e.target.value }), style: fld })}
+                  </View>
+                </View>
+                <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 10 }}>
+                  {React.createElement('input', { type: 'checkbox', checked: couponForm.visible, onChange: (e: any) => setCouponForm({ ...couponForm, visible: e.target.checked }), style: { width: 20, height: 20 } })}
+                  <Text style={{ fontSize: 15, fontWeight: '900', color: '#14532d', writingDirection: 'rtl' }}>פעיל</Text>
+                </View>
+              </>
+            )}
+            <View style={{ flexDirection: 'row-reverse', gap: 8 }}>
+              <TouchableOpacity onPress={save} style={{ flex: 1, backgroundColor: '#16a34a', paddingVertical: 14, borderRadius: 10, alignItems: 'center' }}>
+                <Text style={{ color: '#fff', fontWeight: '900', fontSize: 16 }}>{couponForm.id ? '💾 עדכן' : '➕ הוסף'}</Text>
+              </TouchableOpacity>
+              {couponForm.id && (
+                <TouchableOpacity onPress={reset} style={{ backgroundColor: '#475569', paddingHorizontal: 18, paddingVertical: 14, borderRadius: 10 }}>
+                  <Text style={{ color: '#fff', fontWeight: '900', fontSize: 15 }}>ביטול</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          </View>
+          {coupons.length === 0 ? (
+            <View style={{ backgroundColor: '#fff', padding: 20, borderRadius: 12, alignItems: 'center' }}>
+              <Text style={{ fontSize: 32 }}>🎟️</Text>
+              <Text style={{ color: '#64748b', fontWeight: '700', marginTop: 6, writingDirection: 'rtl' }}>עדיין אין קופונים</Text>
+            </View>
+          ) : coupons.map(c => (
+            <View key={c.id} style={{ backgroundColor: '#fff', borderRadius: 12, padding: 14, borderWidth: 2, borderColor: c.visible ? '#16a34a' : '#cbd5e1', gap: 10 }}>
+              <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Text selectable style={{ fontSize: 22, fontWeight: '900', color: '#14532d', letterSpacing: 3 }}>{c.code}</Text>
+                <Text style={{ fontSize: 13, fontWeight: '900', color: c.visible ? '#16a34a' : '#94a3b8' }}>{c.visible ? '● פעיל' : '○ כבוי'}</Text>
+              </View>
+              {!!c.label && <Text style={{ fontSize: 14, color: '#475569', writingDirection: 'rtl' }}>{c.label}</Text>}
+              <Text style={{ fontSize: 16, fontWeight: '900', color: '#0369a1', writingDirection: 'rtl' }}>הנחה: {c.type === 'percent' ? `${c.value}%` : `₪${c.value}`}</Text>
+              <Text style={{ fontSize: 13, color: '#334155', fontWeight: '700', writingDirection: 'rtl' }}>שימושים: {c.usedCount || 0}{c.maxUses ? ` / ${c.maxUses}` : ' (ללא הגבלה)'}{c.startAt ? ` · מ-${c.startAt}` : ''}{c.endAt ? ` · עד-${c.endAt}` : ''}</Text>
+              <View style={{ flexDirection: 'row-reverse', gap: 8, flexWrap: 'wrap' }}>
+                <TouchableOpacity onPress={() => toggle(c.id)} style={{ backgroundColor: c.visible ? '#475569' : '#16a34a', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 10 }}>
+                  <Text style={{ color: '#fff', fontSize: 14, fontWeight: '900' }}>{c.visible ? '⏸️ כבה' : '▶️ הפעל'}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => setCouponForm({ ...c })} style={{ backgroundColor: '#2563eb', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 10 }}>
+                  <Text style={{ color: '#fff', fontSize: 14, fontWeight: '900' }}>✏️ ערוך</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => resetUses(c.id)} style={{ backgroundColor: '#f59e0b', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 10 }}>
+                  <Text style={{ color: '#fff', fontSize: 14, fontWeight: '900' }}>🔄 אפס</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => del(c.id)} style={{ backgroundColor: '#dc2626', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 10 }}>
+                  <Text style={{ color: '#fff', fontSize: 14, fontWeight: '900' }}>🗑️</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          ))}
+        </View>
+      </View>
+    );
+  };
+
+  const renderClientBanners = () => {
+    const PAGES = [
+      { val: 'home', label: 'דף הבית' },
+      { val: 'welcome', label: 'ברוכים הבאים' },
+      { val: 'info', label: 'פורטל מידע' },
+      { val: 'map', label: 'מפה' },
+      { val: 'category:1', label: 'אירוח' },
+      { val: 'category:2', label: 'אטרקציות' },
+      { val: 'category:3', label: 'סיורים קוליים' },
+      { val: 'category:5', label: 'תחבורה' },
+      { val: 'category:6', label: 'מסעדות' },
+      { val: 'category:casino', label: 'קזינו' },
+      { val: 'all', label: 'כל העמודים' },
+    ];
+    const fld = { padding: 12, border: '2px solid #fcd34d', borderRadius: 10, fontSize: 15, fontWeight: 500, direction: 'rtl' as const, textAlign: 'right' as const, background: '#fff', width: '100%' as const, boxSizing: 'border-box' as const, fontFamily: 'inherit' };
+    const reset = () => setCbForm({ id: '', client: '', mediaUrl: '', mediaType: 'image', position: 'middle', size: 'medium', targetPage: 'home', clickUrl: '', startAt: '', endAt: '', visible: true });
+    const uploadFile = async (file: File) => {
+      setCbUploading(true);
+      try {
+        const fd = new FormData();
+        fd.append('file', file);
+        const r = await fetch(`${API_BASE}/api/upload`, { method: 'POST', body: fd });
+        const j = await r.json();
+        if (j.success && j.data?.filename) {
+          const url = `/uploads/${j.data.filename}`;
+          const isVideo = /\.(mp4|webm|mov)$/i.test(file.name);
+          setCbForm(prev => ({ ...prev, mediaUrl: url, mediaType: isVideo ? 'video' : 'image' }));
+        } else {
+          (window as any).alert('שגיאה בהעלאה');
+        }
+      } catch { (window as any).alert('שגיאה בהעלאה'); }
+      setCbUploading(false);
+    };
+    const save = () => {
+      if (!cbForm.client.trim() || !cbForm.mediaUrl.trim()) { (window as any).alert('חסר שם לקוח או קובץ מדיה'); return; }
+      const id = cbForm.id || `cb_${Date.now()}`;
+      const item = { ...cbForm, id };
+      const arr = cbForm.id ? clientBanners.map(b => b.id === id ? item : b) : [item, ...clientBanners];
+      saveClientBanners(arr);
+      reset();
+    };
+    const del = (id: string) => { if ((window as any).confirm('למחוק?')) saveClientBanners(clientBanners.filter(b => b.id !== id)); };
+    const toggle = (id: string) => saveClientBanners(clientBanners.map(b => b.id === id ? { ...b, visible: !b.visible } : b));
+    const pageLabel = (v: string) => PAGES.find(p => p.val === v)?.label || v;
+    return (
+      <View style={{ borderRadius: 16, overflow: 'hidden', borderWidth: 2, borderColor: '#f59e0b' }}>
+        <View style={{ backgroundColor: '#f59e0b', paddingVertical: 12, paddingHorizontal: 16 }}>
+          <Text style={{ fontSize: 17, fontWeight: '900', color: '#fff', textAlign: 'right', writingDirection: 'rtl' }}>📺 באנרים ללקוחות · {clientBanners.length}</Text>
+        </View>
+        <View style={{ backgroundColor: '#fffbeb', padding: 16, gap: 14 }}>
+          <View style={{ backgroundColor: '#fff', borderRadius: 12, padding: 16, gap: 10, borderWidth: 2, borderColor: '#fcd34d' }}>
+            <Text style={{ fontSize: 16, fontWeight: '900', color: '#78350f', writingDirection: 'rtl' }}>{cbForm.id ? '✏️ עריכה' : '➕ באנר חדש'}</Text>
+            {Platform.OS === 'web' && (
+              <>
+                {React.createElement('input', { placeholder: 'שם לקוח', value: cbForm.client, onChange: (e: any) => setCbForm({ ...cbForm, client: e.target.value }), style: fld })}
+                {React.createElement('input', { type: 'file', accept: 'image/*,video/*,.gif', onChange: (e: any) => { const f = e.target.files?.[0]; if (f) uploadFile(f); }, style: { ...fld, padding: 8 } })}
+                {cbUploading && <Text style={{ fontSize: 13, color: '#d97706', fontWeight: '700' }}>⏳ מעלה…</Text>}
+                {!!cbForm.mediaUrl && (
+                  cbForm.mediaType === 'video' ? (
+                    React.createElement('video', { src: cbForm.mediaUrl, controls: true, style: { width: '100%', maxHeight: 200, borderRadius: 8, background: '#000' } })
+                  ) : (
+                    React.createElement('img', { src: cbForm.mediaUrl, style: { width: '100%', maxHeight: 200, objectFit: 'contain', borderRadius: 8, background: '#f8fafc' } })
+                  )
+                )}
+                <View style={{ flexDirection: 'row-reverse', gap: 10 }}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 13, fontWeight: '900', color: '#78350f', writingDirection: 'rtl', marginBottom: 4 }}>עמוד יעד</Text>
+                    {React.createElement('select', { value: cbForm.targetPage, onChange: (e: any) => setCbForm({ ...cbForm, targetPage: e.target.value }), style: fld }, PAGES.map(p => React.createElement('option', { key: p.val, value: p.val }, p.label)))}
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 13, fontWeight: '900', color: '#78350f', writingDirection: 'rtl', marginBottom: 4 }}>מיקום</Text>
+                    {React.createElement('select', { value: cbForm.position, onChange: (e: any) => setCbForm({ ...cbForm, position: e.target.value as any }), style: fld }, [
+                      React.createElement('option', { key: 't', value: 'top' }, 'למעלה'),
+                      React.createElement('option', { key: 'm', value: 'middle' }, 'אמצע'),
+                      React.createElement('option', { key: 'b', value: 'bottom' }, 'תחתית'),
+                    ])}
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 13, fontWeight: '900', color: '#78350f', writingDirection: 'rtl', marginBottom: 4 }}>גודל</Text>
+                    {React.createElement('select', { value: cbForm.size, onChange: (e: any) => setCbForm({ ...cbForm, size: e.target.value as any }), style: fld }, [
+                      React.createElement('option', { key: 's', value: 'small' }, 'קטן (50px)'),
+                      React.createElement('option', { key: 'm', value: 'medium' }, 'בינוני (100px)'),
+                      React.createElement('option', { key: 'l', value: 'large' }, 'גדול (180px)'),
+                    ])}
+                  </View>
+                </View>
+                {React.createElement('input', { placeholder: 'קישור בלחיצה (URL, לא חובה)', value: cbForm.clickUrl, onChange: (e: any) => setCbForm({ ...cbForm, clickUrl: e.target.value }), style: fld })}
+                <View style={{ flexDirection: 'row-reverse', gap: 10 }}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 13, fontWeight: '900', color: '#78350f', writingDirection: 'rtl', marginBottom: 4 }}>תחילה</Text>
+                    {React.createElement('input', { type: 'date', value: cbForm.startAt, onChange: (e: any) => setCbForm({ ...cbForm, startAt: e.target.value }), style: fld })}
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 13, fontWeight: '900', color: '#78350f', writingDirection: 'rtl', marginBottom: 4 }}>סיום</Text>
+                    {React.createElement('input', { type: 'date', value: cbForm.endAt, onChange: (e: any) => setCbForm({ ...cbForm, endAt: e.target.value }), style: fld })}
+                  </View>
+                </View>
+                <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 10 }}>
+                  {React.createElement('input', { type: 'checkbox', checked: cbForm.visible, onChange: (e: any) => setCbForm({ ...cbForm, visible: e.target.checked }), style: { width: 20, height: 20 } })}
+                  <Text style={{ fontSize: 15, fontWeight: '900', color: '#78350f', writingDirection: 'rtl' }}>פעיל</Text>
+                </View>
+              </>
+            )}
+            <View style={{ flexDirection: 'row-reverse', gap: 8 }}>
+              <TouchableOpacity onPress={save} style={{ flex: 1, backgroundColor: '#d97706', paddingVertical: 14, borderRadius: 10, alignItems: 'center' }}>
+                <Text style={{ color: '#fff', fontWeight: '900', fontSize: 16 }}>{cbForm.id ? '💾 עדכן' : '➕ הוסף'}</Text>
+              </TouchableOpacity>
+              {cbForm.id && (
+                <TouchableOpacity onPress={reset} style={{ backgroundColor: '#475569', paddingHorizontal: 18, paddingVertical: 14, borderRadius: 10 }}>
+                  <Text style={{ color: '#fff', fontWeight: '900', fontSize: 15 }}>ביטול</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          </View>
+
+          {clientBanners.length === 0 ? (
+            <View style={{ backgroundColor: '#fff', padding: 20, borderRadius: 12, alignItems: 'center' }}>
+              <Text style={{ fontSize: 32 }}>📺</Text>
+              <Text style={{ color: '#64748b', fontWeight: '700', marginTop: 6, writingDirection: 'rtl' }}>עדיין אין באנרים ללקוחות</Text>
+            </View>
+          ) : clientBanners.map(b => (
+            <View key={b.id} style={{ backgroundColor: '#fff', borderRadius: 12, padding: 14, borderWidth: 2, borderColor: b.visible ? '#f59e0b' : '#cbd5e1', gap: 10 }}>
+              <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Text style={{ fontSize: 17, fontWeight: '900', color: '#0f172a', writingDirection: 'rtl' }}>{b.client}</Text>
+                <Text style={{ fontSize: 13, fontWeight: '900', color: b.visible ? '#16a34a' : '#94a3b8' }}>{b.visible ? '● פעיל' : '○ כבוי'}</Text>
+              </View>
+              {Platform.OS === 'web' && (
+                b.mediaType === 'video' ? (
+                  React.createElement('video', { src: b.mediaUrl, controls: true, style: { width: '100%', maxHeight: 160, borderRadius: 8, background: '#000' } })
+                ) : (
+                  React.createElement('img', { src: b.mediaUrl, style: { width: '100%', maxHeight: 160, objectFit: 'contain', borderRadius: 8, background: '#f8fafc' } })
+                )
+              )}
+              <Text style={{ fontSize: 14, color: '#334155', fontWeight: '700', writingDirection: 'rtl' }}>📍 {pageLabel(b.targetPage)} · {({top:'למעלה',middle:'אמצע',bottom:'תחתית'} as any)[b.position]} · {({small:'קטן',medium:'בינוני',large:'גדול'} as any)[b.size]}{b.startAt ? ` · מ-${b.startAt}` : ''}{b.endAt ? ` · עד-${b.endAt}` : ''}</Text>
+              {!!b.clickUrl && <Text style={{ fontSize: 13, color: '#0369a1' }} selectable>🔗 {b.clickUrl}</Text>}
+              <View style={{ flexDirection: 'row-reverse', gap: 8 }}>
+                <TouchableOpacity onPress={() => toggle(b.id)} style={{ backgroundColor: b.visible ? '#475569' : '#16a34a', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 10 }}>
+                  <Text style={{ color: '#fff', fontSize: 14, fontWeight: '900' }}>{b.visible ? '⏸️ כבה' : '▶️ הפעל'}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => setCbForm({ ...b })} style={{ backgroundColor: '#2563eb', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 10 }}>
+                  <Text style={{ color: '#fff', fontSize: 14, fontWeight: '900' }}>✏️ ערוך</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => del(b.id)} style={{ backgroundColor: '#dc2626', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 10 }}>
+                  <Text style={{ color: '#fff', fontSize: 14, fontWeight: '900' }}>🗑️ מחק</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          ))}
+        </View>
+      </View>
+    );
   };
 
   const demoTransactions = [
@@ -3122,7 +3916,7 @@ export default function AdminDashboard() {
       const fd = new FormData();
       fd.append('file', file);
       try {
-        await fetch('/api/gallery', { method: 'POST', body: fd });
+        await fetch(`${API_BASE}/api/gallery`, { method: 'POST', body: fd });
         await refreshGallery();
       } catch {}
     };

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Image, StyleSheet, TouchableOpacity, Text, useWindowDimensions } from 'react-native';
+import { API_BASE } from '../constants/api';
 
 type GalleryFile = { filename: string; url: string };
 
@@ -10,7 +11,7 @@ export default function HomeGallery() {
   const timer = useRef<any>(null);
 
   useEffect(() => {
-    fetch('/api/uploads')
+    fetch(`${API_BASE}/api/uploads`)
       .then(r => r.json())
       .then(j => {
         if (j.success) {

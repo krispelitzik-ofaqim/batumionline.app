@@ -25,6 +25,9 @@ import WeatherModal from '../../components/WeatherModal';
 import CurrencyModal from '../../components/CurrencyModal';
 import NewsModal from '../../components/NewsModal';
 import FlightsModal from '../../components/FlightsModal';
+import PopupDisplay from '../../components/PopupDisplay';
+import ClientBannerDisplay from '../../components/ClientBannerDisplay';
+import CouponRedeemModal from '../../components/CouponRedeemModal';
 
 type CatItem = {
   id: string;
@@ -60,6 +63,7 @@ const BOTTOM_BANNERS = [
   { id: 'currency', title: 'המרת מטבעות', icon: '💰', bg: Colors.SECONDARY },
   { id: 'news', title: 'חדשות בעברית', icon: '🗞️', bg: '#7ECFC0' },
   { id: 'flights', title: 'לוח המראות ונחיתות', icon: '✈️', bg: '#2D4A5E' },
+  { id: 'coupon', title: 'מימוש קוד קופון', icon: '🎟️', bg: '#16a34a' },
 ];
 
 const DEV_PALETTE = [
@@ -216,6 +220,7 @@ export default function HomeScreen() {
   return (
     <View style={[styles.safe, dark && { backgroundColor: Colors.TEXT }]}>
       {editMode && <EditToolbar onSave={handleSaveEdit} onExit={handleExitEdit} />}
+      <PopupDisplay page="home" />
       <ScrollView
         style={styles.scroll}
         showsVerticalScrollIndicator={false}
@@ -227,6 +232,8 @@ export default function HomeScreen() {
         </View>
 
         <HomeGallery />
+
+        <ClientBannerDisplay page="home" position="top" />
 
         {/* 1. קטגוריות ראשיות — 6 קארדים, 2 בשורה */}
         {mainGroupVisible && (
@@ -257,6 +264,8 @@ export default function HomeScreen() {
             )}
           </View>
         )}
+
+        <ClientBannerDisplay page="home" position="middle" />
 
         {/* 3. סליידר ברוכים הבאים */}
         {welcomeGroupVisible && (
@@ -312,6 +321,8 @@ export default function HomeScreen() {
           </View>
         )}
 
+        <ClientBannerDisplay page="home" position="bottom" />
+
         <View style={{ height: 24 }} />
       </ScrollView>
 
@@ -323,6 +334,7 @@ export default function HomeScreen() {
       <CurrencyModal visible={activeModal === 'currency'} onClose={() => setActiveModal(null)} bgColor={BOTTOM_BANNERS.find(b => b.id === 'currency')!.bg} />
       <NewsModal visible={activeModal === 'news'} onClose={() => setActiveModal(null)} bgColor={BOTTOM_BANNERS.find(b => b.id === 'news')!.bg} />
       <FlightsModal visible={activeModal === 'flights'} onClose={() => setActiveModal(null)} bgColor={BOTTOM_BANNERS.find(b => b.id === 'flights')!.bg} />
+      <CouponRedeemModal visible={activeModal === 'coupon'} onClose={() => setActiveModal(null)} />
     </View>
   );
 }
