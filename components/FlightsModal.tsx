@@ -439,11 +439,12 @@ function DetailItem({ label, value }: { label: string; value: string }) {
 // ─── Helpers ───────────────────────────────────────────────────
 
 function statusColor(status: string) {
-  if (status === 'בזמן' || status === 'מתוכננת') return { backgroundColor: '#10B981' };
-  if (status === 'נחתה' || status === 'המריאה') return { backgroundColor: '#059669' };
-  if (status === 'עיכוב') return { backgroundColor: '#F59E0B' };
-  if (status === 'בוטלה') return { backgroundColor: '#EF4444' };
-  if (status === 'הופנתה') return { backgroundColor: '#8B5CF6' };
+  if (status === 'בזמן' || status === 'מתוכננת') return { backgroundColor: '#10B981' }; // green — on time
+  if (status === 'בדרך') return { backgroundColor: '#3B82F6' }; // blue — in flight
+  if (status === 'נחתה' || status === 'המריאה') return { backgroundColor: '#6B7280' }; // gray — completed
+  if (status === 'עיכוב') return { backgroundColor: '#F59E0B' }; // amber — delayed
+  if (status === 'בוטלה') return { backgroundColor: '#EF4444' }; // red — cancelled
+  if (status === 'הופנתה') return { backgroundColor: '#8B5CF6' }; // purple — diverted
   return { backgroundColor: 'rgba(255,255,255,0.15)' };
 }
 
