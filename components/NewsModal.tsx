@@ -302,43 +302,50 @@ function formatDate(dateStr: string): string {
   return date.toLocaleDateString('he-IL');
 }
 
+function daysAgoISO(days: number): string {
+  const d = new Date();
+  d.setDate(d.getDate() - days);
+  d.setHours(8 + Math.floor(Math.random() * 10), Math.floor(Math.random() * 60), 0, 0);
+  return d.toISOString();
+}
+
 // ─── Fallback news ─────────────────────────────────────────────
 
 const FALLBACK_NEWS: NewsItem[] = [
   {
     title: 'בטומי: עונת התיירות 2026 נפתחה עם שיא תיירים מישראל',
     summary: 'עיר הנופש בטומי שעל חוף הים השחור רושמת עלייה של 30% במספר התיירים הישראלים בהשוואה לשנה שעברה. טיסות ישירות חדשות מנתב״ג תורמות לגידול המשמעותי. בתי המלון מדווחים על תפוסה מלאה בחודשי הקיץ.',
-    image: '', link: '', source: 'ישראל היום', date: 'היום', topic: 'tourism',
+    image: '', link: '', source: 'ישראל היום', date: formatDate(daysAgoISO(0)), topic: 'tourism',
   },
   {
     title: 'השקעות נדל״ן בבטומי: מחירי הדירות עלו ב-15% בשנה האחרונה',
     summary: 'שוק הנדל״ן בבטומי ממשיך לרשום עליות מחירים. דירות להשקעה באזור הטיילת נמכרות במחירים של 1,500-2,000 דולר למ״ר. יזמים ישראלים מובילים פרויקטים חדשים באזור. מומחים צופים המשך עליית מחירים בשנתיים הקרובות.',
-    image: '', link: '', source: 'גלובס', date: 'היום', topic: 'realestate',
+    image: '', link: '', source: 'גלובס', date: formatDate(daysAgoISO(0)), topic: 'realestate',
   },
   {
     title: 'המסעדות הכי שוות בבטומי: המדריך המלא לשנת 2026',
     summary: 'מסעדת ״ხינקלי הזהב״ זכתה בפרס המסעדה הטובה בגאורגיה. שפים ישראלים פותחים מסעדות חדשות בטיילת. המטבח הגאורגי הופך לטרנד חם בקרב ישראלים. ציוני המסעדות, שעות פתיחה ומחירים — הכל במדריך המלא.',
-    image: '', link: '', source: 'אוכל טוב', date: 'אתמול', topic: 'food',
+    image: '', link: '', source: 'אוכל טוב', date: formatDate(daysAgoISO(1)), topic: 'food',
   },
   {
     title: 'פסטיבל המוזיקה הבינלאומי בבטומי יוצא לדרך בקיץ',
     summary: 'פסטיבל Black Sea Jazz חוזר לבטומי עם ליינאפ מרשים של אמנים בינלאומיים. האירוע יתקיים לאורך שלושה ימים בטיילת הים. כרטיסים כבר זמינים לרכישה. בנוסף, סדרת מופעי רחוב חדשה תתקיים כל ערב שישי לאורך הקיץ.',
-    image: '', link: '', source: 'תרבות', date: 'אתמול', topic: 'entertainment',
+    image: '', link: '', source: 'תרבות', date: formatDate(daysAgoISO(1)), topic: 'entertainment',
   },
   {
     title: 'גאורגיה מקלה על תנאי הכניסה: ללא ויזה לישראלים עד שנה',
     summary: 'ממשלת גאורגיה הודיעה על הארכת פטור הוויזה לאזרחי ישראל לתקופה של עד 365 ימים. המהלך נועד לעודד תיירות והשקעות. בנוסף, הושק מסלול מהיר חדש בנמל התעופה בבטומי לתיירים מישראל.',
-    image: '', link: '', source: 'Ynet', date: 'לפני 2 ימים', topic: 'general',
+    image: '', link: '', source: 'Ynet', date: formatDate(daysAgoISO(2)), topic: 'general',
   },
   {
     title: 'קו רכבל חדש יחבר את בטומי להרי הקווקז',
     summary: 'פרויקט תשתית חדש יאפשר לתיירים להגיע ישירות מבטומי לאתרי הסקי בהרי הקווקז. הרכבל באורך 12 ק״מ צפוי להיפתח בחורף 2027. עלות הפרויקט מוערכת ב-200 מיליון דולר ומומן בשיתוף האיחוד האירופי.',
-    image: '', link: '', source: 'כלכליסט', date: 'לפני 3 ימים', topic: 'tourism',
+    image: '', link: '', source: 'כלכליסט', date: formatDate(daysAgoISO(3)), topic: 'tourism',
   },
   {
     title: 'שוק הלילה החדש של בטומי: אוכל רחוב, מוזיקה ואומנות',
     summary: 'שוק לילה חדש נפתח ברובע הישן של בטומי ומציע חוויה ייחודית של אוכל רחוב גאורגי, מוזיקה חיה ודוכני אומנות מקומית. השוק פתוח בימי חמישי עד שבת מהשעה 20:00 ועד חצות. הכניסה חופשית.',
-    image: '', link: '', source: 'Time Out', date: 'לפני 4 ימים', topic: 'entertainment',
+    image: '', link: '', source: 'Time Out', date: formatDate(daysAgoISO(4)), topic: 'entertainment',
   },
 ];
 
