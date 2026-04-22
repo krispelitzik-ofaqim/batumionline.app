@@ -100,6 +100,7 @@ export default function WelcomeScreen() {
           <View style={{ marginTop: 16 }}>
             <AudioPlayer
               tracks={item.audios}
+              playOnLeft
               onTimeReached={item.id === '5' ? { seconds: 130, callback: fireHearts } : undefined}
             />
           </View>

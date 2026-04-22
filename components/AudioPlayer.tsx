@@ -4,7 +4,7 @@ import { Audio } from 'expo-av';
 import { Colors } from '../constants/colors';
 
 type Track = { title?: string; url: string; coords?: { lat: number; lng: number } };
-type Props = { tracks: Track[]; title?: string; compact?: boolean; onNavigate?: (coords: { lat: number; lng: number }) => void; tint?: string; onActiveChange?: (idx: number, track: Track) => void; onTimeReached?: { seconds: number; callback: () => void } };
+type Props = { tracks: Track[]; title?: string; compact?: boolean; onNavigate?: (coords: { lat: number; lng: number }) => void; tint?: string; onActiveChange?: (idx: number, track: Track) => void; onTimeReached?: { seconds: number; callback: () => void }; playOnLeft?: boolean };
 
 function fmt(ms: number) {
   const s = Math.max(0, Math.floor(ms / 1000));
@@ -24,7 +24,7 @@ function darken(hex: string, amount = 0.45): string {
 
 const SPEEDS = [1, 1.5, 2];
 
-export default function AudioPlayer({ tracks: initialTracks, title, compact, onNavigate, tint, onActiveChange, onTimeReached }: Props) {
+export default function AudioPlayer({ tracks: initialTracks, title, compact, onNavigate, tint, onActiveChange, onTimeReached, playOnLeft }: Props) {
   const [tracks, setTracks] = useState(initialTracks);
   const [activeIdx, setActiveIdx] = useState(0);
   const [playing, setPlaying] = useState(false);
@@ -214,7 +214,7 @@ export default function AudioPlayer({ tracks: initialTracks, title, compact, onN
       ) : (
         <>
           <Text style={styles.nowTitle}>{current?.title || `שיר ${activeIdx + 1}`}</Text>
-          <View style={styles.row}>
+          <View style={[styles.row, playOnLeft && { flexDirection: 'row' }]}>
             <TouchableOpacity style={styles.playBtn} onPress={toggle} activeOpacity={0.85}>
               <Text style={styles.playIcon}>{playing ? '❚❚' : '▶'}</Text>
             </TouchableOpacity>
@@ -313,7 +313,7 @@ const styles = StyleSheet.create({
   },
   header: { fontSize: 13, color: '#888', fontWeight: '700', writingDirection: 'rtl', textAlign: 'right', marginBottom: 6 },
   nowTitle: { fontSize: 17, fontWeight: '900', color: Colors.TEXT, writingDirection: 'rtl', textAlign: 'right', marginBottom: 14 },
-  row: { flexDirection: 'row', alignItems: 'center', gap: 14 },
+  row: { flexDirection: 'row-reverse', alignItems: 'center', gap: 14 },
   playBtn: {
     width: 54, height: 54, borderRadius: 27,
     backgroundColor: Colors.PRIMARY,
