@@ -287,15 +287,11 @@ function NewsCard({ item, onPress }: { item: NewsItem; onPress: () => void }) {
 function formatDate(dateStr: string): string {
   if (!dateStr) return '';
   const date = new Date(dateStr);
-  const now = new Date();
-  const diff = now.getTime() - date.getTime();
-  const hours = Math.floor(diff / 3600000);
-  if (hours < 1) return 'עכשיו';
-  if (hours < 24) return `לפני ${hours} שעות`;
-  const days = Math.floor(hours / 24);
-  if (days === 1) return 'אתמול';
-  if (days < 7) return `לפני ${days} ימים`;
-  return date.toLocaleDateString('he-IL');
+  if (isNaN(date.getTime())) return '';
+  const dd = String(date.getDate()).padStart(2, '0');
+  const mm = String(date.getMonth() + 1).padStart(2, '0');
+  const yyyy = date.getFullYear();
+  return `${dd}/${mm}/${yyyy}`;
 }
 
 function daysAgoISO(days: number): string {
