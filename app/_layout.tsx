@@ -1,8 +1,29 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Text, TextInput, useWindowDimensions } from 'react-native';
+import { Text, TextInput, View, ScrollView, useWindowDimensions } from 'react-native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
+
+class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { error: Error | null }> {
+  state = { error: null as Error | null };
+  static getDerivedStateFromError(error: Error) { return { error }; }
+  componentDidCatch(error: Error, info: any) { console.warn('RootErrorBoundary caught:', error, info); }
+  render() {
+    if (this.state.error) {
+      const e = this.state.error as any;
+      return (
+        <View style={{ flex: 1, backgroundColor: '#1C2B35', padding: 24, paddingTop: 80 }}>
+          <Text style={{ color: '#F4A94E', fontSize: 20, fontWeight: '800', marginBottom: 12, writingDirection: 'rtl' }}>שגיאה בפתיחה</Text>
+          <Text selectable style={{ color: '#fff', fontSize: 14, marginBottom: 8 }}>{String(e?.message || e)}</Text>
+          <ScrollView style={{ flex: 1 }}>
+            <Text selectable style={{ color: '#94a3b8', fontSize: 11, fontFamily: 'monospace' }}>{String(e?.stack || '')}</Text>
+          </ScrollView>
+        </View>
+      );
+    }
+    return this.props.children;
+  }
+}
 import {
   Assistant_400Regular,
   Assistant_500Medium,
@@ -52,18 +73,20 @@ export default function RootLayout() {
   if (!fontsReady) return null;
 
   return (
-    <PreviewContext.Provider value={previewCtx}>
-      <AdminContext.Provider value={{ isAdmin, setAdmin }}>
-        <ThemeContext.Provider value={{ dark, toggle: () => setDark(!dark) }}>
-          <StatusBar style={dark ? 'light' : 'dark'} />
-          <Stack
-            screenOptions={{
-              headerShown: false,
-              contentStyle: { backgroundColor: dark ? Colors.TEXT : Colors.BACKGROUND },
-            }}
-          />
-        </ThemeContext.Provider>
-      </AdminContext.Provider>
-    </PreviewContext.Provider>
+    <ErrorBoundary>
+      <PreviewContext.Provider value={previewCtx}>
+        <AdminContext.Provider value={{ isAdmin, setAdmin }}>
+          <ThemeContext.Provider value={{ dark, toggle: () => setDark(!dark) }}>
+            <StatusBar style={dark ? 'light' : 'dark'} />
+            <Stack
+              screenOptions={{
+                headerShown: false,
+                contentStyle: { backgroundColor: dark ? Colors.TEXT : Colors.BACKGROUND },
+              }}
+            />
+          </ThemeContext.Provider>
+        </AdminContext.Provider>
+      </PreviewContext.Provider>
+    </ErrorBoundary>
   );
 }

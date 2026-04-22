@@ -70,7 +70,7 @@ export default function WelcomeScreen() {
   return (
     <SafeAreaView style={styles.safe}>
       <Stack.Screen options={{ headerShown: false }} />
-      <TouchableOpacity onPress={() => router.back()} style={styles.backFab} accessibilityLabel="חזור">
+      <TouchableOpacity onPress={() => (router.canGoBack() ? router.back() : router.replace("/"))} style={styles.backFab} accessibilityLabel="חזור">
         <Text style={styles.backFabArrow}>←</Text>
       </TouchableOpacity>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
@@ -79,7 +79,7 @@ export default function WelcomeScreen() {
             Platform.OS === 'web' ? (
               React.createElement('img', {
                 src: item.icon,
-                style: { width: '100%', height: 220, objectFit: 'cover', borderRadius: 20, display: 'block' },
+                style: { width: '100%', height: 240, objectFit: 'cover', display: 'block' },
                 alt: item.title,
               })
             ) : (
@@ -90,16 +90,17 @@ export default function WelcomeScreen() {
               <Text style={styles.heroIcon}>{item.icon || '👋'}</Text>
             </LinearGradient>
           )}
-          <LinearGradient colors={['transparent', 'rgba(0,0,0,0.7)']} style={styles.heroOverlay}>
+          <LinearGradient colors={['transparent', 'rgba(0,0,0,0.8)']} style={styles.heroOverlay}>
             <Text style={styles.heroTitle}>{item.title}</Text>
             {item.subtitle && <Text style={styles.heroSub}>{item.subtitle}</Text>}
           </LinearGradient>
         </View>
 
         {item.audios && item.audios.length > 0 && (
-          <View style={{ marginTop: 16 }}>
+          <View style={{ paddingHorizontal: 16, marginTop: 16 }}>
             <AudioPlayer
               tracks={item.audios}
+              compact
               playOnLeft
               onTimeReached={item.id === '5' ? { seconds: 130, callback: fireHearts } : undefined}
             />
@@ -107,7 +108,7 @@ export default function WelcomeScreen() {
         )}
 
         {item.id === '6' && sub && (
-          <View style={[subSt.wrap, { backgroundColor: sub.bgColor || '#fff' }]}>
+          <View style={[subSt.wrap, { backgroundColor: sub.bgColor || '#fff', marginHorizontal: 16 }]}>
             <Text style={[subSt.title, { color: sub.titleColor || '#1C2B35', fontSize: sub.fontSize || 20 }]}>📱 {sub.title}</Text>
             <Text style={subSt.desc}>{sub.desc}</Text>
             <View style={subSt.plans}>
@@ -172,17 +173,16 @@ export default function WelcomeScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.BACKGROUND },
-  backFab: { position: 'absolute', top: 50, left: 16, zIndex: 9999, width: 38, height: 38, borderRadius: 19, backgroundColor: 'rgba(0,0,0,0.55)', alignItems: 'center', justifyContent: 'center', ...(Platform.OS === 'web' ? { cursor: 'pointer' as any } : {}) },
+  backFab: { ...(Platform.OS === 'web' ? { position: 'fixed' as any, cursor: 'pointer' as any } : { position: 'absolute' as any }), top: 12, left: 12, zIndex: 9999, width: 38, height: 38, borderRadius: 19, backgroundColor: 'rgba(0,0,0,0.55)', alignItems: 'center', justifyContent: 'center' },
   backFabArrow: { fontSize: 22, color: '#fff', fontWeight: '900' },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   loadTxt: { fontSize: 16, color: '#999' },
-  content: { padding: 16, paddingBottom: 40 },
+  content: { paddingBottom: 40 },
   heroWrap: {
-    borderRadius: 20, overflow: 'hidden', height: 220, position: 'relative',
-    shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.12, shadowRadius: 10, elevation: 4,
+    overflow: 'hidden', height: 240, position: 'relative',
   },
-  heroImg: { width: '100%', height: 220 },
-  heroGradient: { width: '100%', height: 220, alignItems: 'center', justifyContent: 'center' },
+  heroImg: { width: '100%', height: 240 },
+  heroGradient: { width: '100%', height: 240, alignItems: 'center', justifyContent: 'center' },
   heroIcon: { fontSize: 44 },
   heroOverlay: {
     position: 'absolute', bottom: 0, left: 0, right: 0,

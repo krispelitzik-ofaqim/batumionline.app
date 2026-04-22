@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, Modal, TouchableOpacity, StyleSheet, ActivityIndicator, ScrollView } from 'react-native';
 import { Colors } from '../constants/colors';
 import CamerasModal from './CamerasModal';
+import AudioPlayer from './AudioPlayer';
 
 const DAYS_HE = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
 const OWM_KEY = ''; // Add your OpenWeatherMap API key here
@@ -182,6 +183,14 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
 
         <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
           <Text style={s.title}>מזג האוויר בבטומי</Text>
+
+          <View style={{ marginBottom: 12 }}>
+            <AudioPlayer
+              tracks={[{ title: 'מזג האוויר בבטומי - סקירה שנתית', url: '/uploads/1776419283438-349.mp3' }]}
+              compact
+              playOnLeft
+            />
+          </View>
 
           <TouchableOpacity style={s.camBanner} activeOpacity={0.85} onPress={() => setCamerasOpen(true)}>
             <Text style={s.camBannerIcon}>📹</Text>

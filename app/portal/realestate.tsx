@@ -157,7 +157,7 @@ export default function RealEstatePortal() {
             end={{ x: 0, y: 1 }}
             style={s.heroOverlay}
           >
-            <TouchableOpacity onPress={() => router.back()} style={s.heroBackBtn}>
+            <TouchableOpacity onPress={() => (router.canGoBack() ? router.back() : router.replace("/"))} style={s.heroBackBtn}>
               <Ionicons name="arrow-back" size={22} color={Colors.WHITE} />
             </TouchableOpacity>
             <Text style={s.heroKicker}>BATUMI REAL ESTATE</Text>

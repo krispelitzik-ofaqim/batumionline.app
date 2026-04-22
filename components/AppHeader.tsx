@@ -16,7 +16,7 @@ export default function AppHeader({ crumbs = [], dark = false }: { crumbs?: Crum
   return (
     <View style={[s.container, { backgroundColor: bg, borderBottomColor: borderColor }]}>
       <TouchableOpacity
-        onPress={() => router.back()}
+        onPress={() => (router.canGoBack() ? router.back() : router.replace("/"))}
         style={s.backBtn}
         accessibilityLabel="חזור"
       >

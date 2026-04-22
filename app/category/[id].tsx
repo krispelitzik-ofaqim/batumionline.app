@@ -710,8 +710,8 @@ function HotelCard({ h, dark, pageBtnLabel, mapPoints, layerColor }: { h: Hotel;
     <View style={[st.hotelCard, dark && { backgroundColor: '#2a3942' }]}>
       <HotelImage uri={h.image} titleEn={h.titleEn} />
       {h.audio ? (
-        <View style={{ paddingHorizontal: 12, paddingTop: 8 }}>
-          <AudioPlayer tracks={[{ title: h.title, url: h.audio }]} compact />
+        <View style={{ paddingHorizontal: 24, paddingTop: 8 }}>
+          <AudioPlayer tracks={[{ title: h.title, url: h.audio }]} compact playOnLeft />
         </View>
       ) : null}
       <View style={st.hotelBody}>
@@ -1003,7 +1003,7 @@ export default function CategoryScreen() {
         >
           <Text style={{ fontSize: 12, fontWeight: '900', color: '#fff' }}>שדרג עכשיו</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => router.back()} style={{ marginTop: 6 }}>
+        <TouchableOpacity onPress={() => (router.canGoBack() ? router.back() : router.replace("/"))} style={{ marginTop: 6 }}>
           <Text style={{ fontSize: 10, color: '#888' }}>חזרה</Text>
         </TouchableOpacity>
       </View>
@@ -1014,7 +1014,7 @@ export default function CategoryScreen() {
     return (
       <SafeAreaView style={[st.safe, darkCat && { backgroundColor: cat.heroBg || '#0f1419' }]}>
         <Stack.Screen options={{ headerShown: false }} />
-        <FlightsModal visible={true} onClose={() => router.back()} bgColor="#2D4A5E" />
+        <FlightsModal visible={true} onClose={() => (router.canGoBack() ? router.back() : router.replace("/"))} bgColor="#2D4A5E" />
       </SafeAreaView>
     );
   }
@@ -1167,8 +1167,8 @@ export default function CategoryScreen() {
               </View>
             )}
             {cat.introAudio && (
-              <View style={{ paddingHorizontal: 16, paddingTop: 4, paddingBottom: 8 }}>
-                <AudioPlayer tracks={[{ title: cat.title, url: cat.introAudio }]} compact playOnLeft={cat.id === 'casino'} />
+              <View style={{ paddingHorizontal: 0, paddingTop: 4, paddingBottom: 8 }}>
+                <AudioPlayer tracks={[{ title: cat.title, url: cat.introAudio }]} compact playOnLeft />
               </View>
             )}
             {cat.hotels.filter(h => h.visible !== false).map(h => (

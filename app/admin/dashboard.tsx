@@ -161,32 +161,31 @@ const SECTIONS: Section[] = [
 ];
 
 const TAG_GROUPS: { group: string; icon: string; tags: { key: string; label: string }[]; subgroups?: { label: string; tags: { key: string; label: string }[] }[] }[] = [
-  { group: 'קטגוריות ראשיות', icon: '📂', subgroups: [
+  { group: 'קטגוריות', icon: '📂', subgroups: [
     { label: '🏨 אירוח ולינה', tags: [{ key: 'h1', label: 'מלונות יוקרה' },{ key: 'h2', label: 'מלונות 3-4' },{ key: 'h3', label: 'דירות נופש' },{ key: 'h4', label: 'כפרי נופש' },{ key: 'h5', label: 'ווילות' },{ key: 'h6', label: 'אכסניות' }] },
     { label: '🎡 אטרקציות ואתרים', tags: [{ key: 'a1', label: 'אטרקציות' },{ key: 'a2', label: 'אתרים פופולריים' },{ key: 'a3', label: 'היסטוריים' },{ key: 'a5', label: 'יהדות' },{ key: 'a6', label: 'נצרות' },{ key: 'a7', label: 'אוטובוס' },{ key: 'a8', label: 'נסיעות פרטיות' }] },
     { label: '🎧 סיורים קוליים', tags: [{ key: 'tours', label: 'סיורים קוליים' }] },
     { label: '🍽️ מסעדות ואוכל', tags: [{ key: 'r1', label: 'פופולריות' },{ key: 'r2', label: 'יוקרה' },{ key: 'r4', label: 'כשרות' },{ key: 'r3', label: 'רשתות' },{ key: 'r5', label: 'מהיר' },{ key: 'r6', label: 'שווה להכיר' }] },
     { label: '🍻 בילוי וחיי לילה', tags: [{ key: 'n1', label: 'מועדונים' },{ key: 'n2', label: 'פאבים' },{ key: 'n3', label: 'הופעות' },{ key: 'n4', label: 'חשפנות' }] },
     { label: '🚕 תחבורה', tags: [{ key: 't1', label: 'מוניות' },{ key: 't2', label: 'ציבורית' },{ key: 't3', label: 'רכבות' },{ key: 't4', label: 'רכב' },{ key: 't5', label: 'אופניים' },{ key: 't6', label: 'טיסות' }] },
+    { label: '🎰 קזינו', tags: [{ key: 'casino', label: 'קזינו' }] },
+    { label: '🛍️ קניות ומתנות', tags: [{ key: 'sh1', label: 'שופינג' },{ key: 'sh2', label: 'סופרמרקטים' },{ key: 'sh3', label: 'החזרי מס' }] },
+    { label: '🏋️ ספורט', tags: [{ key: 'sp1', label: 'כושר' },{ key: 'sp2', label: 'ספא' },{ key: 'sp3', label: 'בריכות' },{ key: 'sp4', label: 'חוף' },{ key: 'sp5', label: 'ריצה' },{ key: 'sp6', label: 'יוגה' },{ key: 'sp7', label: 'ריקוד' },{ key: 'sp8', label: 'מגרשים' }] },
+    { label: '⛷️ אקסטרים', tags: [{ key: 'ex1', label: 'סקי' },{ key: 'ex2', label: 'ג׳יפים' },{ key: 'ex3', label: 'טרקטורונים' },{ key: 'ex4', label: 'פרגליידינג' },{ key: 'ex5', label: 'רפטינג' },{ key: 'ex6', label: 'קניונינג' },{ key: 'ex7', label: 'סוסים' },{ key: 'ex8', label: 'צלילה' }] },
+    { label: '🛂 מדריכים', tags: [{ key: 'guides', label: 'מדריכים' }] },
   ], tags: [
-    { key: 'main_unsorted', label: '📥 לא ממויין' },{ key: 'h1', label: 'מלונות יוקרה' },{ key: 'h2', label: 'מלונות 3-4' },{ key: 'h3', label: 'דירות נופש' },{ key: 'h4', label: 'כפרי נופש' },{ key: 'h5', label: 'ווילות' },{ key: 'h6', label: 'אכסניות' },
+    { key: 'main_unsorted', label: '📥 לא ממויין' },
+    { key: 'h1', label: 'מלונות יוקרה' },{ key: 'h2', label: 'מלונות 3-4' },{ key: 'h3', label: 'דירות נופש' },{ key: 'h4', label: 'כפרי נופש' },{ key: 'h5', label: 'ווילות' },{ key: 'h6', label: 'אכסניות' },
     { key: 'a1', label: 'אטרקציות' },{ key: 'a2', label: 'אתרים פופולריים' },{ key: 'a3', label: 'היסטוריים' },{ key: 'a5', label: 'יהדות' },{ key: 'a6', label: 'נצרות' },{ key: 'a7', label: 'אוטובוס' },{ key: 'a8', label: 'נסיעות פרטיות' },
     { key: 'tours', label: 'סיורים קוליים' },
     { key: 'r1', label: 'פופולריות' },{ key: 'r2', label: 'יוקרה' },{ key: 'r4', label: 'כשרות' },{ key: 'r3', label: 'רשתות' },{ key: 'r5', label: 'מהיר' },{ key: 'r6', label: 'שווה להכיר' },
     { key: 'n1', label: 'מועדונים' },{ key: 'n2', label: 'פאבים' },{ key: 'n3', label: 'הופעות' },{ key: 'n4', label: 'חשפנות' },
     { key: 't1', label: 'מוניות' },{ key: 't2', label: 'ציבורית' },{ key: 't3', label: 'רכבות' },{ key: 't4', label: 'רכב' },{ key: 't5', label: 'אופניים' },{ key: 't6', label: 'טיסות' },
-  ]},
-  { group: 'קטגוריות נוספות', icon: '📁', subgroups: [
-    { label: '🛍️ קניות ומתנות', tags: [{ key: 'sh1', label: 'שופינג' },{ key: 'sh2', label: 'סופרמרקטים' },{ key: 'sh3', label: 'החזרי מס' }] },
-    { label: '🏋️ ספורט', tags: [{ key: 'sp1', label: 'כושר' },{ key: 'sp2', label: 'ספא' },{ key: 'sp3', label: 'בריכות' },{ key: 'sp4', label: 'חוף' },{ key: 'sp5', label: 'ריצה' },{ key: 'sp6', label: 'יוגה' },{ key: 'sp7', label: 'ריקוד' },{ key: 'sp8', label: 'מגרשים' }] },
-    { label: '⛷️ אקסטרים', tags: [{ key: 'ex1', label: 'סקי' },{ key: 'ex2', label: 'ג׳יפים' },{ key: 'ex3', label: 'טרקטורונים' },{ key: 'ex4', label: 'פרגליידינג' },{ key: 'ex5', label: 'רפטינג' },{ key: 'ex6', label: 'קניונינג' },{ key: 'ex7', label: 'סוסים' },{ key: 'ex8', label: 'צלילה' }] },
-    { label: '🛂 מדריכים', tags: [{ key: 'guides', label: 'מדריכים' }] },
-    { label: '🎰 קזינו', tags: [{ key: 'casino', label: 'קזינו' }] },
-  ], tags: [
-    { key: 'extra_unsorted', label: '📥 לא ממויין' },{ key: 'sh1', label: 'שופינג' },{ key: 'sh2', label: 'סופרמרקטים' },{ key: 'sh3', label: 'החזרי מס' },
+    { key: 'casino', label: 'קזינו' },
+    { key: 'sh1', label: 'שופינג' },{ key: 'sh2', label: 'סופרמרקטים' },{ key: 'sh3', label: 'החזרי מס' },
     { key: 'sp1', label: 'כושר' },{ key: 'sp2', label: 'ספא' },{ key: 'sp3', label: 'בריכות' },{ key: 'sp4', label: 'חוף' },{ key: 'sp5', label: 'ריצה' },{ key: 'sp6', label: 'יוגה' },{ key: 'sp7', label: 'ריקוד' },{ key: 'sp8', label: 'מגרשים' },
     { key: 'ex1', label: 'סקי' },{ key: 'ex2', label: 'ג׳יפים' },{ key: 'ex3', label: 'טרקטורונים' },{ key: 'ex4', label: 'פרגליידינג' },{ key: 'ex5', label: 'רפטינג' },{ key: 'ex6', label: 'קניונינג' },{ key: 'ex7', label: 'סוסים' },{ key: 'ex8', label: 'צלילה' },
-    { key: 'guides', label: 'מדריכים' },{ key: 'casino', label: 'קזינו' },
+    { key: 'guides', label: 'מדריכים' },
   ]},
   { group: 'סליידר ברוכים הבאים', icon: '👋', tags: [{ key: 'welcome', label: 'ברוכים הבאים' }] },
   { group: 'פורטל המידע', icon: '📋', tags: [{ key: 'info', label: 'פורטל מידע' }] },
@@ -2962,7 +2961,7 @@ export default function AdminDashboard() {
       if (mediaFolder === '__none') return !(f.tags || []).length;
       if (mediaFilter && mediaFilter !== '__none') return (f.tags || []).includes(mediaFilter);
       return activeGrp ? activeGrp.tags.some(t => (f.tags || []).includes(t.key)) : false;
-    });
+    }).slice().sort((a, b) => (a.originalName || a.filename).localeCompare(b.originalName || b.filename, 'he'));
 
     if (!mediaFolder) {
       return (
