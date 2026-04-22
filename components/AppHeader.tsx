@@ -33,7 +33,7 @@ export default function AppHeader({ crumbs = [], dark = false }: { crumbs?: Crum
 const s = StyleSheet.create({
   container: {
     height: 52,
-    flexDirection: 'row-reverse',
+    flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 12,
     gap: 10,
