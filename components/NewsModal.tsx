@@ -208,33 +208,7 @@ export default function NewsModal({ visible, onClose, bgColor }: { visible: bool
             <ActivityIndicator size="large" color={Colors.WHITE} style={{ marginTop: 40 }} />
           ) : (
             filtered.map((item, i) => (
-              <TouchableOpacity
-                key={i}
-                style={s.card}
-                activeOpacity={0.8}
-                onPress={() => setExpanded(item)}
-              >
-                {/* Image */}
-                <Image
-                  source={{ uri: item.image || PLACEHOLDER_IMAGES[item.topic] }}
-                  style={s.cardImage}
-                />
-
-                {/* Topic tag */}
-                <View style={[s.topicTag, { backgroundColor: TOPIC_COLORS[item.topic] }]}>
-                  <Text style={s.topicTxt}>{TOPIC_LABELS[item.topic]}</Text>
-                </View>
-
-                {/* Content */}
-                <View style={s.cardBody}>
-                  <Text style={s.cardTitle} numberOfLines={2}>{item.title}</Text>
-                  <Text style={s.cardSummary} numberOfLines={5}>{item.summary}</Text>
-                  <View style={s.cardFooter}>
-                    <Text style={s.cardSource}>{item.source}</Text>
-                    <Text style={s.cardDate}>{item.date}</Text>
-                  </View>
-                </View>
-              </TouchableOpacity>
+              <NewsCard key={i} item={item} onPress={() => setExpanded(item)} />
             ))
           )}
 
@@ -253,10 +227,7 @@ export default function NewsModal({ visible, onClose, bgColor }: { visible: bool
               <Text style={s.closeX}>✕</Text>
             </TouchableOpacity>
             <ScrollView contentContainerStyle={s.expandedContent} showsVerticalScrollIndicator={false}>
-              <Image
-                source={{ uri: expanded.image || PLACEHOLDER_IMAGES[expanded.topic] }}
-                style={s.expandedImage}
-              />
+              <FallbackImage src={expanded.image} topic={expanded.topic} style={s.expandedImage} />
               <View style={[s.topicTag, { backgroundColor: TOPIC_COLORS[expanded.topic], position: 'relative', alignSelf: 'flex-end', marginTop: 12, marginHorizontal: 16 }]}>
                 <Text style={s.topicTxt}>{TOPIC_LABELS[expanded.topic]}</Text>
               </View>
@@ -286,6 +257,31 @@ export default function NewsModal({ visible, onClose, bgColor }: { visible: bool
 function extractSource(title: string): string {
   const match = title.match(/ - (.+)$/);
   return match ? match[1] : 'חדשות';
+}
+
+function FallbackImage({ src, topic, style }: { src: string; topic: Topic; style: any }) {
+  const [errored, setErrored] = useState(false);
+  const uri = errored || !src ? PLACEHOLDER_IMAGES[topic] : src;
+  return <Image source={{ uri }} style={style} onError={() => setErrored(true)} />;
+}
+
+function NewsCard({ item, onPress }: { item: NewsItem; onPress: () => void }) {
+  return (
+    <TouchableOpacity style={s.card} activeOpacity={0.8} onPress={onPress}>
+      <FallbackImage src={item.image} topic={item.topic} style={s.cardImage} />
+      <View style={[s.topicTag, { backgroundColor: TOPIC_COLORS[item.topic] }]}>
+        <Text style={s.topicTxt}>{TOPIC_LABELS[item.topic]}</Text>
+      </View>
+      <View style={s.cardBody}>
+        <Text style={s.cardTitle} numberOfLines={2}>{item.title}</Text>
+        <Text style={s.cardSummary} numberOfLines={5}>{item.summary}</Text>
+        <View style={s.cardFooter}>
+          <Text style={s.cardSource}>{item.source}</Text>
+          <Text style={s.cardDate}>{item.date}</Text>
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
 }
 
 function formatDate(dateStr: string): string {
