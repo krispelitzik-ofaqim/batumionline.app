@@ -427,9 +427,10 @@ app.get('/api/flights', async (req, res) => {
 
   try {
     const now = new Date();
-    const end = new Date(now.getTime() + 12 * 60 * 60 * 1000);
+    const start = new Date(now.getTime() - 2 * 60 * 60 * 1000); // 2h lookback for recent landings
+    const end = new Date(now.getTime() + 10 * 60 * 60 * 1000);  // 10h ahead (2+10 = 12h window max)
     const fmt = (d) => d.toISOString().slice(0, 16);
-    const url = `https://${host}/flights/airports/icao/${BUS_ICAO}/${fmt(now)}/${fmt(end)}?withLeg=true&direction=Both&withCancelled=true&withCodeshared=true&withCargo=false&withPrivate=false&withLocation=false`;
+    const url = `https://${host}/flights/airports/icao/${BUS_ICAO}/${fmt(start)}/${fmt(end)}?withLeg=true&direction=Both&withCancelled=true&withCodeshared=true&withCargo=false&withPrivate=false&withLocation=false`;
     const response = await fetch(url, {
       headers: {
         'x-rapidapi-key': key,

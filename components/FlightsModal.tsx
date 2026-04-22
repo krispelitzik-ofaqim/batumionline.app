@@ -52,6 +52,9 @@ export default function FlightsModal({ visible, onClose, bgColor }: { visible: b
   const [batumiTime, setBatumiTime] = useState('');
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [selected, setSelected] = useState<Flight | null>(null);
+  const [visibleCount, setVisibleCount] = useState(10);
+
+  useEffect(() => { setVisibleCount(10); }, [tab, visible]);
 
   const lastUpdatedClock = lastUpdated
     ? `${lastUpdated.getHours().toString().padStart(2, '0')}:${lastUpdated.getMinutes().toString().padStart(2, '0')}`
@@ -372,7 +375,7 @@ export default function FlightsModal({ visible, onClose, bgColor }: { visible: b
               {filtered.length === 0 && (
                 <View style={s.empty}>
                   <Text style={s.emptyIcon}>✈️</Text>
-                  <Text style={s.emptyTxt}>אין טיסות ב-24 השעות הקרובות</Text>
+                  <Text style={s.emptyTxt}>אין טיסות ב-12 השעות הקרובות</Text>
                 </View>
               )}
 
@@ -613,6 +616,9 @@ const s = StyleSheet.create({
   detailValue: { fontSize: 14, fontWeight: '700', color: Colors.WHITE, writingDirection: 'rtl' },
 
   empty: { alignItems: 'center', paddingVertical: 40 },
+  loadMoreBtn: { flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'center', gap: 8, marginVertical: 12, marginHorizontal: 14, paddingVertical: 12, borderRadius: 12, backgroundColor: 'rgba(244,169,78,0.15)', borderWidth: 1, borderColor: 'rgba(244,169,78,0.5)' },
+  loadMoreArrow: { color: '#F4A94E', fontSize: 18, fontWeight: '900', lineHeight: 18 },
+  loadMoreTxt: { color: Colors.WHITE, fontSize: 13, fontWeight: '800', writingDirection: 'rtl' },
   emptyIcon: { fontSize: 48 },
   emptyTxt: { fontSize: 16, color: Colors.WHITE, opacity: 0.6, marginTop: 8, writingDirection: 'rtl' },
   sampleNote: { fontSize: 11, color: Colors.WHITE, opacity: 0.3, textAlign: 'center', marginTop: 20, writingDirection: 'rtl' },
