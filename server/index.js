@@ -413,6 +413,8 @@ app.post('/api/upload/multiple', upload.array('files', 10), (req, res) => {
 const BUS_ICAO = 'UGSB'; // Batumi International Airport
 const flightsCache = { arrivals: null, departures: null, fetchedAt: 0 };
 const CACHE_MS = 5 * 60 * 1000; // 5 minutes
+const marineCache = { data: null, fetchedAt: 0 };
+const MARINE_CACHE_MS = 60 * 60 * 1000; // 1 hour (Stormglass free = 50/day)
 
 app.get('/api/flights', async (req, res) => {
   const key = process.env.AERODATABOX_KEY;
@@ -467,6 +469,45 @@ app.get('/api/flights', async (req, res) => {
     flightsCache.departures = departures;
     flightsCache.fetchedAt = Date.now();
     res.json({ arrivals, departures, cached: false, windows: NUM_WINDOWS });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ─── Marine weather (Stormglass) ───────────────────────────────
+app.get('/api/marine', async (req, res) => {
+  const key = process.env.STORMGLASS_KEY;
+  if (!key) return res.status(503).json({ error: 'STORMGLASS_KEY not configured' });
+
+  if (Date.now() - marineCache.fetchedAt < MARINE_CACHE_MS && marineCache.data) {
+    return res.json({ ...marineCache.data, cached: true });
+  }
+
+  try {
+    const params = 'waveHeight,waterTemperature,windSpeed,windDirection,seaLevel';
+    const url = `https://api.stormglass.io/v2/weather/point?lat=41.6168&lng=41.6367&params=${params}&source=sg`;
+    const response = await fetch(url, { headers: { Authorization: key } });
+    if (!response.ok) return res.status(response.status).json({ error: `Upstream ${response.status}` });
+    const data = await response.json();
+
+    const nowHour = new Date();
+    nowHour.setMinutes(0, 0, 0);
+    const nowIso = nowHour.toISOString().slice(0, 13);
+    const currentHour = (data.hours || []).find(h => (h.time || '').startsWith(nowIso)) || (data.hours || [])[0] || null;
+
+    if (!currentHour) return res.status(502).json({ error: 'no data' });
+
+    const payload = {
+      waveHeight: currentHour.waveHeight?.sg ?? null,
+      waterTemp: currentHour.waterTemperature?.sg ?? null,
+      windSpeed: currentHour.windSpeed?.sg ?? null,
+      windDirection: currentHour.windDirection?.sg ?? null,
+      seaLevel: currentHour.seaLevel?.sg ?? null,
+      time: currentHour.time,
+    };
+    marineCache.data = payload;
+    marineCache.fetchedAt = Date.now();
+    res.json({ ...payload, cached: false });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, Modal, TouchableOpacity, StyleSheet, ActivityIndicator, ScrollView, Animated } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Colors } from '../constants/colors';
+import { API_BASE } from '../constants/api';
 import CamerasModal from './CamerasModal';
 import AudioPlayer from './AudioPlayer';
 
@@ -13,6 +14,7 @@ type CurrentWeather = {
   temp: number; feels: number; humidity: number; wind: number;
   desc: string; icon: string; iconCode?: string;
   seaTemp?: number; uv?: number; sunrise?: string; sunset?: string;
+  waveHeight?: number;
 };
 type DayForecast = { day: string; date: string; high: number; low: number; icon: string; desc: string };
 type HourForecast = { hour: string; temp: number; icon: string; pop?: number };
@@ -127,12 +129,14 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
       const foreRes = await fetch(`https://api.openweathermap.org/data/2.5/forecast?id=${BATUMI_ID}&units=metric&lang=he&appid=${OWM_KEY}`);
       const foreData = await foreRes.json();
 
-      // Marine (sea temperature) via Open-Meteo (free, no key)
+      // Marine (Stormglass via our server — water temp + waves)
       let seaTemp: number | undefined;
+      let waveHeight: number | undefined;
       try {
-        const mRes = await fetch(`https://marine-api.open-meteo.com/v1/marine?latitude=${BATUMI_LAT}&longitude=${BATUMI_LON}&current=sea_surface_temperature&timezone=auto`);
+        const mRes = await fetch(`${API_BASE}/api/marine`);
         const mData = await mRes.json();
-        if (mData?.current?.sea_surface_temperature != null) seaTemp = Math.round(mData.current.sea_surface_temperature);
+        if (mData?.waterTemp != null) seaTemp = Math.round(mData.waterTemp);
+        if (mData?.waveHeight != null) waveHeight = Math.round(mData.waveHeight * 10) / 10;
       } catch {}
 
       const sunrise = curData.sys?.sunrise ? fmtTime(curData.sys.sunrise) : undefined;
@@ -148,6 +152,7 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
         icon: owmEmoji(iconCode),
         iconCode,
         seaTemp,
+        waveHeight,
         sunrise,
         sunset,
       });
@@ -330,6 +335,16 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
                           <Text style={s.detailIcon}>🌊</Text>
                           <Text style={s.detailVal}>{current.seaTemp}°</Text>
                           <Text style={s.detailLabel}>טמפ׳ הים</Text>
+                        </View>
+                        <View style={s.divider} />
+                      </>
+                    )}
+                    {current.waveHeight != null && (
+                      <>
+                        <View style={s.detailItem}>
+                          <Text style={s.detailIcon}>〰️</Text>
+                          <Text style={s.detailVal}>{current.waveHeight}m</Text>
+                          <Text style={s.detailLabel}>גלים</Text>
                         </View>
                         <View style={s.divider} />
                       </>
