@@ -5,7 +5,7 @@ import CamerasModal from './CamerasModal';
 import AudioPlayer from './AudioPlayer';
 
 const DAYS_HE = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
-const OWM_KEY = ''; // Add your OpenWeatherMap API key here
+const OWM_KEY = 'eb761e941b8ad25efb4bf8cc3d4d9b71';
 const BATUMI_ID = 614553;
 
 type CurrentWeather = {
