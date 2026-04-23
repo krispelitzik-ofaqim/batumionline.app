@@ -441,7 +441,7 @@ function weatherGradient(iconCode: string | undefined, batumiHourStr: string): [
   if (code.startsWith('13')) return ['#BFDBFE', '#E0F2FE', '#FFFFFF']; // snow
   if (code.startsWith('50')) return ['#94A3B8', '#64748B', '#475569']; // mist
   if (code.startsWith('09') || code.startsWith('10')) return isNight ? ['#0F172A', '#1E3A8A', '#475569'] : ['#475569', '#3B82F6', '#64748B']; // rain
-  if (code.startsWith('03') || code.startsWith('04')) return isNight ? ['#1E293B', '#334155', '#475569'] : ['#94A3B8', '#CBD5E1', '#E2E8F0']; // cloudy
+  if (code.startsWith('03') || code.startsWith('04')) return isNight ? ['#1E293B', '#334155', '#475569'] : ['#475569', '#334155', '#1E293B']; // cloudy — deep slate
 
   // Clear/few clouds — color by time of day (darker anchors for readability)
   if (isDawn) return ['#D97706', '#BE185D', '#6D28D9'];       // dawn deep orange→pink→purple
@@ -542,7 +542,7 @@ const s = StyleSheet.create({
   liveTxt: { color: '#fff', fontSize: 11, fontWeight: '900', letterSpacing: 1 },
   batumiClock: { color: 'rgba(255,255,255,0.85)', fontSize: 14, fontWeight: '700', fontVariant: ['tabular-nums'] },
   updatedTxt: { color: 'rgba(255,255,255,0.55)', fontSize: 11, textAlign: 'center', marginBottom: 18, writingDirection: 'rtl' },
-  hourlyScroll: { gap: 10, paddingVertical: 8, paddingHorizontal: 2, marginBottom: 20 },
+  hourlyScroll: { flexDirection: 'row-reverse', gap: 10, paddingVertical: 8, paddingHorizontal: 2, marginBottom: 20 },
   hourCell: { backgroundColor: 'rgba(255,255,255,0.12)', borderRadius: 14, paddingVertical: 12, paddingHorizontal: 14, alignItems: 'center', minWidth: 70, borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)' },
   hourTime: { fontSize: 12, color: '#fff', fontWeight: '800', marginBottom: 4, textShadowColor: 'rgba(0,0,0,0.35)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 2 },
   hourIcon: { fontSize: 24, marginBottom: 2 },
