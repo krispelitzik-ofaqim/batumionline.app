@@ -16,7 +16,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.batumionline.app",
-      "buildNumber": "9",
+      "buildNumber": "10",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -31,8 +31,7 @@
     },
     "plugins": [
       "expo-router",
-      "expo-font",
-      "expo-notifications"
+      "expo-font"
     ],
     "extra": {
       "router": {},
