@@ -6,7 +6,7 @@ import AudioPlayer from './AudioPlayer';
 
 const DAYS_HE = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
 const OWM_KEY = 'eb761e941b8ad25efb4bf8cc3d4d9b71';
-const BATUMI_ID = 614553;
+const BATUMI_ID = 615532;
 
 type CurrentWeather = {
   temp: number; feels: number; humidity: number; wind: number;
