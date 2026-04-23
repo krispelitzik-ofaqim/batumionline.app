@@ -13,7 +13,7 @@ type CurrentWeather = {
   desc: string; icon: string;
   seaTemp?: number; uv?: number; sunrise?: string; sunset?: string;
 };
-type DayForecast = { day: string; high: number; low: number; icon: string; desc: string };
+type DayForecast = { day: string; date: string; high: number; low: number; icon: string; desc: string };
 type HourForecast = { hour: string; temp: number; icon: string; pop?: number };
 
 const BATUMI_LAT = 41.6168;
@@ -100,6 +100,7 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
         const date = new Date(dateStr);
         return {
           day: DAYS_HE[date.getDay()],
+          date: `${date.getDate()}/${date.getMonth() + 1}`,
           high: Math.round(data.daily.temperature_2m_max[idx]),
           low: Math.round(data.daily.temperature_2m_min[idx]),
           icon: wmoEmoji(data.daily.weather_code[idx]),
@@ -183,6 +184,7 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
         const date = new Date(dateStr);
         return {
           day: DAYS_HE[date.getDay()],
+          date: `${date.getDate()}/${date.getMonth() + 1}`,
           high: Math.round(data.high),
           low: Math.round(data.low),
           icon: data.icon,
@@ -224,6 +226,7 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
         const date = new Date(d.date);
         return {
           day: DAYS_HE[date.getDay()],
+          date: `${date.getDate()}/${date.getMonth() + 1}`,
           high: Number(d.maxtempC),
           low: Number(d.mintempC),
           icon: wttrEmoji(Number(d.hourly?.[4]?.weatherCode || 0)),
@@ -377,7 +380,10 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
                 const desc = isToday && current ? current.desc : day.desc;
                 return (
                   <View key={i} style={s.dayRow}>
-                    <Text style={s.dayName}>{isToday ? 'היום' : day.day}</Text>
+                    <View style={s.dayNameCol}>
+                      <Text style={s.dayName}>{isToday ? 'היום' : day.day}</Text>
+                      <Text style={s.dayDate}>{day.date}</Text>
+                    </View>
                     <Text style={s.dayIcon}>{icon}</Text>
                     <Text style={s.dayDesc} numberOfLines={1} ellipsizeMode="tail">{desc}</Text>
                     <View style={s.dayTemps}>
@@ -511,7 +517,9 @@ const s = StyleSheet.create({
     flexDirection: 'row-reverse', alignItems: 'center', gap: 10,
     backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 14, padding: 14, marginBottom: 8,
   },
+  dayNameCol: { alignItems: 'flex-end', minWidth: 70 },
   dayName: { fontSize: 14, fontWeight: '700', color: Colors.WHITE, textAlign: 'right', writingDirection: 'rtl' },
+  dayDate: { fontSize: 11, color: 'rgba(255,255,255,0.65)', textAlign: 'right', fontWeight: '700', marginTop: 2 },
   dayIcon: { fontSize: 24 },
   dayDesc: { flex: 1, fontSize: 13, color: Colors.WHITE, opacity: 0.85, textAlign: 'right', writingDirection: 'rtl', flexShrink: 1, minWidth: 80 },
   dayTemps: { flexDirection: 'row', gap: 6, alignItems: 'center' },
