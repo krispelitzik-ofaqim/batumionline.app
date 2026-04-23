@@ -682,6 +682,20 @@ function HotelCard({ h, dark, pageBtnLabel, mapPoints, layerColor, placesQuery }
   const [showMap, setShowMap] = useState(false);
   const [showGallery, setShowGallery] = useState(false);
   const [showCatMapModal, setShowCatMapModal] = useState(false);
+  const [placesPhone, setPlacesPhone] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!placesQuery) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const r = await fetch(`${API_BASE}/api/places?q=${encodeURIComponent(placesQuery)}`);
+        const j = await r.json();
+        if (!cancelled && j.found && j.phone) setPlacesPhone(j.phone);
+      } catch {}
+    })();
+    return () => { cancelled = true; };
+  }, [placesQuery]);
   const hasGallery = !!(h.images && h.images.length > 0);
   const btnEnabled = hasGallery || !!h.pageUrl;
   if (showMap && h.coords) {
@@ -730,8 +744,16 @@ function HotelCard({ h, dark, pageBtnLabel, mapPoints, layerColor, placesQuery }
           </View>
         )}
         <Text style={[st.hotelText, dark && { color: '#cbd5e1' }]}>{h.text}</Text>
-        {placesQuery && <PlacesInfoBlock query={placesQuery} />}
         <View style={st.hotelBtnRow}>
+          {placesPhone && (
+            <TouchableOpacity
+              style={[st.hotelBtn, st.hotelBtnAccent]}
+              activeOpacity={0.7}
+              onPress={() => Linking.openURL(`tel:${placesPhone}`)}
+            >
+              <Text style={st.hotelBtnTxt}>📞 חייג</Text>
+            </TouchableOpacity>
+          )}
           <TouchableOpacity
             style={[st.hotelBtn, st.hotelBtnAccent, !h.coords && st.hotelBtnDisabled]}
             activeOpacity={h.coords ? 0.7 : 1}
