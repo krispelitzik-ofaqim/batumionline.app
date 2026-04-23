@@ -426,7 +426,7 @@ function hourGradient(hour: number): [string, string] {
   if (hour >= 11 && hour < 16) return ['#3DA5C4', '#7ECFC0'];    // day: teal bright
   if (hour >= 16 && hour < 18) return ['#F4A94E', '#EC4899'];    // afternoon: orange→pink
   if (hour >= 18 && hour < 20) return ['#7C3AED', '#EC4899'];    // sunset: purple→pink
-  return ['#1E293B', '#0F172A'];                                  // night: navy→black
+  return ['#6B7280', '#111827'];                                  // night: gray→black
 }
 
 function weatherGradient(iconCode: string | undefined, batumiHourStr: string): [string, string, string] {
@@ -446,7 +446,7 @@ function weatherGradient(iconCode: string | undefined, batumiHourStr: string): [
   // Clear/few clouds — color by time of day
   if (isDawn) return ['#F4A94E', '#EC4899', '#8B5CF6'];       // dawn orange-pink
   if (isSunset) return ['#F97316', '#EC4899', '#7C3AED'];     // sunset orange-purple
-  if (isNight) return ['#0F172A', '#1E293B', '#334155'];      // night navy-black
+  if (isNight) return ['#6B7280', '#374151', '#000000'];      // night gray→black
   return ['#7ECFC0', '#3DA5C4', '#1A6B8A'];                   // day teal-blue
 }
 
