@@ -331,12 +331,22 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
                         <View style={s.divider} />
                       </>
                     )}
-                    {current.sunrise && current.sunset && (
+                    {current.sunrise && (
                       <View style={s.detailItem}>
                         <Text style={s.detailIcon}>🌅</Text>
                         <Text style={s.detailVal}>{current.sunrise}</Text>
-                        <Text style={s.detailLabel}>שקיעה {current.sunset}</Text>
+                        <Text style={s.detailLabel}>זריחה</Text>
                       </View>
+                    )}
+                    {current.sunset && (
+                      <>
+                        <View style={s.divider} />
+                        <View style={s.detailItem}>
+                          <Text style={s.detailIcon}>🌇</Text>
+                          <Text style={s.detailVal}>{current.sunset}</Text>
+                          <Text style={s.detailLabel}>שקיעה</Text>
+                        </View>
+                      </>
                     )}
                   </View>
                 </View>
