@@ -28,6 +28,7 @@ import FlightsModal from '../../components/FlightsModal';
 import PopupDisplay from '../../components/PopupDisplay';
 import ClientBannerDisplay from '../../components/ClientBannerDisplay';
 import CouponRedeemModal from '../../components/CouponRedeemModal';
+import { openInAppBrowser, gygBatumi } from '../../constants/affiliates';
 
 type CatItem = {
   id: string;
@@ -64,6 +65,7 @@ const BOTTOM_BANNERS = [
   { id: 'news', title: 'חדשות בעברית', icon: '🗞️', bg: '#7ECFC0' },
   { id: 'flights', title: 'לוח המראות ונחיתות', icon: '✈️', bg: '#2D4A5E' },
   { id: 'coupon', title: 'מימוש קוד קופון', icon: '🎟️', bg: '#16a34a' },
+  { id: 'gyg', title: 'סיורים ופעילויות בבטומי', icon: '🎫', bg: '#FF5A5F' },
 ];
 
 const DEV_PALETTE = [
@@ -312,7 +314,7 @@ export default function HomeScreen() {
             {editBottomBanners.filter((b: any) => b.visible !== false).map((b, idx) => (
               <View key={b.id} style={{ position: 'relative' }}>
                 {editMode && <ReorderControls index={idx} total={editBottomBanners.length} onMove={(dir) => moveBottomBanner(idx, dir)} />}
-                <TouchableOpacity style={[styles.bottomBanner, { backgroundColor: b.bg }]} activeOpacity={0.7} onPress={() => setActiveModal(b.id)}>
+                <TouchableOpacity style={[styles.bottomBanner, { backgroundColor: b.bg }]} activeOpacity={0.7} onPress={() => { if (b.id === 'gyg') openInAppBrowser(gygBatumi()); else setActiveModal(b.id); }}>
                   <Text style={styles.bottomBannerTitle}>{b.title}</Text>
                   <Text style={styles.bottomBannerIcon}>{b.icon}</Text>
                 </TouchableOpacity>
