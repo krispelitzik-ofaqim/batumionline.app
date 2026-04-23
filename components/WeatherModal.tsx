@@ -282,12 +282,14 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
             <ActivityIndicator size="large" color={Colors.WHITE} style={{ marginTop: 40 }} />
           ) : (
             <>
-              {/* Today's weather — large display */}
+              {/* Today's weather — compact display */}
               {current && (
                 <View style={s.currentCard}>
-                  <Text style={s.currentIcon}>{current.icon}</Text>
-                  <Text style={s.currentTemp}>{current.temp}°C</Text>
-                  <Text style={s.currentDesc}>{current.desc}</Text>
+                  <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 10 }}>
+                    <Text style={s.currentIcon}>{current.icon}</Text>
+                    <Text style={s.currentTemp}>{current.temp}°</Text>
+                    <Text style={s.currentDesc}>{current.desc}</Text>
+                  </View>
                   <View style={s.detailsRow}>
                     <View style={s.detailItem}>
                       <Text style={s.detailIcon}>🌡️</Text>
@@ -483,12 +485,12 @@ const s = StyleSheet.create({
   hourTemp: { fontSize: 16, color: '#fff', fontWeight: '900' },
   hourPop: { fontSize: 10, color: '#60A5FA', fontWeight: '700', marginTop: 2 },
 
-  currentCard: { backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 24, padding: 32, alignItems: 'center', marginBottom: 28 },
-  currentIcon: { fontSize: 72 },
-  currentTemp: { fontSize: 64, fontWeight: '900', color: Colors.WHITE, marginTop: 4 },
-  currentDesc: { fontSize: 20, color: Colors.WHITE, opacity: 0.9, marginTop: 4, textTransform: 'capitalize' },
-  detailsRow: { flexDirection: 'row', alignItems: 'center', marginTop: 28, gap: 12, width: '100%', paddingHorizontal: 4 },
-  detailItem: { alignItems: 'center', flex: 1, paddingVertical: 4 },
+  currentCard: { backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 20, padding: 18, marginBottom: 18 },
+  currentIcon: { fontSize: 56 },
+  currentTemp: { fontSize: 52, fontWeight: '900', color: Colors.WHITE, marginLeft: 12, lineHeight: 60 },
+  currentDesc: { fontSize: 16, color: Colors.WHITE, opacity: 0.9, textTransform: 'capitalize', flex: 1, textAlign: 'right', writingDirection: 'rtl' },
+  detailsRow: { flexDirection: 'row', alignItems: 'center', marginTop: 14, gap: 8, width: '100%', paddingHorizontal: 2 },
+  detailItem: { alignItems: 'center', flex: 1, paddingVertical: 2 },
   detailIcon: { fontSize: 22, marginBottom: 6 },
   detailVal: { fontSize: 20, fontWeight: '800', color: Colors.WHITE, marginBottom: 4 },
   detailLabel: { fontSize: 11, color: Colors.WHITE, opacity: 0.7, textAlign: 'center', writingDirection: 'rtl', lineHeight: 14 },
