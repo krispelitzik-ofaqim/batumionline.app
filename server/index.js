@@ -427,24 +427,46 @@ app.get('/api/flights', async (req, res) => {
 
   try {
     const now = new Date();
-    const start = new Date(now.getTime() - 2 * 60 * 60 * 1000); // 2h lookback for recent landings
-    const end = new Date(now.getTime() + 10 * 60 * 60 * 1000);  // 10h ahead (2+10 = 12h window max)
-    const fmt = (d) => d.toISOString().slice(0, 16);
-    const url = `https://${host}/flights/airports/icao/${BUS_ICAO}/${fmt(start)}/${fmt(end)}?withLeg=true&direction=Both&withCancelled=true&withCodeshared=true&withCargo=false&withPrivate=false&withLocation=false`;
-    const response = await fetch(url, {
-      headers: {
-        'x-rapidapi-key': key,
-        'x-rapidapi-host': host,
-      },
+    const startBase = now.getTime() - 2 * 60 * 60 * 1000; // 2h lookback
+    const WIN_MS = 12 * 60 * 60 * 1000;
+    const NUM_WINDOWS = 3; // 3 × 12h = 36h total
+    const fmt = (d) => new Date(d).toISOString().slice(0, 16);
+
+    const windowRequests = Array.from({ length: NUM_WINDOWS }, (_, i) => {
+      const s = startBase + i * WIN_MS;
+      const e = s + WIN_MS;
+      const url = `https://${host}/flights/airports/icao/${BUS_ICAO}/${fmt(s)}/${fmt(e)}?withLeg=true&direction=Both&withCancelled=true&withCodeshared=true&withCargo=false&withPrivate=false&withLocation=false`;
+      return fetch(url, {
+        headers: { 'x-rapidapi-key': key, 'x-rapidapi-host': host },
+      }).then(r => r.ok ? r.json() : null).catch(() => null);
     });
-    if (!response.ok) {
-      return res.status(response.status).json({ error: `Upstream ${response.status}` });
+
+    const results = await Promise.all(windowRequests);
+    const allArrivals = [];
+    const allDepartures = [];
+    for (const r of results) {
+      if (!r) continue;
+      if (Array.isArray(r.arrivals)) allArrivals.push(...r.arrivals);
+      if (Array.isArray(r.departures)) allDepartures.push(...r.departures);
     }
-    const data = await response.json();
-    flightsCache.arrivals = data.arrivals || [];
-    flightsCache.departures = data.departures || [];
+
+    // Dedupe by flight number + scheduled time
+    const dedupe = (list, timeKey) => {
+      const seen = new Map();
+      for (const f of list) {
+        const t = f?.[timeKey]?.scheduledTime?.utc || f?.[timeKey]?.scheduledTime?.local || '';
+        const key = `${f?.number || ''}_${t}`;
+        if (!seen.has(key)) seen.set(key, f);
+      }
+      return Array.from(seen.values());
+    };
+    const arrivals = dedupe(allArrivals, 'arrival').sort((a, b) => (a?.arrival?.scheduledTime?.utc || '').localeCompare(b?.arrival?.scheduledTime?.utc || ''));
+    const departures = dedupe(allDepartures, 'departure').sort((a, b) => (a?.departure?.scheduledTime?.utc || '').localeCompare(b?.departure?.scheduledTime?.utc || ''));
+
+    flightsCache.arrivals = arrivals;
+    flightsCache.departures = departures;
     flightsCache.fetchedAt = Date.now();
-    res.json({ arrivals: flightsCache.arrivals, departures: flightsCache.departures, cached: false });
+    res.json({ arrivals, departures, cached: false, windows: NUM_WINDOWS });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
