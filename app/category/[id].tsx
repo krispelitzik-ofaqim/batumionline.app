@@ -733,7 +733,7 @@ function HotelCard({ h, dark, pageBtnLabel, mapPoints, layerColor, placesQuery }
         <Text style={[st.hotelText, dark && { color: '#cbd5e1' }]}>{h.text}</Text>
         <View style={st.hotelBtnRow}>
           <TouchableOpacity
-            style={[st.hotelBtn, placesQuery ? st.hotelBtnSecondary : st.hotelBtnAccent, !h.coords && st.hotelBtnDisabled]}
+            style={[st.hotelBtn, st.hotelBtnAccent, !h.coords && st.hotelBtnDisabled]}
             activeOpacity={h.coords ? 0.7 : 1}
             onPress={() => {
               if (mapPoints && mapPoints.length > 0) setShowCatMapModal(true);
