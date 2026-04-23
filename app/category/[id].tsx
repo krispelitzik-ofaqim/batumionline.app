@@ -683,6 +683,20 @@ function HotelCard({ h, dark, pageBtnLabel, mapPoints, layerColor, placesQuery }
   const [showGallery, setShowGallery] = useState(false);
   const [showCatMapModal, setShowCatMapModal] = useState(false);
   const [showInfoModal, setShowInfoModal] = useState(false);
+  const [placesWebsite, setPlacesWebsite] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!placesQuery) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const r = await fetch(`${API_BASE}/api/places?q=${encodeURIComponent(placesQuery)}`);
+        const j = await r.json();
+        if (!cancelled && j.found && j.website) setPlacesWebsite(j.website);
+      } catch {}
+    })();
+    return () => { cancelled = true; };
+  }, [placesQuery]);
   const hasGallery = !!(h.images && h.images.length > 0);
   const btnEnabled = hasGallery || !!h.pageUrl;
   if (showMap && h.coords) {
@@ -764,6 +778,15 @@ function HotelCard({ h, dark, pageBtnLabel, mapPoints, layerColor, placesQuery }
           >
             <Text style={[st.hotelBtnTxt, !h.mapUrl && st.hotelBtnTxtDisabled]}>{h.mapUrl && h.mapUrl.includes('wa.me') ? 'WhatsApp' : 'נווט למקום'}</Text>
           </TouchableOpacity>
+          {placesWebsite && (
+            <TouchableOpacity
+              style={[st.hotelBtn, { backgroundColor: '#10b981' }]}
+              activeOpacity={0.7}
+              onPress={() => Linking.openURL(placesWebsite!)}
+            >
+              <Text style={st.hotelBtnTxt}>🌐 אתר</Text>
+            </TouchableOpacity>
+          )}
         </View>
       </View>
       {placesQuery && showInfoModal && (

@@ -12,6 +12,8 @@ type PlaceData = {
   phone?: string;
   website?: string;
   mapsUri?: string;
+  openingHours?: string[];
+  openNow?: boolean | null;
 };
 
 export default function PlacesInfoModal({ query, title, onClose }: { query: string; title: string; onClose: () => void }) {
@@ -60,23 +62,21 @@ export default function PlacesInfoModal({ query, title, onClose }: { query: stri
                   <Text style={s.infoTxt}>{data.address}</Text>
                 </View>
               )}
-              <View style={s.btnCol}>
-                {!!data.phone && (
+              {!!(data.openingHours && data.openingHours.length) && (
+                <View style={s.hoursBlock}>
+                  <Text style={s.hoursTitle}>🕐 שעות פתיחה{data.openNow != null ? (data.openNow ? ' · פתוח עכשיו' : ' · סגור') : ''}</Text>
+                  {data.openingHours.map((line, i) => (
+                    <Text key={i} style={s.hoursLine}>{line}</Text>
+                  ))}
+                </View>
+              )}
+              {!!data.phone && (
+                <View style={s.btnCol}>
                   <TouchableOpacity style={[s.btn, { backgroundColor: '#10b981' }]} onPress={() => Linking.openURL(`tel:${data.phone}`)}>
                     <Text style={s.btnTxt}>📞 חייג · {data.phone}</Text>
                   </TouchableOpacity>
-                )}
-                {!!data.mapsUri && (
-                  <TouchableOpacity style={[s.btn, { backgroundColor: '#3b82f6' }]} onPress={() => Linking.openURL(data.mapsUri!)}>
-                    <Text style={s.btnTxt}>🗺️ נווט ב-Google Maps</Text>
-                  </TouchableOpacity>
-                )}
-                {!!data.website && (
-                  <TouchableOpacity style={[s.btn, { backgroundColor: Colors.PRIMARY }]} onPress={() => Linking.openURL(data.website!)}>
-                    <Text style={s.btnTxt}>🌐 אתר רשמי</Text>
-                  </TouchableOpacity>
-                )}
-              </View>
+                </View>
+              )}
             </ScrollView>
           )}
         </View>
@@ -98,6 +98,9 @@ const s = StyleSheet.create({
   infoRow: { flexDirection: 'row-reverse', alignItems: 'flex-start', gap: 8, marginBottom: 14 },
   infoIcon: { fontSize: 16 },
   infoTxt: { flex: 1, fontSize: 14, color: Colors.TEXT, writingDirection: 'rtl', textAlign: 'right', lineHeight: 20 },
+  hoursBlock: { marginBottom: 14, padding: 12, backgroundColor: '#f8fafc', borderRadius: 10, borderWidth: 1, borderColor: '#e2e8f0' },
+  hoursTitle: { fontSize: 14, fontWeight: '900', color: Colors.TEXT, writingDirection: 'rtl', textAlign: 'right', marginBottom: 6 },
+  hoursLine: { fontSize: 13, color: '#475569', writingDirection: 'rtl', textAlign: 'right', lineHeight: 20, fontWeight: '600' },
   btnCol: { gap: 8 },
   btn: { paddingVertical: 14, borderRadius: 12, alignItems: 'center' },
   btnTxt: { color: '#fff', fontWeight: '800', fontSize: 15, writingDirection: 'rtl' },
