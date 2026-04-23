@@ -70,11 +70,18 @@ export default function PlacesInfoModal({ query, title, onClose }: { query: stri
                   ))}
                 </View>
               )}
-              {!!data.phone && (
+              {(data.phone || data.website) && (
                 <View style={s.btnCol}>
-                  <TouchableOpacity style={[s.btn, { backgroundColor: '#10b981' }]} onPress={() => Linking.openURL(`tel:${data.phone}`)}>
-                    <Text style={s.btnTxt}>📞 חייג · {data.phone}</Text>
-                  </TouchableOpacity>
+                  {!!data.phone && (
+                    <TouchableOpacity style={[s.btn, { backgroundColor: '#10b981' }]} onPress={() => Linking.openURL(`tel:${data.phone}`)}>
+                      <Text style={s.btnTxt}>📞 חייג · {data.phone}</Text>
+                    </TouchableOpacity>
+                  )}
+                  {!!data.website && (
+                    <TouchableOpacity style={[s.btn, { backgroundColor: Colors.PRIMARY }]} onPress={() => Linking.openURL(data.website!)}>
+                      <Text style={s.btnTxt}>🌐 אתר רשמי</Text>
+                    </TouchableOpacity>
+                  )}
                 </View>
               )}
             </ScrollView>
