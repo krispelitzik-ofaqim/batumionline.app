@@ -280,6 +280,7 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
               compact
               playOnLeft
               tint="transparent"
+              textLight
             />
           </View>
 

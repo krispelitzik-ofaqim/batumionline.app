@@ -4,7 +4,7 @@ import { Audio } from 'expo-av';
 import { Colors } from '../constants/colors';
 
 type Track = { title?: string; url: string; coords?: { lat: number; lng: number } };
-type Props = { tracks: Track[]; title?: string; compact?: boolean; onNavigate?: (coords: { lat: number; lng: number }) => void; tint?: string; onActiveChange?: (idx: number, track: Track) => void; onTimeReached?: { seconds: number; callback: () => void }; playOnLeft?: boolean };
+type Props = { tracks: Track[]; title?: string; compact?: boolean; onNavigate?: (coords: { lat: number; lng: number }) => void; tint?: string; onActiveChange?: (idx: number, track: Track) => void; onTimeReached?: { seconds: number; callback: () => void }; playOnLeft?: boolean; textLight?: boolean };
 
 function fmt(ms: number) {
   const s = Math.max(0, Math.floor(ms / 1000));
@@ -24,7 +24,7 @@ function darken(hex: string, amount = 0.45): string {
 
 const SPEEDS = [1, 1.5, 2];
 
-export default function AudioPlayer({ tracks: initialTracks, title, compact, onNavigate, tint, onActiveChange, onTimeReached, playOnLeft }: Props) {
+export default function AudioPlayer({ tracks: initialTracks, title, compact, onNavigate, tint, onActiveChange, onTimeReached, playOnLeft, textLight }: Props) {
   const [tracks, setTracks] = useState(initialTracks);
   const [activeIdx, setActiveIdx] = useState(0);
   const [playing, setPlaying] = useState(false);
@@ -202,20 +202,20 @@ export default function AudioPlayer({ tracks: initialTracks, title, compact, onN
                 <Text style={styles.playIconSmall}>{playing ? '❚❚' : '▶'}</Text>
               </TouchableOpacity>
               <View style={styles.compactProgressWrap}>
-                <Text style={[styles.titleText, { marginBottom: 2 }]} numberOfLines={1}>{current?.title || `שיר ${activeIdx + 1}`}</Text>
+                <Text style={[styles.titleText, { marginBottom: 2 }, textLight && { color: '#fff', textShadowColor: 'rgba(0,0,0,0.35)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 2 }]} numberOfLines={1}>{current?.title || `שיר ${activeIdx + 1}`}</Text>
                 <View style={styles.progressBg}>
                   <View style={[styles.progressFill, { width: `${pct}%` }]} />
                 </View>
                 <View style={styles.timeRowInline}>
-                  <Text style={styles.time}>{fmt(pos)}</Text>
+                  <Text style={[styles.time, textLight && { color: 'rgba(255,255,255,0.8)' }]}>{fmt(pos)}</Text>
                   <View style={styles.speedInline}>
                     {SPEEDS.map((sp, i) => (
                       <TouchableOpacity key={sp} onPress={() => setSpeed(i)} activeOpacity={0.7}>
-                        <Text style={[styles.speedInlineTxt, i === speedIdx && styles.speedInlineTxtActive]}>{sp}x</Text>
+                        <Text style={[styles.speedInlineTxt, i === speedIdx && styles.speedInlineTxtActive, textLight && !(i === speedIdx) && { color: 'rgba(255,255,255,0.7)' }, textLight && i === speedIdx && { color: '#fff' }]}>{sp}x</Text>
                       </TouchableOpacity>
                     ))}
                   </View>
-                  <Text style={styles.time}>{fmt(dur)}</Text>
+                  <Text style={[styles.time, textLight && { color: 'rgba(255,255,255,0.8)' }]}>{fmt(dur)}</Text>
                 </View>
               </View>
             </View>
