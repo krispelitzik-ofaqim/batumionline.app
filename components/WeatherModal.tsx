@@ -368,29 +368,31 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
               {hourly.length > 0 && (
                 <>
                   <Text style={s.weekTitle}>24 השעות הקרובות</Text>
-                  <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.hourlyScroll}>
-                    {hourly.map((h, i) => {
-                      const hourInt = parseInt(h.hour.split(':')[0], 10);
-                      const cellGrad = hourGradient(hourInt);
-                      const isNow = i === 0;
-                      return (
-                        <LinearGradient
-                          key={i}
-                          colors={cellGrad}
-                          start={{ x: 0, y: 0 }}
-                          end={{ x: 0, y: 1 }}
-                          style={[s.hourCell, isNow && s.hourCellNow]}
-                        >
-                          {isNow && <Text style={s.nowBadge}>עכשיו</Text>}
-                          <Text style={s.hourTime}>{h.hour}</Text>
-                          <Text style={s.hourIcon}>{h.icon}</Text>
-                          <Text style={s.hourTemp}>{h.temp}°</Text>
-                          {!!h.pop && h.pop > 10 && <Text style={s.hourPop}>💧 {h.pop}%</Text>}
-                        </LinearGradient>
-                      );
-                    })}
-                    <View style={s.hourArrow}><Text style={s.hourArrowTxt}>←</Text></View>
-                  </ScrollView>
+                  <View style={{ position: 'relative' }}>
+                    <Text style={s.hourArrowFloat}>←</Text>
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.hourlyScroll}>
+                      {hourly.map((h, i) => {
+                        const hourInt = parseInt(h.hour.split(':')[0], 10);
+                        const cellGrad = hourGradient(hourInt);
+                        const isNow = i === 0;
+                        return (
+                          <LinearGradient
+                            key={i}
+                            colors={cellGrad}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 0, y: 1 }}
+                            style={[s.hourCell, isNow && s.hourCellNow]}
+                          >
+                            {isNow && <Text style={s.nowBadge}>עכשיו</Text>}
+                            <Text style={s.hourTime}>{h.hour}</Text>
+                            <Text style={s.hourIcon}>{h.icon}</Text>
+                            <Text style={s.hourTemp}>{h.temp}°</Text>
+                            {!!h.pop && h.pop > 10 && <Text style={s.hourPop}>💧 {h.pop}%</Text>}
+                          </LinearGradient>
+                        );
+                      })}
+                    </ScrollView>
+                  </View>
                 </>
               )}
 
@@ -552,8 +554,7 @@ const s = StyleSheet.create({
   hourCell: { backgroundColor: 'rgba(255,255,255,0.12)', borderRadius: 14, paddingVertical: 12, paddingHorizontal: 14, alignItems: 'center', minWidth: 70, borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)' },
   hourCellNow: { borderWidth: 2, borderColor: '#F4A94E', paddingTop: 8 },
   nowBadge: { position: 'absolute', top: -9, backgroundColor: '#F4A94E', color: '#1C2B35', fontSize: 10, fontWeight: '900', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 8, overflow: 'hidden' },
-  hourArrow: { justifyContent: 'center', alignItems: 'center', paddingHorizontal: 10 },
-  hourArrowTxt: { color: 'rgba(255,255,255,0.5)', fontSize: 26, fontWeight: '900' },
+  hourArrowFloat: { position: 'absolute', top: -18, right: 88, color: 'rgba(255,255,255,0.7)', fontSize: 20, fontWeight: '900', zIndex: 2, textShadowColor: 'rgba(0,0,0,0.35)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 2 },
   hourTime: { fontSize: 12, color: '#fff', fontWeight: '800', marginBottom: 4, textShadowColor: 'rgba(0,0,0,0.35)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 2 },
   hourIcon: { fontSize: 24, marginBottom: 2 },
   hourTemp: { fontSize: 16, color: '#fff', fontWeight: '900', textShadowColor: 'rgba(0,0,0,0.4)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 3 },
