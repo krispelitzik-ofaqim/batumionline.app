@@ -4,6 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Colors } from '../../constants/colors';
 import { ThemeContext } from '../../constants/theme';
 import { fetchContent, API_BASE } from '../../constants/api';
+import HtmlContent from '../../components/HtmlContent';
 
 type TabId = 'about' | 'terms' | 'privacy' | 'contact';
 type Tab = { id: TabId; title: string; icon: string; body: string };
@@ -136,11 +137,8 @@ export default function InfoScreen() {
         ) : (
           <View style={styles.card}>
             <Text style={styles.cardTitle}>{current.title}</Text>
-            {Platform.OS === 'web' && current.body.includes('<') ? (
-              React.createElement('div', {
-                dangerouslySetInnerHTML: { __html: current.body },
-                style: { fontSize: 14, color: '#444', textAlign: 'right', direction: 'rtl', lineHeight: '24px' },
-              })
+            {current.body.includes('<') ? (
+              <HtmlContent html={current.body} baseStyle={{ fontSize: 14, color: '#444', lineHeight: 24 }} />
             ) : (
               <Text style={styles.cardBody}>{current.body || 'תוכן יתווסף בקרוב'}</Text>
             )}

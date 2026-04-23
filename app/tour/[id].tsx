@@ -6,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '../../constants/colors';
 import { fetchContent } from '../../constants/api';
 import AudioPlayer from '../../components/AudioPlayer';
+import MapEmbed from '../../components/MapEmbed';
 
 type Tour = {
   id: string; title: string; subtitle?: string; icon: string;
@@ -60,17 +61,7 @@ export default function TourScreen() {
 
         <Text style={styles.sectionTitle}>מפת המסלול</Text>
         <View style={styles.mapCard}>
-          {Platform.OS === 'web' ? (
-            React.createElement('iframe', {
-              src: `https://www.google.com/maps?q=${encodeURIComponent(tour.title + ' Batumi')}&hl=iw&z=14&output=embed`,
-              style: { width: '100%', height: 220, border: 0, display: 'block' },
-              title: 'map',
-            })
-          ) : (
-            <View style={styles.mapFallback}>
-              <Text style={{ color: '#888' }}>מפה</Text>
-            </View>
-          )}
+          <MapEmbed src={`https://www.google.com/maps?q=${encodeURIComponent(tour.title + ' Batumi')}&hl=iw&z=14&output=embed`} style={{ width: '100%', height: 220 }} />
         </View>
 
         {tour.audios && tour.audios.length > 0 && (

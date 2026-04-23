@@ -18,6 +18,8 @@ import BottomTabBar from '../../components/BottomTabBar';
 import Breadcrumb from '../../components/Breadcrumb';
 import AppHeader from '../../components/AppHeader';
 import PlacesInfoModal from '../../components/PlacesInfoModal';
+import HtmlContent from '../../components/HtmlContent';
+import MapEmbed from '../../components/MapEmbed';
 
 type Hotel = { id: string; title: string; titleEn?: string; text: string; image: string; mapUrl?: string; pageUrl?: string; coords?: { lat: number; lng: number }; visible?: boolean; images?: string[]; amenities?: string[]; price?: string; audio?: string };
 type TourBlock = { id: string; title: string; subtitle?: string; text: string; color: string; images: string[]; audios: { title?: string; url: string }[]; visible?: boolean; coords?: { lat: number; lng: number } };
@@ -501,9 +503,7 @@ function TourCard({ t, onRate, nearbyRestaurants }: { t: TourBlock; onRate: (id:
           // @ts-ignore
           <iframe src={mapSrc} style={{ width: '100%', height: 'calc(100% + 60px)', border: 0, pointerEvents: 'none', marginTop: -60 }} />
         ) : (
-          <View style={{ flex: 1, backgroundColor: '#ddd', alignItems: 'center', justifyContent: 'center' }}>
-            <Text>מפה</Text>
-          </View>
+          <MapEmbed src={mapSrc} style={{ flex: 1 }} />
         )}
         {!mapBig && (
           <TouchableOpacity style={StyleSheet.absoluteFill} activeOpacity={0.85} onPress={() => setMapBig(true)} />
@@ -656,11 +656,7 @@ function CategoryMapModal({ visible, points, focusName, focusCoords, layerColor,
               ])}
             </View>
           )}
-          {Platform.OS === 'web' && React.createElement('iframe', {
-            src: mapSrc,
-            style: { width: '100%', height: 350, border: 0 },
-            title: 'block-map',
-          })}
+          <MapEmbed src={mapSrc} style={{ width: '100%', height: 350 }} />
           {focus && (
             <View style={{ padding: 14, borderTopWidth: 1, borderTopColor: '#eee' }}>
               <Text style={{ fontSize: 16, fontWeight: '900', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl' }}>📍 {focus.name}</Text>
@@ -777,17 +773,7 @@ function HotelMap({ coords, title, onClose }: { coords: { lat: number; lng: numb
   const src = `https://maps.google.com/maps?q=${coords.lat},${coords.lng}(${encodeURIComponent(title)})&z=15&output=embed`;
   return (
     <View style={{ flex: 1, position: 'relative' }}>
-      {Platform.OS === 'web' ? (
-        // @ts-ignore - iframe on web
-        <iframe src={src} style={{ width: '100%', height: '100%', border: 0 }} />
-      ) : (
-        <TouchableOpacity
-          style={{ flex: 1, backgroundColor: '#e5e7eb', alignItems: 'center', justifyContent: 'center' }}
-          onPress={() => Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${coords.lat},${coords.lng}`)}
-        >
-          <Text style={{ fontSize: 14, color: Colors.PRIMARY }}>פתח במפות גוגל</Text>
-        </TouchableOpacity>
-      )}
+      <MapEmbed src={src} style={{ flex: 1 }} />
       <TouchableOpacity style={st.mapClose} onPress={onClose}>
         <Text style={st.mapCloseX}>✕</Text>
       </TouchableOpacity>
@@ -1074,13 +1060,9 @@ export default function CategoryScreen() {
                 <Text style={{ fontSize: 15, fontWeight: '800', color: tourMapOpen ? Colors.PRIMARY : '#fff' }}>🗺️ מפת כל המסלולים</Text>
                 <Text style={{ fontSize: 12, color: tourMapOpen ? Colors.PRIMARY : '#fff' }}>{tourMapOpen ? '▲' : '▼'}</Text>
               </TouchableOpacity>
-              {tourMapOpen && Platform.OS === 'web' && (
+              {tourMapOpen && (
                 <View style={{ marginHorizontal: 8, marginTop: 8, borderRadius: 14, overflow: 'hidden', height: 500, borderWidth: 1, borderColor: '#ddd', position: 'relative' }}>
-                  {React.createElement('iframe', {
-                    src: 'https://www.google.com/maps/d/embed?mid=1ruTENTudaTnlMJh50IZ6Y_Odmu3Y4DE&ehbc=2E312F&z=13',
-                    style: { width: '100%', height: 'calc(100% + 60px)', border: 0, marginTop: -60 },
-                    title: 'tour-routes-map',
-                  })}
+                  <MapEmbed src="https://www.google.com/maps/d/embed?mid=1ruTENTudaTnlMJh50IZ6Y_Odmu3Y4DE&ehbc=2E312F&z=13" style={{ flex: 1 }} />
                   <TouchableOpacity
                     onPress={() => setTourMapOpen(false)}
                     style={{ position: 'absolute', top: 10, left: 10, width: 34, height: 34, borderRadius: 17, backgroundColor: 'rgba(0,0,0,0.55)', alignItems: 'center', justifyContent: 'center' }}
@@ -1164,13 +1146,8 @@ export default function CategoryScreen() {
           })()
         ) : cat.hotels && cat.hotels.length > 0 ? (
           <View style={st.hotelList}>
-            {cat.longText && Platform.OS === 'web' && cat.hotels.length <= 10 && (
-              <View style={{ paddingHorizontal: 16, paddingTop: 8 }}>
-                {React.createElement('div', {
-                  dangerouslySetInnerHTML: { __html: cat.longText },
-                  style: { direction: 'rtl', textAlign: 'right' },
-                })}
-              </View>
+            {cat.longText && cat.hotels.length <= 10 && (
+              <HtmlContent html={cat.longText} style={{ paddingHorizontal: 16, paddingTop: 8 }} />
             )}
             {cat.introAudio && (
               <View style={{ paddingHorizontal: 0, paddingTop: 4, paddingBottom: 8 }}>
@@ -1184,21 +1161,11 @@ export default function CategoryScreen() {
                 ? <FoodieCard key={h.id} h={h} isLast={cat.hotels!.filter(x => x.visible !== false).indexOf(h) === cat.hotels!.filter(x => x.visible !== false).length - 1} />
                 : <HotelCard key={h.id} h={h} dark={darkCat} pageBtnLabel={cat.pageBtnLabel || 'לדף המלון'} mapPoints={mapPoints} layerColor={mapLayerColor || (mapPoints.length > 0 ? Colors.PRIMARY : undefined)} placesQuery={cat.id === 'casino' ? `${h.title} Batumi` : undefined} />
             ))}
-            {cat.longText && Platform.OS === 'web' && cat.hotels.length > 10 && (
-              <View style={{ paddingBottom: 16 }}>
-                {React.createElement('div', {
-                  dangerouslySetInnerHTML: { __html: cat.longText },
-                  style: { direction: 'rtl', textAlign: 'right' },
-                })}
-              </View>
+            {cat.longText && cat.hotels.length > 10 && (
+              <HtmlContent html={cat.longText} style={{ paddingBottom: 16, paddingHorizontal: 16 }} />
             )}
-            {(cat as any).longTextBottom && Platform.OS === 'web' && (
-              <View style={{ paddingHorizontal: 16, paddingBottom: 16, paddingTop: 8 }}>
-                {React.createElement('div', {
-                  dangerouslySetInnerHTML: { __html: (cat as any).longTextBottom },
-                  style: { direction: 'rtl', textAlign: 'right' },
-                })}
-              </View>
+            {(cat as any).longTextBottom && (
+              <HtmlContent html={(cat as any).longTextBottom} style={{ paddingHorizontal: 16, paddingBottom: 16, paddingTop: 8 }} />
             )}
             {cat.cardStyle === 'foodie' && (
               <View style={{ backgroundColor: '#1e1e2a', borderRadius: 16, margin: 16, marginTop: 8, padding: 16 }}>
@@ -1302,16 +1269,7 @@ export default function CategoryScreen() {
           <ArticleView cat={cat} darkCat={darkCat} />
         ) : cat.longText ? (
           <View style={st.body}>
-            {Platform.OS === 'web' ? (
-              React.createElement('div', {
-                dangerouslySetInnerHTML: { __html: cat.longText },
-                style: { direction: 'rtl', textAlign: 'right', color: darkCat ? '#e2e8f0' : Colors.TEXT, lineHeight: 1.8, fontSize: 15 },
-              })
-            ) : (
-              <Text style={[st.content, darkCat && { color: Colors.BACKGROUND }]}>
-                {cat.description || ''}
-              </Text>
-            )}
+            <HtmlContent html={cat.longText} baseStyle={{ color: darkCat ? '#e2e8f0' : Colors.TEXT, lineHeight: 26, fontSize: 15 }} />
           </View>
         ) : (
           <View style={st.body}>

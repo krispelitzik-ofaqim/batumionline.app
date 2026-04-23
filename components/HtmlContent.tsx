@@ -1,0 +1,56 @@
+import React from 'react';
+import { Platform, useWindowDimensions, View, StyleProp, ViewStyle } from 'react-native';
+import RenderHtml from 'react-native-render-html';
+
+type Props = {
+  html: string;
+  style?: StyleProp<ViewStyle>;
+  baseStyle?: Record<string, any>;
+};
+
+export default function HtmlContent({ html, style, baseStyle }: Props) {
+  const { width } = useWindowDimensions();
+
+  if (!html) return null;
+
+  if (Platform.OS === 'web') {
+    return (
+      <View style={style}>
+        {React.createElement('div', {
+          dangerouslySetInnerHTML: { __html: html },
+          style: { direction: 'rtl', textAlign: 'right', ...(baseStyle as any) },
+        })}
+      </View>
+    );
+  }
+
+  return (
+    <View style={style}>
+      <RenderHtml
+        contentWidth={width - 40}
+        source={{ html }}
+        baseStyle={{
+          direction: 'rtl',
+          textAlign: 'right',
+          writingDirection: 'rtl',
+          fontSize: 15,
+          lineHeight: 22,
+          color: '#1C2B35',
+          ...(baseStyle || {}),
+        }}
+        enableExperimentalMarginCollapsing
+        tagsStyles={{
+          p: { marginBottom: 10 },
+          h1: { fontSize: 22, fontWeight: '900', marginBottom: 10 },
+          h2: { fontSize: 18, fontWeight: '800', marginBottom: 8 },
+          h3: { fontSize: 16, fontWeight: '800', marginBottom: 6 },
+          ul: { marginBottom: 10 },
+          li: { marginBottom: 4 },
+          a: { color: '#1A6B8A', textDecorationLine: 'underline' },
+          strong: { fontWeight: '800' },
+          b: { fontWeight: '800' },
+        }}
+      />
+    </View>
+  );
+}

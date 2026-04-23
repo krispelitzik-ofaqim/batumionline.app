@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, Modal, TouchableOpacity, ScrollView, StyleSheet, Platform, Linking, Image } from 'react-native';
 import { Colors } from '../constants/colors';
 import { fetchContent } from '../constants/api';
+import MapEmbed from './MapEmbed';
 
 type Camera = { id: string; name: string; url: string; lat?: number; lng?: number; poster?: string; external?: boolean };
 
@@ -123,18 +124,7 @@ export default function CamerasModal({ visible, onClose, bgColor }: { visible: b
             <View style={s.playerContent}>
               <Text style={s.playerTitle}>{selected.name}</Text>
               <View style={s.playerFrame}>
-                {Platform.OS === 'web' ? (
-                  React.createElement('iframe', {
-                    src: selected.url,
-                    style: { width: '100%', height: '100%', border: 0 },
-                    allow: 'autoplay; fullscreen',
-                    allowFullScreen: true,
-                  })
-                ) : (
-                  <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                    <Text style={{ color: Colors.WHITE }}>שידור זמין בדפדפן</Text>
-                  </View>
-                )}
+                <MapEmbed src={selected.url} style={{ flex: 1 }} />
               </View>
             </View>
           </View>
@@ -149,16 +139,7 @@ export default function CamerasModal({ visible, onClose, bgColor }: { visible: b
             <View style={s.playerContent}>
               <Text style={s.playerTitle}>📍 מיקום: {mapCam.name}</Text>
               <View style={s.playerFrame}>
-                {Platform.OS === 'web' ? (
-                  React.createElement('iframe', {
-                    src: `https://maps.google.com/maps?q=${mapCam.lat},${mapCam.lng}(${encodeURIComponent(mapCam.name)})&z=15&output=embed`,
-                    style: { width: '100%', height: '100%', border: 0 },
-                  })
-                ) : (
-                  <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                    <Text style={{ color: Colors.WHITE }}>מפה זמינה בדפדפן</Text>
-                  </View>
-                )}
+                <MapEmbed src={`https://maps.google.com/maps?q=${mapCam.lat},${mapCam.lng}(${encodeURIComponent(mapCam.name)})&z=15&output=embed`} style={{ flex: 1 }} />
               </View>
             </View>
           </View>

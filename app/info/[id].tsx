@@ -4,6 +4,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Colors } from '../../constants/colors';
 import { fetchContent, API_BASE } from '../../constants/api';
+import HtmlContent from '../../components/HtmlContent';
 
 
 
@@ -78,11 +79,8 @@ export default function InfoPage() {
             </LinearGradient>
           </View>
           <View style={{ marginTop: -16, borderTopLeftRadius: 20, borderTopRightRadius: 20, backgroundColor: Colors.BACKGROUND, paddingTop: 20, paddingHorizontal: 16, minHeight: 400 }}>
-            {Platform.OS === 'web' && portalItem.body.includes('<') ? (
-              React.createElement('div', {
-                dangerouslySetInnerHTML: { __html: portalItem.body },
-                style: { fontSize: 14, color: '#444', textAlign: 'right', direction: 'rtl', lineHeight: '24px' },
-              })
+            {portalItem.body.includes('<') ? (
+              <HtmlContent html={portalItem.body} baseStyle={{ fontSize: 14, color: '#444', lineHeight: 24 }} />
             ) : (
               <Text style={styles.cardBody}>{portalItem.body || 'תוכן יתווסף בקרוב'}</Text>
             )}
@@ -204,11 +202,8 @@ export default function InfoPage() {
           <View>
             <View style={styles.card}>
               <Text style={styles.cardTitle}>{current.title}</Text>
-              {Platform.OS === 'web' && current.body.includes('<') ? (
-                React.createElement('div', {
-                  dangerouslySetInnerHTML: { __html: current.body },
-                  style: { fontSize: 14, color: '#444', textAlign: 'right', direction: 'rtl', lineHeight: '24px' },
-                })
+              {current.body.includes('<') ? (
+                <HtmlContent html={current.body} baseStyle={{ fontSize: 14, color: '#444', lineHeight: 24 }} />
               ) : (
                 <Text style={styles.cardBody}>{current.body}</Text>
               )}

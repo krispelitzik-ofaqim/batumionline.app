@@ -6,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '../../constants/colors';
 import { fetchContent } from '../../constants/api';
 import AudioPlayer from '../../components/AudioPlayer';
+import HtmlContent from '../../components/HtmlContent';
 
 function fireHearts() {
   if (Platform.OS !== 'web') return;
@@ -155,11 +156,8 @@ export default function WelcomeScreen() {
 
         {item.longText ? (
           <View style={styles.card}>
-            {Platform.OS === 'web' && item.longText.includes('<') ? (
-              React.createElement('div', {
-                dangerouslySetInnerHTML: { __html: item.longText },
-                style: { fontSize: 14, color: '#444', textAlign: 'right', direction: 'rtl', lineHeight: '24px' },
-              })
+            {item.longText.includes('<') ? (
+              <HtmlContent html={item.longText} baseStyle={{ fontSize: 14, color: '#444', lineHeight: 24 }} />
             ) : (
               <Text style={styles.cardBody}>{item.longText}</Text>
             )}
