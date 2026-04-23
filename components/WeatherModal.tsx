@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, Modal, TouchableOpacity, StyleSheet, ActivityIndicator, ScrollView } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, Text, Modal, TouchableOpacity, StyleSheet, ActivityIndicator, ScrollView, Animated } from 'react-native';
 import { Colors } from '../constants/colors';
 import CamerasModal from './CamerasModal';
 import AudioPlayer from './AudioPlayer';
@@ -14,22 +14,58 @@ type CurrentWeather = {
   seaTemp?: number; uv?: number; sunrise?: string; sunset?: string;
 };
 type DayForecast = { day: string; high: number; low: number; icon: string; desc: string };
+type HourForecast = { hour: string; temp: number; icon: string; pop?: number };
+
+const BATUMI_LAT = 41.6168;
+const BATUMI_LON = 41.6367;
 
 export default function WeatherModal({ visible, onClose, bgColor }: { visible: boolean; onClose: () => void; bgColor: string }) {
   const [current, setCurrent] = useState<CurrentWeather | null>(null);
   const [forecast, setForecast] = useState<DayForecast[]>([]);
+  const [hourly, setHourly] = useState<HourForecast[]>([]);
   const [loading, setLoading] = useState(true);
   const [camerasOpen, setCamerasOpen] = useState(false);
+  const [batumiTime, setBatumiTime] = useState('');
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const livePulse = useRef(new Animated.Value(1)).current;
+
+  // Batumi clock (UTC+4)
+  useEffect(() => {
+    if (!visible) return;
+    const tick = () => {
+      const t = new Date().toLocaleTimeString('he-IL', { timeZone: 'Asia/Tbilisi', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+      setBatumiTime(t);
+    };
+    tick();
+    const iv = setInterval(tick, 1000);
+    return () => clearInterval(iv);
+  }, [visible]);
+
+  // LIVE dot pulsing animation
+  useEffect(() => {
+    if (!visible) return;
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(livePulse, { toValue: 0.3, duration: 800, useNativeDriver: true }),
+        Animated.timing(livePulse, { toValue: 1, duration: 800, useNativeDriver: true }),
+      ])
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [visible, livePulse]);
+
+  const loadAll = () => {
+    setLoading(true);
+    if (OWM_KEY) fetchOpenWeatherMap();
+    else fetchOpenMeteo();
+  };
 
   useEffect(() => {
     if (!visible) return;
-    setLoading(true);
-
-    if (OWM_KEY) {
-      fetchOpenWeatherMap();
-    } else {
-      fetchOpenMeteo();
-    }
+    loadAll();
+    // Auto-refresh every 10 minutes
+    const iv = setInterval(loadAll, 10 * 60 * 1000);
+    return () => clearInterval(iv);
   }, [visible]);
 
   const fetchOpenMeteo = async () => {
@@ -84,6 +120,21 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
       const curRes = await fetch(`https://api.openweathermap.org/data/2.5/weather?id=${BATUMI_ID}&units=metric&lang=he&appid=${OWM_KEY}`);
       const curData = await curRes.json();
 
+      // 5-day/3-hour forecast (for hourly + daily aggregation)
+      const foreRes = await fetch(`https://api.openweathermap.org/data/2.5/forecast?id=${BATUMI_ID}&units=metric&lang=he&appid=${OWM_KEY}`);
+      const foreData = await foreRes.json();
+
+      // Marine (sea temperature) via Open-Meteo (free, no key)
+      let seaTemp: number | undefined;
+      try {
+        const mRes = await fetch(`https://marine-api.open-meteo.com/v1/marine?latitude=${BATUMI_LAT}&longitude=${BATUMI_LON}&current=sea_surface_temperature&timezone=auto`);
+        const mData = await mRes.json();
+        if (mData?.current?.sea_surface_temperature != null) seaTemp = Math.round(mData.current.sea_surface_temperature);
+      } catch {}
+
+      const sunrise = curData.sys?.sunrise ? fmtTime(curData.sys.sunrise) : undefined;
+      const sunset = curData.sys?.sunset ? fmtTime(curData.sys.sunset) : undefined;
+
       setCurrent({
         temp: Math.round(curData.main.temp),
         feels: Math.round(curData.main.feels_like),
@@ -91,13 +142,26 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
         wind: Math.round(curData.wind.speed * 3.6), // m/s to km/h
         desc: curData.weather?.[0]?.description || '',
         icon: owmEmoji(curData.weather?.[0]?.icon || ''),
+        seaTemp,
+        sunrise,
+        sunset,
       });
 
-      // 7-day forecast
-      const foreRes = await fetch(`https://api.openweathermap.org/data/2.5/forecast?id=${BATUMI_ID}&units=metric&lang=he&appid=${OWM_KEY}`);
-      const foreData = await foreRes.json();
+      // Hourly forecast: next 24 hours (3-hour intervals → 8 points)
+      const hours: HourForecast[] = (foreData.list || []).slice(0, 8).map((item: any) => {
+        const d = new Date(item.dt * 1000);
+        const tzDate = new Date(d.toLocaleString('en-US', { timeZone: 'Asia/Tbilisi' }));
+        const h = tzDate.getHours().toString().padStart(2, '0');
+        return {
+          hour: `${h}:00`,
+          temp: Math.round(item.main.temp),
+          icon: owmEmoji(item.weather?.[0]?.icon || ''),
+          pop: item.pop ? Math.round(item.pop * 100) : 0,
+        };
+      });
+      setHourly(hours);
 
-      // Group by day and extract high/low
+      // 7-day forecast — aggregate by day
       const dayMap: Record<string, { high: number; low: number; icon: string; desc: string }> = {};
       (foreData.list || []).forEach((item: any) => {
         const date = new Date(item.dt * 1000);
@@ -127,10 +191,16 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
       });
 
       setForecast(days);
+      setLastUpdated(new Date());
       setLoading(false);
     } catch {
       fetchWttrFallback();
     }
+  };
+
+  const fmtTime = (unix: number) => {
+    const d = new Date(unix * 1000);
+    return d.toLocaleTimeString('he-IL', { timeZone: 'Asia/Tbilisi', hour: '2-digit', minute: '2-digit', hour12: false });
   };
 
   const fetchWttrFallback = async () => {
@@ -182,7 +252,17 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
         </TouchableOpacity>
 
         <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
-          <Text style={s.title}>מזג האוויר בבטומי</Text>
+          <View style={s.liveHeader}>
+            <View style={s.liveBadge}>
+              <Animated.View style={[s.liveDot, { opacity: livePulse }]} />
+              <Text style={s.liveTxt}>LIVE</Text>
+            </View>
+            <Text style={s.title}>מזג האוויר בבטומי</Text>
+            <Text style={s.batumiClock}>🕐 {batumiTime}</Text>
+          </View>
+          {lastUpdated && (
+            <Text style={s.updatedTxt}>עודכן: {lastUpdated.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })} · מתרענן כל 10 דק׳</Text>
+          )}
 
           <View style={{ marginBottom: 12 }}>
             <AudioPlayer
@@ -258,6 +338,23 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
                     )}
                   </View>
                 </View>
+              )}
+
+              {/* Hourly forecast */}
+              {hourly.length > 0 && (
+                <>
+                  <Text style={s.weekTitle}>24 השעות הקרובות</Text>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.hourlyScroll}>
+                    {hourly.map((h, i) => (
+                      <View key={i} style={s.hourCell}>
+                        <Text style={s.hourTime}>{h.hour}</Text>
+                        <Text style={s.hourIcon}>{h.icon}</Text>
+                        <Text style={s.hourTemp}>{h.temp}°</Text>
+                        {!!h.pop && h.pop > 10 && <Text style={s.hourPop}>💧 {h.pop}%</Text>}
+                      </View>
+                    ))}
+                  </ScrollView>
+                </>
               )}
 
               {/* 7-day weekly forecast */}
@@ -372,7 +469,19 @@ const s = StyleSheet.create({
   camBannerIcon: { fontSize: 20 },
   camBannerTxt: { flex: 1, fontSize: 15, fontWeight: '800', color: '#fff', textAlign: 'right', writingDirection: 'rtl' },
   camBannerArrow: { fontSize: 22, color: '#fff', opacity: 0.7 },
-  title: { fontSize: 28, fontWeight: '800', color: Colors.WHITE, textAlign: 'center', marginBottom: 24, writingDirection: 'rtl' },
+  title: { fontSize: 24, fontWeight: '800', color: Colors.WHITE, textAlign: 'center', writingDirection: 'rtl', flex: 1 },
+  liveHeader: { flexDirection: 'row-reverse', alignItems: 'center', gap: 10, marginBottom: 4 },
+  liveBadge: { flexDirection: 'row-reverse', alignItems: 'center', gap: 5, backgroundColor: '#EF4444', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 },
+  liveDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#fff' },
+  liveTxt: { color: '#fff', fontSize: 11, fontWeight: '900', letterSpacing: 1 },
+  batumiClock: { color: 'rgba(255,255,255,0.85)', fontSize: 14, fontWeight: '700', fontVariant: ['tabular-nums'] },
+  updatedTxt: { color: 'rgba(255,255,255,0.55)', fontSize: 11, textAlign: 'center', marginBottom: 18, writingDirection: 'rtl' },
+  hourlyScroll: { gap: 10, paddingVertical: 8, paddingHorizontal: 2, marginBottom: 20 },
+  hourCell: { backgroundColor: 'rgba(255,255,255,0.12)', borderRadius: 14, paddingVertical: 12, paddingHorizontal: 14, alignItems: 'center', minWidth: 70, borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)' },
+  hourTime: { fontSize: 12, color: 'rgba(255,255,255,0.8)', fontWeight: '700', marginBottom: 4 },
+  hourIcon: { fontSize: 24, marginBottom: 2 },
+  hourTemp: { fontSize: 16, color: '#fff', fontWeight: '900' },
+  hourPop: { fontSize: 10, color: '#60A5FA', fontWeight: '700', marginTop: 2 },
 
   currentCard: { backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 24, padding: 32, alignItems: 'center', marginBottom: 28 },
   currentIcon: { fontSize: 72 },
