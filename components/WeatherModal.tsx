@@ -29,6 +29,7 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
   const [batumiTime, setBatumiTime] = useState('');
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const livePulse = useRef(new Animated.Value(1)).current;
+  const hourlyRef = useRef<ScrollView | null>(null);
 
   // Batumi clock (UTC+4)
   useEffect(() => {
@@ -370,7 +371,13 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
                   <Text style={s.weekTitle}>24 השעות הקרובות</Text>
                   <View style={{ position: 'relative' }}>
                     <Text style={s.hourArrowFloat}>←</Text>
-                    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.hourlyScroll}>
+                    <ScrollView
+                      ref={hourlyRef}
+                      horizontal
+                      showsHorizontalScrollIndicator={false}
+                      contentContainerStyle={s.hourlyScroll}
+                      onContentSizeChange={(w) => hourlyRef.current?.scrollTo({ x: w, animated: false })}
+                    >
                       {hourly.map((h, i) => {
                         const hourInt = parseInt(h.hour.split(':')[0], 10);
                         const cellGrad = hourGradient(hourInt);
