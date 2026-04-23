@@ -367,14 +367,24 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
                 <>
                   <Text style={s.weekTitle}>24 השעות הקרובות</Text>
                   <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.hourlyScroll}>
-                    {hourly.map((h, i) => (
-                      <View key={i} style={s.hourCell}>
-                        <Text style={s.hourTime}>{h.hour}</Text>
-                        <Text style={s.hourIcon}>{h.icon}</Text>
-                        <Text style={s.hourTemp}>{h.temp}°</Text>
-                        {!!h.pop && h.pop > 10 && <Text style={s.hourPop}>💧 {h.pop}%</Text>}
-                      </View>
-                    ))}
+                    {hourly.map((h, i) => {
+                      const hourInt = parseInt(h.hour.split(':')[0], 10);
+                      const cellGrad = hourGradient(hourInt);
+                      return (
+                        <LinearGradient
+                          key={i}
+                          colors={cellGrad}
+                          start={{ x: 0, y: 0 }}
+                          end={{ x: 0, y: 1 }}
+                          style={s.hourCell}
+                        >
+                          <Text style={s.hourTime}>{h.hour}</Text>
+                          <Text style={s.hourIcon}>{h.icon}</Text>
+                          <Text style={s.hourTemp}>{h.temp}°</Text>
+                          {!!h.pop && h.pop > 10 && <Text style={s.hourPop}>💧 {h.pop}%</Text>}
+                        </LinearGradient>
+                      );
+                    })}
                   </ScrollView>
                 </>
               )}
@@ -407,6 +417,16 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
       </LinearGradient>
     </Modal>
   );
+}
+
+function hourGradient(hour: number): [string, string] {
+  // 5-8 dawn, 8-11 morning, 11-16 day, 16-18 afternoon, 18-20 sunset, 20-5 night
+  if (hour >= 5 && hour < 8) return ['#FDE68A', '#F4A94E'];      // dawn: soft yellow→orange
+  if (hour >= 8 && hour < 11) return ['#60A5FA', '#A7F3D0'];     // morning: sky blue→mint
+  if (hour >= 11 && hour < 16) return ['#3DA5C4', '#7ECFC0'];    // day: teal bright
+  if (hour >= 16 && hour < 18) return ['#F4A94E', '#EC4899'];    // afternoon: orange→pink
+  if (hour >= 18 && hour < 20) return ['#7C3AED', '#EC4899'];    // sunset: purple→pink
+  return ['#1E293B', '#0F172A'];                                  // night: navy→black
 }
 
 function weatherGradient(iconCode: string | undefined, batumiHourStr: string): [string, string, string] {
