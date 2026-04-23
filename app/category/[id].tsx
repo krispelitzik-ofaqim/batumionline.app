@@ -17,6 +17,7 @@ import FlightsModal from '../../components/FlightsModal';
 import BottomTabBar from '../../components/BottomTabBar';
 import Breadcrumb from '../../components/Breadcrumb';
 import AppHeader from '../../components/AppHeader';
+import PlacesInfoBlock from '../../components/PlacesInfoBlock';
 
 type Hotel = { id: string; title: string; titleEn?: string; text: string; image: string; mapUrl?: string; pageUrl?: string; coords?: { lat: number; lng: number }; visible?: boolean; images?: string[]; amenities?: string[]; price?: string; audio?: string };
 type TourBlock = { id: string; title: string; subtitle?: string; text: string; color: string; images: string[]; audios: { title?: string; url: string }[]; visible?: boolean; coords?: { lat: number; lng: number } };
@@ -677,7 +678,7 @@ function CategoryMapModal({ visible, points, focusName, focusCoords, layerColor,
   );
 }
 
-function HotelCard({ h, dark, pageBtnLabel, mapPoints, layerColor }: { h: Hotel; dark: boolean; pageBtnLabel: string; mapPoints?: MapPoint[]; layerColor?: string }) {
+function HotelCard({ h, dark, pageBtnLabel, mapPoints, layerColor, placesQuery }: { h: Hotel; dark: boolean; pageBtnLabel: string; mapPoints?: MapPoint[]; layerColor?: string; placesQuery?: string }) {
   const [showMap, setShowMap] = useState(false);
   const [showGallery, setShowGallery] = useState(false);
   const [showCatMapModal, setShowCatMapModal] = useState(false);
@@ -729,6 +730,7 @@ function HotelCard({ h, dark, pageBtnLabel, mapPoints, layerColor }: { h: Hotel;
           </View>
         )}
         <Text style={[st.hotelText, dark && { color: '#cbd5e1' }]}>{h.text}</Text>
+        {placesQuery && <PlacesInfoBlock query={placesQuery} />}
         <View style={st.hotelBtnRow}>
           <TouchableOpacity
             style={[st.hotelBtn, st.hotelBtnAccent, !h.coords && st.hotelBtnDisabled]}
@@ -1176,7 +1178,7 @@ export default function CategoryScreen() {
                 ? <PassportCard key={h.id} h={h} pageBtnLabel={cat.pageBtnLabel || 'אתר/פייסבוק'} />
                 : cat.cardStyle === 'foodie'
                 ? <FoodieCard key={h.id} h={h} isLast={cat.hotels!.filter(x => x.visible !== false).indexOf(h) === cat.hotels!.filter(x => x.visible !== false).length - 1} />
-                : <HotelCard key={h.id} h={h} dark={darkCat} pageBtnLabel={cat.pageBtnLabel || 'לדף המלון'} mapPoints={mapPoints} layerColor={mapLayerColor || (mapPoints.length > 0 ? Colors.PRIMARY : undefined)} />
+                : <HotelCard key={h.id} h={h} dark={darkCat} pageBtnLabel={cat.pageBtnLabel || 'לדף המלון'} mapPoints={mapPoints} layerColor={mapLayerColor || (mapPoints.length > 0 ? Colors.PRIMARY : undefined)} placesQuery={cat.id === 'casino' ? `${h.title} Batumi` : undefined} />
             ))}
             {cat.longText && Platform.OS === 'web' && cat.hotels.length > 10 && (
               <View style={{ paddingBottom: 16 }}>
