@@ -486,7 +486,7 @@ app.get('/api/marine', async (req, res) => {
   }
 
   try {
-    const params = 'waveHeight,waterTemperature,windSpeed,windDirection,seaLevel';
+    const params = 'waveHeight,waveDirection,wavePeriod,waterTemperature,windSpeed,windDirection,gust,visibility,seaLevel,airTemperature';
     const url = `https://api.stormglass.io/v2/weather/point?lat=41.6168&lng=41.6367&params=${params}&source=sg`;
     const response = await fetch(url, { headers: { Authorization: key } });
     if (!response.ok) return res.status(response.status).json({ error: `Upstream ${response.status}` });
@@ -501,9 +501,14 @@ app.get('/api/marine', async (req, res) => {
 
     const payload = {
       waveHeight: currentHour.waveHeight?.sg ?? null,
+      waveDirection: currentHour.waveDirection?.sg ?? null,
+      wavePeriod: currentHour.wavePeriod?.sg ?? null,
       waterTemp: currentHour.waterTemperature?.sg ?? null,
+      airTemp: currentHour.airTemperature?.sg ?? null,
       windSpeed: currentHour.windSpeed?.sg ?? null,
       windDirection: currentHour.windDirection?.sg ?? null,
+      gust: currentHour.gust?.sg ?? null,
+      visibility: currentHour.visibility?.sg ?? null,
       seaLevel: currentHour.seaLevel?.sg ?? null,
       time: currentHour.time,
     };

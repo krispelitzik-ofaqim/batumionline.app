@@ -16,6 +16,12 @@ type CurrentWeather = {
   seaTemp?: number; uv?: number; sunrise?: string; sunset?: string;
   waveHeight?: number;
 };
+type MarineData = {
+  waveHeight?: number; waveDirection?: number; wavePeriod?: number;
+  waterTemp?: number; airTemp?: number;
+  windSpeed?: number; windDirection?: number; gust?: number;
+  visibility?: number; seaLevel?: number;
+};
 type DayForecast = { day: string; date: string; high: number; low: number; icon: string; desc: string };
 type HourForecast = { hour: string; temp: number; icon: string; pop?: number };
 
@@ -32,6 +38,8 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const livePulse = useRef(new Animated.Value(1)).current;
   const hourlyRef = useRef<ScrollView | null>(null);
+  const [marine, setMarine] = useState<MarineData | null>(null);
+  const [skippersOpen, setSkippersOpen] = useState(false);
 
   // Batumi clock (UTC+4)
   useEffect(() => {
@@ -135,6 +143,7 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
       try {
         const mRes = await fetch(`${API_BASE}/api/marine`);
         const mData = await mRes.json();
+        setMarine(mData);
         if (mData?.waterTemp != null) seaTemp = Math.round(mData.waterTemp);
         if (mData?.waveHeight != null) waveHeight = Math.round(mData.waveHeight * 10) / 10;
       } catch {}
@@ -439,6 +448,36 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
                   </View>
                 );
               })}
+
+              {/* Skippers panel */}
+              {marine && (
+                <View style={s.skippersWrap}>
+                  <TouchableOpacity onPress={() => setSkippersOpen(o => !o)} style={s.skippersHeader} activeOpacity={0.85}>
+                    <Text style={s.skippersIcon}>⛵</Text>
+                    <Text style={s.skippersTitle}>מזג אוויר לספנים ושטים</Text>
+                    <Text style={s.skippersArrow}>{skippersOpen ? '▲' : '▼'}</Text>
+                  </TouchableOpacity>
+                  {skippersOpen && (
+                    <View style={s.skippersBody}>
+                      <View style={[s.safetyBanner, safetyLevel(marine.waveHeight, marine.windSpeed)]}>
+                        <Text style={s.safetyTxt}>{safetyMessage(marine.waveHeight, marine.windSpeed)}</Text>
+                      </View>
+                      <View style={s.skGrid}>
+                        <SkCell icon="🌊" label="גובה גלים" val={marine.waveHeight != null ? `${marine.waveHeight.toFixed(1)} m` : '—'} />
+                        <SkCell icon="🧭" label="כיוון גלים" val={marine.waveDirection != null ? degToCardinal(marine.waveDirection) : '—'} />
+                        <SkCell icon="⏱️" label="פריוד גלים" val={marine.wavePeriod != null ? `${Math.round(marine.wavePeriod)} שנ׳` : '—'} />
+                        <SkCell icon="💨" label="רוח" val={marine.windSpeed != null ? `${Math.round(marine.windSpeed * 1.944)} קשר` : '—'} />
+                        <SkCell icon="🧭" label="כיוון רוח" val={marine.windDirection != null ? degToCardinal(marine.windDirection) : '—'} />
+                        <SkCell icon="💢" label="מכות רוח" val={marine.gust != null ? `${Math.round(marine.gust * 1.944)} קשר` : '—'} />
+                        <SkCell icon="👁️" label="ראות" val={marine.visibility != null ? `${marine.visibility.toFixed(1)} ק״מ` : '—'} />
+                        <SkCell icon="📏" label="מפלס ים" val={marine.seaLevel != null ? `${marine.seaLevel.toFixed(2)} m` : '—'} />
+                        <SkCell icon="🌡️" label="טמפ׳ מים" val={marine.waterTemp != null ? `${marine.waterTemp.toFixed(1)}°C` : '—'} />
+                      </View>
+                      <Text style={s.skippersNote}>נתונים מ-Stormglass · מתרענן כל שעה</Text>
+                    </View>
+                  )}
+                </View>
+              )}
             </>
           )}
         </ScrollView>
@@ -447,6 +486,44 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
     </Modal>
   );
 }
+
+function degToCardinal(deg: number): string {
+  const dirs = ['צפון', 'צפון-מזרח', 'מזרח', 'דרום-מזרח', 'דרום', 'דרום-מערב', 'מערב', 'צפון-מערב'];
+  return dirs[Math.round(deg / 45) % 8] || '—';
+}
+
+function safetyLevel(wave?: number | null, wind?: number | null): { backgroundColor: string } {
+  const w = wave ?? 0;
+  const windKts = (wind ?? 0) * 1.944;
+  if (w > 2 || windKts > 25) return { backgroundColor: '#DC2626' };
+  if (w > 1 || windKts > 15) return { backgroundColor: '#F59E0B' };
+  return { backgroundColor: '#16A34A' };
+}
+
+function safetyMessage(wave?: number | null, wind?: number | null): string {
+  const w = wave ?? 0;
+  const windKts = (wind ?? 0) * 1.944;
+  if (w > 2 || windKts > 25) return '⚠️ לא מומלץ — ים סוער';
+  if (w > 1 || windKts > 15) return '⚠️ זהירות — תנאים בגבול';
+  return '✅ תנאים טובים לשיט';
+}
+
+function SkCell({ icon, label, val }: { icon: string; label: string; val: string }) {
+  return (
+    <View style={skS.cell}>
+      <Text style={skS.icon}>{icon}</Text>
+      <Text style={skS.val}>{val}</Text>
+      <Text style={skS.label}>{label}</Text>
+    </View>
+  );
+}
+
+const skS = StyleSheet.create({
+  cell: { width: '33.333%', paddingVertical: 10, paddingHorizontal: 4, alignItems: 'center' },
+  icon: { fontSize: 22, marginBottom: 4 },
+  val: { fontSize: 15, fontWeight: '900', color: '#fff', textShadowColor: 'rgba(0,0,0,0.35)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 2 },
+  label: { fontSize: 10, color: 'rgba(255,255,255,0.75)', marginTop: 2, fontWeight: '700', writingDirection: 'rtl', textAlign: 'center' },
+});
 
 function hourGradient(hour: number): [string, string] {
   // 5-8 dawn, 8-11 morning, 11-16 day, 16-18 afternoon, 18-20 sunset, 20-5 night
@@ -606,4 +683,15 @@ const s = StyleSheet.create({
   dayTemps: { flexDirection: 'row', gap: 6, alignItems: 'center' },
   dayHigh: { fontSize: 17, fontWeight: '900', color: Colors.WHITE, textShadowColor: 'rgba(0,0,0,0.35)', textShadowOffset: { width: 0, height: 2 }, textShadowRadius: 3 },
   dayLow: { fontSize: 15, color: 'rgba(255,255,255,0.6)', fontWeight: '700' },
+
+  skippersWrap: { marginTop: 24, borderRadius: 14, backgroundColor: 'rgba(0,0,0,0.15)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)', overflow: 'hidden' },
+  skippersHeader: { flexDirection: 'row-reverse', alignItems: 'center', gap: 10, paddingHorizontal: 16, paddingVertical: 14 },
+  skippersIcon: { fontSize: 24 },
+  skippersTitle: { flex: 1, fontSize: 16, fontWeight: '900', color: '#fff', writingDirection: 'rtl', textAlign: 'right', textShadowColor: 'rgba(0,0,0,0.35)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 2 },
+  skippersArrow: { fontSize: 12, color: '#fff', fontWeight: '900' },
+  skippersBody: { paddingHorizontal: 12, paddingBottom: 14, paddingTop: 4 },
+  safetyBanner: { paddingVertical: 10, borderRadius: 10, alignItems: 'center', marginBottom: 10, borderWidth: 1, borderColor: 'rgba(255,255,255,0.25)' },
+  safetyTxt: { fontSize: 15, fontWeight: '900', color: '#fff', writingDirection: 'rtl', textShadowColor: 'rgba(0,0,0,0.45)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 2 },
+  skGrid: { flexDirection: 'row-reverse', flexWrap: 'wrap' },
+  skippersNote: { fontSize: 10, color: 'rgba(255,255,255,0.55)', marginTop: 10, textAlign: 'center', writingDirection: 'rtl' },
 });
