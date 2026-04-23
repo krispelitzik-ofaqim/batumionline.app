@@ -17,7 +17,7 @@ import FlightsModal from '../../components/FlightsModal';
 import BottomTabBar from '../../components/BottomTabBar';
 import Breadcrumb from '../../components/Breadcrumb';
 import AppHeader from '../../components/AppHeader';
-import PlacesInfoBlock from '../../components/PlacesInfoBlock';
+import PlacesInfoModal from '../../components/PlacesInfoModal';
 
 type Hotel = { id: string; title: string; titleEn?: string; text: string; image: string; mapUrl?: string; pageUrl?: string; coords?: { lat: number; lng: number }; visible?: boolean; images?: string[]; amenities?: string[]; price?: string; audio?: string };
 type TourBlock = { id: string; title: string; subtitle?: string; text: string; color: string; images: string[]; audios: { title?: string; url: string }[]; visible?: boolean; coords?: { lat: number; lng: number } };
@@ -682,20 +682,7 @@ function HotelCard({ h, dark, pageBtnLabel, mapPoints, layerColor, placesQuery }
   const [showMap, setShowMap] = useState(false);
   const [showGallery, setShowGallery] = useState(false);
   const [showCatMapModal, setShowCatMapModal] = useState(false);
-  const [placesPhone, setPlacesPhone] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!placesQuery) return;
-    let cancelled = false;
-    (async () => {
-      try {
-        const r = await fetch(`${API_BASE}/api/places?q=${encodeURIComponent(placesQuery)}`);
-        const j = await r.json();
-        if (!cancelled && j.found && j.phone) setPlacesPhone(j.phone);
-      } catch {}
-    })();
-    return () => { cancelled = true; };
-  }, [placesQuery]);
+  const [showInfoModal, setShowInfoModal] = useState(false);
   const hasGallery = !!(h.images && h.images.length > 0);
   const btnEnabled = hasGallery || !!h.pageUrl;
   if (showMap && h.coords) {
@@ -745,17 +732,8 @@ function HotelCard({ h, dark, pageBtnLabel, mapPoints, layerColor, placesQuery }
         )}
         <Text style={[st.hotelText, dark && { color: '#cbd5e1' }]}>{h.text}</Text>
         <View style={st.hotelBtnRow}>
-          {placesPhone && (
-            <TouchableOpacity
-              style={[st.hotelBtn, st.hotelBtnAccent]}
-              activeOpacity={0.7}
-              onPress={() => Linking.openURL(`tel:${placesPhone}`)}
-            >
-              <Text style={st.hotelBtnTxt}>📞 חייג</Text>
-            </TouchableOpacity>
-          )}
           <TouchableOpacity
-            style={[st.hotelBtn, st.hotelBtnAccent, !h.coords && st.hotelBtnDisabled]}
+            style={[st.hotelBtn, placesQuery ? st.hotelBtnSecondary : st.hotelBtnAccent, !h.coords && st.hotelBtnDisabled]}
             activeOpacity={h.coords ? 0.7 : 1}
             onPress={() => {
               if (mapPoints && mapPoints.length > 0) setShowCatMapModal(true);
@@ -767,15 +745,16 @@ function HotelCard({ h, dark, pageBtnLabel, mapPoints, layerColor, placesQuery }
           </TouchableOpacity>
           <CategoryMapModal visible={showCatMapModal} points={mapPoints || []} focusName={h.title} focusCoords={h.coords} layerColor={layerColor} onClose={() => setShowCatMapModal(false)} />
           <TouchableOpacity
-            style={[st.hotelBtn, st.hotelBtnPrimary, !btnEnabled && st.hotelBtnDisabled]}
-            activeOpacity={btnEnabled ? 0.7 : 1}
+            style={[st.hotelBtn, st.hotelBtnPrimary, !placesQuery && !btnEnabled && st.hotelBtnDisabled]}
+            activeOpacity={0.7}
             onPress={() => {
-              if (hasGallery) setShowGallery(true);
+              if (placesQuery) setShowInfoModal(true);
+              else if (hasGallery) setShowGallery(true);
               else if (h.pageUrl) Linking.openURL(h.pageUrl);
             }}
-            disabled={!btnEnabled}
+            disabled={!placesQuery && !btnEnabled}
           >
-            <Text style={[st.hotelBtnTxt, !btnEnabled && st.hotelBtnTxtDisabled]}>{pageBtnLabel}</Text>
+            <Text style={[st.hotelBtnTxt, !placesQuery && !btnEnabled && st.hotelBtnTxtDisabled]}>{pageBtnLabel}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[st.hotelBtn, st.hotelBtnSecondary, !h.mapUrl && st.hotelBtnDisabled]}
@@ -787,6 +766,9 @@ function HotelCard({ h, dark, pageBtnLabel, mapPoints, layerColor, placesQuery }
           </TouchableOpacity>
         </View>
       </View>
+      {placesQuery && showInfoModal && (
+        <PlacesInfoModal query={placesQuery} title={h.title} onClose={() => setShowInfoModal(false)} />
+      )}
     </View>
   );
 }
