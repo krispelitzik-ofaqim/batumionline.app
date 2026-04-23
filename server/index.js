@@ -417,6 +417,8 @@ const marineCache = { data: null, fetchedAt: 0 };
 const MARINE_CACHE_MS = 60 * 60 * 1000; // 1 hour (Stormglass free = 50/day)
 const unsplashCache = {}; // keyed by query
 const UNSPLASH_CACHE_MS = 24 * 60 * 60 * 1000; // 24 hours (free = 50/hour)
+const placesCache = {}; // keyed by query
+const PLACES_CACHE_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 app.get('/api/flights', async (req, res) => {
   const key = process.env.AERODATABOX_KEY;
@@ -549,6 +551,59 @@ app.get('/api/unsplash', async (req, res) => {
     }));
     unsplashCache[cacheKey] = { data: photos, fetchedAt: Date.now() };
     res.json({ photos, cached: false });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ─── Google Places ────────────────────────────────────────────
+app.get('/api/places', async (req, res) => {
+  const key = process.env.GOOGLE_PLACES_KEY;
+  if (!key) return res.status(503).json({ error: 'GOOGLE_PLACES_KEY not configured' });
+  const query = (req.query.q || '').toString().trim();
+  if (!query) return res.status(400).json({ error: 'q required' });
+
+  const cacheKey = query.toLowerCase();
+  const cached = placesCache[cacheKey];
+  if (cached && Date.now() - cached.fetchedAt < PLACES_CACHE_MS) {
+    return res.json({ ...cached.data, cached: true });
+  }
+
+  try {
+    const r = await fetch('https://places.googleapis.com/v1/places:searchText', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Goog-Api-Key': key,
+        'X-Goog-FieldMask': 'places.displayName,places.rating,places.userRatingCount,places.formattedAddress,places.internationalPhoneNumber,places.websiteUri,places.googleMapsUri,places.currentOpeningHours,places.photos',
+      },
+      body: JSON.stringify({ textQuery: query, languageCode: 'he' }),
+    });
+    if (!r.ok) return res.status(r.status).json({ error: `Upstream ${r.status}` });
+    const data = await r.json();
+    const p = (data.places || [])[0];
+    if (!p) { placesCache[cacheKey] = { data: { found: false }, fetchedAt: Date.now() }; return res.json({ found: false, cached: false }); }
+
+    const photos = (p.photos || []).slice(0, 5).map(ph => ({
+      ref: ph.name,
+      url: `https://places.googleapis.com/v1/${ph.name}/media?maxWidthPx=800&key=${key}`,
+    }));
+
+    const payload = {
+      found: true,
+      name: p.displayName?.text || '',
+      rating: p.rating ?? null,
+      reviews: p.userRatingCount ?? null,
+      address: p.formattedAddress || '',
+      phone: p.internationalPhoneNumber || '',
+      website: p.websiteUri || '',
+      mapsUri: p.googleMapsUri || '',
+      openingHours: p.currentOpeningHours?.weekdayDescriptions || [],
+      openNow: p.currentOpeningHours?.openNow ?? null,
+      photos,
+    };
+    placesCache[cacheKey] = { data: payload, fetchedAt: Date.now() };
+    res.json({ ...payload, cached: false });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
