@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, Modal, TouchableOpacity, StyleSheet, ActivityIndicator, ScrollView, Animated } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Colors } from '../constants/colors';
 import CamerasModal from './CamerasModal';
 import AudioPlayer from './AudioPlayer';
@@ -10,7 +11,7 @@ const BATUMI_ID = 615532;
 
 type CurrentWeather = {
   temp: number; feels: number; humidity: number; wind: number;
-  desc: string; icon: string;
+  desc: string; icon: string; iconCode?: string;
   seaTemp?: number; uv?: number; sunrise?: string; sunset?: string;
 };
 type DayForecast = { day: string; date: string; high: number; low: number; icon: string; desc: string };
@@ -136,13 +137,15 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
       const sunrise = curData.sys?.sunrise ? fmtTime(curData.sys.sunrise) : undefined;
       const sunset = curData.sys?.sunset ? fmtTime(curData.sys.sunset) : undefined;
 
+      const iconCode = curData.weather?.[0]?.icon || '';
       setCurrent({
         temp: Math.round(curData.main.temp),
         feels: Math.round(curData.main.feels_like),
         humidity: curData.main.humidity,
         wind: Math.round(curData.wind.speed * 3.6), // m/s to km/h
         desc: curData.weather?.[0]?.description || '',
-        icon: owmEmoji(curData.weather?.[0]?.icon || ''),
+        icon: owmEmoji(iconCode),
+        iconCode,
         seaTemp,
         sunrise,
         sunset,
@@ -241,10 +244,14 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
     }
   };
 
+  const gradColors = weatherGradient(current?.iconCode, batumiTime);
   return (
     <Modal visible={visible} animationType="slide" transparent={false}>
-      <View
-        style={[s.container, { backgroundColor: bgColor }]}
+      <LinearGradient
+        colors={gradColors}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
+        style={s.container}
         // @ts-ignore — web-only: prevent browser auto-translation
         translate="no"
         // @ts-ignore — web class for Google Translate
@@ -397,9 +404,30 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
           )}
         </ScrollView>
         <CamerasModal visible={camerasOpen} onClose={() => setCamerasOpen(false)} bgColor={bgColor} />
-      </View>
+      </LinearGradient>
     </Modal>
   );
+}
+
+function weatherGradient(iconCode: string | undefined, batumiHourStr: string): [string, string, string] {
+  const hour = parseInt((batumiHourStr || '12:00').split(':')[0], 10) || 12;
+  const code = (iconCode || '').toLowerCase();
+  const isNight = code.endsWith('n') || hour < 5 || hour >= 20;
+  const isDawn = hour >= 5 && hour < 8;
+  const isSunset = hour >= 17 && hour < 20;
+
+  // Weather-dominant conditions
+  if (code.startsWith('11')) return ['#1E1B4B', '#4C1D95', '#0F172A']; // thunder
+  if (code.startsWith('13')) return ['#BFDBFE', '#E0F2FE', '#FFFFFF']; // snow
+  if (code.startsWith('50')) return ['#94A3B8', '#64748B', '#475569']; // mist
+  if (code.startsWith('09') || code.startsWith('10')) return isNight ? ['#0F172A', '#1E3A8A', '#475569'] : ['#475569', '#3B82F6', '#64748B']; // rain
+  if (code.startsWith('03') || code.startsWith('04')) return isNight ? ['#1E293B', '#334155', '#475569'] : ['#94A3B8', '#CBD5E1', '#E2E8F0']; // cloudy
+
+  // Clear/few clouds — color by time of day
+  if (isDawn) return ['#F4A94E', '#EC4899', '#8B5CF6'];       // dawn orange-pink
+  if (isSunset) return ['#F97316', '#EC4899', '#7C3AED'];     // sunset orange-purple
+  if (isNight) return ['#0F172A', '#1E293B', '#334155'];      // night navy-black
+  return ['#7ECFC0', '#3DA5C4', '#1A6B8A'];                   // day teal-blue
 }
 
 function owmEmoji(icon: string): string {
