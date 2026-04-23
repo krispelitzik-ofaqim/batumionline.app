@@ -415,6 +415,8 @@ const flightsCache = { arrivals: null, departures: null, fetchedAt: 0 };
 const CACHE_MS = 5 * 60 * 1000; // 5 minutes
 const marineCache = { data: null, fetchedAt: 0 };
 const MARINE_CACHE_MS = 60 * 60 * 1000; // 1 hour (Stormglass free = 50/day)
+const unsplashCache = {}; // keyed by query
+const UNSPLASH_CACHE_MS = 24 * 60 * 60 * 1000; // 24 hours (free = 50/hour)
 
 app.get('/api/flights', async (req, res) => {
   const key = process.env.AERODATABOX_KEY;
@@ -508,6 +510,40 @@ app.get('/api/marine', async (req, res) => {
     marineCache.data = payload;
     marineCache.fetchedAt = Date.now();
     res.json({ ...payload, cached: false });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ─── Unsplash photos ─────────────────────────────────────────
+app.get('/api/unsplash', async (req, res) => {
+  const key = process.env.UNSPLASH_ACCESS_KEY;
+  if (!key) return res.status(503).json({ error: 'UNSPLASH_ACCESS_KEY not configured' });
+
+  const query = (req.query.q || 'batumi').toString();
+  const count = Math.min(parseInt(req.query.count) || 20, 30);
+  const cacheKey = `${query}:${count}`;
+  const cached = unsplashCache[cacheKey];
+  if (cached && Date.now() - cached.fetchedAt < UNSPLASH_CACHE_MS) {
+    return res.json({ photos: cached.data, cached: true });
+  }
+
+  try {
+    const url = `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&per_page=${count}&orientation=landscape`;
+    const response = await fetch(url, { headers: { Authorization: `Client-ID ${key}` } });
+    if (!response.ok) return res.status(response.status).json({ error: `Upstream ${response.status}` });
+    const data = await response.json();
+    const photos = (data.results || []).map(p => ({
+      id: p.id,
+      url: p.urls?.regular,
+      thumb: p.urls?.small,
+      alt: p.alt_description || p.description || '',
+      author: p.user?.name || '',
+      authorLink: `${p.user?.links?.html}?utm_source=batumionline&utm_medium=referral` || '',
+      downloadLink: p.links?.download_location,
+    }));
+    unsplashCache[cacheKey] = { data: photos, fetchedAt: Date.now() };
+    res.json({ photos, cached: false });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

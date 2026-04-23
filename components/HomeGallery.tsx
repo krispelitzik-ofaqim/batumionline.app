@@ -11,15 +11,19 @@ export default function HomeGallery() {
   const timer = useRef<any>(null);
 
   useEffect(() => {
-    fetch(`${API_BASE}/api/uploads`)
-      .then(r => r.json())
-      .then(j => {
-        if (j.success) {
-          const galleryFiles = (j.files || []).filter((f: any) => (f.tags || []).includes('gallery_main'));
-          setFiles(galleryFiles);
-        }
-      })
-      .catch(() => {});
+    (async () => {
+      try {
+        const r = await fetch(`${API_BASE}/api/uploads`);
+        const j = await r.json();
+        const galleryFiles = j.success ? (j.files || []).filter((f: any) => (f.tags || []).includes('gallery_main')) : [];
+        if (galleryFiles.length > 0) { setFiles(galleryFiles); return; }
+        // fallback: Unsplash Batumi photos
+        const ur = await fetch(`${API_BASE}/api/unsplash?q=batumi%20georgia&count=15`);
+        const uj = await ur.json();
+        const photos = (uj.photos || []).map((p: any, i: number) => ({ filename: `unsplash_${p.id}`, url: p.url }));
+        setFiles(photos);
+      } catch {}
+    })();
   }, []);
 
   useEffect(() => {
