@@ -274,11 +274,12 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
             <Text style={s.updatedTxt}>עודכן: {lastUpdated.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })} · מתרענן כל 10 דק׳</Text>
           )}
 
-          <View style={{ marginBottom: 12 }}>
+          <View style={s.audioWrap}>
             <AudioPlayer
               tracks={[{ title: 'מזג האוויר בבטומי - סקירה שנתית', url: '/uploads/1776419283438-349.mp3' }]}
               compact
               playOnLeft
+              tint="transparent"
             />
           </View>
 
@@ -542,6 +543,7 @@ const s = StyleSheet.create({
   liveTxt: { color: '#fff', fontSize: 11, fontWeight: '900', letterSpacing: 1 },
   batumiClock: { color: 'rgba(255,255,255,0.85)', fontSize: 14, fontWeight: '700', fontVariant: ['tabular-nums'] },
   updatedTxt: { color: 'rgba(255,255,255,0.55)', fontSize: 11, textAlign: 'center', marginBottom: 18, writingDirection: 'rtl' },
+  audioWrap: { marginBottom: 12, borderRadius: 18, borderWidth: 1, borderColor: 'rgba(255,255,255,0.35)' },
   hourlyScroll: { flexDirection: 'row-reverse', gap: 10, paddingVertical: 8, paddingHorizontal: 2, marginBottom: 20 },
   hourCell: { backgroundColor: 'rgba(255,255,255,0.12)', borderRadius: 14, paddingVertical: 12, paddingHorizontal: 14, alignItems: 'center', minWidth: 70, borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)' },
   hourTime: { fontSize: 12, color: '#fff', fontWeight: '800', marginBottom: 4, textShadowColor: 'rgba(0,0,0,0.35)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 2 },
