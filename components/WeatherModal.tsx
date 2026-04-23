@@ -454,7 +454,7 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
                 <View style={s.skippersWrap}>
                   <TouchableOpacity onPress={() => setSkippersOpen(o => !o)} style={s.skippersHeader} activeOpacity={0.85}>
                     <Text style={s.skippersIcon}>⛵</Text>
-                    <Text style={s.skippersTitle}>מזג אוויר לספנים ושטים</Text>
+                    <Text style={s.skippersTitle}>מזג אוויר לספנים ושייטים · Batumi Black Sea</Text>
                     <Text style={s.skippersArrow}>{skippersOpen ? '▲' : '▼'}</Text>
                   </TouchableOpacity>
                   {skippersOpen && (
