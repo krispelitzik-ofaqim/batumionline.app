@@ -412,7 +412,7 @@ app.post('/api/upload/multiple', upload.array('files', 10), (req, res) => {
 // ─── Flights proxy (AeroDataBox via RapidAPI) ────────────────
 const BUS_ICAO = 'UGSB'; // Batumi International Airport
 const flightsCache = { arrivals: null, departures: null, fetchedAt: 0 };
-const CACHE_MS = 10 * 60 * 1000; // 10 minutes
+const CACHE_MS = 5 * 60 * 1000; // 5 minutes
 
 app.get('/api/flights', async (req, res) => {
   const key = process.env.AERODATABOX_KEY;
