@@ -44,6 +44,7 @@ const AIRLINE_LOGOS: Record<string, any> = {
   IZ: require('../assets/images/flights/IZ.png'),
   TK: require('../assets/images/flights/TK.png'),
   CW: require('../assets/images/flights/CW.png'),
+  A4: require('../assets/images/flights/A4.png'),
 };
 
 export default function FlightsModal({ visible, onClose, bgColor }: { visible: boolean; onClose: () => void; bgColor: string }) {
