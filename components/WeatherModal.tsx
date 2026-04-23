@@ -443,11 +443,11 @@ function weatherGradient(iconCode: string | undefined, batumiHourStr: string): [
   if (code.startsWith('09') || code.startsWith('10')) return isNight ? ['#0F172A', '#1E3A8A', '#475569'] : ['#475569', '#3B82F6', '#64748B']; // rain
   if (code.startsWith('03') || code.startsWith('04')) return isNight ? ['#1E293B', '#334155', '#475569'] : ['#94A3B8', '#CBD5E1', '#E2E8F0']; // cloudy
 
-  // Clear/few clouds — color by time of day
-  if (isDawn) return ['#F4A94E', '#EC4899', '#8B5CF6'];       // dawn orange-pink
-  if (isSunset) return ['#F97316', '#EC4899', '#7C3AED'];     // sunset orange-purple
+  // Clear/few clouds — color by time of day (darker anchors for readability)
+  if (isDawn) return ['#D97706', '#BE185D', '#6D28D9'];       // dawn deep orange→pink→purple
+  if (isSunset) return ['#C2410C', '#9D174D', '#5B21B6'];     // sunset burnt orange→plum
   if (isNight) return ['#6B7280', '#374151', '#000000'];      // night gray→black
-  return ['#7ECFC0', '#3DA5C4', '#1A6B8A'];                   // day teal-blue
+  return ['#1A6B8A', '#0C4A6E', '#082F49'];                   // day deep teal→navy
 }
 
 function owmEmoji(icon: string): string {
