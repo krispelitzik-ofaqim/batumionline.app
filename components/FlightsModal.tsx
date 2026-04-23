@@ -122,7 +122,9 @@ export default function FlightsModal({ visible, onClose, bgColor }: { visible: b
         arrRevised: parseLocal(f.arrival?.revisedTime),
       });
 
+      const IL_AIRPORTS = new Set(['TLV', 'ETM', 'VDA', 'HFA']);
       const arrivals: Flight[] = (data.arrivals || [])
+        .filter((f: any) => IL_AIRPORTS.has(f.departure?.airport?.iata))
         .map((f: any) => ({
           flight: f.number || '—',
           airline: f.airline?.name || '',
@@ -136,6 +138,7 @@ export default function FlightsModal({ visible, onClose, bgColor }: { visible: b
         }));
 
       const departures: Flight[] = (data.departures || [])
+        .filter((f: any) => IL_AIRPORTS.has(f.arrival?.airport?.iata))
         .map((f: any) => ({
           flight: f.number || '—',
           airline: f.airline?.name || '',
