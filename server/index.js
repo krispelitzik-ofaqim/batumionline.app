@@ -444,14 +444,26 @@ app.get('/api/flights', async (req, res) => {
       const url = `https://${host}/flights/airports/icao/${BUS_ICAO}/${fmt(s)}/${fmt(e)}?withLeg=true&direction=Both&withCancelled=true&withCodeshared=true&withCargo=false&withPrivate=false&withLocation=false`;
       return fetch(url, {
         headers: { 'x-rapidapi-key': key, 'x-rapidapi-host': host },
-      }).then(r => r.ok ? r.json() : null).catch(() => null);
+      }).then(async r => {
+        if (!r.ok) {
+          const body = await r.text().catch(() => '');
+          console.warn(`[flights] window ${i} HTTP ${r.status}: ${body.slice(0, 200)}`);
+          return null;
+        }
+        return r.json();
+      }).catch(err => {
+        console.warn(`[flights] window ${i} fetch failed: ${err.message}`);
+        return null;
+      });
     });
 
     const results = await Promise.all(windowRequests);
     const allArrivals = [];
     const allDepartures = [];
+    let successfulWindows = 0;
     for (const r of results) {
       if (!r) continue;
+      successfulWindows++;
       if (Array.isArray(r.arrivals)) allArrivals.push(...r.arrivals);
       if (Array.isArray(r.departures)) allDepartures.push(...r.departures);
     }
@@ -469,10 +481,15 @@ app.get('/api/flights', async (req, res) => {
     const arrivals = dedupe(allArrivals, 'arrival').sort((a, b) => (a?.arrival?.scheduledTime?.utc || '').localeCompare(b?.arrival?.scheduledTime?.utc || ''));
     const departures = dedupe(allDepartures, 'departure').sort((a, b) => (a?.departure?.scheduledTime?.utc || '').localeCompare(b?.departure?.scheduledTime?.utc || ''));
 
-    flightsCache.arrivals = arrivals;
-    flightsCache.departures = departures;
-    flightsCache.fetchedAt = Date.now();
-    res.json({ arrivals, departures, cached: false, windows: NUM_WINDOWS });
+    const hasData = arrivals.length > 0 || departures.length > 0;
+    if (hasData && successfulWindows > 0) {
+      flightsCache.arrivals = arrivals;
+      flightsCache.departures = departures;
+      flightsCache.fetchedAt = Date.now();
+    } else {
+      console.warn(`[flights] empty result (${successfulWindows}/${NUM_WINDOWS} windows succeeded) — not caching`);
+    }
+    res.json({ arrivals, departures, cached: false, windows: NUM_WINDOWS, successfulWindows });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
