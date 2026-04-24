@@ -438,26 +438,29 @@ app.get('/api/flights', async (req, res) => {
     const NUM_WINDOWS = 3; // 3 × 12h = 36h total
     const fmt = (d) => new Date(d).toISOString().slice(0, 16);
 
-    const windowRequests = Array.from({ length: NUM_WINDOWS }, (_, i) => {
+    // Sequential with 1.1s spacing — AeroDataBox BASIC plan is 1 req/sec.
+    const results = [];
+    for (let i = 0; i < NUM_WINDOWS; i++) {
       const s = startBase + i * WIN_MS;
       const e = s + WIN_MS;
       const url = `https://${host}/flights/airports/icao/${BUS_ICAO}/${fmt(s)}/${fmt(e)}?withLeg=true&direction=Both&withCancelled=true&withCodeshared=true&withCargo=false&withPrivate=false&withLocation=false`;
-      return fetch(url, {
-        headers: { 'x-rapidapi-key': key, 'x-rapidapi-host': host },
-      }).then(async r => {
+      try {
+        const r = await fetch(url, {
+          headers: { 'x-rapidapi-key': key, 'x-rapidapi-host': host },
+        });
         if (!r.ok) {
           const body = await r.text().catch(() => '');
           console.warn(`[flights] window ${i} HTTP ${r.status}: ${body.slice(0, 200)}`);
-          return null;
+          results.push(null);
+        } else {
+          results.push(await r.json());
         }
-        return r.json();
-      }).catch(err => {
+      } catch (err) {
         console.warn(`[flights] window ${i} fetch failed: ${err.message}`);
-        return null;
-      });
-    });
-
-    const results = await Promise.all(windowRequests);
+        results.push(null);
+      }
+      if (i < NUM_WINDOWS - 1) await new Promise(res => setTimeout(res, 1100));
+    }
     const allArrivals = [];
     const allDepartures = [];
     let successfulWindows = 0;
