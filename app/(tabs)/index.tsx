@@ -14,7 +14,7 @@ import { ThemeContext } from '../../constants/theme';
 import { AdminContext } from '../../constants/adminContext';
 import { PreviewContext } from '../../constants/previewContext';
 import { router } from 'expo-router';
-import { fetchContent } from '../../constants/api';
+import { fetchContent, resolveUri } from '../../constants/api';
 import { Colors } from '../../constants/colors';
 import WelcomeSlider from '../../components/WelcomeSlider';
 import HomeGallery from '../../components/HomeGallery';
@@ -119,7 +119,7 @@ function CatCard({ item, width }: { item: CatItem; width: number }) {
       onPress={() => router.push(`/category/${item.id}`)}
     >
       {iconIsImage ? (
-        <Image source={{ uri: item.icon }} style={styles.cardTop} resizeMode="cover" />
+        <Image source={{ uri: resolveUri(item.icon) }} style={styles.cardTop} resizeMode="cover" />
       ) : (
         <LinearGradient
           colors={[item.bg, item.bgDark]}

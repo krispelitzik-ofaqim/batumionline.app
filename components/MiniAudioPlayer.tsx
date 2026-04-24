@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Audio, AVPlaybackStatus } from 'expo-av';
 import { Colors } from '../constants/colors';
+import { resolveUri } from '../constants/api';
 
 function formatTime(ms: number): string {
   const total = Math.max(0, Math.floor(ms / 1000));
@@ -48,7 +49,8 @@ export default function MiniAudioPlayer({
     try {
       if (!soundRef.current) {
         setLoading(true);
-        const { sound } = await Audio.Sound.createAsync(source, { shouldPlay: true }, onStatus);
+        const resolved = source && typeof source === 'object' && source.uri ? { ...source, uri: resolveUri(source.uri) } : source;
+        const { sound } = await Audio.Sound.createAsync(resolved, { shouldPlay: true }, onStatus);
         soundRef.current = sound;
         setLoading(false);
         return;

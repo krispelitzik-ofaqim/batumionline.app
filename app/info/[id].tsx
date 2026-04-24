@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, Linkin
 import { router, useLocalSearchParams } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Colors } from '../../constants/colors';
-import { fetchContent, API_BASE } from '../../constants/api';
+import { fetchContent, API_BASE, resolveUri } from '../../constants/api';
 import HtmlContent from '../../components/HtmlContent';
 
 
@@ -68,7 +68,7 @@ export default function InfoPage() {
                   alt: portalItem.title,
                 })
               ) : (
-                <Image source={{ uri: portalItem.image }} style={{ width: '100%', height: 240 }} resizeMode="cover" />
+                <Image source={{ uri: resolveUri(portalItem.image) }} style={{ width: '100%', height: 240 }} resizeMode="cover" />
               )
             ) : (
               <LinearGradient colors={['#1A6B8A', '#3DA5C4']} style={{ height: 240 }} />

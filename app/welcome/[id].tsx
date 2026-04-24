@@ -4,7 +4,7 @@ import { useLocalSearchParams, Stack, router } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '../../constants/colors';
-import { fetchContent } from '../../constants/api';
+import { fetchContent, resolveUri } from '../../constants/api';
 import AudioPlayer from '../../components/AudioPlayer';
 import HtmlContent from '../../components/HtmlContent';
 
@@ -84,7 +84,7 @@ export default function WelcomeScreen() {
                 alt: item.title,
               })
             ) : (
-              <Image source={{ uri: item.icon }} style={styles.heroImg} resizeMode="cover" />
+              <Image source={{ uri: resolveUri(item.icon) }} style={styles.heroImg} resizeMode="cover" />
             )
           ) : (
             <LinearGradient colors={[bg, '#3DA5C4']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.heroGradient}>

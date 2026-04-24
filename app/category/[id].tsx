@@ -9,7 +9,7 @@ import { ThemeContext } from '../../constants/theme';
 import { PreviewContext } from '../../constants/previewContext';
 import { AdminContext } from '../../constants/adminContext';
 import DevicePreviewBar from '../../components/DevicePreviewBar';
-import { fetchContent, fetchRatings, submitRating, API_BASE } from '../../constants/api';
+import { fetchContent, fetchRatings, submitRating, API_BASE, resolveUri } from '../../constants/api';
 
 type MapPoint = { name: string; lat: number; lng: number; description?: string };
 import AudioPlayer from '../../components/AudioPlayer';
@@ -51,7 +51,7 @@ function FoodieCard({ h, isLast }: { h: Hotel; isLast?: boolean }) {
       <View style={{ flexDirection: 'row-reverse', gap: 12 }}>
         <View style={{ width: 80, height: 80, borderRadius: 12, overflow: 'hidden', backgroundColor: '#f0f0f0' }}>
           {!imgFailed ? (
-            <Image source={{ uri: h.image }} style={{ width: '100%', height: '100%' }} resizeMode="cover" onError={() => setImgFailed(true)} />
+            <Image source={{ uri: resolveUri(h.image) }} style={{ width: '100%', height: '100%' }} resizeMode="cover" onError={() => setImgFailed(true)} />
           ) : (
             <View style={{ width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
               <Text style={{ fontSize: 30 }}>🍽️</Text>
@@ -89,7 +89,7 @@ function PassportCard({ h, pageBtnLabel }: { h: Hotel; pageBtnLabel: string }) {
       <View style={passSt.body}>
         <View style={passSt.photoWrap}>
           {h.image && !imgFailed ? (
-            <Image source={{ uri: h.image }} style={passSt.photo} resizeMode="cover" onError={() => setImgFailed(true)} />
+            <Image source={{ uri: resolveUri(h.image) }} style={passSt.photo} resizeMode="cover" onError={() => setImgFailed(true)} />
           ) : (
             <View style={[passSt.photo, { backgroundColor: '#334155', alignItems: 'center', justifyContent: 'center' }]}>
               <Text style={{ fontSize: 36 }}>👤</Text>
@@ -170,7 +170,7 @@ function HotelImage({ uri, titleEn }: { uri?: string; titleEn?: string }) {
   if (isSvg && Platform.OS === 'web') {
     return (
       <View style={st.hotelImg}>
-        <Image source={{ uri: 'http://localhost:3001/uploads/city.jpg' }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+        <Image source={{ uri: resolveUri('/uploads/city.jpg') }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
         <View style={{ position: 'absolute', bottom: 8, right: 8, width: 44, height: 44, borderRadius: 22, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', borderWidth: 2, borderColor: '#e2e8f0', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.15, shadowRadius: 4 }}>
           {React.createElement('img', { src: uri, style: { width: 28, height: 28, objectFit: 'contain' }, alt: titleEn || '' })}
         </View>
@@ -400,7 +400,7 @@ function TourAlbum({ tourId, color }: { tourId: string; color: string }) {
           {photos.map((p: any) => (
             <View key={p.id} style={{ width: '32%' }}>
               <View style={{ aspectRatio: 1, borderRadius: 8, overflow: 'hidden', backgroundColor: '#f0f0f0' }}>
-                <Image source={{ uri: p.image.startsWith('/') ? `http://localhost:3001${p.image}` : p.image }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+                <Image source={{ uri: resolveUri(p.image) }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
               </View>
               <Text style={{ fontSize: 9, color: '#1C2B35', fontWeight: '700', textAlign: 'center', marginTop: 3, writingDirection: 'rtl' }}>{p.name}</Text>
               <Text style={{ fontSize: 8, color: '#888', textAlign: 'center', writingDirection: 'rtl' }}>{p.city} · {p.date}</Text>
@@ -788,7 +788,7 @@ function SubCard({ item, width, onPress }: { item: Item; width: number; onPress:
   return (
     <TouchableOpacity style={[st.card, { width }]} activeOpacity={0.7} onPress={onPress}>
       {iconIsImage ? (
-        <Image source={{ uri: item.icon }} style={st.cardTop} resizeMode="cover" />
+        <Image source={{ uri: resolveUri(item.icon) }} style={st.cardTop} resizeMode="cover" />
       ) : (
         <LinearGradient colors={[bg, bgDark]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={st.cardTop}>
           <Text style={st.cardIcon}>{item.icon}</Text>
@@ -809,7 +809,7 @@ function SubBanner({ item, width, onPress }: { item: Item; width: number; onPres
   return (
     <TouchableOpacity style={[st.banner, { width }]} activeOpacity={0.7} onPress={onPress}>
       {iconIsImage ? (
-        <Image source={{ uri: item.icon }} style={st.bannerImg} resizeMode="cover" />
+        <Image source={{ uri: resolveUri(item.icon) }} style={st.bannerImg} resizeMode="cover" />
       ) : (
         <LinearGradient colors={[bg, bgDark]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={st.bannerImg}>
           <Text style={st.bannerImgIcon}>{item.icon}</Text>
@@ -1174,7 +1174,7 @@ export default function CategoryScreen() {
                   <View key={r.id} style={{ paddingVertical: 10, borderBottomWidth: i < recommendations.length - 1 ? 1 : 0, borderBottomColor: '#333' }}>
                     <View style={{ flexDirection: 'row-reverse', gap: 10, alignItems: 'flex-start' }}>
                       {r.image && (
-                        <Image source={{ uri: r.image.startsWith('/') ? `http://localhost:3001${r.image}` : r.image }} style={{ width: 50, height: 50, borderRadius: 8 }} resizeMode="cover" />
+                        <Image source={{ uri: resolveUri(r.image) }} style={{ width: 50, height: 50, borderRadius: 8 }} resizeMode="cover" />
                       )}
                       <View style={{ flex: 1 }}>
                         <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -1621,7 +1621,7 @@ function ArticleView({ cat, darkCat }: { cat: Item; darkCat: boolean }) {
             <Text style={[artSt.cardTitle, darkCat && { color: '#f1f5f9' }]}>{sec.title}</Text>
           </View>
           <Text style={[artSt.cardTip, darkCat && { color: '#cbd5e1' }]}>{sec.tip}</Text>
-          {sec.image ? <Image source={{ uri: sec.image }} style={artSt.cardImg} resizeMode="cover" /> : null}
+          {sec.image ? <Image source={{ uri: resolveUri(sec.image) }} style={artSt.cardImg} resizeMode="cover" /> : null}
           {sec.actionLabel && sec.actionUrl ? (
             <TouchableOpacity style={[artSt.cardBtn, { backgroundColor: art.color || Colors.PRIMARY }]} onPress={() => Linking.openURL(sec.actionUrl!)}>
               <Text style={artSt.cardBtnTxt}>{sec.actionLabel}</Text>

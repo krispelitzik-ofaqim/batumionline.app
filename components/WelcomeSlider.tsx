@@ -3,7 +3,7 @@ import { ScrollView, TouchableOpacity, View, Text, Image, StyleSheet, NativeSynt
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { Colors } from '../constants/colors';
-import { fetchContent } from '../constants/api';
+import { fetchContent, resolveUri } from '../constants/api';
 
 function fireConfetti() {
   if (Platform.OS !== 'web') return;
@@ -88,7 +88,7 @@ export default function WelcomeSlider() {
       <TouchableOpacity key={`${item.id}-${idx}`} style={styles.card} activeOpacity={0.7} onPress={() => { if (item.id === '1') fireConfetti(); router.push(`/welcome/${item.id}` as any); }}>
         {isImage ? (
           <>
-            <Image source={{ uri: item.icon }} style={StyleSheet.absoluteFillObject} resizeMode="cover" />
+            <Image source={{ uri: resolveUri(item.icon) }} style={StyleSheet.absoluteFillObject} resizeMode="cover" />
             <LinearGradient colors={['transparent', 'rgba(0,0,0,0.75)']} style={StyleSheet.absoluteFillObject} />
           </>
         ) : (

@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
 import { Audio } from 'expo-av';
 import { Colors } from '../constants/colors';
+import { resolveUri } from '../constants/api';
 
 type Track = { title?: string; url: string; coords?: { lat: number; lng: number } };
 type Props = { tracks: Track[]; title?: string; compact?: boolean; onNavigate?: (coords: { lat: number; lng: number }) => void; tint?: string; onActiveChange?: (idx: number, track: Track) => void; onTimeReached?: { seconds: number; callback: () => void }; playOnLeft?: boolean; textLight?: boolean };
@@ -64,7 +65,7 @@ export default function AudioPlayer({ tracks: initialTracks, title, compact, onN
     if (Platform.OS === 'web') {
       const el = new (window as any).Audio();
       el.preload = 'metadata';
-      el.src = current.url;
+      el.src = resolveUri(current.url);
       const onMeta = () => setDur((el.duration || 0) * 1000);
       el.addEventListener('loadedmetadata', onMeta);
       return () => { el.removeEventListener('loadedmetadata', onMeta); el.src = ''; };
@@ -105,7 +106,7 @@ export default function AudioPlayer({ tracks: initialTracks, title, compact, onN
   const toggle = async () => {
     if (Platform.OS === 'web') {
       if (!audioElRef.current) {
-        audioElRef.current = new (window as any).Audio(current.url);
+        audioElRef.current = new (window as any).Audio(resolveUri(current.url));
         audioElRef.current.playbackRate = SPEEDS[speedIdx];
         audioElRef.current.ontimeupdate = () => {
           setPos((audioElRef.current.currentTime || 0) * 1000);
@@ -124,7 +125,7 @@ export default function AudioPlayer({ tracks: initialTracks, title, compact, onN
     }
 
     if (!soundRef.current) {
-      const { sound } = await Audio.Sound.createAsync({ uri: current.url }, { shouldPlay: true });
+      const { sound } = await Audio.Sound.createAsync({ uri: resolveUri(current.url) }, { shouldPlay: true });
       soundRef.current = sound;
       sound.setOnPlaybackStatusUpdate((st: any) => {
         if (!st.isLoaded) return;

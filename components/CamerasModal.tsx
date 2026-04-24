@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Modal, TouchableOpacity, ScrollView, StyleSheet, Platform, Linking, Image } from 'react-native';
 import { Colors } from '../constants/colors';
-import { fetchContent } from '../constants/api';
+import { fetchContent, resolveUri } from '../constants/api';
 import MapEmbed from './MapEmbed';
 
 type Camera = { id: string; name: string; url: string; lat?: number; lng?: number; poster?: string; external?: boolean };
@@ -14,10 +14,10 @@ const STREAM_URLS: string[] = [
 ];
 
 const POSTER_URLS: string[] = [
-  'http://localhost:3001/uploads/1776681329648-973.png',
-  'http://localhost:3001/uploads/1776681347754-653.png',
-  'http://localhost:3001/uploads/1776681374874-256.png',
-  'http://localhost:3001/uploads/1776680848799-463.png',
+  '/uploads/1776681329648-973.png',
+  '/uploads/1776681347754-653.png',
+  '/uploads/1776681374874-256.png',
+  '/uploads/1776680848799-463.png',
 ];
 
 export default function CamerasModal({ visible, onClose, bgColor }: { visible: boolean; onClose: () => void; bgColor: string }) {
@@ -44,14 +44,14 @@ export default function CamerasModal({ visible, onClose, bgColor }: { visible: b
           name: 'Alliance Privilege (קניון)',
           url: 'https://alliance.ge/en/live/alliance-privilege',
           external: true,
-          poster: 'http://localhost:3001/uploads/1776681974391-806.png',
+          poster: '/uploads/1776681974391-806.png',
         });
         list.push({
           id: 'cam6',
           name: 'Alliance Centropolis',
           url: 'https://alliance.ge/en/live/alliance-centropolis',
           external: true,
-          poster: 'http://localhost:3001/uploads/1776682079343-887.png',
+          poster: '/uploads/1776682079343-887.png',
         });
         setCameras(list);
       }
@@ -74,7 +74,7 @@ export default function CamerasModal({ visible, onClose, bgColor }: { visible: b
       >
         {cam.poster ? (
           <View style={featured ? s.posterFull : s.posterThumb}>
-            <Image source={{ uri: cam.poster }} style={s.posterImg} resizeMode="cover" />
+            <Image source={{ uri: resolveUri(cam.poster) }} style={s.posterImg} resizeMode="cover" />
             {cam.url && <Text style={s.liveTag}>● חי</Text>}
           </View>
         ) : (

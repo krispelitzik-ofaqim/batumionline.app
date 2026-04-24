@@ -4,7 +4,7 @@ import { router } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../../constants/colors';
-import { fetchContent, API_BASE } from '../../constants/api';
+import { fetchContent, API_BASE, resolveUri } from '../../constants/api';
 import BusinessServicesSlider from '../../components/BusinessServicesSlider';
 import RealEstateGallery from '../../components/RealEstateGallery';
 import CurrencyTicker from '../../components/CurrencyTicker';
@@ -215,7 +215,7 @@ export default function RealEstatePortal() {
                     style={[s.listingCard, lst.size === 'half' && s.listingCardHalf]}
                     onPress={() => setExpandedFixedId(expandedFixedId === lst.id ? null : lst.id)}
                   >
-                    <Image source={{ uri: lst.image }} style={s.listingImage} />
+                    <Image source={{ uri: resolveUri(lst.image) }} style={s.listingImage} />
                     <View style={s.listingBody}>
                       <Text style={s.listingTitle} numberOfLines={2}>{lst.title}</Text>
                       {lst.features.map((f, i) => (
@@ -238,7 +238,7 @@ export default function RealEstatePortal() {
                         </TouchableOpacity>
                         <Text style={s.fixedExpandedTitle} numberOfLines={1}>{lst.title}</Text>
                       </View>
-                      <Image source={{ uri: lst.image }} style={{ width: '100%', aspectRatio: 16 / 10 }} resizeMode="cover" />
+                      <Image source={{ uri: resolveUri(lst.image) }} style={{ width: '100%', aspectRatio: 16 / 10 }} resizeMode="cover" />
                       <View style={{ padding: 12 }}>
                         {lst.features.map((f, i) => (
                           <View key={i} style={{ flexDirection: 'row-reverse', gap: 6, marginBottom: 4 }}>
@@ -275,7 +275,7 @@ export default function RealEstatePortal() {
                     onPress={() => lst.link && Linking.openURL(lst.link)}
                     style={s.hBanner}
                   >
-                    <Image source={{ uri: lst.image }} style={s.hBannerImg} />
+                    <Image source={{ uri: resolveUri(lst.image) }} style={s.hBannerImg} />
                     <View style={s.hBannerBody}>
                       <Text style={s.hBannerTitle} numberOfLines={1}>{lst.title}</Text>
                       <Text style={s.hBannerInfo} numberOfLines={1}>{lst.features.slice(0, 2).join(' · ')}</Text>
@@ -459,7 +459,7 @@ function FutureSlider({ projects }: { projects: Listing[] }) {
       >
         {projects.map(p => (
           <TouchableOpacity key={p.id} activeOpacity={0.85} style={{ width: SLIDE_W, height: 260, borderRadius: 14, overflow: 'hidden', backgroundColor: Colors.WHITE, borderWidth: 1, borderColor: '#e2e8f0' }} onPress={() => p.link && Linking.openURL(p.link)}>
-            {p.image && <Image source={{ uri: p.image }} style={{ width: SLIDE_W, height: 140 }} />}
+            {p.image && <Image source={{ uri: resolveUri(p.image) }} style={{ width: SLIDE_W, height: 140 }} />}
             <View style={{ padding: 12, flex: 1, justifyContent: 'space-between' }}>
               <View>
                 <Text style={{ fontSize: 15, fontWeight: '900', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl' }} numberOfLines={1}>{p.title}</Text>
@@ -513,7 +513,7 @@ function NewsSliderArrows({ news }: { news: Article[] }) {
         {news.map(n => (
           <TouchableOpacity key={n.id} activeOpacity={0.85} style={[s.newsCardLike, { width: SLIDE_W, height: 200 }]} onPress={() => n.link && Linking.openURL(n.link)}>
             {n.image ? (
-              <Image source={{ uri: n.image }} style={{ width: SLIDE_W, height: 100 }} />
+              <Image source={{ uri: resolveUri(n.image) }} style={{ width: SLIDE_W, height: 100 }} />
             ) : (
               <View style={{ width: SLIDE_W, height: 100, backgroundColor: '#e2e8f0', alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: 30 }}>🏙️</Text></View>
             )}

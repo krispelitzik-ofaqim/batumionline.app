@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 import { router } from 'expo-router';
 import { Colors } from '../constants/colors';
-import { fetchContent } from '../constants/api';
+import { fetchContent, resolveUri } from '../constants/api';
 
 type Item = { id: string; title: string; subtitle?: string; icon: string; bg?: string };
 
@@ -84,7 +84,7 @@ export default function InfoPortal() {
               <TouchableOpacity key={`${item.id}-${i}`} activeOpacity={0.85} style={styles.card} onPress={() => router.push(`/info/${item.id}` as any)}>
                 <View style={[styles.cardTop, { backgroundColor: item.bg || Colors.SECONDARY + '25' }]}>
                   {isImage ? (
-                    <Image source={{ uri: item.icon }} style={styles.cardImage} resizeMode="cover" />
+                    <Image source={{ uri: resolveUri(item.icon) }} style={styles.cardImage} resizeMode="cover" />
                   ) : (
                     <Text style={styles.cardEmoji}>{item.icon}</Text>
                   )}

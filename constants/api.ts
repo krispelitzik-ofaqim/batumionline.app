@@ -8,6 +8,24 @@ export const API_BASE = Platform.OS === 'web'
     ? `http://${DEV_HOST}:3001`
     : 'https://www.batumionline.app';
 
+/**
+ * Resolve a stored asset URL to one that works on the current platform.
+ * - Absolute URLs (http/https/data:) pass through, except hardcoded localhost which is swapped for API_BASE on native.
+ * - Relative paths starting with "/" get API_BASE prefixed (on native).
+ * - Anything else (e.g. emoji) is returned as-is.
+ */
+export function resolveUri(u?: string): string {
+  if (!u) return '';
+  if (u.startsWith('data:')) return u;
+  if (u.startsWith('http://localhost:3001') || u.startsWith('https://localhost:3001')) {
+    const path = u.replace(/^https?:\/\/localhost:3001/, '');
+    return `${API_BASE}${path}`;
+  }
+  if (u.startsWith('http://') || u.startsWith('https://')) return u;
+  if (u.startsWith('/')) return `${API_BASE}${u}`;
+  return u;
+}
+
 export async function fetchContent() {
   const res = await fetch(`${API_BASE}/api/content`);
   const json = await res.json();
