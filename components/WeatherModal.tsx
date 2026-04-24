@@ -348,16 +348,6 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
                         <View style={s.divider} />
                       </>
                     )}
-                    {current.waveHeight != null && (
-                      <>
-                        <View style={s.detailItem}>
-                          <Text style={s.detailIcon}>〰️</Text>
-                          <Text style={s.detailVal}>{current.waveHeight}m</Text>
-                          <Text style={s.detailLabel}>גלים</Text>
-                        </View>
-                        <View style={s.divider} />
-                      </>
-                    )}
                     {current.uv != null && (
                       <>
                         <View style={s.detailItem}>
@@ -454,7 +444,7 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
                 <View style={s.skippersWrap}>
                   <TouchableOpacity onPress={() => setSkippersOpen(o => !o)} style={s.skippersHeader} activeOpacity={0.85}>
                     <Text style={s.skippersIcon}>⛵</Text>
-                    <Text style={s.skippersTitle}>מזג אוויר לספנים ושייטים · Batumi Black Sea</Text>
+                    <Text style={s.skippersTitle}>מזג אוויר לספנים ושייטים</Text>
                     <Text style={s.skippersArrow}>{skippersOpen ? '▲' : '▼'}</Text>
                   </TouchableOpacity>
                   {skippersOpen && (
