@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Image, StyleSheet, TouchableOpacity, Text, useWindowDimensions } from 'react-native';
-import { API_BASE } from '../constants/api';
+import { API_BASE, resolveUri } from '../constants/api';
 
 type GalleryFile = { filename: string; url: string };
 
@@ -40,7 +40,7 @@ export default function HomeGallery() {
 
   return (
     <View style={[styles.wrap, { width: width - 32 }]}>
-      <Image source={{ uri: current.url }} style={StyleSheet.absoluteFillObject} resizeMode="cover" />
+      <Image source={{ uri: resolveUri(current.url) }} style={StyleSheet.absoluteFillObject} resizeMode="cover" />
       {files.length > 1 && (
         <View style={styles.dots}>
           {files.map((_, i) => (

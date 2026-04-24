@@ -25,3 +25,13 @@ export function gygSearch(query: string): string {
 export function gygBatumi(): string {
   return `https://www.getyourguide.com/batumi-l2213/?partner_id=${GYG_PARTNER_ID}`;
 }
+
+export function bookingSearch(hotelName: string): string {
+  const q = encodeURIComponent(`${hotelName} Batumi`);
+  return `https://www.booking.com/searchresults.html?ss=${q}`;
+}
+
+export function agodaSearch(hotelName: string): string {
+  const q = encodeURIComponent(`${hotelName} Batumi`);
+  return `https://www.agoda.com/search?q=${q}`;
+}

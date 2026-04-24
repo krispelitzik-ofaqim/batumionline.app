@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Modal, View, Text, TouchableOpacity, ScrollView, ActivityIndicator, StyleSheet, Linking, Platform } from 'react-native';
 import { API_BASE } from '../constants/api';
 import { Colors } from '../constants/colors';
+import { openInAppBrowser, bookingSearch, agodaSearch, gygSearch } from '../constants/affiliates';
 
 type PlaceData = {
   found: boolean;
@@ -16,7 +17,7 @@ type PlaceData = {
   openNow?: boolean | null;
 };
 
-export default function PlacesInfoModal({ query, title, onClose }: { query: string; title: string; onClose: () => void }) {
+export default function PlacesInfoModal({ query, title, onClose, hideHours, showHotelPrices, showAttractionTickets, isRestaurant }: { query: string; title: string; onClose: () => void; hideHours?: boolean; showHotelPrices?: boolean; showAttractionTickets?: boolean; isRestaurant?: boolean }) {
   const [data, setData] = useState<PlaceData | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -62,19 +63,37 @@ export default function PlacesInfoModal({ query, title, onClose }: { query: stri
                   <Text style={s.infoTxt}>{data.address}</Text>
                 </View>
               )}
-              {!!(data.openingHours && data.openingHours.length) && (
-                <View style={s.hoursBlock}>
-                  <Text style={s.hoursTitle}>🕐 שעות פתיחה{data.openNow != null ? (data.openNow ? ' · פתוח עכשיו' : ' · סגור') : ''}</Text>
-                  {data.openingHours.map((line, i) => (
-                    <Text key={i} style={s.hoursLine}>{line}</Text>
-                  ))}
-                </View>
-              )}
-              {(data.phone || data.website) && (
+              {!hideHours && !!(data.openingHours && data.openingHours.length) && (() => {
+                const hours = data.openingHours!;
+                const timesOnly = hours.map(l => l.replace(/^[^:]+:\s*/, ''));
+                const allSame = timesOnly.every(t => t === timesOnly[0]);
+                return (
+                  <View style={s.hoursBlock}>
+                    <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                      <Text style={s.hoursTitle}>🕐 שעות פתיחה</Text>
+                      {data.openNow != null && (
+                        <View style={{ paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6, backgroundColor: data.openNow ? '#dcfce7' : '#fee2e2' }}>
+                          <Text style={{ fontSize: 11, fontWeight: '900', color: data.openNow ? '#16a34a' : '#dc2626' }}>
+                            {data.openNow ? '🟢 פתוח כעת' : '🔴 סגור כעת'}
+                          </Text>
+                        </View>
+                      )}
+                    </View>
+                    {allSame ? (
+                      <Text style={s.hoursLine}>כל ימות השבוע: {timesOnly[0]}</Text>
+                    ) : (
+                      hours.map((line, i) => (
+                        <Text key={i} style={s.hoursLine}>{line}</Text>
+                      ))
+                    )}
+                  </View>
+                );
+              })()}
+              {(data.phone || data.website || data.mapsUri) && (
                 <View style={s.btnCol}>
                   {!!data.phone && (
                     <TouchableOpacity style={[s.btn, { backgroundColor: '#10b981' }]} onPress={() => Linking.openURL(`tel:${data.phone}`)}>
-                      <Text style={s.btnTxt}>📞 חייג · {data.phone}</Text>
+                      <Text style={s.btnTxt}>{isRestaurant ? '📞 להזמנת שולחן' : '📞 חייג'} · {data.phone}</Text>
                     </TouchableOpacity>
                   )}
                   {!!data.website && (
@@ -82,6 +101,28 @@ export default function PlacesInfoModal({ query, title, onClose }: { query: stri
                       <Text style={s.btnTxt}>🌐 אתר רשמי</Text>
                     </TouchableOpacity>
                   )}
+                  {!!data.mapsUri && (
+                    <TouchableOpacity style={[s.btn, { backgroundColor: '#f59e0b' }]} onPress={() => Linking.openURL(data.mapsUri!)}>
+                      <Text style={s.btnTxt}>⭐ דרג בגוגל</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+              )}
+              {showHotelPrices && (
+                <View style={[s.btnRow, { marginTop: 10 }]}>
+                  <TouchableOpacity style={[s.btn, { flex: 1, backgroundColor: '#003580' }]} onPress={() => openInAppBrowser(bookingSearch(title))}>
+                    <Text style={s.btnTxt}>💰 Booking</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={[s.btn, { flex: 1, backgroundColor: '#d71b5c' }]} onPress={() => openInAppBrowser(agodaSearch(title))}>
+                    <Text style={s.btnTxt}>💰 Agoda</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+              {showAttractionTickets && (
+                <View style={[s.btnCol, { marginTop: 10 }]}>
+                  <TouchableOpacity style={[s.btn, { backgroundColor: '#f97316' }]} onPress={() => openInAppBrowser(gygSearch(`${title} Batumi`))}>
+                    <Text style={s.btnTxt}>🎫 כרטיסים ב-GetYourGuide</Text>
+                  </TouchableOpacity>
                 </View>
               )}
             </ScrollView>
@@ -109,6 +150,7 @@ const s = StyleSheet.create({
   hoursTitle: { fontSize: 14, fontWeight: '900', color: Colors.TEXT, writingDirection: 'rtl', textAlign: 'right', marginBottom: 6 },
   hoursLine: { fontSize: 13, color: '#475569', writingDirection: 'rtl', textAlign: 'right', lineHeight: 20, fontWeight: '600' },
   btnCol: { gap: 8 },
+  btnRow: { flexDirection: 'row-reverse', gap: 8 },
   btn: { paddingVertical: 14, borderRadius: 12, alignItems: 'center' },
   btnTxt: { color: '#fff', fontWeight: '800', fontSize: 15, writingDirection: 'rtl' },
   notFound: { fontSize: 14, color: '#64748b', textAlign: 'center', paddingVertical: 30, writingDirection: 'rtl' },

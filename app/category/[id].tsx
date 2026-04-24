@@ -157,9 +157,20 @@ const passSt = StyleSheet.create({
   btnTxt: { color: '#fff', fontWeight: '800', fontSize: 13 },
 });
 
-function HotelImage({ uri, titleEn }: { uri?: string; titleEn?: string }) {
+function HotelImage({ uri, titleEn, placesQuery }: { uri?: string; titleEn?: string; placesQuery?: string }) {
   const [failed, setFailed] = useState(!uri);
+  const [fetchedName, setFetchedName] = useState<string | null>(null);
   const isSvg = uri && uri.endsWith('.svg');
+  useEffect(() => {
+    if (titleEn || !placesQuery) return;
+    let cancelled = false;
+    fetch(`${API_BASE}/api/places?q=${encodeURIComponent(placesQuery)}&lang=en`)
+      .then(r => r.json())
+      .then(j => { if (!cancelled && j?.found && j?.name) setFetchedName(j.name); })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [placesQuery, titleEn]);
+  const displayEn = titleEn || fetchedName;
   if (failed) {
     return (
       <View style={[st.hotelImg, { backgroundColor: '#e5e7eb', alignItems: 'center', justifyContent: 'center' }]}>
@@ -174,9 +185,9 @@ function HotelImage({ uri, titleEn }: { uri?: string; titleEn?: string }) {
         <View style={{ position: 'absolute', bottom: 8, right: 8, width: 44, height: 44, borderRadius: 22, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', borderWidth: 2, borderColor: '#e2e8f0', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.15, shadowRadius: 4 }}>
           {React.createElement('img', { src: uri, style: { width: 28, height: 28, objectFit: 'contain' }, alt: titleEn || '' })}
         </View>
-        {titleEn ? (
+        {displayEn ? (
           <View style={st.enBadge}>
-            <Text style={st.enBadgeTxt}>{titleEn}</Text>
+            <Text style={st.enBadgeTxt}>{displayEn}</Text>
           </View>
         ) : null}
       </View>
@@ -184,10 +195,10 @@ function HotelImage({ uri, titleEn }: { uri?: string; titleEn?: string }) {
   }
   return (
     <View style={st.hotelImg}>
-      <Image source={{ uri }} style={{ width: '100%', height: '100%' }} resizeMode="cover" onError={() => setFailed(true)} />
-      {titleEn ? (
+      <Image source={{ uri: resolveUri(uri) }} style={{ width: '100%', height: '100%' }} resizeMode="cover" onError={() => setFailed(true)} />
+      {displayEn ? (
         <View style={st.enBadge}>
-          <Text style={st.enBadgeTxt}>{titleEn}</Text>
+          <Text style={st.enBadgeTxt}>{displayEn}</Text>
         </View>
       ) : null}
     </View>
@@ -465,7 +476,7 @@ function TourCard({ t, onRate, nearbyRestaurants }: { t: TourBlock; onRate: (id:
       <View style={tourSt.imgWrap}>
         {images.length > 0 ? (
           <>
-            <Image source={{ uri: images[imgIdx] }} style={tourSt.img} resizeMode="cover" />
+            <Image source={{ uri: resolveUri(images[imgIdx]) }} style={tourSt.img} resizeMode="cover" />
             {stationTitle && (
               <View style={tourSt.stationOverlay}>
                 <Text style={tourSt.stationOverlayTxt}>{stationTitle}</Text>
@@ -674,7 +685,7 @@ function CategoryMapModal({ visible, points, focusName, focusCoords, layerColor,
   );
 }
 
-function HotelCard({ h, dark, pageBtnLabel, mapPoints, layerColor, placesQuery }: { h: Hotel; dark: boolean; pageBtnLabel: string; mapPoints?: MapPoint[]; layerColor?: string; placesQuery?: string }) {
+function HotelCard({ h, dark, pageBtnLabel, mapPoints, layerColor, placesQuery, isHotel, isAttraction, isRestaurant }: { h: Hotel; dark: boolean; pageBtnLabel: string; mapPoints?: MapPoint[]; layerColor?: string; placesQuery?: string; isHotel?: boolean; isAttraction?: boolean; isRestaurant?: boolean }) {
   const [showMap, setShowMap] = useState(false);
   const [showGallery, setShowGallery] = useState(false);
   const [showCatMapModal, setShowCatMapModal] = useState(false);
@@ -697,7 +708,7 @@ function HotelCard({ h, dark, pageBtnLabel, mapPoints, layerColor, placesQuery }
           </TouchableOpacity>
           <View style={st.galleryGrid}>
             {h.images!.slice(0, 9).map((src, i) => (
-              <Image key={i} source={{ uri: src }} style={st.galleryImg} resizeMode="cover" />
+              <Image key={i} source={{ uri: resolveUri(src) }} style={st.galleryImg} resizeMode="cover" />
             ))}
           </View>
         </View>
@@ -706,7 +717,7 @@ function HotelCard({ h, dark, pageBtnLabel, mapPoints, layerColor, placesQuery }
   }
   return (
     <View style={[st.hotelCard, dark && { backgroundColor: '#2a3942' }]}>
-      <HotelImage uri={h.image} titleEn={h.titleEn} />
+      <HotelImage uri={h.image} titleEn={h.titleEn} placesQuery={placesQuery} />
       {h.audio ? (
         <View style={{ paddingHorizontal: 24, paddingTop: 8 }}>
           <AudioPlayer tracks={[{ title: h.title, url: h.audio }]} compact playOnLeft />
@@ -750,7 +761,7 @@ function HotelCard({ h, dark, pageBtnLabel, mapPoints, layerColor, placesQuery }
             }}
             disabled={!placesQuery && !btnEnabled}
           >
-            <Text style={[st.hotelBtnTxt, !placesQuery && !btnEnabled && st.hotelBtnTxtDisabled]}>{pageBtnLabel}</Text>
+            <Text style={[st.hotelBtnTxt, !placesQuery && !btnEnabled && st.hotelBtnTxtDisabled]}>{placesQuery ? 'מידע' : pageBtnLabel}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[st.hotelBtn, st.hotelBtnSecondary, !h.mapUrl && st.hotelBtnDisabled]}
@@ -763,7 +774,7 @@ function HotelCard({ h, dark, pageBtnLabel, mapPoints, layerColor, placesQuery }
         </View>
       </View>
       {placesQuery && showInfoModal && (
-        <PlacesInfoModal query={placesQuery} title={h.title} onClose={() => setShowInfoModal(false)} />
+        <PlacesInfoModal query={placesQuery} title={h.title} onClose={() => setShowInfoModal(false)} hideHours={isHotel} showHotelPrices={isHotel} showAttractionTickets={isAttraction} isRestaurant={isRestaurant} />
       )}
     </View>
   );
@@ -834,6 +845,7 @@ export default function CategoryScreen() {
   const cardW = (w - 48) / 2;
 
   const [cat, setCat] = useState<Item | null>(null);
+  const [rootId, setRootId] = useState<string | null>(null);
   const [crumbs, setCrumbs] = useState<{ title: string; path?: string }[]>([]);
   const [selectedTour, setSelectedTour] = useState<TourBlock | null>(null);
   const scrollRef = useRef<ScrollView>(null);
@@ -923,6 +935,7 @@ export default function CategoryScreen() {
         path: i < path.length - 1 ? `/category/${c.id}` : undefined,
       }));
       setCrumbs(computed);
+      if (path.length > 0) setRootId(path[0].id);
       if (data.paywall) {
         setPaywall(data.paywall);
         if (data.paywall.mode === 'premium' && data.paywall.lockedCategories.includes(id as string)) {
@@ -1020,7 +1033,7 @@ export default function CategoryScreen() {
       <ScrollView ref={scrollRef} showsVerticalScrollIndicator={false} style={{ maxWidth: w, alignSelf: 'center', width: '100%' }}>
         {cat.heroImage ? (
           <View style={st.heroImgWrap}>
-            <Image source={{ uri: cat.heroImage }} style={st.heroImgBg} resizeMode="cover" />
+            <Image source={{ uri: resolveUri(cat.heroImage) }} style={st.heroImgBg} resizeMode="cover" />
             <View style={st.heroImgBottomBar}>
               <Text style={st.heroImgBarTxt}>{cat.titleEn || ''}</Text>
               <Text style={st.heroImgBarTxt}>{cat.titleGe || ''}</Text>
@@ -1159,7 +1172,7 @@ export default function CategoryScreen() {
                 ? <PassportCard key={h.id} h={h} pageBtnLabel={cat.pageBtnLabel || 'אתר/פייסבוק'} />
                 : cat.cardStyle === 'foodie'
                 ? <FoodieCard key={h.id} h={h} isLast={cat.hotels!.filter(x => x.visible !== false).indexOf(h) === cat.hotels!.filter(x => x.visible !== false).length - 1} />
-                : <HotelCard key={h.id} h={h} dark={darkCat} pageBtnLabel={cat.pageBtnLabel || 'לדף המלון'} mapPoints={mapPoints} layerColor={mapLayerColor || (mapPoints.length > 0 ? Colors.PRIMARY : undefined)} placesQuery={cat.id === 'casino' ? `${h.title} Batumi` : undefined} />
+                : <HotelCard key={h.id} h={h} dark={darkCat} pageBtnLabel={cat.pageBtnLabel || 'לדף המלון'} mapPoints={mapPoints} layerColor={mapLayerColor || (mapPoints.length > 0 ? Colors.PRIMARY : undefined)} placesQuery={`${h.title} Batumi`} isHotel={rootId === '1'} isAttraction={rootId === '2'} isRestaurant={rootId === '6'} />
             ))}
             {cat.longText && cat.hotels.length > 10 && (
               <HtmlContent html={cat.longText} style={{ paddingBottom: 16, paddingHorizontal: 16 }} />
@@ -1603,7 +1616,7 @@ function ArticleView({ cat, darkCat }: { cat: Item; darkCat: boolean }) {
           <Text style={artSt.appsTitle}>📲 אפליקציות מומלצות להורדה</Text>
           {art.apps.map((app, i) => (
             <TouchableOpacity key={i} style={artSt.appRow} onPress={() => Linking.openURL(app.url)} activeOpacity={0.7}>
-              <Image source={{ uri: app.logo }} style={artSt.appLogo} resizeMode="contain" />
+              <Image source={{ uri: resolveUri(app.logo) }} style={artSt.appLogo} resizeMode="contain" />
               <View style={artSt.appInfo}>
                 <Text style={artSt.appName}>{app.name}</Text>
                 <Text style={artSt.appSub}>{app.subtitle}</Text>

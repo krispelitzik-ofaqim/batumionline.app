@@ -147,7 +147,7 @@ export default function RealEstatePortal() {
       <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
         {/* Hero */}
         <ImageBackground
-          source={{ uri: heroUri }}
+          source={{ uri: resolveUri(heroUri) }}
           style={s.hero}
           imageStyle={{ borderRadius: 0 }}
         >

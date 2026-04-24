@@ -650,8 +650,9 @@ app.get('/api/places', async (req, res) => {
   if (!key) return res.status(503).json({ error: 'GOOGLE_PLACES_KEY not configured' });
   const query = (req.query.q || '').toString().trim();
   if (!query) return res.status(400).json({ error: 'q required' });
+  const lang = (req.query.lang || 'he').toString() === 'en' ? 'en' : 'he';
 
-  const cacheKey = query.toLowerCase();
+  const cacheKey = `${lang}:${query.toLowerCase()}`;
   const cached = placesCache[cacheKey];
   if (cached && Date.now() - cached.fetchedAt < PLACES_CACHE_MS) {
     return res.json({ ...cached.data, cached: true });
@@ -665,7 +666,7 @@ app.get('/api/places', async (req, res) => {
         'X-Goog-Api-Key': key,
         'X-Goog-FieldMask': 'places.displayName,places.rating,places.userRatingCount,places.internationalPhoneNumber,places.googleMapsUri,places.websiteUri,places.currentOpeningHours,places.formattedAddress',
       },
-      body: JSON.stringify({ textQuery: query, languageCode: 'he' }),
+      body: JSON.stringify({ textQuery: query, languageCode: lang }),
     });
     if (!r.ok) return res.status(r.status).json({ error: `Upstream ${r.status}` });
     const data = await r.json();

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, Linking, Platform } from 'react-native';
-import { fetchContent } from '../constants/api';
+import { fetchContent, resolveUri } from '../constants/api';
 
 type Banner = {
   id: string;
@@ -61,7 +61,7 @@ export default function ClientBannerDisplay({ page, position }: { page: string; 
             style: { width: '100%', height: '100%', objectFit: 'cover', borderRadius: 12, background: '#000' },
           })
         ) : (
-          <Image source={{ uri: banner.mediaUrl }} style={{ width: '100%', height, borderRadius: 12 }} resizeMode="cover" />
+          <Image source={{ uri: resolveUri(banner.mediaUrl) }} style={{ width: '100%', height, borderRadius: 12 }} resizeMode="cover" />
         )}
       </TouchableOpacity>
       <View style={s.adTag}>

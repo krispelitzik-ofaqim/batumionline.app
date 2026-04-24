@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image, Linking, ScrollView, TextInput } from 'react-native';
 import { Colors } from '../constants/colors';
-import { API_BASE } from '../constants/api';
+import { API_BASE, resolveUri } from '../constants/api';
 
 type Listing = {
   id: string; type: string; title: string; description?: string;
@@ -52,7 +52,7 @@ function Expanded({ l, onClose }: { l: Listing; onClose: () => void }) {
         <Text style={s.expandedId}>#{shortId(l.id, (l as any).createdAt)}</Text>
       </View>
       <View style={{ width: '100%', aspectRatio: 16 / 10, backgroundColor: '#000' }}>
-        {imgs[idx] && <Image source={{ uri: imgs[idx] }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />}
+        {imgs[idx] && <Image source={{ uri: resolveUri(imgs[idx]) }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />}
         {imgs.length > 1 && (
           <>
             <TouchableOpacity style={[s.navArrow, { right: 8 }]} onPress={() => setIdx((idx - 1 + imgs.length) % imgs.length)}>
@@ -71,7 +71,7 @@ function Expanded({ l, onClose }: { l: Listing; onClose: () => void }) {
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ padding: 8 }} contentContainerStyle={{ gap: 6 }}>
           {imgs.map((u, i) => (
             <TouchableOpacity key={i} onPress={() => setIdx(i)}>
-              <Image source={{ uri: u }} style={[s.thumb, i === idx && s.thumbActive]} />
+              <Image source={{ uri: resolveUri(u) }} style={[s.thumb, i === idx && s.thumbActive]} />
             </TouchableOpacity>
           ))}
         </ScrollView>
@@ -125,7 +125,7 @@ function Card({ l, onPress }: { l: Listing; onPress: () => void }) {
     return (
       <TouchableOpacity activeOpacity={0.85} onPress={onPress} style={[s.banner, l.highlighted && s.highlighted]}>
         {l.highlighted && <View style={s.highlightBadge}><Text style={s.highlightBadgeTxt}>✨ מודגשת</Text></View>}
-        {img ? <Image source={{ uri: img }} style={s.bannerImg} /> : <View style={[s.bannerImg, { backgroundColor: '#e2e8f0' }]} />}
+        {img ? <Image source={{ uri: resolveUri(img) }} style={s.bannerImg} /> : <View style={[s.bannerImg, { backgroundColor: '#e2e8f0' }]} />}
         <View style={s.bannerBody}>
           <View>
             <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -146,7 +146,7 @@ function Card({ l, onPress }: { l: Listing; onPress: () => void }) {
   if (size === 'full') {
     return (
       <TouchableOpacity activeOpacity={0.85} onPress={onPress} style={s.full}>
-        {img ? <Image source={{ uri: img }} style={s.fullImg} /> : <View style={[s.fullImg, { backgroundColor: '#e2e8f0' }]} />}
+        {img ? <Image source={{ uri: resolveUri(img) }} style={s.fullImg} /> : <View style={[s.fullImg, { backgroundColor: '#e2e8f0' }]} />}
         <View style={{ padding: 12 }}>
           <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' }}>
             <Text style={s.cardTitle} numberOfLines={1}>{l.title}</Text>
@@ -165,7 +165,7 @@ function Card({ l, onPress }: { l: Listing; onPress: () => void }) {
 
   return (
     <TouchableOpacity activeOpacity={0.85} onPress={onPress} style={s.half}>
-      {img ? <Image source={{ uri: img }} style={s.halfImg} /> : <View style={[s.halfImg, { backgroundColor: '#e2e8f0' }]} />}
+      {img ? <Image source={{ uri: resolveUri(img) }} style={s.halfImg} /> : <View style={[s.halfImg, { backgroundColor: '#e2e8f0' }]} />}
       <View style={{ padding: 8 }}>
         <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' }}>
           <Text style={s.cardTitle} numberOfLines={1}>{l.title}</Text>

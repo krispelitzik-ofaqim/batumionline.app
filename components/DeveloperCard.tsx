@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, Image, TouchableOpacity, Linking, StyleSheet, ScrollView } from 'react-native';
 import { Colors } from '../constants/colors';
+import { resolveUri } from '../constants/api';
 
 export type DevUnit = {
   id: string;
@@ -50,7 +51,7 @@ export default function DeveloperCard({ d }: { d: Developer }) {
       {premium && <View style={[s.badge, { backgroundColor: '#f59e0b', top: 8 }, badgePos]}><Text style={s.badgeTxt}>✨ Premium</Text></View>}
 
       <View style={[s.headerRow, { flexDirection: headerDir }]}>
-        {d.logo && <Image source={{ uri: d.logo }} style={[s.logoSide, { borderColor: brand + '40' }]} />}
+        {d.logo && <Image source={{ uri: resolveUri(d.logo) }} style={[s.logoSide, { borderColor: brand + '40' }]} />}
         <View style={{ flex: 1 }}>
           <Text style={[s.company, { color: brand, textAlign, writingDirection }]} numberOfLines={1}>{d.company}</Text>
           <Text style={[s.project, { textAlign, writingDirection }]} numberOfLines={1}>{d.projectName}</Text>
@@ -60,7 +61,7 @@ export default function DeveloperCard({ d }: { d: Developer }) {
 
       {featured && (
         <TouchableOpacity activeOpacity={0.9} onPress={() => setSelectedUnit(featured)} style={s.featured}>
-          {featured.image && <Image source={{ uri: featured.image }} style={s.featuredImg} />}
+          {featured.image && <Image source={{ uri: resolveUri(featured.image) }} style={s.featuredImg} />}
           {featured.sold && <View style={s.soldStamp}><Text style={s.soldStampTxt}>נמכר</Text></View>}
           <View style={[s.unitOverlay, { backgroundColor: brand + 'DD' }]}>
             <Text style={s.unitTitleBig}>{featured.title}</Text>
@@ -74,7 +75,7 @@ export default function DeveloperCard({ d }: { d: Developer }) {
           {rest.map(u => (
             <TouchableOpacity key={u.id} activeOpacity={0.85} onPress={() => setSelectedUnit(u)} style={[s.smallUnit, { borderColor: brand + '30' }]}>
               <View style={{ position: 'relative' }}>
-                {u.image && <Image source={{ uri: u.image }} style={s.smallUnitImg} />}
+                {u.image && <Image source={{ uri: resolveUri(u.image) }} style={s.smallUnitImg} />}
                 {u.sold && <View style={s.soldStampSmall}><Text style={s.soldStampTxtSmall}>נמכר</Text></View>}
               </View>
               <View style={{ padding: 6 }}>
@@ -112,7 +113,7 @@ export default function DeveloperCard({ d }: { d: Developer }) {
             </TouchableOpacity>
             <Text style={s.unitModalTitle}>{selectedUnit.title}</Text>
           </View>
-          {selectedUnit.image && <Image source={{ uri: selectedUnit.image }} style={{ width: '100%', aspectRatio: 16 / 10 }} />}
+          {selectedUnit.image && <Image source={{ uri: resolveUri(selectedUnit.image) }} style={{ width: '100%', aspectRatio: 16 / 10 }} />}
           <View style={{ padding: 12 }}>
             {selectedUnit.size && <Text style={s.unitDetailMeta}>📐 {selectedUnit.size}</Text>}
             {selectedUnit.description && <Text style={s.unitDetailDesc}>{selectedUnit.description}</Text>}

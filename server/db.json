@@ -966,8 +966,8 @@
       "subtitle": "גלה מקומות וחוויות",
       "description": "גלו את האתרים המרהיבים של בטומי — מהגנים הבוטניים ועד כיכר פיאצה, הטיילת לאורך הים, ומוזיאונים מרתקים.",
       "icon": "🎡",
-      "bg": "#F4A94E",
-      "bgDark": "#F4A94E",
+      "bg": "#eab308",
+      "bgDark": "#f97316",
       "image": "",
       "children": [
         {
@@ -1501,6 +1501,30 @@
                 "lat": 41.65,
                 "lng": 41.64
               }
+            },
+            {
+              "id": "nat_fishing",
+              "title": "דיג",
+              "text": "דיג בחוף בטומי ובאגמים בסביבה. ניתן לשכור סירות דיג ומדריכים מקומיים. עונת הדיג הטובה: מרץ-אוקטובר.",
+              "image": "/uploads/city.jpg",
+              "mapUrl": "https://www.google.com/maps/search/?api=1&query=Fishing+Batumi+Black+Sea",
+              "coords": {
+                "lat": 41.65,
+                "lng": 41.635
+              },
+              "visible": true
+            },
+            {
+              "id": "nat_birdwatch",
+              "title": "צפייה בציפורים",
+              "text": "אזור בטומי נמצא על מסלול נדידה מרכזי. בסתיו ובאביב ניתן לראות נשרים, בזים ומגוון ציפורים נודדות. נקודות תצפית בקובולטי ובחנצטי.",
+              "image": "/uploads/city.jpg",
+              "mapUrl": "https://www.google.com/maps/search/?api=1&query=Batumi+Birdwatching",
+              "coords": {
+                "lat": 41.75,
+                "lng": 41.78
+              },
+              "visible": true
             }
           ],
           "pageBtnLabel": "מידע נוסף",
@@ -1577,7 +1601,8 @@
               }
             }
           ],
-          "pageBtnLabel": "מידע נוסף"
+          "pageBtnLabel": "מידע נוסף",
+          "bgDark": "#eab308"
         },
         {
           "id": "a6",
@@ -1676,6 +1701,77 @@
           ],
           "pageBtnLabel": "מידע נוסף",
           "visible": false
+        },
+        {
+          "id": "a10",
+          "title": "תרבות",
+          "subtitle": "מופעים, מוזיאונים ואירועים",
+          "description": "חוויות תרבותיות בבטומי — קרקס, תיאטרון, קונצרטים ופסטיבלים.",
+          "icon": "🎭",
+          "bg": "#10b981",
+          "bgDark": "#6D28D9",
+          "hotels": [
+            {
+              "id": "cul_1",
+              "title": "קרקס בטומי",
+              "text": "קרקס בטומי ההיסטורי — מופעים לכל המשפחה עם אקרובטים, ליצנים ובעלי חיים.",
+              "image": "/uploads/city.jpg",
+              "mapUrl": "https://www.google.com/maps/search/?api=1&query=Batumi+Circus",
+              "coords": {
+                "lat": 41.6399,
+                "lng": 41.6231
+              },
+              "visible": true
+            },
+            {
+              "id": "cul_2",
+              "title": "נמל בטומי",
+              "text": "נמל הים השחור הראשי של גאורגיה. יציאה לסיורים ימיים, שייט יאכטות.",
+              "image": "/uploads/city.jpg",
+              "mapUrl": "https://www.google.com/maps/search/?api=1&query=Batumi+Sea+Port",
+              "coords": {
+                "lat": 41.6506,
+                "lng": 41.6368
+              },
+              "visible": true
+            },
+            {
+              "id": "cul_3",
+              "title": "תיאטרון בטומי",
+              "text": "תיאטרון הדרמה של בטומי. מופעי דרמה, מוזיקה וריקוד בבניין היסטורי מרהיב.",
+              "image": "/uploads/city.jpg",
+              "mapUrl": "https://www.google.com/maps/search/?api=1&query=Batumi+State+Drama+Theatre",
+              "coords": {
+                "lat": 41.6453,
+                "lng": 41.6368
+              },
+              "visible": true
+            },
+            {
+              "id": "cul_4",
+              "title": "אולמות קונצרטים",
+              "text": "קונצרטים של אמנים בינלאומיים באולמות כמו Black Sea Arena ו-Batumi Arena.",
+              "image": "/uploads/city.jpg",
+              "mapUrl": "https://www.google.com/maps/search/?api=1&query=Black+Sea+Arena+Batumi",
+              "coords": {
+                "lat": 41.66,
+                "lng": 41.64
+              },
+              "visible": true
+            },
+            {
+              "id": "cul_5",
+              "title": "פסטיבלים",
+              "text": "פסטיבלים לאורך השנה — ג׳אז, אוכל אדג׳רי, פסטיבל הים ועוד.",
+              "image": "/uploads/city.jpg",
+              "mapUrl": "https://www.google.com/maps/search/?api=1&query=Batumi+Festivals",
+              "coords": {
+                "lat": 41.6469,
+                "lng": 41.6292
+              },
+              "visible": true
+            }
+          ]
         }
       ],
       "heroBg": "#F4A94E"
@@ -1686,8 +1782,8 @@
       "subtitle": "מטבח מקומי ואוכל משובח",
       "description": "המטבח הגאורגי הוא חוויה בפני עצמה. חצ׳פורי, חינקלי, שש״ק ויין מעולה.",
       "icon": "🍽️",
-      "bg": "#7ECFC0",
-      "bgDark": "#3DA5C4",
+      "bg": "#fef3c7",
+      "bgDark": "#ef4444",
       "image": "",
       "children": [
         {
@@ -2020,7 +2116,7 @@
           "title": "מסעדות יוקרה",
           "subtitle": "חוויה שף במלונות",
           "icon": "🥂",
-          "bg": "#1A6B8A",
+          "bg": "#ef4444",
           "hotels": [
             {
               "id": "lux_1",
@@ -2154,7 +2250,8 @@
             }
           ],
           "pageBtnLabel": "הזמן שולחן",
-          "longText": "<div style=\"font-family:Arial,sans-serif;padding:8px 16px;direction:rtl;text-align:right;font-size:12px;line-height:1.5;color:#444\"><p style=\"margin:0\">גולשים יקרים, בחרנו עבורכם מספר מסעדות הממוקמות בתוך מלונות. מסעדות בסטנדרט גבוהה, מוקפדות, נקיות ומגישות אוכל עדכני או אוטנתי. במסעדות אלו לרוב מקפידים על קוד לבוש \"Smart Casual\" (אלגנטי לא רשמי), מומלץ לא להגיע בבגדי ים או כפכפים. חשוב מאוד להזמין מקום מראש.</p></div>"
+          "longText": "<div style=\"font-family:Arial,sans-serif;padding:8px 16px;direction:rtl;text-align:right;font-size:12px;line-height:1.5;color:#444\"><p style=\"margin:0\">גולשים יקרים, בחרנו עבורכם מספר מסעדות הממוקמות בתוך מלונות. מסעדות בסטנדרט גבוהה, מוקפדות, נקיות ומגישות אוכל עדכני או אוטנתי. במסעדות אלו לרוב מקפידים על קוד לבוש \"Smart Casual\" (אלגנטי לא רשמי), מומלץ לא להגיע בבגדי ים או כפכפים. חשוב מאוד להזמין מקום מראש.</p></div>",
+          "bgDark": "#F4A94E"
         },
         {
           "id": "r4",
@@ -2506,7 +2603,7 @@
           "title": "אוכל רחוב",
           "subtitle": "פנינים מקומיות",
           "icon": "🔥",
-          "bg": "#7ECFC0",
+          "bg": "#84cc16",
           "hotels": [
             {
               "id": "sf_1",
@@ -2646,7 +2743,8 @@
             }
           ],
           "pageBtnLabel": "מה אוכלים",
-          "cardStyle": "foodie"
+          "cardStyle": "foodie",
+          "bgDark": "#7ECFC0"
         },
         {
           "id": "r7",
@@ -3025,6 +3123,65 @@
           ],
           "pageBtnLabel": "נווט",
           "visible": false
+        },
+        {
+          "id": "r_culinary",
+          "title": "סיורים קולינריים",
+          "subtitle": "טעימות, בישול ויין",
+          "description": "חוויות אוכל ויין — סיורי בישול, יקבי אדג׳רה ושוקי איכרים.",
+          "icon": "🍷",
+          "bg": "#eab308",
+          "bgDark": "#9A3412",
+          "hotels": [
+            {
+              "id": "cul_tour_1",
+              "title": "סיורי בישול",
+              "text": "סדנאות בישול אדג׳רי במסעדות ובתים פרטיים. ללמוד להכין חצ׳אפורי, חינקלי ועוד מאכלים מסורתיים.",
+              "image": "/uploads/city.jpg",
+              "mapUrl": "https://www.google.com/maps/search/?api=1&query=Batumi+Cooking+Class",
+              "coords": {
+                "lat": 41.6469,
+                "lng": 41.6292
+              },
+              "visible": true
+            },
+            {
+              "id": "cul_tour_2",
+              "title": "סיורי יין באדג׳רה",
+              "text": "סיורים ליקבים מקומיים באזור אדג׳רה. טעימות יין, היכרות עם זני ענבים ייחודיים ומפגש עם יינני המשפחה.",
+              "image": "/uploads/city.jpg",
+              "mapUrl": "https://www.google.com/maps/search/?api=1&query=Adjara+Wine+Tour",
+              "coords": {
+                "lat": 41.7,
+                "lng": 41.9
+              },
+              "visible": true
+            },
+            {
+              "id": "cul_tour_3",
+              "title": "שוק איכרים",
+              "text": "שוק בוקר עם תוצרת חקלאית טרייה — פירות, ירקות, גבינות ודבש ישירות מהחוואים. ריחות וטעמים אמיתיים של אדג׳רה.",
+              "image": "/uploads/city.jpg",
+              "mapUrl": "https://www.google.com/maps/search/?api=1&query=Batumi+Farmers+Market",
+              "coords": {
+                "lat": 41.6459,
+                "lng": 41.631
+              },
+              "visible": true
+            },
+            {
+              "id": "cul_tour_4",
+              "title": "דבש אדג׳רי פראי",
+              "text": "דבש פראי מהרי אדג׳רה, נאסף מכוורות בגבהים. טעימות ומכירה בחוות דבש מקומיות.",
+              "image": "/uploads/city.jpg",
+              "mapUrl": "https://www.google.com/maps/search/?api=1&query=Adjara+Wild+Honey",
+              "coords": {
+                "lat": 41.65,
+                "lng": 41.8
+              },
+              "visible": true
+            }
+          ]
         }
       ],
       "heroBg": "#7ECFC0"

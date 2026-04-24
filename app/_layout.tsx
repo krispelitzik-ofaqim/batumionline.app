@@ -1,15 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Text, TextInput, View, ScrollView, useWindowDimensions, I18nManager, Platform } from 'react-native';
-
-// Force LTR base layout on all platforms so our manual RTL (flexDirection: 'row-reverse',
-// textAlign: 'right', writingDirection: 'rtl') renders consistently on web AND iOS/Android.
-// Without this, iOS with Hebrew system language auto-flips layouts and breaks our design.
-if (Platform.OS !== 'web') {
-  try {
-    I18nManager.allowRTL(false);
-    if (I18nManager.isRTL) I18nManager.forceRTL(false);
-  } catch {}
-}
+import { Text, TextInput, View, ScrollView, useWindowDimensions } from 'react-native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
