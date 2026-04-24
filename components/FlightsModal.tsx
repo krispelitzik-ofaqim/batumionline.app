@@ -23,6 +23,7 @@ type Flight = {
 
 type FlightDetails = {
   aircraft?: string;
+  aircraftReg?: string;
   gate?: string;
   terminal?: string;
   checkInDesk?: string;
@@ -33,6 +34,7 @@ type FlightDetails = {
   depRevised?: string;
   arrScheduled?: string;
   arrRevised?: string;
+  distanceKm?: number;
 };
 
 const AIRLINE_LOGOS: Record<string, any> = {
@@ -110,6 +112,7 @@ export default function FlightsModal({ visible, onClose, bgColor }: { visible: b
 
       const buildDetails = (f: any): FlightDetails => ({
         aircraft: f.aircraft?.model,
+        aircraftReg: f.aircraft?.reg,
         gate: f.departure?.gate,
         terminal: f.arrival?.terminal || f.departure?.terminal,
         checkInDesk: f.departure?.checkInDesk,
@@ -120,6 +123,7 @@ export default function FlightsModal({ visible, onClose, bgColor }: { visible: b
         depRevised: parseLocal(f.departure?.revisedTime),
         arrScheduled: parseLocal(f.arrival?.scheduledTime),
         arrRevised: parseLocal(f.arrival?.revisedTime),
+        distanceKm: f.greatCircleDistance?.km,
       });
 
       const IL_AIRPORTS = new Set(['TLV', 'ETM', 'VDA', 'HFA']);
@@ -161,6 +165,8 @@ export default function FlightsModal({ visible, onClose, bgColor }: { visible: b
   useEffect(() => {
     if (!visible) return;
     reload();
+    const interval = setInterval(reload, 60_000);
+    return () => clearInterval(interval);
   }, [visible]);
 
   // ─── AviationStack API ──────────────────────────────────────
@@ -417,15 +423,31 @@ export default function FlightsModal({ visible, onClose, bgColor }: { visible: b
                 </View>
               </View>
 
-              {selected.details && (
-                <View style={s.detailsGrid}>
-                  {selected.details.aircraft && <DetailItem label="דגם מטוס" value={selected.details.aircraft} />}
-                  {selected.details.gate && <DetailItem label="שער יציאה" value={selected.details.gate} />}
-                  {selected.details.terminal && <DetailItem label="טרמינל" value={selected.details.terminal} />}
-                  {selected.details.checkInDesk && <DetailItem label="דלפק צ׳ק-אין" value={selected.details.checkInDesk} />}
-                  {selected.details.baggageBelt && <DetailItem label="סרט מזוודות" value={selected.details.baggageBelt} />}
-                </View>
-              )}
+              {(() => {
+                const d = selected.details;
+                if (!d) return null;
+                const delay = computeDelay(d);
+                const duration = computeDuration(d);
+                return (
+                  <>
+                    {delay && (
+                      <View style={s.delayBanner}>
+                        <Text style={s.delayTxt}>⚠ {delay}</Text>
+                      </View>
+                    )}
+                    <View style={s.detailsGrid}>
+                      {d.gate && <DetailItem label="שער יציאה" value={d.gate} />}
+                      {d.terminal && <DetailItem label="טרמינל" value={d.terminal} />}
+                      {d.checkInDesk && <DetailItem label="דלפק צ׳ק-אין" value={d.checkInDesk} />}
+                      {d.baggageBelt && <DetailItem label="סרט מזוודות" value={d.baggageBelt} />}
+                      {duration && <DetailItem label="משך טיסה" value={duration} />}
+                      {d.distanceKm && <DetailItem label="מרחק" value={`${Math.round(d.distanceKm).toLocaleString()} ק״מ`} />}
+                      {d.aircraft && <DetailItem label="דגם מטוס" value={d.aircraft} />}
+                      {d.aircraftReg && <DetailItem label="מספר זנב" value={d.aircraftReg} />}
+                    </View>
+                  </>
+                );
+              })()}
             </ScrollView>
           </View>
         )}
@@ -451,8 +473,38 @@ function statusColor(status: string) {
   if (status === 'נחתה' || status === 'המריאה') return { backgroundColor: '#6B7280' }; // gray — completed
   if (status === 'עיכוב') return { backgroundColor: '#F59E0B' }; // amber — delayed
   if (status === 'בוטלה') return { backgroundColor: '#EF4444' }; // red — cancelled
-  if (status === 'הופנתה') return { backgroundColor: '#8B5CF6' }; // purple — diverted
+  if (status === 'הועברה') return { backgroundColor: '#8B5CF6' }; // purple — diverted
   return { backgroundColor: 'rgba(255,255,255,0.15)' };
+}
+
+function computeDelay(d: FlightDetails): string | null {
+  const pairs: [string | undefined, string | undefined, string][] = [
+    [d.depScheduled, d.depRevised, 'המראה'],
+    [d.arrScheduled, d.arrRevised, 'נחיתה'],
+  ];
+  for (const [sched, rev, label] of pairs) {
+    if (!sched || !rev || sched === rev) continue;
+    const ms = new Date(rev).getTime() - new Date(sched).getTime();
+    if (isNaN(ms) || ms <= 60_000) continue;
+    const mins = Math.round(ms / 60_000);
+    const hh = Math.floor(mins / 60);
+    const mm = mins % 60;
+    const dur = hh > 0 ? `${hh}:${String(mm).padStart(2, '0')} שעות` : `${mm} דק׳`;
+    return `עיכוב ב${label}: ${dur}`;
+  }
+  return null;
+}
+
+function computeDuration(d: FlightDetails): string | null {
+  const dep = d.depScheduled;
+  const arr = d.arrScheduled;
+  if (!dep || !arr) return null;
+  const ms = new Date(arr).getTime() - new Date(dep).getTime();
+  if (isNaN(ms) || ms <= 0) return null;
+  const mins = Math.round(ms / 60_000);
+  const hh = Math.floor(mins / 60);
+  const mm = mins % 60;
+  return hh > 0 ? `${hh}ש׳ ${mm}ד׳` : `${mm} דק׳`;
 }
 
 function translateStatus(status: string): string {
@@ -464,7 +516,7 @@ function translateStatus(status: string): string {
   if (s === 'departed') return 'המריאה';
   if (s === 'delayed') return 'עיכוב';
   if (s === 'cancelled' || s === 'canceled') return 'בוטלה';
-  if (s === 'diverted') return 'הופנתה';
+  if (s === 'diverted') return 'הועברה';
   return 'בזמן';
 }
 
@@ -618,6 +670,8 @@ const s = StyleSheet.create({
   routeCode: { fontSize: 13, fontWeight: '600', color: Colors.WHITE, opacity: 0.7, marginTop: 4, textAlign: 'center', writingDirection: 'rtl' },
   routeDate: { fontSize: 11, color: Colors.WHITE, opacity: 0.5, marginTop: 2 },
   routeArrow: { fontSize: 20, color: Colors.WHITE, opacity: 0.4 },
+  delayBanner: { backgroundColor: 'rgba(245,158,11,0.18)', borderWidth: 1, borderColor: 'rgba(245,158,11,0.6)', borderRadius: 12, paddingVertical: 10, paddingHorizontal: 14, marginBottom: 12 },
+  delayTxt: { fontSize: 13, fontWeight: '700', color: '#FCD34D', textAlign: 'center', writingDirection: 'rtl' },
   detailsGrid: { backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 16, padding: 18, gap: 12 },
   detailItem: { flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' },
   detailLabel: { fontSize: 13, color: Colors.WHITE, opacity: 0.6, writingDirection: 'rtl' },
