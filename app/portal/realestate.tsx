@@ -300,10 +300,8 @@ export default function RealEstatePortal() {
 
             <RealEstateGallery />
 
-            {/* Section 2 — Finance stats */}
-            <Section title="מדד הכסף" icon="💰">
-              <FinanceStats />
-            </Section>
+            {/* Section 2 — Market indices with switchable tabs */}
+            <IndicesTabs />
 
             {/* Section 3 — Tips before buying */}
             <Section title="מה צריך לדעת לפני שרוכשים דירה בבטומי" icon="💡">
@@ -372,6 +370,54 @@ export default function RealEstatePortal() {
           </View>
         </View>
       </Modal>
+    </View>
+  );
+}
+
+function IndicesTabs() {
+  const tabs = [
+    { id: 'money', label: 'מדד הכסף', icon: '💰', bg: undefined as string | undefined },
+    { id: 'realEstate', label: 'מדד הנדל״ן', icon: '🏠', bg: '#C8E6C9' },
+    { id: 'tourism', label: 'מדד התיירים', icon: '🧳', bg: '#FFE0B2' },
+  ];
+  const [active, setActive] = useState(tabs[0].id);
+  const current = tabs.find(t => t.id === active)!;
+
+  return (
+    <View style={s.section}>
+      <View style={{ flexDirection: 'row-reverse', gap: 6, marginBottom: 10, paddingHorizontal: 2 }}>
+        {tabs.map(t => {
+          const isActive = t.id === active;
+          return (
+            <TouchableOpacity
+              key={t.id}
+              onPress={() => setActive(t.id)}
+              activeOpacity={0.8}
+              style={{
+                flex: 1,
+                paddingVertical: 8,
+                paddingHorizontal: 4,
+                borderRadius: 10,
+                borderWidth: 1.5,
+                alignItems: 'center',
+                backgroundColor: isActive ? (t.bg || '#FFFFFF') : 'transparent',
+                borderColor: isActive ? '#1A6B8A' : '#cbd5e1',
+              }}
+            >
+              <Text style={{
+                fontSize: 13,
+                fontWeight: isActive ? '900' : '600',
+                color: isActive ? '#1C2B35' : '#64748b',
+                writingDirection: 'rtl',
+                textAlign: 'center',
+              }}>
+                {t.icon} {t.label}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+      <FinanceStats cardBg={current.bg} channel={active as any} />
     </View>
   );
 }

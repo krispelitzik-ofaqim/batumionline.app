@@ -569,7 +569,19 @@ function TourismWorldBankTable() {
 }
 
 // ─── Manual Indicators Table (generic) ─────────────────────────
-type ManualRow = { id: string; label: string; unit: string; values: Record<string, string> };
+type ManualRow = {
+  id: string;
+  label: string;
+  unit: string;
+  values: Record<string, string>;
+  channel?: 'money' | 'realEstate' | 'tourism';
+  extraYears?: number[];
+  displayType?: 'line' | 'table';
+  tableRows?: Array<{ id: string; category: string; value: string; year?: string; cells?: Record<string, string> }>;
+  columns?: Array<{ id: string; name: string }>;
+  sources?: string;
+  notes?: string;
+};
 
 function ManualIndicatorsTable({ title, subtitle, storageField, accentColor, headerBg, lineColor, cellBg }: { title: string; subtitle: string; storageField: string; accentColor: string; headerBg: string; lineColor: string; cellBg: string }) {
   const [rows, setRows] = useState<ManualRow[]>([]);
@@ -580,29 +592,109 @@ function ManualIndicatorsTable({ title, subtitle, storageField, accentColor, hea
   useEffect(() => {
     (async () => {
       setLoading(true);
-      try {
-        const r = await fetch('https://api.worldbank.org/v2/country/GE/indicator/FP.CPI.TOTL.ZG?format=json&per_page=12');
-        const j = await r.json();
-        const arr = Array.isArray(j) && j[1] ? j[1] : [];
-        const ys = arr.filter((x: any) => x.value != null).map((x: any) => parseInt(x.date, 10)).sort((a: number, b: number) => b - a).slice(0, 4).sort((a: number, b: number) => a - b);
-        setYears(ys);
-      } catch {
-        const now = new Date().getFullYear();
-        setYears([now - 3, now - 2, now - 1, now]);
-      }
+      setYears([]);
       try {
         const r = await fetch(`${API_BASE}/api/content`);
-        const d = await r.json();
-        if (Array.isArray(d[storageField])) setRows(d[storageField]);
+        const resp = await r.json();
+        const d = resp && resp.success && resp.data ? resp.data : resp;
+        if (Array.isArray(d[storageField])) {
+          // Migrate legacy `values` (year->value map) into tableRows so they don't disappear
+          const migrated = d[storageField].map((row: any) => {
+            const existing = Array.isArray(row.tableRows) ? row.tableRows : [];
+            if (existing.length === 0 && row.values && typeof row.values === 'object') {
+              const fromValues = Object.entries(row.values)
+                .filter(([_, v]) => v !== '')
+                .map(([y, v]) => ({ id: 't_' + Math.random().toString(36).slice(2, 6), year: String(y), category: '', value: String(v) }));
+              if (fromValues.length > 0) {
+                return { ...row, tableRows: fromValues };
+              }
+            }
+            return row;
+          });
+          setRows(migrated);
+        }
       } catch {}
       setLoading(false);
     })();
   }, [storageField]);
 
-  const addRow = () => setRows(prev => [...prev, { id: 'm_' + Math.random().toString(36).slice(2, 8), label: '', unit: '%', values: {} }]);
+  const addRow = () => setRows(prev => [...prev, {
+    id: 'm_' + Math.random().toString(36).slice(2, 8),
+    label: '', unit: '', values: {}, extraYears: [], displayType: 'line',
+    tableRows: [],
+    columns: [
+      { id: 'c_year', name: 'שנה' },
+      { id: 'c_type', name: 'סוג' },
+      { id: 'c_val', name: 'ערך' },
+    ],
+  }]);
+  const addColumn = (rowId: string) => {
+    let name = 'עמודה חדשה';
+    if (typeof window !== 'undefined' && typeof (window as any).prompt === 'function') {
+      const n = (window as any).prompt('שם העמודה החדשה:', name);
+      if (!n) return;
+      name = n;
+    }
+    setRows(prev => prev.map(r => r.id === rowId ? { ...r, columns: [...(r.columns || []), { id: 'c_' + Math.random().toString(36).slice(2, 6), name }] } : r));
+  };
+  const DEFAULT_COLS = [
+    { id: 'c_year', name: 'שנה' },
+    { id: 'c_type', name: 'סוג' },
+    { id: 'c_val', name: 'ערך' },
+  ];
+  const ensureColumns = (r: ManualRow) => (r.columns && r.columns.length > 0) ? r.columns : DEFAULT_COLS;
+  const updateColumn = (rowId: string, colId: string, name: string) =>
+    setRows(prev => prev.map(r => {
+      if (r.id !== rowId) return r;
+      const cols = ensureColumns(r);
+      return { ...r, columns: cols.map(c => c.id === colId ? { ...c, name } : c) };
+    }));
+  const deleteColumn = (rowId: string, colId: string) =>
+    setRows(prev => prev.map(r => {
+      if (r.id !== rowId) return r;
+      const cols = ensureColumns(r);
+      return {
+        ...r,
+        columns: cols.filter(c => c.id !== colId),
+        tableRows: (r.tableRows || []).map(tr => {
+          const cells = { ...(tr.cells || {}) }; delete cells[colId];
+          return { ...tr, cells };
+        }),
+      };
+    }));
+  const updateCell2 = (rowId: string, trId: string, colId: string, val: string) =>
+    setRows(prev => prev.map(r => r.id === rowId ? {
+      ...r,
+      tableRows: (r.tableRows || []).map(tr => tr.id === trId ? { ...tr, cells: { ...(tr.cells || {}), [colId]: val } } : tr),
+    } : r));
   const deleteRow = (id: string) => setRows(prev => prev.filter(r => r.id !== id));
   const updateRow = (id: string, patch: Partial<ManualRow>) => setRows(prev => prev.map(r => r.id === id ? { ...r, ...patch } : r));
   const updateCell = (id: string, year: number, val: string) => setRows(prev => prev.map(r => r.id === id ? { ...r, values: { ...r.values, [year]: val } } : r));
+  const addTableRow = (id: string) => setRows(prev => prev.map(r => r.id === id ? { ...r, tableRows: [...(r.tableRows || []), { id: 't_' + Math.random().toString(36).slice(2, 6), category: '', value: '' }] } : r));
+  const updateTableRow = (rowId: string, trId: string, patch: Partial<{ category: string; value: string; year: string }>) =>
+    setRows(prev => prev.map(r => r.id === rowId ? { ...r, tableRows: (r.tableRows || []).map(tr => tr.id === trId ? { ...tr, ...patch } : tr) } : r));
+  const deleteTableRow = (rowId: string, trId: string) =>
+    setRows(prev => prev.map(r => r.id === rowId ? { ...r, tableRows: (r.tableRows || []).filter(tr => tr.id !== trId) } : r));
+  const addYear = (id: string) => {
+    const row = rows.find(r => r.id === id);
+    if (!row) return;
+    const known = new Set([...years, ...(row.extraYears || [])]);
+    const defaultNext = known.size ? Math.max(...known) + 1 : new Date().getFullYear();
+    let input: string | null = String(defaultNext);
+    if (typeof window !== 'undefined' && typeof (window as any).prompt === 'function') {
+      input = (window as any).prompt('הכנס שנה להוספה:', String(defaultNext));
+    }
+    if (!input) return;
+    const year = parseInt(input, 10);
+    if (isNaN(year) || year < 1900 || year > 2100) return;
+    if (known.has(year)) return;
+    setRows(prev => prev.map(r => r.id === id ? { ...r, extraYears: [...(r.extraYears || []), year] } : r));
+  };
+  const removeYear = (id: string, year: number) => setRows(prev => prev.map(r => {
+    if (r.id !== id) return r;
+    const { [year]: _, ...rest } = r.values;
+    return { ...r, values: rest, extraYears: (r.extraYears || []).filter(y => y !== year) };
+  }));
 
   const save = async () => {
     setSaving(true);
@@ -655,30 +747,85 @@ function ManualIndicatorsTable({ title, subtitle, storageField, accentColor, hea
         <Text style={{ textAlign: 'center', color: '#94a3b8', padding: 20 }}>טוען...</Text>
       ) : (
         <>
-          <View style={{ flexDirection: 'row-reverse', paddingVertical: 8, paddingHorizontal: 10, backgroundColor: '#f1f5f9', gap: 6 }}>
-            <Text style={{ flex: 1.8, fontSize: 11, fontWeight: '800', color: '#475569', textAlign: 'right', writingDirection: 'rtl' }}>מדד</Text>
-            <Text style={{ width: 50, fontSize: 11, fontWeight: '800', color: '#475569', textAlign: 'center' }}>יחידה</Text>
-            {years.map(y => (
-              <Text key={y} style={{ flex: 1, fontSize: 11, fontWeight: '800', color: '#475569', textAlign: 'center' }}>{y}</Text>
-            ))}
-            <Text style={{ width: 90, fontSize: 11, fontWeight: '800', color: '#475569', textAlign: 'center' }}>מגמה</Text>
-            <Text style={{ width: 30 }}></Text>
-          </View>
           {rows.length === 0 ? (
             <Text style={{ textAlign: 'center', color: '#94a3b8', padding: 20, writingDirection: 'rtl' }}>אין מדדים. לחץ "➕ הוסף מדד"</Text>
-          ) : rows.map((row, idx) => (
-            <View key={row.id} style={{ flexDirection: 'row-reverse', paddingVertical: 8, paddingHorizontal: 10, gap: 6, backgroundColor: idx % 2 === 0 ? '#fff' : '#fafafa', borderTopWidth: 1, borderTopColor: '#f1f5f9', alignItems: 'center' }}>
-              <TextInput style={{ flex: 1.8, fontSize: 12, color: accentColor, textAlign: 'right', writingDirection: 'rtl', fontWeight: '700', borderWidth: 1, borderColor: cellBg, borderRadius: 6, padding: 6 }} value={row.label} onChangeText={v => updateRow(row.id, { label: v })} placeholder="שם המדד" placeholderTextColor="#93c5fd" />
-              <TextInput style={{ width: 50, fontSize: 11, textAlign: 'center', borderWidth: 1, borderColor: cellBg, borderRadius: 6, padding: 6 }} value={row.unit} onChangeText={v => updateRow(row.id, { unit: v })} placeholder="%" placeholderTextColor="#93c5fd" />
-              {years.map(y => (
-                <TextInput key={y} style={{ flex: 1, fontSize: 11, textAlign: 'center', borderWidth: 1, borderColor: cellBg, borderRadius: 6, padding: 6, backgroundColor: cellBg + '40' }} value={row.values[y] || ''} onChangeText={v => updateCell(row.id, y, v)} placeholder="—" placeholderTextColor="#93c5fd" keyboardType="numeric" />
-              ))}
-              <View style={{ width: 90, alignItems: 'center' }}>{sparkline(row)}</View>
-              <TouchableOpacity onPress={() => deleteRow(row.id)} style={{ width: 30, alignItems: 'center' }}>
-                <Text style={{ fontSize: 14, color: '#dc2626' }}>🗑</Text>
-              </TouchableOpacity>
-            </View>
-          ))}
+          ) : rows.map((row, idx) => {
+            const rowYears = [...years, ...(row.extraYears || [])].sort((a, b) => a - b);
+            const pct = (y: number, i: number) => {
+              if (i === 0) return '';
+              const curr = parseFloat(row.values[y] || '');
+              const prev = parseFloat(row.values[rowYears[i - 1]] || '');
+              if (isNaN(curr) || isNaN(prev) || prev === 0) return '';
+              const d = ((curr - prev) / Math.abs(prev)) * 100;
+              return (d >= 0 ? '+' : '') + d.toFixed(1) + '%';
+            };
+            const cols = row.columns && row.columns.length > 0 ? row.columns : [
+              { id: 'c_year', name: 'שנה' },
+              { id: 'c_type', name: 'סוג' },
+              { id: 'c_val', name: 'ערך' },
+            ];
+            const cellFor = (tr: any, colId: string): string => {
+              if (tr.cells && tr.cells[colId] !== undefined) return tr.cells[colId];
+              if (colId === 'c_year') return tr.year || '';
+              if (colId === 'c_type') return tr.category || '';
+              if (colId === 'c_val') return tr.value || '';
+              return '';
+            };
+            const setCell = (tr: any, colId: string, v: string) => {
+              if (colId === 'c_year') updateTableRow(row.id, tr.id, { year: v });
+              else if (colId === 'c_type') updateTableRow(row.id, tr.id, { category: v });
+              else if (colId === 'c_val') updateTableRow(row.id, tr.id, { value: v });
+              else updateCell2(row.id, tr.id, colId, v);
+            };
+            return (
+              <View key={row.id} style={{ paddingVertical: 10, paddingHorizontal: 10, backgroundColor: idx % 2 === 0 ? '#fff' : '#fafafa', borderTopWidth: 1, borderTopColor: '#f1f5f9' }}>
+                <View style={{ flexDirection: 'row-reverse', gap: 6, alignItems: 'center', marginBottom: 8 }}>
+                  <TextInput style={{ flex: 1.8, fontSize: 12, color: accentColor, textAlign: 'right', writingDirection: 'rtl', fontWeight: '700', borderWidth: 1, borderColor: cellBg, borderRadius: 6, padding: 6 }} value={row.label} onChangeText={v => updateRow(row.id, { label: v })} placeholder="שם המדד" placeholderTextColor="#93c5fd" />
+                  <TextInput style={{ width: 60, fontSize: 11, textAlign: 'center', borderWidth: 1, borderColor: cellBg, borderRadius: 6, padding: 6 }} value={row.unit} onChangeText={v => updateRow(row.id, { unit: v })} placeholder="יחידה" placeholderTextColor="#93c5fd" />
+                  <TouchableOpacity onPress={() => deleteRow(row.id)} style={{ width: 30, alignItems: 'center' }}>
+                    <Text style={{ fontSize: 14, color: '#dc2626' }}>🗑</Text>
+                  </TouchableOpacity>
+                </View>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  <View>
+                    <View style={{ flexDirection: 'row-reverse', paddingVertical: 4, gap: 6, alignItems: 'center' }}>
+                      {cols.map(col => (
+                        <View key={col.id} style={{ width: 130, alignItems: 'center' }}>
+                          <TextInput style={{ width: '100%', fontSize: 10, fontWeight: '800', color: '#1e40af', textAlign: 'center', borderWidth: 1, borderColor: cellBg, borderRadius: 4, padding: 4, backgroundColor: headerBg }} value={col.name} onChangeText={v => updateColumn(row.id, col.id, v)} placeholder="עמודה" />
+                          {cols.length > 1 && (
+                            <TouchableOpacity onPress={() => deleteColumn(row.id, col.id)} style={{ paddingVertical: 4, paddingHorizontal: 10, marginTop: 2, borderRadius: 4, backgroundColor: '#fee2e2' }}>
+                              <Text style={{ fontSize: 11, color: '#dc2626', fontWeight: '800' }}>✕ מחק</Text>
+                            </TouchableOpacity>
+                          )}
+                        </View>
+                      ))}
+                      <TouchableOpacity onPress={() => addColumn(row.id)} style={{ paddingHorizontal: 8, paddingVertical: 4, borderRadius: 4, borderWidth: 1, borderColor: accentColor, borderStyle: 'dashed' }}>
+                        <Text style={{ fontSize: 10, color: accentColor, fontWeight: '800' }}>+ עמודה</Text>
+                      </TouchableOpacity>
+                      <View style={{ width: 28 }} />
+                    </View>
+                    {(row.tableRows || []).map(tr => (
+                      <View key={tr.id} style={{ flexDirection: 'row-reverse', gap: 6, alignItems: 'center', paddingVertical: 3 }}>
+                        {cols.map(col => (
+                          <TextInput key={col.id} style={{ width: 120, fontSize: 12, textAlign: 'center', borderWidth: 1, borderColor: cellBg, borderRadius: 6, padding: 6, backgroundColor: cellBg + '40' }} value={cellFor(tr, col.id)} onChangeText={v => setCell(tr, col.id, v)} placeholder="—" placeholderTextColor="#93c5fd" />
+                        ))}
+                        <TouchableOpacity onPress={() => deleteTableRow(row.id, tr.id)} style={{ width: 28, alignItems: 'center' }}>
+                          <Text style={{ fontSize: 14, color: '#dc2626' }}>✕</Text>
+                        </TouchableOpacity>
+                      </View>
+                    ))}
+                  </View>
+                </ScrollView>
+                <TouchableOpacity onPress={() => addTableRow(row.id)} style={{ alignSelf: 'flex-end', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 6, borderWidth: 1, borderColor: accentColor, borderStyle: 'dashed', marginTop: 6 }}>
+                  <Text style={{ fontSize: 12, color: accentColor, fontWeight: '800' }}>+ שורה</Text>
+                </TouchableOpacity>
+                <View style={{ marginTop: 10, gap: 6 }}>
+                  <TextInput style={{ fontSize: 11, borderWidth: 1, borderColor: cellBg, borderRadius: 6, padding: 6, textAlign: 'right', writingDirection: 'rtl' }} value={row.sources || ''} onChangeText={v => updateRow(row.id, { sources: v })} placeholder="מקורות (למשל: Geostat, NBG, Galt & Taggart)" placeholderTextColor="#94a3b8" />
+                  <TextInput style={{ fontSize: 11, borderWidth: 1, borderColor: cellBg, borderRadius: 6, padding: 6, textAlign: 'right', writingDirection: 'rtl' }} value={row.notes || ''} onChangeText={v => updateRow(row.id, { notes: v })} placeholder="הערות (אופציונלי)" placeholderTextColor="#94a3b8" />
+                </View>
+              </View>
+            );
+          })}
           {rows.length > 0 && (
             <TouchableOpacity onPress={save} disabled={saving} style={{ margin: 10, paddingVertical: 10, borderRadius: 8, backgroundColor: '#10b981', alignItems: 'center', opacity: saving ? 0.5 : 1 }}>
               <Text style={{ color: '#fff', fontWeight: '900', fontSize: 13 }}>{saving ? 'שומר...' : '💾 שמור מדדים'}</Text>
@@ -716,7 +863,8 @@ function FinanceManualTable() {
       }
       try {
         const r = await fetch(`${API_BASE}/api/content`);
-        const d = await r.json();
+        const resp = await r.json();
+        const d = resp && resp.success && resp.data ? resp.data : resp;
         if (Array.isArray(d.financeStatsCustom)) setRows(d.financeStatsCustom);
       } catch {}
       setLoading(false);
@@ -724,8 +872,28 @@ function FinanceManualTable() {
   }, []);
 
   const addRow = () => {
-    setRows(prev => [...prev, { id: 'm_' + Math.random().toString(36).slice(2, 8), label: '', unit: '%', values: {} }]);
+    setRows(prev => [...prev, { id: 'm_' + Math.random().toString(36).slice(2, 8), label: '', unit: '%', values: {}, channel: 'money', extraYears: [] }]);
   };
+  const addYear = (id: string) => {
+    const row = rows.find(r => r.id === id);
+    if (!row) return;
+    const known = new Set([...years, ...(row.extraYears || [])]);
+    const defaultNext = known.size ? Math.max(...known) + 1 : new Date().getFullYear();
+    let input: string | null = String(defaultNext);
+    if (typeof window !== 'undefined' && typeof (window as any).prompt === 'function') {
+      input = (window as any).prompt('הכנס שנה להוספה:', String(defaultNext));
+    }
+    if (!input) return;
+    const year = parseInt(input, 10);
+    if (isNaN(year) || year < 1900 || year > 2100) return;
+    if (known.has(year)) return;
+    setRows(prev => prev.map(r => r.id === id ? { ...r, extraYears: [...(r.extraYears || []), year] } : r));
+  };
+  const removeYear = (id: string, year: number) => setRows(prev => prev.map(r => {
+    if (r.id !== id) return r;
+    const { [year]: _, ...rest } = r.values;
+    return { ...r, values: rest, extraYears: (r.extraYears || []).filter(y => y !== year) };
+  }));
   const deleteRow = (id: string) => setRows(prev => prev.filter(r => r.id !== id));
   const updateRow = (id: string, patch: Partial<ManualRow>) => setRows(prev => prev.map(r => r.id === id ? { ...r, ...patch } : r));
   const updateCell = (id: string, year: number, val: string) => setRows(prev => prev.map(r => r.id === id ? { ...r, values: { ...r.values, [year]: val } } : r));
@@ -781,50 +949,77 @@ function FinanceManualTable() {
         <Text style={{ textAlign: 'center', color: '#94a3b8', padding: 20 }}>טוען...</Text>
       ) : (
         <>
-          <View style={{ flexDirection: 'row-reverse', paddingVertical: 8, paddingHorizontal: 10, backgroundColor: '#f1f5f9', gap: 6 }}>
-            <Text style={{ flex: 1.8, fontSize: 11, fontWeight: '800', color: '#475569', textAlign: 'right', writingDirection: 'rtl' }}>מדד</Text>
-            <Text style={{ width: 50, fontSize: 11, fontWeight: '800', color: '#475569', textAlign: 'center' }}>יחידה</Text>
-            {years.map(y => (
-              <Text key={y} style={{ flex: 1, fontSize: 11, fontWeight: '800', color: '#475569', textAlign: 'center' }}>{y}</Text>
-            ))}
-            <Text style={{ width: 90, fontSize: 11, fontWeight: '800', color: '#475569', textAlign: 'center' }}>מגמה</Text>
-            <Text style={{ width: 30 }}></Text>
-          </View>
           {rows.length === 0 ? (
             <Text style={{ textAlign: 'center', color: '#94a3b8', padding: 20, writingDirection: 'rtl' }}>אין מדדים ידניים. לחץ "➕ הוסף מדד"</Text>
-          ) : rows.map((row, idx) => (
-            <View key={row.id} style={{ flexDirection: 'row-reverse', paddingVertical: 8, paddingHorizontal: 10, gap: 6, backgroundColor: idx % 2 === 0 ? '#fff' : '#fafafa', borderTopWidth: 1, borderTopColor: '#f1f5f9', alignItems: 'center' }}>
-              <TextInput
-                style={{ flex: 1.8, fontSize: 12, color: '#1e40af', textAlign: 'right', writingDirection: 'rtl', fontWeight: '700', borderWidth: 1, borderColor: '#bfdbfe', borderRadius: 6, padding: 6 }}
-                value={row.label}
-                onChangeText={v => updateRow(row.id, { label: v })}
-                placeholder="שם המדד"
-                placeholderTextColor="#93c5fd"
-              />
-              <TextInput
-                style={{ width: 50, fontSize: 11, textAlign: 'center', borderWidth: 1, borderColor: '#bfdbfe', borderRadius: 6, padding: 6 }}
-                value={row.unit}
-                onChangeText={v => updateRow(row.id, { unit: v })}
-                placeholder="%"
-                placeholderTextColor="#93c5fd"
-              />
-              {years.map(y => (
-                <TextInput
-                  key={y}
-                  style={{ flex: 1, fontSize: 11, textAlign: 'center', borderWidth: 1, borderColor: '#bfdbfe', borderRadius: 6, padding: 6, backgroundColor: '#eff6ff' }}
-                  value={row.values[y] || ''}
-                  onChangeText={v => updateCell(row.id, y, v)}
-                  placeholder="—"
-                  placeholderTextColor="#93c5fd"
-                  keyboardType="numeric"
-                />
-              ))}
-              <View style={{ width: 90, alignItems: 'center' }}>{sparkline(row)}</View>
-              <TouchableOpacity onPress={() => deleteRow(row.id)} style={{ width: 30, alignItems: 'center' }}>
-                <Text style={{ fontSize: 14, color: '#dc2626' }}>🗑</Text>
-              </TouchableOpacity>
-            </View>
-          ))}
+          ) : rows.map((row, idx) => {
+            const rowYears = [...years, ...(row.extraYears || [])].sort((a, b) => a - b);
+            const channelLabel = row.channel === 'realEstate' ? '🏠 נדל"ן' : row.channel === 'tourism' ? '🧳 תיירות' : '💰 כסף';
+            const channelNext = row.channel === 'money' ? 'realEstate' : row.channel === 'realEstate' ? 'tourism' : 'money';
+            const pct = (y: number, i: number) => {
+              if (i === 0) return '';
+              const curr = parseFloat(row.values[y] || '');
+              const prev = parseFloat(row.values[rowYears[i - 1]] || '');
+              if (isNaN(curr) || isNaN(prev) || prev === 0) return '';
+              const d = ((curr - prev) / Math.abs(prev)) * 100;
+              return (d >= 0 ? '+' : '') + d.toFixed(1) + '%';
+            };
+            return (
+              <View key={row.id} style={{ paddingVertical: 10, paddingHorizontal: 10, backgroundColor: idx % 2 === 0 ? '#fff' : '#fafafa', borderTopWidth: 1, borderTopColor: '#f1f5f9' }}>
+                <View style={{ flexDirection: 'row-reverse', gap: 6, alignItems: 'center', marginBottom: 8 }}>
+                  <TextInput
+                    style={{ flex: 1.8, fontSize: 12, color: '#1e40af', textAlign: 'right', writingDirection: 'rtl', fontWeight: '700', borderWidth: 1, borderColor: '#bfdbfe', borderRadius: 6, padding: 6 }}
+                    value={row.label}
+                    onChangeText={v => updateRow(row.id, { label: v })}
+                    placeholder="שם המדד"
+                    placeholderTextColor="#93c5fd"
+                  />
+                  <TextInput
+                    style={{ width: 50, fontSize: 11, textAlign: 'center', borderWidth: 1, borderColor: '#bfdbfe', borderRadius: 6, padding: 6 }}
+                    value={row.unit}
+                    onChangeText={v => updateRow(row.id, { unit: v })}
+                    placeholder="%"
+                    placeholderTextColor="#93c5fd"
+                  />
+                  <TouchableOpacity onPress={() => updateRow(row.id, { channel: channelNext })} style={{ paddingHorizontal: 8, paddingVertical: 6, borderRadius: 6, backgroundColor: '#dbeafe' }}>
+                    <Text style={{ fontSize: 11, fontWeight: '800', color: '#1e40af', writingDirection: 'rtl' }}>{channelLabel}</Text>
+                  </TouchableOpacity>
+                  <View style={{ width: 90, alignItems: 'center' }}>{sparkline(row)}</View>
+                  <TouchableOpacity onPress={() => deleteRow(row.id)} style={{ width: 30, alignItems: 'center' }}>
+                    <Text style={{ fontSize: 14, color: '#dc2626' }}>🗑</Text>
+                  </TouchableOpacity>
+                </View>
+                <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 6 }}>
+                  {rowYears.map((y, i) => {
+                    const isExtra = (row.extraYears || []).includes(y);
+                    return (
+                      <View key={y} style={{ width: 80, alignItems: 'center', padding: 6, borderWidth: 1, borderColor: '#bfdbfe', borderRadius: 8, backgroundColor: '#fff' }}>
+                        <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 2, marginBottom: 4 }}>
+                          <Text style={{ fontSize: 11, fontWeight: '800', color: '#1e40af' }}>{y}</Text>
+                          {isExtra && (
+                            <TouchableOpacity onPress={() => removeYear(row.id, y)}>
+                              <Text style={{ fontSize: 10, color: '#dc2626' }}>✕</Text>
+                            </TouchableOpacity>
+                          )}
+                        </View>
+                        <TextInput
+                          style={{ width: '100%', fontSize: 12, textAlign: 'center', borderWidth: 1, borderColor: '#bfdbfe', borderRadius: 6, padding: 5, backgroundColor: '#eff6ff', fontWeight: '700' }}
+                          value={row.values[y] || ''}
+                          onChangeText={v => updateCell(row.id, y, v)}
+                          placeholder="—"
+                          placeholderTextColor="#93c5fd"
+                          keyboardType="numeric"
+                        />
+                        <Text style={{ fontSize: 9, color: pct(y, i).startsWith('-') ? '#dc2626' : '#16a34a', marginTop: 3, minHeight: 10, fontWeight: '700' }}>{pct(y, i)}</Text>
+                      </View>
+                    );
+                  })}
+                  <TouchableOpacity onPress={() => addYear(row.id)} style={{ width: 80, padding: 6, borderRadius: 8, borderWidth: 1, borderColor: '#93c5fd', borderStyle: 'dashed', alignItems: 'center', justifyContent: 'center', minHeight: 72 }}>
+                    <Text style={{ fontSize: 12, color: '#3b82f6', fontWeight: '800' }}>+ שנה</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            );
+          })}
           {rows.length > 0 && (
             <TouchableOpacity onPress={save} disabled={saving} style={{ margin: 10, paddingVertical: 10, borderRadius: 8, backgroundColor: '#10b981', alignItems: 'center', opacity: saving ? 0.5 : 1 }}>
               <Text style={{ color: '#fff', fontWeight: '900', fontSize: 13 }}>{saving ? 'שומר...' : '💾 שמור מדדים ידניים'}</Text>

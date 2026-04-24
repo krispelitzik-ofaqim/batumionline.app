@@ -30,6 +30,21 @@ app.use(express.json({ limit: '50mb', strict: false }));
 app.use('/uploads', express.static(UPLOADS_DIR));
 // Fallback: serve git-committed uploads when file not found in persistent volume
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// Serve purchased Batumi photo library (used as news/fallback images)
+const BATUMI_IMAGES_DIR = path.join(__dirname, '..', 'assets', 'images', 'google');
+app.use('/batumi-images', express.static(BATUMI_IMAGES_DIR, { maxAge: '7d' }));
+let batumiImagesCache = null;
+app.get('/api/batumi-images', (_req, res) => {
+  try {
+    if (!batumiImagesCache) {
+      batumiImagesCache = fs.readdirSync(BATUMI_IMAGES_DIR)
+        .filter(f => /\.(jpe?g|png|webp)$/i.test(f));
+    }
+    res.json({ images: batumiImagesCache });
+  } catch (e) {
+    res.json({ images: [] });
+  }
+});
 
 // ─── Helpers ───────────────────────────────────────────────────
 
@@ -406,6 +421,59 @@ app.post('/api/upload/multiple', upload.array('files', 10), (req, res) => {
     res.json({ success: true, files });
   } catch (err) {
     res.status(500).json({ success: false, error: 'Upload failed' });
+  }
+});
+
+// ─── Geostat: Adjara construction turnover (yearly) ──────────
+const geostatCache = { data: null, fetchedAt: 0 };
+const GEOSTAT_CACHE_MS = 24 * 60 * 60 * 1000; // 24h
+app.get('/api/geostat/construction-adjara', async (_req, res) => {
+  if (Date.now() - geostatCache.fetchedAt < GEOSTAT_CACHE_MS && geostatCache.data) {
+    return res.json({ ...geostatCache.data, cached: true });
+  }
+  try {
+    const url = 'https://pc-axis.geostat.ge/PXWeb/api/v1/en/Database/Construction/Construction%20By%20kind%20of%20economic%20activity%20NACE%20rev.2/Turnover/Turnover_by_regions.px';
+    const meta = await fetch(url).then(r => r.json());
+    const periodVar = meta.variables.find(v => v.code === 'Period');
+    const years = periodVar.valueTexts;
+    const r = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        query: [{ code: 'Regions', selection: { filter: 'item', values: ['2'] } }],
+        response: { format: 'json' },
+      }),
+    });
+    const text = await r.text();
+    const stripped = text.charCodeAt(0) === 0xFEFF ? text.slice(1) : text;
+    const data = JSON.parse(stripped);
+    // Convert GEL to USD using current NBG rate
+    let usdPerGel = 1 / 2.7; // fallback
+    try {
+      const nbg = await fetch('https://nbg.gov.ge/gw/api/ct/monetarypolicy/currencies/en/json/');
+      const arr = await nbg.json();
+      const today = arr?.[0]?.currencies || [];
+      const usd = today.find(c => c.code === 'USD');
+      if (usd?.rate && usd?.quantity) {
+        // rate is GEL per (quantity) USD; to convert GEL→USD divide by (rate / quantity)
+        usdPerGel = usd.quantity / usd.rate;
+      }
+    } catch {}
+    const series = (data.data || []).map((row) => {
+      const periodIdx = parseInt(row.key[0], 10);
+      const gel = parseFloat(row.values[0]) || 0;
+      return {
+        year: years[periodIdx],
+        value: Math.round(gel * usdPerGel * 10) / 10,
+      };
+    }).filter(p => p.year);
+    const payload = { unit: 'mln USD', region: 'Adjara (Batumi area)', series, usdPerGel };
+    geostatCache.data = payload;
+    geostatCache.fetchedAt = Date.now();
+    res.json({ ...payload, cached: false });
+  } catch (err) {
+    console.warn(`[geostat] fetch failed: ${err.message}`);
+    res.status(502).json({ error: 'Geostat fetch failed' });
   }
 });
 

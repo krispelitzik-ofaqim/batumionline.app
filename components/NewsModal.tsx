@@ -3,6 +3,7 @@ import {
   View, Text, Modal, TouchableOpacity, StyleSheet, ActivityIndicator, ScrollView, Linking, Image,
 } from 'react-native';
 import { Colors } from '../constants/colors';
+import { API_BASE } from '../constants/api';
 
 const NEWSAPI_KEY = ''; // https://newsapi.org — set key for live data
 
@@ -59,30 +60,49 @@ export default function NewsModal({ visible, onClose, bgColor }: { visible: bool
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<Topic | 'all'>('all');
   const [expanded, setExpanded] = useState<NewsItem | null>(null);
+  const [batumiImages, setBatumiImages] = useState<string[]>([]);
   const chipScrollRef = useRef<ScrollView>(null);
 
   useEffect(() => {
     if (!visible) return;
     setLoading(true);
-
-    if (NEWSAPI_KEY) {
-      fetchNewsAPI();
+    const loadNews = (images: string[]) => {
+      if (NEWSAPI_KEY) fetchNewsAPI(images);
+      else fetchRSS(images);
+    };
+    if (batumiImages.length === 0) {
+      fetch(`${API_BASE}/api/batumi-images`)
+        .then(r => r.json())
+        .then(d => {
+          const imgs = d.images || [];
+          setBatumiImages(imgs);
+          loadNews(imgs);
+        })
+        .catch(() => loadNews([]));
     } else {
-      fetchRSS();
+      loadNews(batumiImages);
     }
   }, [visible]);
 
+  const pickFromImages = (seed: string, images: string[]): string => {
+    if (!images || images.length === 0) return '';
+    let hash = 0;
+    for (let i = 0; i < seed.length; i++) hash = ((hash << 5) - hash + seed.charCodeAt(i)) | 0;
+    const idx = Math.abs(hash) % images.length;
+    return `${API_BASE}/batumi-images/${images[idx]}`;
+  };
+
   // ─── Search queries per topic ─────────────────────────────────
   const TOPIC_QUERIES: Record<Topic, string> = {
-    tourism: 'Batumi tourism travel',
-    realestate: 'Batumi real estate property',
-    food: 'Batumi restaurants food',
-    entertainment: 'Batumi events nightlife',
-    israel: 'בטומי site:ynet.co.il OR site:walla.co.il OR site:mako.co.il OR site:globes.co.il OR site:calcalist.co.il OR site:israelhayom.co.il',
+    tourism: 'בטומי תיירות',
+    realestate: 'בטומי נדלן',
+    food: 'בטומי מסעדות',
+    entertainment: 'בטומי חיי לילה',
+    israel: 'בטומי ישראלים',
   };
 
   // ─── NewsAPI — fetch per topic ──────────────────────────────
-  const fetchNewsAPI = async () => {
+  const fetchNewsAPI = async (_images: string[] = []) => {
     try {
       const topics = Object.keys(TOPIC_QUERIES) as Topic[];
       const results = await Promise.all(
@@ -115,7 +135,7 @@ export default function NewsModal({ visible, onClose, bgColor }: { visible: bool
   };
 
   // ─── Google News RSS — fetch per topic ──────────────────────
-  const fetchRSS = async () => {
+  const fetchRSS = async (images: string[] = []) => {
     try {
       const topics = Object.keys(TOPIC_QUERIES) as Topic[];
       const results = await Promise.all(
@@ -128,7 +148,7 @@ export default function NewsModal({ visible, onClose, bgColor }: { visible: bool
             return (data.items || []).map((item: any) => ({
               title: item.title || '',
               summary: item.description?.replace(/<[^>]+>/g, '').slice(0, 250) || '',
-              image: item.enclosure?.link || item.thumbnail || '',
+              image: item.enclosure?.link || item.thumbnail || pickFromImages(item.title || item.guid || '', images) || PLACEHOLDER_IMAGES[topic],
               link: item.link || '',
               source: item.author || extractSource(item.title),
               date: formatDate(item.pubDate),
@@ -141,7 +161,6 @@ export default function NewsModal({ visible, onClose, bgColor }: { visible: bool
         })
       );
       const all: NewsItem[] = results.flat()
-        .filter((n: any) => !!n.image)
         .sort((a: any, b: any) => (b.pubTs || 0) - (a.pubTs || 0));
       if (all.length > 0) {
         setNews(all);

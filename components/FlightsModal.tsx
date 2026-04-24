@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import {
-  View, Text, Modal, TouchableOpacity, StyleSheet, ActivityIndicator, ScrollView, Animated, Image,
+  View, Text, Modal, TouchableOpacity, StyleSheet, ActivityIndicator, ScrollView, Animated, Image, Linking,
 } from 'react-native';
 import { Colors } from '../constants/colors';
 import { API_BASE } from '../constants/api';
@@ -24,17 +24,26 @@ type Flight = {
 type FlightDetails = {
   aircraft?: string;
   aircraftReg?: string;
+  aircraftModeS?: string;
+  callSign?: string;
   gate?: string;
   terminal?: string;
   checkInDesk?: string;
   baggageBelt?: string;
   originName?: string;
+  originIcao?: string;
   destName?: string;
+  destIcao?: string;
   depScheduled?: string;
   depRevised?: string;
+  depRunway?: string;
   arrScheduled?: string;
   arrRevised?: string;
+  arrRunway?: string;
   distanceKm?: number;
+  codeshareStatus?: string;
+  isCargo?: boolean;
+  quality?: string[];
 };
 
 const AIRLINE_LOGOS: Record<string, any> = {
@@ -113,17 +122,26 @@ export default function FlightsModal({ visible, onClose, bgColor }: { visible: b
       const buildDetails = (f: any): FlightDetails => ({
         aircraft: f.aircraft?.model,
         aircraftReg: f.aircraft?.reg,
+        aircraftModeS: f.aircraft?.modeS,
+        callSign: f.callSign,
         gate: f.departure?.gate,
         terminal: f.arrival?.terminal || f.departure?.terminal,
         checkInDesk: f.departure?.checkInDesk,
         baggageBelt: f.arrival?.baggageBelt,
         originName: f.departure?.airport?.name,
+        originIcao: f.departure?.airport?.icao,
         destName: f.arrival?.airport?.name,
+        destIcao: f.arrival?.airport?.icao,
         depScheduled: parseLocal(f.departure?.scheduledTime),
         depRevised: parseLocal(f.departure?.revisedTime),
+        depRunway: parseLocal(f.departure?.runwayTime),
         arrScheduled: parseLocal(f.arrival?.scheduledTime),
         arrRevised: parseLocal(f.arrival?.revisedTime),
+        arrRunway: parseLocal(f.arrival?.runwayTime),
         distanceKm: f.greatCircleDistance?.km,
+        codeshareStatus: f.codeshareStatus,
+        isCargo: f.isCargo,
+        quality: f.arrival?.quality || f.departure?.quality,
       });
 
       const IL_AIRPORTS = new Set(['TLV', 'ETM', 'VDA', 'HFA']);
@@ -442,9 +460,26 @@ export default function FlightsModal({ visible, onClose, bgColor }: { visible: b
                       {d.baggageBelt && <DetailItem label="סרט מזוודות" value={d.baggageBelt} />}
                       {duration && <DetailItem label="משך טיסה" value={duration} />}
                       {d.distanceKm && <DetailItem label="מרחק" value={`${Math.round(d.distanceKm).toLocaleString()} ק״מ`} />}
+                      {d.depRunway && <DetailItem label="המראה בפועל" value={formatTime(d.depRunway)} />}
+                      {d.arrRunway && <DetailItem label="נחיתה בפועל" value={formatTime(d.arrRunway)} />}
                       {d.aircraft && <DetailItem label="דגם מטוס" value={d.aircraft} />}
                       {d.aircraftReg && <DetailItem label="מספר זנב" value={d.aircraftReg} />}
+                      {d.callSign && <DetailItem label="Call Sign" value={d.callSign} />}
                     </View>
+                    <TouchableOpacity
+                      style={s.fr24Btn}
+                      activeOpacity={0.8}
+                      onPress={() => {
+                        const iata = (selected.flight || '').replace(/\s+/g, '').toLowerCase();
+                        const url = iata
+                          ? `https://www.flightradar24.com/data/flights/${iata}`
+                          : 'https://www.flightradar24.com';
+                        Linking.openURL(url);
+                      }}
+                    >
+                      <Text style={s.fr24Icon}>📡</Text>
+                      <Text style={s.fr24Txt}>עקוב ב-FlightRadar24</Text>
+                    </TouchableOpacity>
                   </>
                 );
               })()}
@@ -672,6 +707,9 @@ const s = StyleSheet.create({
   routeArrow: { fontSize: 20, color: Colors.WHITE, opacity: 0.4 },
   delayBanner: { backgroundColor: 'rgba(245,158,11,0.18)', borderWidth: 1, borderColor: 'rgba(245,158,11,0.6)', borderRadius: 12, paddingVertical: 10, paddingHorizontal: 14, marginBottom: 12 },
   delayTxt: { fontSize: 13, fontWeight: '700', color: '#FCD34D', textAlign: 'center', writingDirection: 'rtl' },
+  fr24Btn: { flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'center', gap: 10, marginTop: 14, paddingVertical: 14, borderRadius: 14, backgroundColor: 'rgba(244,169,78,0.18)', borderWidth: 1, borderColor: 'rgba(244,169,78,0.6)' },
+  fr24Icon: { fontSize: 18 },
+  fr24Txt: { fontSize: 14, fontWeight: '700', color: '#FCD34D', writingDirection: 'rtl' },
   detailsGrid: { backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 16, padding: 18, gap: 12 },
   detailItem: { flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' },
   detailLabel: { fontSize: 13, color: Colors.WHITE, opacity: 0.6, writingDirection: 'rtl' },
