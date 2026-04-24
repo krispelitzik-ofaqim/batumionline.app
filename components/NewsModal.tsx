@@ -41,6 +41,7 @@ type NewsItem = {
   source: string;
   date: string;
   topic: Topic;
+  pubTs?: number;
 };
 
 // ─── Topic detection from title/content keywords ───────────────
@@ -119,19 +120,19 @@ export default function NewsModal({ visible, onClose, bgColor }: { visible: bool
       const topics = Object.keys(TOPIC_QUERIES) as Topic[];
       const results = await Promise.all(
         topics.map(async (topic) => {
-          const q = encodeURIComponent(TOPIC_QUERIES[topic]);
+          const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(TOPIC_QUERIES[topic])}&hl=he&gl=IL&ceid=IL:he`;
+          const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`;
           try {
-            const res = await fetch(
-              `https://api.rss2json.com/v1/api.json?rss_url=https://news.google.com/rss/search?q=${q}%26hl=he%26gl=IL%26ceid=IL:he`
-            );
+            const res = await fetch(apiUrl);
             const data = await res.json();
-            return (data.items || []).slice(0, 8).map((item: any) => ({
+            return (data.items || []).map((item: any) => ({
               title: item.title || '',
               summary: item.description?.replace(/<[^>]+>/g, '').slice(0, 250) || '',
               image: item.enclosure?.link || item.thumbnail || '',
               link: item.link || '',
               source: item.author || extractSource(item.title),
               date: formatDate(item.pubDate),
+              pubTs: item.pubDate ? new Date(item.pubDate).getTime() : 0,
               topic,
             }));
           } catch {
@@ -139,7 +140,9 @@ export default function NewsModal({ visible, onClose, bgColor }: { visible: bool
           }
         })
       );
-      const all: NewsItem[] = results.flat().filter(n => !!n.image);
+      const all: NewsItem[] = results.flat()
+        .filter((n: any) => !!n.image)
+        .sort((a: any, b: any) => (b.pubTs || 0) - (a.pubTs || 0));
       if (all.length > 0) {
         setNews(all);
       } else {

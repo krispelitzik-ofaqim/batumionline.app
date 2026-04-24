@@ -459,7 +459,7 @@ app.get('/api/flights', async (req, res) => {
         console.warn(`[flights] window ${i} fetch failed: ${err.message}`);
         results.push(null);
       }
-      if (i < NUM_WINDOWS - 1) await new Promise(res => setTimeout(res, 1100));
+      if (i < NUM_WINDOWS - 1) await new Promise(res => setTimeout(res, 1500));
     }
     const allArrivals = [];
     const allDepartures = [];
