@@ -7,6 +7,8 @@ import { Colors } from '../../constants/colors';
 import { fetchContent, resolveUri } from '../../constants/api';
 import AudioPlayer from '../../components/AudioPlayer';
 import HtmlContent from '../../components/HtmlContent';
+import AppHeader from '../../components/AppHeader';
+import BottomTabBar from '../../components/BottomTabBar';
 
 function fireHearts() {
   if (Platform.OS !== 'web') return;
@@ -71,9 +73,7 @@ export default function WelcomeScreen() {
   return (
     <SafeAreaView style={styles.safe}>
       <Stack.Screen options={{ headerShown: false }} />
-      <TouchableOpacity onPress={() => (router.canGoBack() ? router.back() : router.replace("/"))} style={styles.backFab} accessibilityLabel="חזור">
-        <Text style={styles.backFabArrow}>←</Text>
-      </TouchableOpacity>
+      <AppHeader crumbs={[{ title: item.title || 'ברוכים הבאים' }]} />
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
         <View style={styles.heroWrap}>
           {item.icon && (item.icon.startsWith('http') || item.icon.startsWith('data:') || item.icon.startsWith('/')) ? (
@@ -165,6 +165,7 @@ export default function WelcomeScreen() {
         ) : null}
 
       </ScrollView>
+      <BottomTabBar />
     </SafeAreaView>
   );
 }

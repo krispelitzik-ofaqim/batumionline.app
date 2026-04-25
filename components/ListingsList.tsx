@@ -163,18 +163,18 @@ function Card({ l, onPress }: { l: Listing; onPress: () => void }) {
 
   if (size === 'full') {
     return (
-      <TouchableOpacity activeOpacity={0.85} onPress={onPress} style={s.full}>
+      <TouchableOpacity activeOpacity={0.85} onPress={onPress} style={[s.full, l.highlighted && s.highlighted]}>
         <CardImage images={imgs} height={180} />
         <View style={{ padding: 12 }}>
-          <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Text style={s.cardTitle} numberOfLines={1}>{l.title}</Text>
-            <Text style={s.idBadge}>#{shortId(l.id, (l as any).createdAt)}</Text>
+          <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
+            <Text style={[s.cardTitle, { flex: 1, fontSize: 18, fontWeight: '900' }]} numberOfLines={2}>{l.title}</Text>
+            <Text style={[s.cardPrice, { fontSize: 18, marginTop: 0 }]}>{l.price ? `$${l.price}${periodBadge ? ' · ' + periodBadge : ''}` : (periodBadge || '')}</Text>
           </View>
-          {l.location ? <Text style={s.cardSub}>📍 {l.location}</Text> : null}
+          {l.location ? <Text style={[s.cardSub, { marginTop: 6 }]}>📍 {l.location}</Text> : null}
           {l.description ? <Text style={s.cardDesc} numberOfLines={2}>{l.description}</Text> : null}
-          <View style={[s.cardFooter, { marginTop: 8 }]}>
-            <Text style={[s.cardPrice, { fontSize: 18 }]}>{l.price ? `$${l.price}${periodBadge ? ' · ' + periodBadge : ''}` : (periodBadge || '')}</Text>
-            <Text style={s.moreLink}>פרטים נוספים ‹</Text>
+          <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginTop: 8 }}>
+            <Text style={s.idBadge}>#{shortId(l.id, (l as any).createdAt)}</Text>
+            <Text style={s.moreLink}>פרטים נוספים ›</Text>
           </View>
         </View>
       </TouchableOpacity>
@@ -182,7 +182,7 @@ function Card({ l, onPress }: { l: Listing; onPress: () => void }) {
   }
 
   return (
-    <TouchableOpacity activeOpacity={0.85} onPress={onPress} style={s.half}>
+    <TouchableOpacity activeOpacity={0.85} onPress={onPress} style={[s.half, l.highlighted && s.highlighted]}>
       <CardImage images={imgs} height={110} />
       <View style={{ padding: 8 }}>
         <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' }}>

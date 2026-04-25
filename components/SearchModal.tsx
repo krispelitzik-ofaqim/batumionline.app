@@ -118,10 +118,9 @@ export default function SearchModal({ visible, onClose }: { visible: boolean; on
 const s = StyleSheet.create({
   backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.45)' },
   sheet: {
-    position: 'absolute', left: 0, right: 0, bottom: 0,
-    height: '60%',
+    position: 'absolute', left: 0, right: 0, top: 0, bottom: 0,
     backgroundColor: Colors.WHITE,
-    borderTopLeftRadius: 22, borderTopRightRadius: 22,
+    paddingTop: 50,
     padding: 14,
   },
   handle: { alignSelf: 'center', width: 44, height: 4, borderRadius: 2, backgroundColor: '#cbd5e1', marginBottom: 10 },

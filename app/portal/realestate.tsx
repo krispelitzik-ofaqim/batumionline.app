@@ -43,9 +43,9 @@ type Article = { id: string; title: string; summary: string; image?: string; lin
 type Listing = { id: string; title: string; image: string; images?: string[]; price: string; features: string[]; cta: string; link?: string; size?: 'full' | 'half'; article?: string };
 
 const DEFAULT_TOP_BUTTONS: TopButton[] = [
-  { id: 'hotels', label: 'פרויקטים מלונאיים' },
   { id: 'sale', label: 'דירות למכירה' },
   { id: 'rent', label: 'דירות להשכרה' },
+  { id: 'hotels', label: 'פרויקטים מלונאיים' },
 ];
 
 const FALLBACK_NEWS: Article[] = [
@@ -179,7 +179,7 @@ export default function RealEstatePortal() {
             style={[s.topBtnRect, s.homeBtn, activeTop === null && s.topBtnActive]}
             onPress={() => setActiveTop(null)}
           >
-            <Text style={[s.topBtnTxt, activeTop === null && s.topBtnTxtActive]} numberOfLines={2}>🏠 פורטל</Text>
+            <Text style={[s.topBtnTxt, activeTop === null && s.topBtnTxtActive]} numberOfLines={2}>🏠 פורטל{'\n'}הנדל"ן</Text>
           </TouchableOpacity>
           {topButtons.map(b => (
             <TouchableOpacity
@@ -201,14 +201,16 @@ export default function RealEstatePortal() {
             )}
 
             {(activeTop === 'sale' || activeTop === 'rent' || activeTop === 'hotels') && (
-              <View style={{ marginBottom: 14 }}>
-                <TouchableOpacity onPress={() => activeTop === 'hotels' ? setChoiceOpen(true) : setFormOpen(true)} style={s.uploadCard}>
-                  <Text style={s.uploadIcon}>📝</Text>
-                  <View style={{ flex: 1 }}>
-                    <Text style={s.uploadTitle}>פרסם מודעה חדשה</Text>
-                    <Text style={s.uploadSub}>{activeTop === 'sale' ? 'למכירה' : activeTop === 'rent' ? 'להשכרה' : 'פרויקט מלונאי'} · חינם · אישור תוך 3 שעות</Text>
+              <View style={{ marginBottom: 14, paddingHorizontal: 12 }}>
+                <TouchableOpacity onPress={() => activeTop === 'hotels' ? setChoiceOpen(true) : setFormOpen(true)} activeOpacity={0.85} style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 10, paddingVertical: 10, paddingHorizontal: 14, borderRadius: 10, borderWidth: 1.5, borderColor: Colors.PRIMARY, backgroundColor: '#fff' }}>
+                  <View style={{ width: 30, height: 30, borderRadius: 15, backgroundColor: Colors.PRIMARY, alignItems: 'center', justifyContent: 'center' }}>
+                    <Text style={{ fontSize: 16, color: '#fff', fontWeight: '900' }}>+</Text>
                   </View>
-                  <Text style={s.uploadArrow}>‹</Text>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 13, fontWeight: '900', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl' }}>פרסם {activeTop === 'sale' ? 'למכירה' : activeTop === 'rent' ? 'להשכרה' : 'פרויקט'}</Text>
+                    <Text style={{ fontSize: 10, color: '#64748b', textAlign: 'right', writingDirection: 'rtl', marginTop: 1 }}>חינם · חשיפה לישראלים בבטומי</Text>
+                  </View>
+                  <Text style={{ fontSize: 16, color: Colors.PRIMARY, fontWeight: '300' }}>‹</Text>
                 </TouchableOpacity>
               </View>
             )}
@@ -217,32 +219,54 @@ export default function RealEstatePortal() {
             <View style={s.listingsGrid}>
               {((curated[activeTop] && curated[activeTop].length > 0 ? curated[activeTop] : LISTINGS_BY_TOP[activeTop]) || []).filter((lst: any) => !!lst.image && lst.visible !== false).map((lst: any) => {
                 const hs = lst.highlightStyle || '';
-                const cardBg = hs === 'yellow' || hs === 'yellow-border' ? '#fffbeb' : hs === 'blue' ? '#1A6B8A' : Colors.WHITE;
-                const cardBorder = hs === 'yellow-border' ? { borderWidth: 2, borderColor: '#f59e0b' } : hs === 'blue' ? { borderWidth: 2, borderColor: '#3DA5C4' } : {};
+                const cardBg = hs === 'yellow' || hs === 'yellow-border' ? '#fffbeb' : hs === 'blue' ? '#0c1e3a' : Colors.WHITE;
+                const cardBorder = hs === 'yellow-border' ? { borderWidth: 2, borderColor: '#f59e0b' } : hs === 'blue' ? { borderWidth: 2, borderColor: '#1e3a8a' } : {};
                 const isBlue = hs === 'blue';
                 const txtColor = isBlue ? '#fff' : '#1C2B35';
                 const subColor = isBlue ? '#cbd5e1' : '#555';
                 const priceColor = isBlue ? '#F4A94E' : '#10b981';
+                const isBanner = lst.size === 'banner';
+                const isFull = lst.size === 'full' || (!lst.size);
                 return (
                 <React.Fragment key={lst.id}>
                   <TouchableOpacity
                     activeOpacity={0.85}
-                    style={[s.listingCard, lst.size === 'half' && s.listingCardHalf, { backgroundColor: cardBg }, cardBorder]}
+                    style={[s.listingCard, lst.size === 'half' && s.listingCardHalf, isBanner && { width: '100%', flexDirection: 'row-reverse', height: 130 }, { backgroundColor: cardBg }, cardBorder]}
                     onPress={() => setExpandedFixedId(expandedFixedId === lst.id ? null : lst.id)}
                   >
-                    <Image source={{ uri: resolveUri(lst.image) }} style={s.listingImage} />
-                    <View style={s.listingBody}>
-                      <Text style={[s.listingTitle, { color: txtColor }]} numberOfLines={2}>{lst.title}</Text>
-                      {(lst.features || []).map((f: string, i: number) => (
-                        <View key={i} style={s.listingFeature}>
-                          <Text style={[s.listingFeatureCheck, { color: isBlue ? '#F4A94E' : Colors.PRIMARY }]}>✓</Text>
-                          <Text style={[s.listingFeatureTxt, { color: subColor }]} numberOfLines={2}>{f}</Text>
-                        </View>
-                      ))}
-                      <Text style={[s.listingPrice, { color: priceColor }]}>{lst.price}</Text>
-                      <View style={s.listingCta}>
-                        <Text style={s.listingCtaTxt}>{lst.cta || 'פרטים'}</Text>
-                      </View>
+                    <Image source={{ uri: resolveUri(lst.image) }} style={[s.listingImage, isBanner && { width: 150, height: '100%' }]} />
+                    <View style={[s.listingBody, isBanner && { flex: 1, padding: 8 }]}>
+                      {isFull ? (
+                        <>
+                          <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
+                            <Text style={[{ flex: 1, fontSize: 18, fontWeight: '900', color: txtColor, textAlign: 'right', writingDirection: 'rtl' }]} numberOfLines={2}>{lst.title}</Text>
+                            <Text style={[s.listingPrice, { color: priceColor, marginTop: 0, fontSize: 18 }]}>{lst.price}</Text>
+                          </View>
+                          {!!lst.location && <Text style={[s.listingFeatureTxt, { color: subColor, marginTop: 6, fontSize: 12 }]}>📍 {lst.location}</Text>}
+                          {(lst.features || []).slice(0, 4).map((f: string, i: number) => (
+                            <View key={i} style={s.listingFeature}>
+                              <Text style={[s.listingFeatureCheck, { color: isBlue ? '#F4A94E' : Colors.PRIMARY }]}>✓</Text>
+                              <Text style={[s.listingFeatureTxt, { color: subColor }]} numberOfLines={1}>{f}</Text>
+                            </View>
+                          ))}
+                          <Text style={{ fontSize: 11, color: isBlue ? '#F4A94E' : Colors.PRIMARY, fontWeight: '700', textAlign: 'left', marginTop: 8 }}>פרטים נוספים ›</Text>
+                        </>
+                      ) : (
+                        <>
+                          <Text style={[s.listingTitle, { color: txtColor }, isBanner && { fontSize: 13, marginBottom: 4 }]} numberOfLines={2}>{lst.title}</Text>
+                          {!!lst.location && <Text style={[s.listingFeatureTxt, { color: subColor, marginBottom: 4 }]}>📍 {lst.location}</Text>}
+                          {(lst.features || []).slice(0, isBanner ? 2 : 4).map((f: string, i: number) => (
+                            <View key={i} style={s.listingFeature}>
+                              <Text style={[s.listingFeatureCheck, { color: isBlue ? '#F4A94E' : Colors.PRIMARY }]}>✓</Text>
+                              <Text style={[s.listingFeatureTxt, { color: subColor }]} numberOfLines={1}>{f}</Text>
+                            </View>
+                          ))}
+                          <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginTop: 6 }}>
+                            <Text style={[s.listingPrice, { color: priceColor, marginTop: 0 }, isBanner && { fontSize: 16 }]}>{lst.price}</Text>
+                            <Text style={{ fontSize: 11, color: isBlue ? '#F4A94E' : Colors.PRIMARY, fontWeight: '700' }}>פרטים ›</Text>
+                          </View>
+                        </>
+                      )}
                     </View>
                   </TouchableOpacity>
                   {expandedFixedId === lst.id && (
@@ -253,22 +277,26 @@ export default function RealEstatePortal() {
                         </TouchableOpacity>
                         <Text style={s.fixedExpandedTitle} numberOfLines={1}>{lst.title}</Text>
                       </View>
-                      <Image source={{ uri: resolveUri(lst.image) }} style={{ width: '100%', aspectRatio: 16 / 10 }} resizeMode="cover" />
+                      <ExpandedGallery images={(lst.images && lst.images.length > 0) ? lst.images : (lst.image ? [lst.image] : [])} />
                       <View style={{ padding: 12 }}>
-                        {lst.features.map((f, i) => (
+                        {!!lst.location && <Text style={{ fontSize: 13, color: '#cbd5e1', textAlign: 'right', writingDirection: 'rtl', marginBottom: 8 }}>📍 {lst.location}</Text>}
+                        {(lst.features || []).map((f: string, i: number) => (
                           <View key={i} style={{ flexDirection: 'row-reverse', gap: 6, marginBottom: 4 }}>
                             <Text style={{ color: '#4ade80' }}>✓</Text>
                             <Text style={{ fontSize: 13, color: '#e2e8f0', textAlign: 'right', writingDirection: 'rtl' }}>{f}</Text>
                           </View>
                         ))}
-                        <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginTop: 10 }}>
-                          <Text style={{ fontSize: 18, fontWeight: '900', color: '#10b981' }}>{lst.price}</Text>
-                          {lst.link && (
-                            <TouchableOpacity onPress={() => Linking.openURL(lst.link!)} style={{ paddingHorizontal: 14, paddingVertical: 8, backgroundColor: Colors.PRIMARY, borderRadius: 8 }}>
-                              <Text style={{ color: '#fff', fontSize: 12, fontWeight: '800' }}>{lst.cta}</Text>
+                        <Text style={{ fontSize: 20, fontWeight: '900', color: '#10b981', textAlign: 'right', marginTop: 10 }}>{lst.price}</Text>
+                        {(lst as any).phone && (
+                          <View style={{ flexDirection: 'row-reverse', gap: 8, marginTop: 10 }}>
+                            <TouchableOpacity onPress={() => Linking.openURL(`https://wa.me/${String((lst as any).phone).replace(/\D/g, '')}`)} style={{ flex: 1, paddingVertical: 10, backgroundColor: '#25D366', borderRadius: 8, alignItems: 'center' }}>
+                              <Text style={{ color: '#fff', fontSize: 13, fontWeight: '900' }}>💬 WhatsApp</Text>
                             </TouchableOpacity>
-                          )}
-                        </View>
+                            <TouchableOpacity onPress={() => Linking.openURL(`tel:${(lst as any).phone}`)} style={{ flex: 1, paddingVertical: 10, backgroundColor: '#10b981', borderRadius: 8, alignItems: 'center' }}>
+                              <Text style={{ color: '#fff', fontSize: 13, fontWeight: '900' }}>📞 חייג · {(lst as any).phone}</Text>
+                            </TouchableOpacity>
+                          </View>
+                        )}
                       </View>
                     </View>
                   )}
@@ -310,7 +338,7 @@ export default function RealEstatePortal() {
         ) : (
           <>
             {/* Section 1 — News slider */}
-            <Section title="חדשות נדל״ן" icon="📰">
+            <Section title="חדשות נדל״ן" icon="">
               <NewsSliderArrows news={news} />
             </Section>
 
@@ -332,12 +360,14 @@ export default function RealEstatePortal() {
             <ArticlesAt loc="after_business_services" articles={articles} onOpen={setOpenArticle} />
 
             {/* Section - Future real estate (between services and currency) */}
-            <Section title="עתיד הנדל״ן" icon="🔮">
+            <Section title="עתיד הנדל״ן" icon="">
               <FutureSlider projects={futureProjects} />
             </Section>
 
             <ArticlesAt loc="after_future" articles={articles} onOpen={setOpenArticle} />
             <ArticlesAt loc="before_currency" articles={articles} onOpen={setOpenArticle} />
+
+            <BrokerBanner />
 
             <CurrencyTicker />
           </>
@@ -470,6 +500,86 @@ function Section({ title, icon, children }: { title: string; icon: string; child
         <Text style={s.sectionTitle}>{title}</Text>
       </View>
       {children}
+    </View>
+  );
+}
+
+const BROKER_FALLBACK_IMAGES = [
+  '/uploads/1775910069485-6.jpg',
+  '/uploads/1775910069516-30.jpg',
+  '/uploads/1775910069548-933.jpg',
+  '/uploads/1775910069562-341.jpg',
+  '/uploads/1775910069573-698.jpg',
+  '/uploads/1775910069590-365.jpg',
+];
+
+function BrokerBanner() {
+  const [brokers, setBrokers] = useState<any[]>(BROKER_FALLBACK_IMAGES.map((img, i) => ({ id: `b${i+1}`, name: 'דודי ספיר', title: 'מתווך נדל״ן מומלץ בבטומי', phone: '+995-555-123-456', image: img })));
+  const [idx, setIdx] = useState(0);
+
+  useEffect(() => {
+    fetchContent().then(d => {
+      if (Array.isArray(d?.brokers) && d.brokers.length > 0) {
+        const visible = d.brokers.filter((b: any) => b.visible !== false);
+        if (visible.length > 0) setBrokers(visible);
+      }
+    }).catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    if (brokers.length < 2) return;
+    const t = setInterval(() => setIdx(i => (i + 1) % brokers.length), 5000);
+    return () => clearInterval(t);
+  }, [brokers.length]);
+
+  const broker = brokers[idx % brokers.length] || brokers[0];
+  if (!broker) return null;
+
+  return (
+    <View style={{ paddingHorizontal: 16, marginTop: 16 }}>
+      <Text style={{ fontSize: 14, fontWeight: '700', color: '#888', textAlign: 'right', writingDirection: 'rtl', marginBottom: 8 }}>מתווכים מומלצים בבטומי</Text>
+      <TouchableOpacity activeOpacity={0.85} onPress={() => router.push('/portal/brokers' as any)} style={{ flexDirection: 'row-reverse', backgroundColor: '#fff', borderRadius: 14, overflow: 'hidden', borderWidth: 1, borderColor: '#e2e8f0', height: 110 }}>
+        <Image source={{ uri: resolveUri(broker.image) }} style={{ width: 110, height: '100%' }} resizeMode="cover" />
+        <View style={{ flex: 1, padding: 12, justifyContent: 'center' }}>
+          <Text style={{ fontSize: 12, fontWeight: '700', color: Colors.PRIMARY, textAlign: 'right', writingDirection: 'rtl' }}>✓ {broker.title}</Text>
+          <Text style={{ fontSize: 17, fontWeight: '900', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl', marginTop: 2 }}>{broker.name}</Text>
+          <Text style={{ fontSize: 12, color: '#475569', textAlign: 'right', writingDirection: 'rtl', marginTop: 4 }}>📞 {broker.phone}</Text>
+          <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginTop: 6 }}>
+            <Text style={{ fontSize: 10, color: '#64748b' }}>לכל המתווכים ›</Text>
+            <View style={{ flexDirection: 'row', gap: 3 }}>
+              {brokers.map((_, i) => <View key={i} style={{ width: 5, height: 5, borderRadius: 3, backgroundColor: i === idx ? Colors.PRIMARY : '#cbd5e1' }} />)}
+            </View>
+          </View>
+        </View>
+      </TouchableOpacity>
+    </View>
+  );
+}
+
+function ExpandedGallery({ images }: { images: string[] }) {
+  const [idx, setIdx] = useState(0);
+  if (images.length === 0) return null;
+  const next = () => setIdx((idx + 1) % images.length);
+  const prev = () => setIdx((idx - 1 + images.length) % images.length);
+  return (
+    <View style={{ width: '100%', aspectRatio: 16 / 10, backgroundColor: '#000', position: 'relative' }}>
+      <Image source={{ uri: resolveUri(images[idx]) }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+      {images.length > 1 && (
+        <>
+          <TouchableOpacity onPress={prev} style={{ position: 'absolute', top: '50%', right: 8, marginTop: -16, width: 32, height: 32, borderRadius: 16, backgroundColor: 'rgba(0,0,0,0.6)', alignItems: 'center', justifyContent: 'center' }}>
+            <Text style={{ color: '#fff', fontSize: 20 }}>›</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={next} style={{ position: 'absolute', top: '50%', left: 8, marginTop: -16, width: 32, height: 32, borderRadius: 16, backgroundColor: 'rgba(0,0,0,0.6)', alignItems: 'center', justifyContent: 'center' }}>
+            <Text style={{ color: '#fff', fontSize: 20 }}>‹</Text>
+          </TouchableOpacity>
+          <View style={{ position: 'absolute', bottom: 8, left: 0, right: 0, flexDirection: 'row', justifyContent: 'center', gap: 5 }}>
+            {images.map((_, i) => <View key={i} style={{ width: 7, height: 7, borderRadius: 4, backgroundColor: i === idx ? '#fff' : 'rgba(255,255,255,0.5)' }} />)}
+          </View>
+          <View style={{ position: 'absolute', top: 8, right: 8, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12, backgroundColor: 'rgba(0,0,0,0.6)' }}>
+            <Text style={{ color: '#fff', fontSize: 11, fontWeight: '800' }}>📷 {idx + 1}/{images.length}</Text>
+          </View>
+        </>
+      )}
     </View>
   );
 }
@@ -609,10 +719,10 @@ function FutureSlider({ projects }: { projects: Listing[] }) {
 }
 
 function NewsSliderArrows({ news }: { news: Article[] }) {
-  const SLIDE_W = 340;
-  const GAP = 12;
   const { width } = useWindowDimensions();
-  const sidePad = Math.max(16, (width - SLIDE_W) / 2);
+  const SLIDE_W = Math.min(width - 64, 360);
+  const GAP = 12;
+  const sidePad = 16;
   const scrollRef = useRef<ScrollView>(null);
   const [idx, setIdx] = useState(0);
   const scrollTo = (i: number) => {
@@ -633,17 +743,18 @@ function NewsSliderArrows({ news }: { news: Article[] }) {
       >
         {news.map(n => (
           <TouchableOpacity key={n.id} activeOpacity={0.85} style={[s.newsCardLike, { width: SLIDE_W, height: 200 }]} onPress={() => n.link && Linking.openURL(n.link)}>
-            {n.image ? (
-              <Image source={{ uri: resolveUri(n.image) }} style={{ width: SLIDE_W, height: 100 }} />
-            ) : (
-              <View style={{ width: SLIDE_W, height: 100, backgroundColor: '#e2e8f0', alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: 30 }}>🏙️</Text></View>
-            )}
-            <View style={{ height: 100, padding: 10, backgroundColor: Colors.WHITE, justifyContent: 'space-between' }}>
-              <View>
-                <Text style={{ fontSize: 14, fontWeight: '900', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl' }} numberOfLines={1}>{n.title}</Text>
-                <Text style={{ fontSize: 12, color: '#555', textAlign: 'right', writingDirection: 'rtl', marginTop: 4 }} numberOfLines={2}>{n.summary}</Text>
-              </View>
-              {n.date && <Text style={{ fontSize: 11, color: '#94a3b8', textAlign: 'right', writingDirection: 'rtl' }}>{n.date}</Text>}
+            <View style={{ width: SLIDE_W, height: 140, position: 'relative' }}>
+              {n.image ? (
+                <Image source={{ uri: resolveUri(n.image) }} style={{ width: SLIDE_W, height: 140 }} />
+              ) : (
+                <View style={{ width: SLIDE_W, height: 140, backgroundColor: '#e2e8f0', alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: 36 }}>🏙️</Text></View>
+              )}
+              <LinearGradient colors={['transparent', 'rgba(0,0,0,0.85)']} style={{ position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: 12, paddingTop: 30, paddingBottom: 8 }}>
+                <Text style={{ fontSize: 14, fontWeight: '900', color: '#fff', textAlign: 'right', writingDirection: 'rtl' }} numberOfLines={2}>{n.title}</Text>
+              </LinearGradient>
+            </View>
+            <View style={{ height: 60, padding: 10, backgroundColor: Colors.WHITE, justifyContent: 'center' }}>
+              <Text style={{ fontSize: 12, color: '#555', textAlign: 'right', writingDirection: 'rtl', lineHeight: 16 }} numberOfLines={2}>{n.summary}</Text>
             </View>
           </TouchableOpacity>
         ))}
@@ -660,7 +771,7 @@ function NewsSliderArrows({ news }: { news: Article[] }) {
 
 const s = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.BACKGROUND },
-  heroBackBtn: { position: 'absolute', top: 16, left: 16, width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(0,0,0,0.4)', alignItems: 'center', justifyContent: 'center', zIndex: 5 },
+  heroBackBtn: { position: 'absolute', top: 50, left: 16, width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(0,0,0,0.5)', alignItems: 'center', justifyContent: 'center', zIndex: 5 },
   backBtn: {
     position: 'absolute', top: 50, right: 16, zIndex: 10,
     width: 40, height: 40, borderRadius: 20,
@@ -675,15 +786,15 @@ const s = StyleSheet.create({
   heroTitle: { fontSize: 32, fontWeight: '900', color: Colors.WHITE, textAlign: 'right', writingDirection: 'rtl', marginTop: 4 },
   heroSub: { fontSize: 14, color: Colors.WHITE, opacity: 0.85, textAlign: 'right', writingDirection: 'rtl', marginTop: 4 },
 
-  topRow: { flexDirection: 'row-reverse', gap: 4, paddingHorizontal: 6, paddingVertical: 10, justifyContent: 'center' },
-  topBtnRect: { flex: 1, backgroundColor: Colors.WHITE, paddingHorizontal: 6, paddingVertical: 10, borderRadius: 10, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.08, shadowRadius: 4, elevation: 2, alignItems: 'center' },
+  topRow: { flexDirection: 'row-reverse', gap: 6, paddingHorizontal: 8, paddingVertical: 10, justifyContent: 'center' },
+  topBtnRect: { flex: 1, backgroundColor: 'transparent', paddingHorizontal: 4, paddingVertical: 8, borderRadius: 10, borderWidth: 1.5, borderColor: '#cbd5e1', alignItems: 'center', justifyContent: 'center', minHeight: 52 },
   topGrid: { flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 6, paddingHorizontal: 16, paddingVertical: 14, justifyContent: 'center' },
   topBtnGrid: { width: '32%', backgroundColor: Colors.WHITE, paddingHorizontal: 6, paddingVertical: 10, borderRadius: 10, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.08, shadowRadius: 4, elevation: 2, alignItems: 'center', justifyContent: 'center', minHeight: 50 },
   topBtn: { backgroundColor: Colors.WHITE, paddingHorizontal: 14, paddingVertical: 10, borderRadius: 22, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.08, shadowRadius: 4, elevation: 2 },
-  homeBtn: { backgroundColor: Colors.ACCENT + '30' },
-  topBtnActive: { backgroundColor: Colors.PRIMARY },
-  topBtnTxt: { fontSize: 10, fontWeight: '700', color: Colors.TEXT, writingDirection: 'rtl', textAlign: 'center' },
-  topBtnTxtActive: { color: Colors.WHITE },
+  homeBtn: {},
+  topBtnActive: { backgroundColor: '#fff', borderColor: Colors.PRIMARY },
+  topBtnTxt: { fontSize: 12, fontWeight: '600', color: '#64748b', writingDirection: 'rtl', textAlign: 'center' },
+  topBtnTxtActive: { color: '#1C2B35', fontWeight: '900' },
 
   layoutToggle: { flexDirection: 'row-reverse', gap: 8, paddingHorizontal: 16, marginBottom: 10 },
   layoutBtn: { backgroundColor: Colors.WHITE, paddingHorizontal: 14, paddingVertical: 8, borderRadius: 18, borderWidth: 1, borderColor: '#E5E5E5' },
@@ -748,7 +859,7 @@ const s = StyleSheet.create({
   newsRow: { gap: 12 },
   newsSlide: { width: 260, backgroundColor: Colors.WHITE, borderRadius: 14, overflow: 'hidden', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.08, shadowRadius: 6, elevation: 2 },
   newsSliderWrap: { position: 'relative' },
-  newsCardLike: { borderRadius: 16, overflow: 'hidden', shadowColor: '#000', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.15, shadowRadius: 8, elevation: 4 },
+  newsCardLike: { borderRadius: 16, overflow: 'hidden', backgroundColor: '#fff' },
   arrowBtn: { position: 'absolute', width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(0,0,0,0.5)', alignItems: 'center', justifyContent: 'center', zIndex: 5 },
   arrowTxt: { fontSize: 26, fontWeight: '300', color: Colors.WHITE, lineHeight: 28 },
   newsSlideImg: { width: '100%', height: 140 },

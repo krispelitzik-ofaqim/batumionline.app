@@ -1732,12 +1732,12 @@ const tourSt = StyleSheet.create({
   audioWrap: { backgroundColor: 'rgba(255,255,255,0.4)', borderRadius: 12, padding: 8 },
   hint: { fontSize: 11, color: '#555', textAlign: 'center', writingDirection: 'rtl', paddingVertical: 4 },
   ratingRow: {
-    marginTop: 12, paddingVertical: 12, paddingHorizontal: 16, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.5)',
-    flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', width: '100%',
+    marginTop: 12, paddingVertical: 8, paddingHorizontal: 10, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.5)',
+    flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: 4,
   },
-  ratingLabel: { fontSize: 13, fontWeight: '800', color: Colors.TEXT, writingDirection: 'rtl' },
-  stars: { flexDirection: 'row-reverse', gap: 2 },
-  star: { fontSize: 28, color: '#d1d5db', paddingHorizontal: 2 },
+  ratingLabel: { fontSize: 12, fontWeight: '800', color: Colors.TEXT, writingDirection: 'rtl' },
+  stars: { flexDirection: 'row-reverse', gap: 1 },
+  star: { fontSize: 18, color: '#d1d5db', paddingHorizontal: 1 },
   starOn: { color: '#F4A94E' },
   submitBtn: {
     paddingHorizontal: 18, paddingVertical: 8, borderRadius: 10, backgroundColor: Colors.PRIMARY,

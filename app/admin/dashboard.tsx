@@ -652,18 +652,32 @@ function CuratedListingsEditor() {
           <TextInput style={{ borderWidth: 1, borderColor: '#fde047', borderRadius: 6, padding: 6, fontSize: 12, textAlign: 'right', fontWeight: '700', marginBottom: 4 }} value={it.title} onChangeText={v => update(it.id, { title: v })} placeholder="כותרת" placeholderTextColor="#fcd34d" />
           <TextInput style={{ borderWidth: 1, borderColor: '#fde047', borderRadius: 6, padding: 6, fontSize: 11, textAlign: 'right', marginBottom: 4 }} value={it.price} onChangeText={v => update(it.id, { price: v })} placeholder="מחיר" placeholderTextColor="#fcd34d" />
           <TextInput style={{ borderWidth: 1, borderColor: '#fde047', borderRadius: 6, padding: 6, fontSize: 11, textAlign: 'right', marginBottom: 4 }} value={it.location || ''} onChangeText={v => update(it.id, { location: v })} placeholder="מיקום (שכונה / רחוב)" placeholderTextColor="#fcd34d" />
+          <TextInput style={{ borderWidth: 1, borderColor: '#fde047', borderRadius: 6, padding: 6, fontSize: 11, textAlign: 'right', marginBottom: 4 }} value={it.phone || ''} onChangeText={v => update(it.id, { phone: v })} placeholder="טלפון WhatsApp (לקשר במודעה הפתוחה)" placeholderTextColor="#fcd34d" keyboardType="phone-pad" />
           <TextInput style={{ borderWidth: 1, borderColor: '#fde047', borderRadius: 6, padding: 6, fontSize: 11, textAlign: 'right', marginBottom: 4, minHeight: 50 }} multiline value={(it.features || []).join('\n')} onChangeText={v => update(it.id, { features: v.split('\n') })} placeholder="פרטים (שורה לכל אחד)" placeholderTextColor="#fcd34d" />
-          {it.image && <Image source={{ uri: resolveUri(it.image) }} style={{ width: 80, height: 80, borderRadius: 6, marginBottom: 4 }} />}
+          <Text style={{ fontSize: 11, fontWeight: '800', color: '#713f12', marginTop: 6, marginBottom: 4, textAlign: 'right' }}>תמונות (הראשונה ראשית, השאר בגלריה הפתוחה):</Text>
+          <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 4, marginBottom: 4 }}>
+            {[it.image, ...((it.images || []) as string[])].filter(Boolean).map((u: string, idx: number) => (
+              <View key={idx} style={{ position: 'relative' }}>
+                <Image source={{ uri: resolveUri(u) }} style={{ width: 70, height: 70, borderRadius: 6 }} />
+                <TouchableOpacity onPress={() => {
+                  if (idx === 0) update(it.id, { image: (it.images && it.images[0]) || '', images: (it.images || []).slice(1) });
+                  else update(it.id, { images: (it.images || []).filter((_: any, i: number) => i !== idx - 1) });
+                }} style={{ position: 'absolute', top: -6, left: -6, width: 18, height: 18, borderRadius: 9, backgroundColor: '#dc2626', alignItems: 'center', justifyContent: 'center' }}>
+                  <Text style={{ color: '#fff', fontSize: 10, fontWeight: '900' }}>✕</Text>
+                </TouchableOpacity>
+              </View>
+            ))}
+          </View>
           {Platform.OS === 'web' && React.createElement('div', { style: { marginBottom: 4 } }, [
             React.createElement('input', {
               key: 'inp', type: 'file', accept: 'image/*', id: `cl_file_${it.id}`, style: { display: 'none' },
-              onChange: async (e: any) => { const f = e.target.files?.[0]; if (!f) return; const url = await upload(f); if (url) update(it.id, { image: url }); e.target.value = ''; },
+              onChange: async (e: any) => { const f = e.target.files?.[0]; if (!f) return; const url = await upload(f); if (url) { if (!it.image) update(it.id, { image: url }); else update(it.id, { images: [...(it.images || []), url] }); } e.target.value = ''; },
             }),
             React.createElement('button', {
               key: 'btn', type: 'button',
               onClick: () => { const el = (document as any).getElementById(`cl_file_${it.id}`); if (el) el.click(); },
               style: { width: '100%', backgroundColor: '#fff', border: '2px dashed #fcd34d', borderRadius: 4, padding: 6, cursor: 'pointer', color: '#713f12', fontSize: 11, fontWeight: 800 },
-            }, '📤 העלה תמונה'),
+            }, '📤 הוסף תמונה'),
           ])}
           <Text style={{ fontSize: 11, fontWeight: '800', color: '#713f12', marginTop: 6, marginBottom: 4, textAlign: 'right' }}>גודל:</Text>
           <View style={{ flexDirection: 'row-reverse', gap: 6, marginBottom: 4, flexWrap: 'wrap' }}>
@@ -829,6 +843,7 @@ function BlocksMenu() {
     { id: 'business', icon: '💼', title: 'פורטל העסקים', component: <BusinessProjectsEditor /> },
     { id: 'gallery', icon: '🖼️', title: 'באנר מתחלף', component: <RealEstateGalleryEditor /> },
     { id: 'articles', icon: '📝', title: 'כתבות וטיפים', component: <RealEstateArticlesEditor /> },
+    { id: 'brokers', icon: '🤝', title: 'מתווכים מומלצים', component: <BrokersEditor /> },
   ];
   return (
     <View>
@@ -948,6 +963,95 @@ function RealEstateArticlesEditor() {
       {items.length > 0 && (
         <TouchableOpacity onPress={save} disabled={saving} style={{ backgroundColor: '#a21caf', borderRadius: 8, paddingVertical: 8, alignItems: 'center', marginTop: 8, opacity: saving ? 0.5 : 1 }}>
           <Text style={{ color: '#fff', fontWeight: '900', fontSize: 13 }}>{saved ? '✓ נשמר' : saving ? 'שומר...' : '💾 שמור כתבות'}</Text>
+        </TouchableOpacity>
+      )}
+    </View>
+  );
+}
+
+function BrokersEditor() {
+  const [items, setItems] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    fetchContent().then(d => {
+      setItems(Array.isArray(d?.brokers) ? d.brokers : []);
+      setLoading(false);
+    }).catch(() => setLoading(false));
+  }, []);
+
+  const upload = async (file: File): Promise<string | null> => {
+    const fd = new FormData();
+    fd.append('file', file);
+    try {
+      const r = await fetch(`${API_BASE}/api/upload`, { method: 'POST', body: fd });
+      const j = await r.json();
+      return j.success && j.filename ? `/uploads/${j.filename}` : null;
+    } catch { return null; }
+  };
+
+  const add = () => setItems(p => [...p, { id: 'br_' + Date.now(), name: '', title: '', phone: '', whatsapp: '', image: '', description: '', city: 'בטומי', yearsActive: '', visible: true }]);
+  const update = (id: string, patch: any) => setItems(p => p.map(i => i.id === id ? { ...i, ...patch } : i));
+  const remove = (id: string) => setItems(p => p.filter(i => i.id !== id));
+
+  const save = async () => {
+    setSaving(true);
+    try {
+      await fetch(`${API_BASE}/api/content/brokers`, {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(items),
+      });
+      setSaved(true); setTimeout(() => setSaved(false), 2000);
+    } catch {}
+    setSaving(false);
+  };
+
+  return (
+    <View style={{ marginBottom: 14, padding: 12, backgroundColor: '#ecfdf5', borderRadius: 10, borderWidth: 1, borderColor: '#a7f3d0' }}>
+      <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+        <Text style={{ fontSize: 13, fontWeight: '900', color: '#065f46', writingDirection: 'rtl' }}>🤝 מתווכים מומלצים</Text>
+        <TouchableOpacity onPress={add} style={{ paddingHorizontal: 10, paddingVertical: 6, borderRadius: 6, backgroundColor: '#059669' }}>
+          <Text style={{ fontSize: 11, fontWeight: '800', color: '#fff' }}>➕ מתווך</Text>
+        </TouchableOpacity>
+      </View>
+      {loading ? <Text>טוען...</Text> : items.map(it => (
+        <View key={it.id} style={{ marginBottom: 8, padding: 8, backgroundColor: '#fff', borderRadius: 6 }}>
+          <TextInput style={{ borderWidth: 1, borderColor: '#a7f3d0', borderRadius: 6, padding: 6, fontSize: 12, textAlign: 'right', fontWeight: '700', marginBottom: 4 }} value={it.name} onChangeText={v => update(it.id, { name: v })} placeholder="שם" placeholderTextColor="#6ee7b7" />
+          <TextInput style={{ borderWidth: 1, borderColor: '#a7f3d0', borderRadius: 6, padding: 6, fontSize: 11, textAlign: 'right', marginBottom: 4 }} value={it.title} onChangeText={v => update(it.id, { title: v })} placeholder="כותרת (מתווך נדל״ן מומלץ בבטומי)" placeholderTextColor="#6ee7b7" />
+          <TextInput style={{ borderWidth: 1, borderColor: '#a7f3d0', borderRadius: 6, padding: 6, fontSize: 11, textAlign: 'right', marginBottom: 4 }} value={it.phone} onChangeText={v => update(it.id, { phone: v })} placeholder="טלפון" placeholderTextColor="#6ee7b7" keyboardType="phone-pad" />
+          <TextInput style={{ borderWidth: 1, borderColor: '#a7f3d0', borderRadius: 6, padding: 6, fontSize: 11, textAlign: 'right', marginBottom: 4 }} value={it.whatsapp} onChangeText={v => update(it.id, { whatsapp: v })} placeholder="WhatsApp (קוד מדינה+מספר)" placeholderTextColor="#6ee7b7" />
+          <TextInput style={{ borderWidth: 1, borderColor: '#a7f3d0', borderRadius: 6, padding: 6, fontSize: 11, textAlign: 'right', marginBottom: 4 }} value={it.city} onChangeText={v => update(it.id, { city: v })} placeholder="עיר" placeholderTextColor="#6ee7b7" />
+          <TextInput style={{ borderWidth: 1, borderColor: '#a7f3d0', borderRadius: 6, padding: 6, fontSize: 11, textAlign: 'right', marginBottom: 4 }} value={it.yearsActive} onChangeText={v => update(it.id, { yearsActive: v })} placeholder="ניסיון (8 שנים)" placeholderTextColor="#6ee7b7" />
+          <TextInput style={{ borderWidth: 1, borderColor: '#a7f3d0', borderRadius: 6, padding: 6, fontSize: 11, textAlign: 'right', marginBottom: 4, minHeight: 60 }} multiline value={it.description} onChangeText={v => update(it.id, { description: v })} placeholder="תיאור" placeholderTextColor="#6ee7b7" />
+          {it.image && <Image source={{ uri: resolveUri(it.image) }} style={{ width: 80, height: 80, borderRadius: 6, marginBottom: 4 }} />}
+          {Platform.OS === 'web' && React.createElement('div', { style: { marginBottom: 4 } }, [
+            React.createElement('input', {
+              key: 'inp', type: 'file', accept: 'image/*', id: `br_file_${it.id}`, style: { display: 'none' },
+              onChange: async (e: any) => { const f = e.target.files?.[0]; if (!f) return; const url = await upload(f); if (url) update(it.id, { image: url }); e.target.value = ''; },
+            }),
+            React.createElement('button', {
+              key: 'btn', type: 'button',
+              onClick: () => { const el = (document as any).getElementById(`br_file_${it.id}`); if (el) el.click(); },
+              style: { width: '100%', backgroundColor: '#fff', border: '2px dashed #6ee7b7', borderRadius: 4, padding: 6, cursor: 'pointer', color: '#065f46', fontSize: 11, fontWeight: 800 },
+            }, '📤 העלה תמונה'),
+          ])}
+          <View style={{ flexDirection: 'row-reverse', gap: 10, marginTop: 6 }}>
+            <TouchableOpacity onPress={() => update(it.id, { visible: !it.visible })} style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 4 }}>
+              <View style={{ width: 16, height: 16, borderWidth: 2, borderColor: '#059669', backgroundColor: it.visible !== false ? '#059669' : '#fff', borderRadius: 3, alignItems: 'center', justifyContent: 'center' }}>
+                {it.visible !== false && <Text style={{ color: '#fff', fontSize: 10, fontWeight: '900' }}>✓</Text>}
+              </View>
+              <Text style={{ fontSize: 11, color: '#065f46', fontWeight: '700' }}>הצג</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => remove(it.id)} style={{ marginRight: 'auto' }}>
+              <Text style={{ fontSize: 11, color: '#dc2626' }}>🗑 מחק</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      ))}
+      {items.length > 0 && (
+        <TouchableOpacity onPress={save} disabled={saving} style={{ backgroundColor: '#059669', borderRadius: 8, paddingVertical: 8, alignItems: 'center', marginTop: 8, opacity: saving ? 0.5 : 1 }}>
+          <Text style={{ color: '#fff', fontWeight: '900', fontSize: 13 }}>{saved ? '✓ נשמר' : saving ? 'שומר...' : '💾 שמור מתווכים'}</Text>
         </TouchableOpacity>
       )}
     </View>
