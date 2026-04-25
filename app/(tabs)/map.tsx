@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform, Modal } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { Colors } from '../../constants/colors';
 import { ThemeContext } from '../../constants/theme';
@@ -14,6 +14,7 @@ export default function MapScreen() {
   const [active, setActive] = useState('הכל');
   const [layers, setLayers] = useState<MapLayer[]>([]);
   const [focusPoint, setFocusPoint] = useState<{ lat: number; lng: number; name: string } | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
   const bg = dark ? Colors.TEXT : Colors.BACKGROUND;
   const { lat, lng, name } = useLocalSearchParams<{ lat?: string; lng?: string; name?: string }>();
 
@@ -77,17 +78,32 @@ export default function MapScreen() {
           ];
         }).flat().filter(Boolean))
       ) : (
-        <View style={styles.layerGrid}>
-          {categories.map((c, i) => {
-            const on = c === active;
-            return (
-              <TouchableOpacity key={c} onPress={() => { setActive(c); setFocusPoint(null); }} style={[styles.layerChip, on && styles.layerChipOn]}>
-                <Text style={[styles.layerChipTxt, on && styles.layerChipTxtOn]} numberOfLines={2}>{c}</Text>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
+        <TouchableOpacity onPress={() => setMenuOpen(true)} style={styles.openMenuBtn} activeOpacity={0.85}>
+          <Text style={styles.openMenuTxt}>📍 {active === 'הכל' ? 'בחר קטגוריה' : active}</Text>
+          <Text style={styles.openMenuArrow}>▲</Text>
+        </TouchableOpacity>
       )}
+      <Modal visible={menuOpen} transparent animationType="slide" onRequestClose={() => setMenuOpen(false)}>
+        <TouchableOpacity activeOpacity={1} onPress={() => setMenuOpen(false)} style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' }}>
+          <TouchableOpacity activeOpacity={1} style={{ backgroundColor: '#fff', borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: '60%', paddingBottom: 20 }}>
+            <View style={{ width: 40, height: 4, backgroundColor: '#cbd5e1', borderRadius: 2, alignSelf: 'center', marginTop: 10, marginBottom: 8 }} />
+            <Text style={{ fontSize: 15, fontWeight: '900', color: Colors.TEXT, textAlign: 'center', writingDirection: 'rtl', marginBottom: 10 }}>קטגוריות מפה</Text>
+            <ScrollView showsVerticalScrollIndicator={false}>
+              {categories.map(c => {
+                const on = c === active;
+                const layer = layers.find(l => l.name === c) as any;
+                const color = layer?.color || (c === 'הכל' ? Colors.PRIMARY : '#64748b');
+                return (
+                  <TouchableOpacity key={c} onPress={() => { setActive(c); setFocusPoint(null); setMenuOpen(false); }} style={{ flexDirection: 'row-reverse', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 14, backgroundColor: on ? color + '20' : 'transparent', borderRightWidth: 4, borderRightColor: color }}>
+                    <Text style={{ flex: 1, fontSize: 14, fontWeight: on ? '900' : '700', color, textAlign: 'right', writingDirection: 'rtl' }}>{c}</Text>
+                    {layer?.points && <Text style={{ fontSize: 11, color: '#94a3b8', fontWeight: '700' }}>{layer.points.length}</Text>}
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
+          </TouchableOpacity>
+        </TouchableOpacity>
+      </Modal>
       <View style={{ flex: 1, position: 'relative' }}>
         <View style={{ flex: 1, overflow: 'hidden' }}>
           <MapEmbed src={buildMapSrc()} style={{ flex: 1 }} />
@@ -172,5 +188,8 @@ const styles = StyleSheet.create({
   layerChipOn: { backgroundColor: Colors.PRIMARY },
   layerChipTxt: { fontSize: 12, fontWeight: '800', color: Colors.TEXT, textAlign: 'center', writingDirection: 'rtl' },
   layerChipTxtOn: { color: '#fff' },
+  openMenuBtn: { flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', backgroundColor: Colors.PRIMARY, paddingHorizontal: 16, paddingVertical: 12, marginHorizontal: 12, marginVertical: 8, borderRadius: 12 },
+  openMenuTxt: { fontSize: 14, fontWeight: '800', color: '#fff', writingDirection: 'rtl' },
+  openMenuArrow: { fontSize: 12, color: '#fff', fontWeight: '900' },
 });
 

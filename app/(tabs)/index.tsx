@@ -155,6 +155,9 @@ export default function HomeScreen() {
   const [editExtraCats, setEditExtraCats] = useState(EXTRA_CATEGORIES);
   const [editBottomBanners, setEditBottomBanners] = useState(BOTTOM_BANNERS);
   const [realEstateImg, setRealEstateImg] = useState('');
+  const [reBannerKicker, setReBannerKicker] = useState('BATUMI');
+  const [reBannerTitle, setReBannerTitle] = useState('פורטל הנדל״ן והעסקים');
+  const [reBannerSub, setReBannerSub] = useState('כל העסקים והנכסים של בטומי במקום אחד');
   const { simulatedWidth } = useContext(PreviewContext);
   const w = simulatedWidth ? Math.min(simulatedWidth, screenW) : screenW;
   const cardW = (w - 48) / 2;
@@ -183,7 +186,11 @@ export default function HomeScreen() {
         if (data.bottomBanners) setEditBottomBanners(data.bottomBanners);
         const side = data.sideBanners || [];
         const re = side.find((b: any) => b.id === 'realestate');
-        if (re?.icon?.startsWith('http')) setRealEstateImg(re.icon);
+        const img = re?.image || (re?.icon?.startsWith('http') || re?.icon?.startsWith('/') ? re.icon : '');
+        if (img) setRealEstateImg(resolveUri(img));
+        if (re?.kicker !== undefined) setReBannerKicker(re.kicker || '');
+        if (re?.bannerTitle !== undefined) setReBannerTitle(re.bannerTitle || '');
+        if (re?.bannerSub !== undefined) setReBannerSub(re.bannerSub || '');
       })
       .catch(() => {
         // Fallback to hardcoded data — already set as defaults
@@ -288,7 +295,7 @@ export default function HomeScreen() {
           <View style={styles.section}>
             <TouchableOpacity activeOpacity={0.85} style={styles.megaBannerWrap} onPress={() => router.push('/portal/realestate')}>
               <ImageBackground
-                source={{ uri: realEstateImg || 'https://images.unsplash.com/photo-1519677100203-a0e668c92439?w=800&q=80' }}
+                source={{ uri: realEstateImg || resolveUri('/uploads/city.jpg') }}
                 style={styles.megaBanner}
                 imageStyle={{ borderRadius: 18 }}
               >
@@ -298,9 +305,9 @@ export default function HomeScreen() {
                   end={{ x: 0, y: 1 }}
                   style={styles.megaBannerOverlay}
                 >
-                  <Text style={styles.megaBannerKicker}>BATUMI</Text>
-                  <Text style={styles.megaBannerTitle}>פורטל הנדל״ן והעסקים</Text>
-                  <Text style={styles.megaBannerSub}>כל העסקים והנכסים של בטומי במקום אחד</Text>
+                  {!!reBannerKicker && <Text style={styles.megaBannerKicker}>{reBannerKicker}</Text>}
+                  {!!reBannerTitle && <Text style={styles.megaBannerTitle}>{reBannerTitle}</Text>}
+                  {!!reBannerSub && <Text style={styles.megaBannerSub}>{reBannerSub}</Text>}
                 </LinearGradient>
               </ImageBackground>
             </TouchableOpacity>
@@ -315,7 +322,7 @@ export default function HomeScreen() {
               <View key={b.id} style={{ position: 'relative' }}>
                 {editMode && <ReorderControls index={idx} total={editBottomBanners.length} onMove={(dir) => moveBottomBanner(idx, dir)} />}
                 <TouchableOpacity style={[styles.bottomBanner, { backgroundColor: b.bg }]} activeOpacity={0.7} onPress={() => { if (b.id === 'gyg') openInAppBrowser(gygBatumi()); else setActiveModal(b.id); }}>
-                  <Text style={styles.bottomBannerTitle}>{b.title}</Text>
+                  <Text style={styles.bottomBannerTitle} numberOfLines={1}>{b.title}</Text>
                   <Text style={styles.bottomBannerIcon}>{b.icon}</Text>
                 </TouchableOpacity>
               </View>
@@ -385,8 +392,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row-reverse', alignItems: 'center',
     paddingHorizontal: 16, justifyContent: 'space-between',
   },
-  bottomBannerTitle: { fontSize: 14, fontWeight: '700', color: Colors.WHITE, textAlign: 'right', writingDirection: 'rtl' },
-  bottomBannerIcon: { fontSize: 32 },
+  bottomBannerTitle: { fontSize: 13, fontWeight: '700', color: Colors.WHITE, textAlign: 'right', writingDirection: 'rtl', flex: 1 },
+  bottomBannerIcon: { fontSize: 28, marginLeft: 8 },
   bottomSectionTitle: { fontSize: 16, fontWeight: 'normal', color: '#999999', textAlign: 'right', writingDirection: 'rtl', marginBottom: 8 },
 
 });

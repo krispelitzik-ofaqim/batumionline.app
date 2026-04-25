@@ -1,5 +1,5 @@
 import React from 'react';
-import { Platform, useWindowDimensions, View, StyleProp, ViewStyle } from 'react-native';
+import { Platform, useWindowDimensions, View, Text, StyleProp, ViewStyle } from 'react-native';
 import RenderHtml from 'react-native-render-html';
 
 type Props = {
@@ -7,6 +7,13 @@ type Props = {
   style?: StyleProp<ViewStyle>;
   baseStyle?: Record<string, any>;
 };
+
+function stripGoogleDocsCss(h: string): string {
+  return h
+    .replace(/style="[^"]*width:[^;"]*[;"][^"]*"/g, 'style=""')
+    .replace(/class="[^"]*"/g, '')
+    .replace(/<span[^>]*>/g, '<span>');
+}
 
 export default function HtmlContent({ html, style, baseStyle }: Props) {
   const { width } = useWindowDimensions();
@@ -24,11 +31,13 @@ export default function HtmlContent({ html, style, baseStyle }: Props) {
     );
   }
 
+  const cleanHtml = stripGoogleDocsCss(html);
+
   return (
     <View style={style}>
       <RenderHtml
         contentWidth={width - 40}
-        source={{ html }}
+        source={{ html: cleanHtml }}
         baseStyle={{
           direction: 'rtl',
           textAlign: 'right',

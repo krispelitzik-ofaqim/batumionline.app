@@ -40,7 +40,7 @@ const DEMO_DEVELOPERS: Developer[] = [
 
 type TopButton = { id: string; label: string };
 type Article = { id: string; title: string; summary: string; image?: string; link?: string; date?: string };
-type Listing = { id: string; title: string; image: string; price: string; features: string[]; cta: string; link?: string; size?: 'full' | 'half' };
+type Listing = { id: string; title: string; image: string; images?: string[]; price: string; features: string[]; cta: string; link?: string; size?: 'full' | 'half'; article?: string };
 
 const DEFAULT_TOP_BUTTONS: TopButton[] = [
   { id: 'hotels', label: 'פרויקטים מלונאיים' },
@@ -108,6 +108,9 @@ export default function RealEstatePortal() {
   const [moneyIndex] = useState(FALLBACK_MONEY_INDEX);
   const [tips] = useState<Article[]>(FALLBACK_TIPS);
   const [galleryImages, setGalleryImages] = useState<string[]>([]);
+  const [futureProjects, setFutureProjects] = useState<Listing[]>(LISTINGS_BY_TOP['future'] || []);
+  const [articles, setArticles] = useState<any[]>([]);
+  const [openArticle, setOpenArticle] = useState<any | null>(null);
 
   const handleService = useCallback((id: string) => {
     if (id === 'bank') {
@@ -125,6 +128,8 @@ export default function RealEstatePortal() {
         const side = data?.sideBanners || [];
         const re = side.find((b: any) => b.id === 'realestate');
         if (re?.icon?.startsWith('http')) setRealEstateImage(re.icon);
+        if (Array.isArray(data?.futureProjects) && data.futureProjects.length) setFutureProjects(data.futureProjects);
+        if (Array.isArray(data?.realEstateArticles)) setArticles(data.realEstateArticles);
       })
       .catch(() => {});
 
@@ -140,7 +145,7 @@ export default function RealEstatePortal() {
       .catch(() => {});
   }, []);
 
-  const heroUri = realEstateImage || galleryImages[0] || 'https://images.unsplash.com/photo-1519677100203-a0e668c92439?w=1200&q=80';
+  const heroUri = realEstateImage || galleryImages[0] || '/uploads/city.jpg';
 
   return (
     <View style={s.container}>
@@ -298,27 +303,30 @@ export default function RealEstatePortal() {
               <NewsSliderArrows news={news} />
             </Section>
 
+            <ArticlesAt loc="after_news" articles={articles} onOpen={setOpenArticle} />
+
             <RealEstateGallery />
+
+            <ArticlesAt loc="after_gallery" articles={articles} onOpen={setOpenArticle} />
 
             {/* Section 2 — Market indices with switchable tabs */}
             <IndicesTabs />
 
-            {/* Section 3 — Tips before buying */}
-            <Section title="מה צריך לדעת לפני שרוכשים דירה בבטומי" icon="💡">
-              {tips.map(t => (
-                <View key={t.id} style={s.tipCard}>
-                  <Text style={s.tipTitle}>{t.title}</Text>
-                  <Text style={s.tipSummary}>{t.summary}</Text>
-                </View>
-              ))}
-            </Section>
+            <ArticlesAt loc="after_indices" articles={articles} onOpen={setOpenArticle} />
+
+            <ArticlesAt loc="after_tips" articles={articles} onOpen={setOpenArticle} />
 
             <BusinessServicesSlider variant="large" onPressService={handleService} />
 
+            <ArticlesAt loc="after_business_services" articles={articles} onOpen={setOpenArticle} />
+
             {/* Section - Future real estate (between services and currency) */}
             <Section title="עתיד הנדל״ן" icon="🔮">
-              <FutureSlider projects={LISTINGS_BY_TOP['future'] || []} />
+              <FutureSlider projects={futureProjects} />
             </Section>
+
+            <ArticlesAt loc="after_future" articles={articles} onOpen={setOpenArticle} />
+            <ArticlesAt loc="before_currency" articles={articles} onOpen={setOpenArticle} />
 
             <CurrencyTicker />
           </>
@@ -326,6 +334,27 @@ export default function RealEstatePortal() {
 
         <View style={{ height: 40 }} />
       </ScrollView>
+      <Modal visible={!!openArticle} transparent animationType="fade" onRequestClose={() => setOpenArticle(null)}>
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'center', padding: 16 }}>
+          <View style={{ backgroundColor: '#fff', borderRadius: 18, overflow: 'hidden', maxHeight: '90%' }}>
+            {openArticle?.showImage && openArticle?.image && (
+              <View style={{ width: '100%', height: 200, position: 'relative' }}>
+                <Image source={{ uri: resolveUri(openArticle.image) }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+              </View>
+            )}
+            <TouchableOpacity onPress={() => setOpenArticle(null)} style={{ position: 'absolute', top: 10, left: 10, width: 32, height: 32, borderRadius: 16, backgroundColor: 'rgba(0,0,0,0.6)', alignItems: 'center', justifyContent: 'center', zIndex: 5 }}>
+              <Text style={{ color: '#fff', fontSize: 16, fontWeight: '900' }}>✕</Text>
+            </TouchableOpacity>
+            <ScrollView style={{ maxHeight: 400 }}>
+              <View style={{ padding: 16 }}>
+                <Text style={{ fontSize: 18, fontWeight: '900', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl' }}>{openArticle?.title}</Text>
+                {!!openArticle?.summary && <Text style={{ fontSize: 13, color: '#64748b', textAlign: 'right', writingDirection: 'rtl', marginTop: 4 }}>{openArticle.summary}</Text>}
+                {!!openArticle?.article && <Text style={{ fontSize: 13, color: '#475569', textAlign: 'right', writingDirection: 'rtl', marginTop: 14, lineHeight: 20 }}>{openArticle.article}</Text>}
+              </View>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
       <BottomTabBar />
       <ListingForm
         visible={formOpen}
@@ -434,6 +463,96 @@ function Section({ title, icon, children }: { title: string; icon: string; child
   );
 }
 
+function ArticlesAt({ loc, articles, onOpen }: { loc: string; articles: any[]; onOpen: (a: any) => void }) {
+  const items = articles.filter(a => a.location === loc && a.visible !== false);
+  if (items.length === 0) return null;
+  return (
+    <View style={{ marginTop: 18, paddingHorizontal: 16 }}>
+      {items.map(a => (
+        <TouchableOpacity key={a.id} activeOpacity={0.85} onPress={() => onOpen(a)} style={{ backgroundColor: '#fff', borderRadius: 12, marginBottom: 10, overflow: 'hidden', borderWidth: 1, borderColor: '#e2e8f0' }}>
+          {a.showImage && a.image && <Image source={{ uri: resolveUri(a.image) }} style={{ width: '100%', height: 140 }} resizeMode="cover" />}
+          <View style={{ padding: 12 }}>
+            <Text style={{ fontSize: 15, fontWeight: '900', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl' }}>💡 {a.title}</Text>
+            {!!a.summary && <Text style={{ fontSize: 12, color: '#475569', textAlign: 'right', writingDirection: 'rtl', marginTop: 4, lineHeight: 18 }}>{a.summary}</Text>}
+            {!!a.article && <Text style={{ fontSize: 11, color: Colors.PRIMARY, textAlign: 'right', writingDirection: 'rtl', marginTop: 6, fontWeight: '700' }}>קרא עוד ›</Text>}
+          </View>
+        </TouchableOpacity>
+      ))}
+    </View>
+  );
+}
+
+function FutureCard({ p, width }: { p: Listing; width: number }) {
+  const imgs = (p.images && p.images.length > 0) ? p.images : (p.image ? [p.image] : []);
+  const [imgIdx, setImgIdx] = useState(0);
+  const [open, setOpen] = useState(false);
+  const next = () => setImgIdx((imgIdx + 1) % imgs.length);
+  const prev = () => setImgIdx((imgIdx - 1 + imgs.length) % imgs.length);
+  return (
+    <>
+      <TouchableOpacity activeOpacity={0.85} style={{ width, height: 260, borderRadius: 14, overflow: 'hidden', backgroundColor: Colors.WHITE, borderWidth: 1, borderColor: '#e2e8f0' }} onPress={() => setOpen(true)}>
+        <View style={{ width, height: 140, position: 'relative' }}>
+          {imgs.length > 0 && <Image source={{ uri: resolveUri(imgs[imgIdx]) }} style={{ width, height: 140 }} />}
+          {imgs.length > 1 && (
+            <View style={{ position: 'absolute', bottom: 6, left: 0, right: 0, flexDirection: 'row', justifyContent: 'center', gap: 4 }}>
+              {imgs.map((_, i) => <View key={i} style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: i === imgIdx ? '#fff' : 'rgba(255,255,255,0.5)' }} />)}
+            </View>
+          )}
+        </View>
+        <View style={{ padding: 12, flex: 1, justifyContent: 'space-between' }}>
+          <View>
+            <Text style={{ fontSize: 15, fontWeight: '900', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl' }} numberOfLines={1}>{p.title}</Text>
+            <Text style={{ fontSize: 12, color: '#64748b', textAlign: 'right', writingDirection: 'rtl', marginTop: 2 }} numberOfLines={1}>{p.price || ''}</Text>
+            <Text style={{ fontSize: 11, color: '#475569', textAlign: 'right', writingDirection: 'rtl', marginTop: 6 }} numberOfLines={3}>{(p.features || []).join(' · ')}</Text>
+          </View>
+        </View>
+      </TouchableOpacity>
+      <Modal visible={open} transparent animationType="fade" onRequestClose={() => setOpen(false)}>
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'center', padding: 16 }}>
+          <View style={{ backgroundColor: '#fff', borderRadius: 18, overflow: 'hidden', maxHeight: '90%' }}>
+            <View style={{ width: '100%', height: 240, backgroundColor: '#000', position: 'relative' }}>
+              {imgs.length > 0 && <Image source={{ uri: resolveUri(imgs[imgIdx]) }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />}
+              {imgs.length > 1 && (
+                <>
+                  <TouchableOpacity onPress={prev} style={{ position: 'absolute', top: 100, right: 10, width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(0,0,0,0.5)', alignItems: 'center', justifyContent: 'center' }}>
+                    <Text style={{ color: '#fff', fontSize: 22 }}>›</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={next} style={{ position: 'absolute', top: 100, left: 10, width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(0,0,0,0.5)', alignItems: 'center', justifyContent: 'center' }}>
+                    <Text style={{ color: '#fff', fontSize: 22 }}>‹</Text>
+                  </TouchableOpacity>
+                  <View style={{ position: 'absolute', bottom: 10, left: 0, right: 0, flexDirection: 'row', justifyContent: 'center', gap: 5 }}>
+                    {imgs.map((_, i) => <View key={i} style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: i === imgIdx ? '#fff' : 'rgba(255,255,255,0.5)' }} />)}
+                  </View>
+                </>
+              )}
+              <TouchableOpacity onPress={() => setOpen(false)} style={{ position: 'absolute', top: 10, left: 10, width: 32, height: 32, borderRadius: 16, backgroundColor: 'rgba(0,0,0,0.6)', alignItems: 'center', justifyContent: 'center' }}>
+                <Text style={{ color: '#fff', fontSize: 16, fontWeight: '900' }}>✕</Text>
+              </TouchableOpacity>
+            </View>
+            <ScrollView style={{ maxHeight: 400 }}>
+              <View style={{ padding: 16 }}>
+                <Text style={{ fontSize: 18, fontWeight: '900', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl' }}>{p.title}</Text>
+                {!!p.price && <Text style={{ fontSize: 14, fontWeight: '800', color: '#10b981', textAlign: 'right', writingDirection: 'rtl', marginTop: 4 }}>{p.price}</Text>}
+                {(p.features || []).length > 0 && (
+                  <View style={{ marginTop: 12, gap: 6 }}>
+                    {(p.features || []).map((f, i) => (
+                      <View key={i} style={{ flexDirection: 'row-reverse', gap: 6 }}>
+                        <Text style={{ color: '#10b981', fontWeight: '900' }}>✓</Text>
+                        <Text style={{ flex: 1, fontSize: 13, color: '#1C2B35', textAlign: 'right', writingDirection: 'rtl' }}>{f}</Text>
+                      </View>
+                    ))}
+                  </View>
+                )}
+                {!!p.article && <Text style={{ fontSize: 13, color: '#475569', textAlign: 'right', writingDirection: 'rtl', marginTop: 14, lineHeight: 20 }}>{p.article}</Text>}
+              </View>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+    </>
+  );
+}
+
 function FutureSlider({ projects }: { projects: Listing[] }) {
   const SLIDE_W = 340;
   const GAP = 12;
@@ -458,16 +577,7 @@ function FutureSlider({ projects }: { projects: Listing[] }) {
         onMomentumScrollEnd={(e) => setIdx(Math.round(e.nativeEvent.contentOffset.x / (SLIDE_W + GAP)))}
       >
         {projects.map(p => (
-          <TouchableOpacity key={p.id} activeOpacity={0.85} style={{ width: SLIDE_W, height: 260, borderRadius: 14, overflow: 'hidden', backgroundColor: Colors.WHITE, borderWidth: 1, borderColor: '#e2e8f0' }} onPress={() => p.link && Linking.openURL(p.link)}>
-            {p.image && <Image source={{ uri: resolveUri(p.image) }} style={{ width: SLIDE_W, height: 140 }} />}
-            <View style={{ padding: 12, flex: 1, justifyContent: 'space-between' }}>
-              <View>
-                <Text style={{ fontSize: 15, fontWeight: '900', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl' }} numberOfLines={1}>{p.title}</Text>
-                <Text style={{ fontSize: 12, color: '#64748b', textAlign: 'right', writingDirection: 'rtl', marginTop: 2 }} numberOfLines={1}>{p.price || ''}</Text>
-                <Text style={{ fontSize: 11, color: '#475569', textAlign: 'right', writingDirection: 'rtl', marginTop: 6 }} numberOfLines={3}>{(p.features || []).join(' · ')}</Text>
-              </View>
-            </View>
-          </TouchableOpacity>
+          <FutureCard key={p.id} p={p} width={SLIDE_W} />
         ))}
       </ScrollView>
       {projects.length > 1 && (

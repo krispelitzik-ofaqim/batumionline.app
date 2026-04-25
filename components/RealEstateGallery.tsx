@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Image, StyleSheet, TouchableOpacity, Text, useWindowDimensions } from 'react-native';
 import { Colors } from '../constants/colors';
+import { fetchContent, resolveUri } from '../constants/api';
 
 type Slide = { uri: string; caption: string };
 
-const SLIDES: Slide[] = [
+const FALLBACK_SLIDES: Slide[] = [
   { uri: 'https://images.unsplash.com/photo-1582407947092-45795aba4166?w=1200&q=80', caption: 'Orbi Sea Towers' },
   { uri: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1200&q=80', caption: 'Riviera Residence' },
   { uri: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=1200&q=80', caption: 'Palm Tower' },
@@ -17,9 +18,18 @@ export default function RealEstateGallery() {
   const { width } = useWindowDimensions();
   const [idx, setIdx] = useState(0);
   const [failed, setFailed] = useState<Set<number>>(new Set());
+  const [slides, setSlides] = useState<Slide[]>(FALLBACK_SLIDES);
   const timer = useRef<any>(null);
 
-  const validSlides = SLIDES.map((s, i) => ({ ...s, _origIdx: i })).filter((_, i) => !failed.has(i));
+  useEffect(() => {
+    fetchContent().then(d => {
+      if (Array.isArray(d?.realEstateGallery) && d.realEstateGallery.length > 0) {
+        setSlides(d.realEstateGallery.map((s: any) => ({ uri: resolveUri(s.uri || s.image || ''), caption: s.caption || '' })));
+      }
+    }).catch(() => {});
+  }, []);
+
+  const validSlides = slides.map((s, i) => ({ ...s, _origIdx: i })).filter((_, i) => !failed.has(i));
 
   useEffect(() => {
     timer.current = setInterval(() => {
