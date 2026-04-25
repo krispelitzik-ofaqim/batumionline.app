@@ -48,46 +48,16 @@ export default function MapScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: bg }]}>
-      {Platform.OS === 'web' ? (
-        React.createElement('div', {
-          style: {
-            display: 'flex', flexWrap: 'wrap',
-            gap: '2px 14px', padding: '3px 10px', direction: 'rtl',
-            background: '#fff', borderBottom: '1px solid #eee',
-            justifyContent: 'center',
-          },
-        }, categories.map((c, i) => {
-          const on = c === active;
-          const layer = layers.find(l => l.name === c) as any;
-          const hc = (layer?.color) || (c === 'הכל' ? '#1A6B8A' : '#555');
-          const isMesadot = c.includes('מסעדות') && !categories[i-1]?.includes('מסעדות');
-          return [
-            isMesadot ? React.createElement('div', { key: 'break', style: { flexBasis: '100%', height: 0 } }) : null,
-            React.createElement('div', {
-              key: c,
-              onClick: () => { setActive(c); setFocusPoint(null); },
-              style: {
-                padding: '2px 0', cursor: 'pointer', textAlign: 'center',
-                color: hc, fontSize: 12, fontWeight: on ? 800 : 600, fontFamily: 'Arial, sans-serif',
-                transition: 'all 0.15s ease', whiteSpace: 'nowrap',
-                borderBottom: on ? `2px solid ${hc}` : '2px solid transparent',
-              },
-              onMouseEnter: (e: any) => { if (!on) { e.currentTarget.style.borderBottom = `2px solid ${hc}`; e.currentTarget.style.fontWeight = '800'; } },
-              onMouseLeave: (e: any) => { if (!on) { e.currentTarget.style.borderBottom = '2px solid transparent'; e.currentTarget.style.fontWeight = '600'; } },
-            }, c),
-          ];
-        }).flat().filter(Boolean))
-      ) : (
-        <TouchableOpacity onPress={() => setMenuOpen(true)} style={styles.openMenuBtn} activeOpacity={0.85}>
-          <Text style={styles.openMenuTxt}>📍 {active === 'הכל' ? 'בחר קטגוריה' : active}</Text>
-          <Text style={styles.openMenuArrow}>▲</Text>
-        </TouchableOpacity>
-      )}
       <Modal visible={menuOpen} transparent animationType="slide" onRequestClose={() => setMenuOpen(false)}>
         <TouchableOpacity activeOpacity={1} onPress={() => setMenuOpen(false)} style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' }}>
           <TouchableOpacity activeOpacity={1} style={{ backgroundColor: '#fff', borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: '60%', paddingBottom: 20 }}>
             <View style={{ width: 40, height: 4, backgroundColor: '#cbd5e1', borderRadius: 2, alignSelf: 'center', marginTop: 10, marginBottom: 8 }} />
-            <Text style={{ fontSize: 15, fontWeight: '900', color: Colors.TEXT, textAlign: 'center', writingDirection: 'rtl', marginBottom: 10 }}>קטגוריות מפה</Text>
+            <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, marginBottom: 10 }}>
+              <Text style={{ fontSize: 15, fontWeight: '900', color: Colors.TEXT, writingDirection: 'rtl' }}>קטגוריות מפה</Text>
+              <TouchableOpacity onPress={() => setMenuOpen(false)} style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: '#f1f5f9', alignItems: 'center', justifyContent: 'center' }}>
+                <Text style={{ fontSize: 16, color: '#64748b', fontWeight: '900' }}>✕</Text>
+              </TouchableOpacity>
+            </View>
             <ScrollView showsVerticalScrollIndicator={false}>
               {categories.map(c => {
                 const on = c === active;
@@ -108,6 +78,10 @@ export default function MapScreen() {
         <View style={{ flex: 1, overflow: 'hidden' }}>
           <MapEmbed src={buildMapSrc()} style={{ flex: 1 }} />
         </View>
+        <TouchableOpacity onPress={() => setMenuOpen(true)} style={styles.openMenuBtn} activeOpacity={0.85}>
+          <Text style={styles.openMenuTxt}>📍 {active === 'הכל' ? 'בחר קטגוריה' : active}</Text>
+          <Text style={styles.openMenuArrow}>▲</Text>
+        </TouchableOpacity>
         {active !== 'הכל' && (() => {
           const layer = layers.find(l => l.name === active);
           if (!layer) return null;
@@ -188,8 +162,8 @@ const styles = StyleSheet.create({
   layerChipOn: { backgroundColor: Colors.PRIMARY },
   layerChipTxt: { fontSize: 12, fontWeight: '800', color: Colors.TEXT, textAlign: 'center', writingDirection: 'rtl' },
   layerChipTxtOn: { color: '#fff' },
-  openMenuBtn: { flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', backgroundColor: Colors.PRIMARY, paddingHorizontal: 16, paddingVertical: 12, marginHorizontal: 12, marginVertical: 8, borderRadius: 12 },
-  openMenuTxt: { fontSize: 14, fontWeight: '800', color: '#fff', writingDirection: 'rtl' },
-  openMenuArrow: { fontSize: 12, color: '#fff', fontWeight: '900' },
+  openMenuBtn: { position: 'absolute', bottom: 16, alignSelf: 'center', flexDirection: 'row-reverse', alignItems: 'center', gap: 10, backgroundColor: 'rgba(255,255,255,0.95)', paddingHorizontal: 18, paddingVertical: 12, borderRadius: 24, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.15, shadowRadius: 8, elevation: 6, borderWidth: 1, borderColor: '#e2e8f0' },
+  openMenuTxt: { fontSize: 13, fontWeight: '800', color: Colors.TEXT, writingDirection: 'rtl' },
+  openMenuArrow: { fontSize: 10, color: Colors.PRIMARY, fontWeight: '900' },
 });
 

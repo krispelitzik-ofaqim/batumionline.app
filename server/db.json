@@ -9765,7 +9765,13 @@
     "1777108295277-378.png": "צילום מסך 2026-02-03 ב-19.28.32.png",
     "1777108729210-489.png": "צילום מסך 2026-02-03 ב-19.28.32.png",
     "1777108832335-583.png": "צילום מסך 2026-02-03 ב-19.28.32.png",
-    "1777114889454-969.png": "צילום מסך 2026-02-03 ב-19.28.32.png"
+    "1777114889454-969.png": "צילום מסך 2026-02-03 ב-19.28.32.png",
+    "1777122166785-685.jpeg": "WhatsApp Image 2026-04-24 at 18.21.35.jpeg",
+    "1777122166815-34.jpeg": "WhatsApp Image 2026-04-24 at 18.22.01.jpeg",
+    "1777122166832-578.jpeg": "WhatsApp Image 2026-04-24 at 21.14.18.jpeg",
+    "1777122166846-518.jpeg": "WhatsApp Image 2026-04-24 at 21.14.36.jpeg",
+    "1777122166857-101.jpeg": "WhatsApp Image 2026-04-24 at 21.14.53.jpeg",
+    "1777122166867-685.jpeg": "WhatsApp Image 2026-04-24 at 21.15.27.jpeg"
   },
   "mapLayers": [
     {
@@ -10575,6 +10581,28 @@
       "visible": true,
       "size": "banner",
       "highlighted": true
+    },
+    {
+      "id": "lst_moecnmeojvx7",
+      "type": "sale",
+      "title": "123 דירה חדשה",
+      "description": "דירה במיקום מצןו",
+      "price": "54,000",
+      "location": "שדרה מרכזי",
+      "phone": "0545370088",
+      "images": [
+        "http://localhost:3001/uploads/1777122166785-685.jpeg",
+        "http://localhost:3001/uploads/1777122166815-34.jpeg",
+        "http://localhost:3001/uploads/1777122166832-578.jpeg",
+        "http://localhost:3001/uploads/1777122166846-518.jpeg",
+        "http://localhost:3001/uploads/1777122166857-101.jpeg",
+        "http://localhost:3001/uploads/1777122166867-685.jpeg"
+      ],
+      "size": "banner",
+      "period": "",
+      "createdAt": "2026-04-25T13:02:50.161Z",
+      "approved": true,
+      "visible": true
     }
   ],
   "mapLayersBackup": {
@@ -14842,5 +14870,175 @@
       "category": "bc_residency",
       "article": "הוצאת דרכון גאורגי לאחר קבלת אזרחות. ליווי מלא בהגשה, צילום, מעקב סטטוס וקבלה."
     }
-  ]
+  ],
+  "curatedListings": {
+    "sale": [
+      {
+        "id": "ap1",
+        "title": "דירת 2 חדרים - מרכז",
+        "image": "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80",
+        "price": "$72,000",
+        "location": "מרכז העיר",
+        "features": [
+          "65 מ\"ר",
+          "קומה 8",
+          "משופצת",
+          "מרפסת"
+        ],
+        "size": "banner",
+        "visible": true,
+        "highlightStyle": "blue"
+      },
+      {
+        "id": "ap2",
+        "title": "דירת 3 חדרים - טיילת",
+        "image": "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80",
+        "price": "$125,000",
+        "location": "הטיילת",
+        "features": [
+          "95 מ\"ר",
+          "נוף ים",
+          "חניה",
+          "מרוהטת"
+        ],
+        "size": "half",
+        "visible": false
+      },
+      {
+        "id": "ap3",
+        "title": "סטודיו - שכונת אלברס",
+        "image": "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80",
+        "price": "$38,000",
+        "location": "שכונת אלברס",
+        "features": [
+          "28 מ\"ר",
+          "משופץ",
+          "מרוהט",
+          "מוכן להשכרה"
+        ],
+        "size": "half",
+        "visible": false
+      }
+    ],
+    "rent": [
+      {
+        "id": "rt1",
+        "title": "דירת 2 חדרים להשכרה - מרכז",
+        "image": "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80",
+        "price": "$650/חודש",
+        "location": "מרכז",
+        "features": [
+          "60 מ\"ר",
+          "מרוהטת",
+          "קומה 5",
+          "מיזוג"
+        ],
+        "size": "full",
+        "visible": true
+      },
+      {
+        "id": "rt2",
+        "title": "דירת 3 חדרים - טיילת",
+        "image": "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80",
+        "price": "$1,200/חודש",
+        "location": "הטיילת",
+        "features": [
+          "90 מ\"ר",
+          "נוף ים",
+          "מרוהטת",
+          "חניה"
+        ],
+        "size": "half",
+        "visible": true
+      },
+      {
+        "id": "rt3",
+        "title": "סטודיו - שכונת אלברס",
+        "image": "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80",
+        "price": "$400/חודש",
+        "location": "אלברס",
+        "features": [
+          "28 מ\"ר",
+          "מרוהט",
+          "מיני מטבח",
+          "וויי-פיי"
+        ],
+        "size": "half",
+        "visible": true
+      }
+    ],
+    "hotels": [
+      {
+        "id": "nh1",
+        "title": "Orbi Sea Towers Phase 4",
+        "image": "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80",
+        "price": "$65,000",
+        "location": "חוף",
+        "features": [
+          "אולפנים החל מ-22 מ\"ר",
+          "מסירה 2028",
+          "בריכה ו-SPA",
+          "מרחק 50 מ׳ מהים"
+        ],
+        "size": "full",
+        "visible": true
+      },
+      {
+        "id": "nh2",
+        "title": "Batumi Riviera Residence",
+        "image": "https://images.unsplash.com/photo-1582407947092-45795aba4166?w=800&q=80",
+        "price": "$82,000",
+        "location": "מרכז",
+        "features": [
+          "דירת 1 חדר",
+          "תשואה 9% מובטחת"
+        ],
+        "size": "half",
+        "visible": true
+      },
+      {
+        "id": "nh3",
+        "title": "Palm Tower by Sea",
+        "image": "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&q=80",
+        "price": "$54,000",
+        "location": "קו ראשון לים",
+        "features": [
+          "אולפן 25 מ\"ר",
+          "קו ראשון לים"
+        ],
+        "size": "half",
+        "visible": true
+      },
+      {
+        "id": "rh1",
+        "title": "Pullman Batumi",
+        "image": "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=800&q=80",
+        "price": "$95,000",
+        "location": "מרכז",
+        "features": [
+          "דירת נופש מלונאית",
+          "ניהול בינלאומי",
+          "תשואה 7-8%",
+          "מוכן למגורים"
+        ],
+        "size": "banner",
+        "visible": true
+      },
+      {
+        "id": "rh2",
+        "title": "Wyndham Grand Batumi",
+        "image": "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=800&q=80",
+        "price": "$110,000",
+        "location": "טיילת",
+        "features": [
+          "2 חדרים",
+          "מלון 5 כוכבים",
+          "חוזה 10 שנים",
+          "ניהול רשת"
+        ],
+        "size": "banner",
+        "visible": true
+      }
+    ]
+  }
 }

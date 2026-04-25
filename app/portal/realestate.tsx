@@ -111,6 +111,7 @@ export default function RealEstatePortal() {
   const [futureProjects, setFutureProjects] = useState<Listing[]>(LISTINGS_BY_TOP['future'] || []);
   const [articles, setArticles] = useState<any[]>([]);
   const [openArticle, setOpenArticle] = useState<any | null>(null);
+  const [curated, setCurated] = useState<Record<string, Listing[]>>({});
 
   const handleService = useCallback((id: string) => {
     if (id === 'bank') {
@@ -130,6 +131,7 @@ export default function RealEstatePortal() {
         if (re?.icon?.startsWith('http')) setRealEstateImage(re.icon);
         if (Array.isArray(data?.futureProjects) && data.futureProjects.length) setFutureProjects(data.futureProjects);
         if (Array.isArray(data?.realEstateArticles)) setArticles(data.realEstateArticles);
+        if (data?.curatedListings && typeof data.curatedListings === 'object') setCurated(data.curatedListings);
       })
       .catch(() => {});
 
@@ -213,25 +215,33 @@ export default function RealEstatePortal() {
 
             {/* Listings grid - admin-curated */}
             <View style={s.listingsGrid}>
-              {(LISTINGS_BY_TOP[activeTop] || []).filter(lst => !!lst.image).map(lst => (
+              {((curated[activeTop] && curated[activeTop].length > 0 ? curated[activeTop] : LISTINGS_BY_TOP[activeTop]) || []).filter((lst: any) => !!lst.image && lst.visible !== false).map((lst: any) => {
+                const hs = lst.highlightStyle || '';
+                const cardBg = hs === 'yellow' || hs === 'yellow-border' ? '#fffbeb' : hs === 'blue' ? '#1A6B8A' : Colors.WHITE;
+                const cardBorder = hs === 'yellow-border' ? { borderWidth: 2, borderColor: '#f59e0b' } : hs === 'blue' ? { borderWidth: 2, borderColor: '#3DA5C4' } : {};
+                const isBlue = hs === 'blue';
+                const txtColor = isBlue ? '#fff' : '#1C2B35';
+                const subColor = isBlue ? '#cbd5e1' : '#555';
+                const priceColor = isBlue ? '#F4A94E' : '#10b981';
+                return (
                 <React.Fragment key={lst.id}>
                   <TouchableOpacity
                     activeOpacity={0.85}
-                    style={[s.listingCard, lst.size === 'half' && s.listingCardHalf]}
+                    style={[s.listingCard, lst.size === 'half' && s.listingCardHalf, { backgroundColor: cardBg }, cardBorder]}
                     onPress={() => setExpandedFixedId(expandedFixedId === lst.id ? null : lst.id)}
                   >
                     <Image source={{ uri: resolveUri(lst.image) }} style={s.listingImage} />
                     <View style={s.listingBody}>
-                      <Text style={s.listingTitle} numberOfLines={2}>{lst.title}</Text>
-                      {lst.features.map((f, i) => (
+                      <Text style={[s.listingTitle, { color: txtColor }]} numberOfLines={2}>{lst.title}</Text>
+                      {(lst.features || []).map((f: string, i: number) => (
                         <View key={i} style={s.listingFeature}>
-                          <Text style={s.listingFeatureCheck}>✓</Text>
-                          <Text style={s.listingFeatureTxt} numberOfLines={2}>{f}</Text>
+                          <Text style={[s.listingFeatureCheck, { color: isBlue ? '#F4A94E' : Colors.PRIMARY }]}>✓</Text>
+                          <Text style={[s.listingFeatureTxt, { color: subColor }]} numberOfLines={2}>{f}</Text>
                         </View>
                       ))}
-                      <Text style={s.listingPrice}>{lst.price}</Text>
+                      <Text style={[s.listingPrice, { color: priceColor }]}>{lst.price}</Text>
                       <View style={s.listingCta}>
-                        <Text style={s.listingCtaTxt}>{lst.cta}</Text>
+                        <Text style={s.listingCtaTxt}>{lst.cta || 'פרטים'}</Text>
                       </View>
                     </View>
                   </TouchableOpacity>
@@ -263,7 +273,8 @@ export default function RealEstatePortal() {
                     </View>
                   )}
                 </React.Fragment>
-              ))}
+                );
+              })}
             </View>
 
             {(activeTop === 'sale' || activeTop === 'rent' || activeTop === 'hotels') && (

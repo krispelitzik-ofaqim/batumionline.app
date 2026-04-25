@@ -116,16 +116,34 @@ function Expanded({ l, onClose }: { l: Listing; onClose: () => void }) {
   );
 }
 
+function CardImage({ images, height }: { images: string[]; height: number }) {
+  if (images.length === 0) return <View style={{ height, backgroundColor: '#e2e8f0' }} />;
+  return (
+    <View style={{ height, position: 'relative', backgroundColor: '#000' }}>
+      <Image source={{ uri: resolveUri(images[0]) }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+      {images.length > 1 && (
+        <View style={{ position: 'absolute', top: 8, right: 8, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 10, backgroundColor: 'rgba(0,0,0,0.6)' }}>
+          <Text style={{ color: '#fff', fontSize: 10, fontWeight: '800' }}>📷 {images.length}</Text>
+        </View>
+      )}
+    </View>
+  );
+}
+
 function Card({ l, onPress }: { l: Listing; onPress: () => void }) {
   const size = l.size || 'half';
-  const img = l.images && l.images[0];
+  const imgs = l.images || [];
+  const img = imgs[0];
   const periodBadge = l.period ? PERIOD_LABEL[l.period] || l.period : null;
+  const verified = !!l.phone;
+  const openWa = (e: any) => { e.stopPropagation?.(); if (l.phone) Linking.openURL(`https://wa.me/${String(l.phone).replace(/\D/g, '')}`); };
 
   if (size === 'banner') {
     return (
       <TouchableOpacity activeOpacity={0.85} onPress={onPress} style={[s.banner, l.highlighted && s.highlighted]}>
-        {l.highlighted && <View style={s.highlightBadge}><Text style={s.highlightBadgeTxt}>✨ מודגשת</Text></View>}
-        {img ? <Image source={{ uri: resolveUri(img) }} style={s.bannerImg} /> : <View style={[s.bannerImg, { backgroundColor: '#e2e8f0' }]} />}
+        <View style={{ width: 140, height: 110, position: 'relative' }}>
+          <CardImage images={imgs} height={110} />
+        </View>
         <View style={s.bannerBody}>
           <View>
             <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -135,8 +153,8 @@ function Card({ l, onPress }: { l: Listing; onPress: () => void }) {
             <Text style={s.bannerInfo} numberOfLines={1}>{l.location || ''}{l.description ? ` · ${l.description}` : ''}</Text>
           </View>
           <View style={s.bannerBottom}>
-            <Text style={s.bannerPrice}>{l.price ? `$${l.price}${periodBadge ? ' · ' + periodBadge : ''}` : (periodBadge || '')}</Text>
-            <Text style={s.moreLink}>פרטים נוספים ‹</Text>
+            <Text style={[s.bannerPrice, { fontSize: 16 }]}>{l.price ? `$${l.price}${periodBadge ? ' · ' + periodBadge : ''}` : (periodBadge || '')}</Text>
+            <Text style={s.moreLink}>פרטים ‹</Text>
           </View>
         </View>
       </TouchableOpacity>
@@ -146,16 +164,16 @@ function Card({ l, onPress }: { l: Listing; onPress: () => void }) {
   if (size === 'full') {
     return (
       <TouchableOpacity activeOpacity={0.85} onPress={onPress} style={s.full}>
-        {img ? <Image source={{ uri: resolveUri(img) }} style={s.fullImg} /> : <View style={[s.fullImg, { backgroundColor: '#e2e8f0' }]} />}
+        <CardImage images={imgs} height={180} />
         <View style={{ padding: 12 }}>
           <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' }}>
             <Text style={s.cardTitle} numberOfLines={1}>{l.title}</Text>
             <Text style={s.idBadge}>#{shortId(l.id, (l as any).createdAt)}</Text>
           </View>
           {l.location ? <Text style={s.cardSub}>📍 {l.location}</Text> : null}
-          {l.description ? <Text style={s.cardDesc} numberOfLines={3}>{l.description}</Text> : null}
-          <View style={s.cardFooter}>
-            <Text style={s.cardPrice}>{l.price ? `$${l.price}${periodBadge ? ' · ' + periodBadge : ''}` : (periodBadge || '')}</Text>
+          {l.description ? <Text style={s.cardDesc} numberOfLines={2}>{l.description}</Text> : null}
+          <View style={[s.cardFooter, { marginTop: 8 }]}>
+            <Text style={[s.cardPrice, { fontSize: 18 }]}>{l.price ? `$${l.price}${periodBadge ? ' · ' + periodBadge : ''}` : (periodBadge || '')}</Text>
             <Text style={s.moreLink}>פרטים נוספים ‹</Text>
           </View>
         </View>
@@ -165,7 +183,7 @@ function Card({ l, onPress }: { l: Listing; onPress: () => void }) {
 
   return (
     <TouchableOpacity activeOpacity={0.85} onPress={onPress} style={s.half}>
-      {img ? <Image source={{ uri: resolveUri(img) }} style={s.halfImg} /> : <View style={[s.halfImg, { backgroundColor: '#e2e8f0' }]} />}
+      <CardImage images={imgs} height={110} />
       <View style={{ padding: 8 }}>
         <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' }}>
           <Text style={s.cardTitle} numberOfLines={1}>{l.title}</Text>
@@ -173,7 +191,7 @@ function Card({ l, onPress }: { l: Listing; onPress: () => void }) {
         </View>
         {l.location ? <Text style={s.cardSub} numberOfLines={1}>📍 {l.location}</Text> : null}
         <View style={[s.cardFooter, { marginTop: 4 }]}>
-          <Text style={[s.cardPrice, { fontSize: 12 }]}>{l.price ? `$${l.price}` : (periodBadge || '')}</Text>
+          <Text style={[s.cardPrice, { fontSize: 14 }]}>{l.price ? `$${l.price}` : (periodBadge || '')}</Text>
           <Text style={[s.moreLink, { fontSize: 9 }]}>פרטים ‹</Text>
         </View>
       </View>

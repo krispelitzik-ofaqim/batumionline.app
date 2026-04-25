@@ -367,7 +367,7 @@ const styles = StyleSheet.create({
   },
   cardTop: { height: 100, alignItems: 'center', justifyContent: 'center' },
   cardIcon: { fontSize: 68 },
-  cardBottom: { backgroundColor: Colors.WHITE, paddingVertical: 10, paddingHorizontal: 12, minHeight: 80 },
+  cardBottom: { backgroundColor: Colors.WHITE, paddingVertical: 6, paddingHorizontal: 10, minHeight: 56 },
   cardTitle: { fontSize: 16, fontWeight: 'bold', color: '#1C2B35', textAlign: 'right', writingDirection: 'rtl' },
   cardSub: { fontSize: 12, fontWeight: 'normal', color: '#999999', marginTop: 2, lineHeight: 16, textAlign: 'right', writingDirection: 'rtl' },
   cardDesc: { fontSize: 11, color: '#777', marginTop: 4, lineHeight: 15, textAlign: 'right', writingDirection: 'rtl' },

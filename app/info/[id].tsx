@@ -5,6 +5,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Colors } from '../../constants/colors';
 import { fetchContent, API_BASE, resolveUri } from '../../constants/api';
 import HtmlContent from '../../components/HtmlContent';
+import BottomTabBar from '../../components/BottomTabBar';
 
 
 
@@ -213,6 +214,7 @@ export default function InfoPage() {
           </View>
         )}
       </ScrollView>
+      <BottomTabBar />
     </View>
   );
 }

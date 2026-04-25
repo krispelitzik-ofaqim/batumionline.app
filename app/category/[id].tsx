@@ -720,7 +720,7 @@ function HotelCard({ h, dark, pageBtnLabel, mapPoints, layerColor, placesQuery, 
       <HotelImage uri={h.image} titleEn={h.titleEn} placesQuery={placesQuery} />
       {h.audio ? (
         <View style={{ paddingHorizontal: 24, paddingTop: 8 }}>
-          <AudioPlayer tracks={[{ title: h.title, url: h.audio }]} compact playOnLeft />
+          <AudioPlayer tracks={[{ title: h.title, url: h.audio }]} compact playOnLeft tint={dark ? '#1A6B8A' : undefined} textLight={dark} />
         </View>
       ) : null}
       <View style={st.hotelBody}>
@@ -781,9 +781,17 @@ function HotelCard({ h, dark, pageBtnLabel, mapPoints, layerColor, placesQuery, 
 }
 
 function HotelMap({ coords, title, onClose }: { coords: { lat: number; lng: number }; title: string; onClose: () => void }) {
+  useEffect(() => {
+    if (Platform.OS !== 'web') {
+      const url = `https://www.google.com/maps/search/?api=1&query=${coords.lat},${coords.lng}`;
+      Linking.openURL(url).catch(() => {});
+      onClose();
+    }
+  }, []);
+  if (Platform.OS !== 'web') return null;
   const src = `https://maps.google.com/maps?q=${coords.lat},${coords.lng}(${encodeURIComponent(title)})&z=15&output=embed`;
   return (
-    <View style={{ flex: 1, position: 'relative' }}>
+    <View style={{ height: 420, position: 'relative' }}>
       <MapEmbed src={src} style={{ flex: 1 }} />
       <TouchableOpacity style={st.mapClose} onPress={onClose}>
         <Text style={st.mapCloseX}>✕</Text>
@@ -806,8 +814,8 @@ function SubCard({ item, width, onPress }: { item: Item; width: number; onPress:
         </LinearGradient>
       )}
       <View style={st.cardBottom}>
-        <Text style={st.cardTitle}>{item.title}</Text>
-        {item.subtitle ? <Text style={st.cardSub}>{item.subtitle}</Text> : null}
+        <Text style={st.cardTitle} numberOfLines={2}>{item.title}</Text>
+        {item.subtitle ? <Text style={st.cardSub} numberOfLines={1}>{item.subtitle}</Text> : null}
       </View>
     </TouchableOpacity>
   );
@@ -1042,8 +1050,10 @@ export default function CategoryScreen() {
           </View>
         ) : (
           <View style={[st.hero, { backgroundColor: cat.heroBg || cat.bg || (darkCat ? '#1a1a2e' : '#3DA5C4') }]}>
-            <Text style={[st.heroTitle, darkCat && { color: '#F4A94E' }]}>{cat.title}</Text>
-            {cat.icon ? <Text style={{ fontSize: 40, textAlign: 'center', marginTop: 4 }}>{cat.icon}</Text> : null}
+            <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 10, justifyContent: 'center' }}>
+              {cat.icon ? <Text style={{ fontSize: 28 }}>{cat.icon}</Text> : null}
+              <Text style={[st.heroTitle, darkCat && { color: '#F4A94E' }]}>{cat.title}</Text>
+            </View>
             {cat.subtitle ? <Text style={[st.heroSub, darkCat && { color: '#d4af37' }]}>{cat.subtitle}</Text> : null}
           </View>
         )}
@@ -1094,7 +1104,7 @@ export default function CategoryScreen() {
                       {[1, 2, 3, 4, 5].map(n => (
                         <Text key={n} style={[st.tourGridStar, n <= avg && st.tourGridStarOn]}>★</Text>
                       ))}
-                      {r && r.count > 0 && <Text style={{ fontSize: 10, color: 'rgba(0,0,0,0.5)', marginRight: 4 }}>({r.count})</Text>}
+                      {r && r.count > 0 && <Text style={{ fontSize: 9, color: 'rgba(0,0,0,0.5)', marginRight: 3 }}>({r.count})</Text>}
                     </View>
                     <Text style={st.tourGridIcon}>🎧</Text>
                     <Text style={st.tourGridTitle} numberOfLines={2}>{t.title || 'ללא כותרת'}</Text>
@@ -1160,11 +1170,11 @@ export default function CategoryScreen() {
         ) : cat.hotels && cat.hotels.length > 0 ? (
           <View style={st.hotelList}>
             {cat.longText && cat.hotels.length <= 10 && (
-              <HtmlContent html={cat.longText} style={{ paddingHorizontal: 16, paddingTop: 8 }} />
+              <HtmlContent html={cat.longText} style={{ paddingHorizontal: 16, paddingTop: 8 }} baseStyle={{ color: darkCat ? '#e2e8f0' : Colors.TEXT, textAlign: 'right', writingDirection: 'rtl' }} />
             )}
             {cat.introAudio && (
               <View style={{ paddingHorizontal: 0, paddingTop: 4, paddingBottom: 8 }}>
-                <AudioPlayer tracks={[{ title: cat.title, url: cat.introAudio }]} compact playOnLeft />
+                <AudioPlayer tracks={[{ title: cat.title, url: cat.introAudio }]} compact playOnLeft tint={darkCat ? '#1A6B8A' : undefined} textLight={darkCat} />
               </View>
             )}
             {cat.hotels.filter(h => h.visible !== false).map(h => (
@@ -1175,10 +1185,10 @@ export default function CategoryScreen() {
                 : <HotelCard key={h.id} h={h} dark={darkCat} pageBtnLabel={cat.pageBtnLabel || 'לדף המלון'} mapPoints={mapPoints} layerColor={mapLayerColor || (mapPoints.length > 0 ? Colors.PRIMARY : undefined)} placesQuery={`${h.title} Batumi`} isHotel={rootId === '1'} isAttraction={rootId === '2'} isRestaurant={rootId === '6'} />
             ))}
             {cat.longText && cat.hotels.length > 10 && (
-              <HtmlContent html={cat.longText} style={{ paddingBottom: 16, paddingHorizontal: 16 }} />
+              <HtmlContent html={cat.longText} style={{ paddingBottom: 16, paddingHorizontal: 16 }} baseStyle={{ color: darkCat ? '#e2e8f0' : Colors.TEXT, textAlign: 'right', writingDirection: 'rtl' }} />
             )}
             {(cat as any).longTextBottom && (
-              <HtmlContent html={(cat as any).longTextBottom} style={{ paddingHorizontal: 16, paddingBottom: 16, paddingTop: 8 }} />
+              <HtmlContent html={(cat as any).longTextBottom} style={{ paddingHorizontal: 16, paddingBottom: 16, paddingTop: 8 }} baseStyle={{ color: darkCat ? '#e2e8f0' : Colors.TEXT, textAlign: 'right', writingDirection: 'rtl' }} />
             )}
             {cat.cardStyle === 'foodie' && (
               <View style={{ backgroundColor: '#1e1e2a', borderRadius: 16, margin: 16, marginTop: 8, padding: 16 }}>
@@ -1310,9 +1320,9 @@ const st = StyleSheet.create({
   emptyWrap: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 },
   emptyTxt: { fontSize: 16, color: '#999', writingDirection: 'rtl' },
 
-  hero: { paddingVertical: 30, paddingHorizontal: 24, alignItems: 'center' },
-  heroTitle: { fontSize: 26, fontWeight: '800', color: Colors.WHITE, textAlign: 'center', writingDirection: 'rtl' },
-  heroSub: { fontSize: 14, color: Colors.WHITE, opacity: 0.85, marginTop: 4, textAlign: 'center', writingDirection: 'rtl' },
+  hero: { paddingVertical: 14, paddingHorizontal: 24, alignItems: 'center' },
+  heroTitle: { fontSize: 22, fontWeight: '800', color: Colors.WHITE, textAlign: 'center', writingDirection: 'rtl' },
+  heroSub: { fontSize: 13, color: Colors.WHITE, opacity: 0.85, marginTop: 2, textAlign: 'center', writingDirection: 'rtl' },
   heroImgWrap: { width: '100%', height: 180, position: 'relative' },
   heroImgBg: { width: '100%', height: '100%' },
   heroImgOverlay: {
@@ -1334,11 +1344,11 @@ const st = StyleSheet.create({
     shadowColor: Colors.TEXT, shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.07, shadowRadius: 8, elevation: 3, marginBottom: 4,
   },
-  cardTop: { height: 100, alignItems: 'center', justifyContent: 'center' },
-  cardIcon: { fontSize: 68 },
-  cardBottom: { backgroundColor: Colors.WHITE, paddingVertical: 10, paddingHorizontal: 12 },
-  cardTitle: { fontSize: 15, fontWeight: 'bold', color: '#1C2B35', textAlign: 'right', writingDirection: 'rtl' },
-  cardSub: { fontSize: 12, color: '#666', textAlign: 'right', writingDirection: 'rtl', marginTop: 2 },
+  cardTop: { height: 90, alignItems: 'center', justifyContent: 'center' },
+  cardIcon: { fontSize: 56 },
+  cardBottom: { backgroundColor: Colors.WHITE, paddingVertical: 8, paddingHorizontal: 10, minHeight: 56 },
+  cardTitle: { fontSize: 13, fontWeight: 'bold', color: '#1C2B35', textAlign: 'right', writingDirection: 'rtl' },
+  cardSub: { fontSize: 11, color: '#666', textAlign: 'right', writingDirection: 'rtl', marginTop: 2 },
 
   addCard: {
     backgroundColor: '#f0f2f5', borderWidth: 2, borderStyle: 'dashed',
@@ -1393,7 +1403,7 @@ const st = StyleSheet.create({
   hotelBody: { padding: 14 },
   hotelTitle: { fontSize: 20, fontWeight: '800', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl', marginBottom: 6 },
   hotelText: { fontSize: 14, color: '#555', lineHeight: 22, textAlign: 'right', writingDirection: 'rtl', marginBottom: 12 },
-  hotelBtnRow: { flexDirection: 'row-reverse', gap: 10 },
+  hotelBtnRow: { flexDirection: 'row-reverse', gap: 6 },
   hotelBtn: {
     flex: 1, paddingVertical: 10, borderRadius: 8,
     alignItems: 'center', justifyContent: 'center',
@@ -1401,14 +1411,14 @@ const st = StyleSheet.create({
   hotelBtnPrimary: { backgroundColor: '#1A6B8A' },
   hotelBtnSecondary: { backgroundColor: '#3DA5C4' },
   hotelBtnAccent: { backgroundColor: '#F4A94E' },
-  hotelBtnTxt: { color: Colors.WHITE, fontSize: 13, fontWeight: '700' },
+  hotelBtnTxt: { color: Colors.WHITE, fontSize: 12, fontWeight: '700', textAlign: 'center', writingDirection: 'rtl' },
   hotelBtnDisabled: { opacity: 0.6 },
   hotelBtnTxtDisabled: {},
 
   tourGrid: { padding: 16, flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 12 },
   tourGridWrap: { width: '47%' },
-  tourGridStars: { flexDirection: 'row-reverse', justifyContent: 'center', gap: 2, marginBottom: 4 },
-  tourGridStar: { fontSize: 16, color: '#d1d5db' },
+  tourGridStars: { flexDirection: 'row-reverse', justifyContent: 'center', alignItems: 'center', gap: 1, marginBottom: 4 },
+  tourGridStar: { fontSize: 12, color: '#d1d5db' },
   tourGridStarOn: { color: '#F4A94E' },
   tourGridPopular: { fontSize: 10, fontWeight: '800', color: '#B45309', textAlign: 'center', writingDirection: 'rtl', marginTop: 2, marginBottom: 4 },
   tourGridCard: {

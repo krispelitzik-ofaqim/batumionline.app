@@ -383,8 +383,8 @@ export default function FlightsModal({ visible, onClose, bgColor }: { visible: b
                     )}
                   </View>
                   <View style={{ flex: 1 }}>
-                    <Text style={s.flightNum}>{f.flight}</Text>
-                    <Text style={s.airline}>{f.airline}</Text>
+                    <Text style={s.flightNum} numberOfLines={1}>{f.flight}</Text>
+                    <Text style={s.airline} numberOfLines={1}>{f.airline}</Text>
                   </View>
                   <View style={s.timeCol}>
                     <Text style={s.timeVal}>{f.depTime}</Text>
@@ -680,19 +680,19 @@ const s = StyleSheet.create({
   thCell: { fontSize: 12, fontWeight: '700', color: Colors.WHITE, opacity: 0.5, textAlign: 'right', writingDirection: 'rtl' },
 
   flightRow: {
-    flexDirection: 'row-reverse', alignItems: 'center', gap: 6,
-    backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 12, padding: 14, marginBottom: 6,
+    flexDirection: 'row-reverse', alignItems: 'center', gap: 4,
+    backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 12, padding: 8, marginBottom: 6,
   },
-  logo: { width: 36, height: 36, borderRadius: 6, backgroundColor: 'rgba(255,255,255,0.1)' },
-  flightNum: { fontSize: 15, fontWeight: '700', color: Colors.WHITE, textAlign: 'right' },
-  airline: { fontSize: 11, color: Colors.WHITE, opacity: 0.5, textAlign: 'right' },
-  timeCol: { alignItems: 'center', width: 48 },
-  timeVal: { fontSize: 15, fontWeight: '700', color: Colors.WHITE },
-  timeDateLabel: { fontSize: 10, color: Colors.WHITE, opacity: 0.6, marginTop: 1 },
-  timeLabel: { fontSize: 10, color: Colors.WHITE, opacity: 0.4, marginTop: 1 },
-  timeArrow: { fontSize: 12, color: Colors.WHITE, opacity: 0.3, marginHorizontal: 2 },
-  statusBadge: { paddingVertical: 5, paddingHorizontal: 6, borderRadius: 8, alignItems: 'center', alignSelf: 'center', width: 80 },
-  statusTxt: { fontSize: 11, fontWeight: '700', color: Colors.WHITE, writingDirection: 'rtl' },
+  logo: { width: 30, height: 30, borderRadius: 6, backgroundColor: 'rgba(255,255,255,0.1)' },
+  flightNum: { fontSize: 13, fontWeight: '700', color: Colors.WHITE, textAlign: 'right' },
+  airline: { fontSize: 10, color: Colors.WHITE, opacity: 0.5, textAlign: 'right' },
+  timeCol: { alignItems: 'center', width: 42 },
+  timeVal: { fontSize: 13, fontWeight: '700', color: Colors.WHITE },
+  timeDateLabel: { fontSize: 9, color: Colors.WHITE, opacity: 0.6, marginTop: 1 },
+  timeLabel: { fontSize: 9, color: Colors.WHITE, opacity: 0.4, marginTop: 1 },
+  timeArrow: { fontSize: 11, color: Colors.WHITE, opacity: 0.3, marginHorizontal: 1 },
+  statusBadge: { paddingVertical: 4, paddingHorizontal: 4, borderRadius: 8, alignItems: 'center', alignSelf: 'center', width: 60 },
+  statusTxt: { fontSize: 10, fontWeight: '700', color: Colors.WHITE, writingDirection: 'rtl' },
 
   detailsOverlay: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(10,20,30,0.96)', zIndex: 100 },
   detailsClose: { position: 'absolute', top: 54, right: 20, zIndex: 110, width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.25)', justifyContent: 'center', alignItems: 'center' },
