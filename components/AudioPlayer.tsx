@@ -175,7 +175,7 @@ export default function AudioPlayer({ tracks: initialTracks, title, compact, onN
   if (!tracks || tracks.length === 0) return null;
 
   return (
-    <View style={[styles.card, compact && styles.cardCompact, tint && { backgroundColor: tint, borderColor: 'rgba(0,0,0,0.1)' }]}>
+    <View style={[styles.card, compact && styles.cardCompact, tint && { backgroundColor: tint, borderColor: 'rgba(255,255,255,0.4)', borderWidth: 1.5, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8 }]}>
       {title && <Text style={styles.header}>{title}</Text>}
 
       {compact ? (

@@ -61,7 +61,65 @@ export default function SearchModal({ visible, onClose }: { visible: boolean; on
         }
       }
     }
-    return out.slice(0, 30);
+
+    // Portals
+    if (matches('פורטל הנדל"ן') || matches('נדל"ן') || matches('דירות') || matches('מכירה') || matches('השכרה') || matches('פרויקט')) {
+      out.push({ id: 'portal_re', title: 'פורטל הנדל״ן', path: '/portal/realestate', icon: '🏠' });
+    }
+    if (matches('פורטל העסקים') || matches('עסקים') || matches('בנק') || matches('עורך דין')) {
+      out.push({ id: 'portal_biz', title: 'פורטל העסקים', path: '/portal/business', icon: '💼' });
+    }
+    if (matches('מתווך') || matches('מתווכים')) {
+      out.push({ id: 'portal_brokers', title: 'מתווכים מומלצים', path: '/portal/brokers', icon: '🤝' });
+    }
+
+    // Curated listings
+    for (const tab of ['sale', 'rent', 'hotels']) {
+      const list = (data.curatedListings || {})[tab] || [];
+      for (const lst of list) {
+        if (matches(lst.title) || matches(lst.location) || matches((lst.features || []).join(' '))) {
+          out.push({ id: `curated:${lst.id}`, title: lst.title, path: '/portal/realestate' as any, parentTitle: tab === 'sale' ? 'דירות למכירה' : tab === 'rent' ? 'דירות להשכרה' : 'פרויקטים מלונאיים' });
+        }
+      }
+    }
+
+    // Future projects
+    for (const f of (data.futureProjects || [])) {
+      if (matches(f.title) || matches(f.article) || matches((f.features || []).join(' '))) {
+        out.push({ id: `future:${f.id}`, title: f.title, path: '/portal/realestate' as any, parentTitle: 'עתיד הנדל״ן' });
+      }
+    }
+
+    // News
+    if (matches('חדשות')) {
+      out.push({ id: 'news_section', title: 'חדשות נדל״ן', path: '/portal/realestate' as any, icon: '📰' });
+    }
+    for (const cat of (data.realEstate?.newsCategories || [])) {
+      if (matches(cat.title)) {
+        out.push({ id: `news_cat:${cat.id}`, title: cat.title, path: '/portal/realestate' as any, parentTitle: 'חדשות נדל״ן', icon: cat.icon });
+      }
+      for (const n of (cat.items || [])) {
+        if (matches(n.title) || matches(n.summary) || matches(n.article)) {
+          out.push({ id: `news:${n.id}`, title: n.title, path: '/portal/realestate' as any, parentTitle: cat.title });
+        }
+      }
+    }
+
+    // Articles
+    for (const a of (data.realEstateArticles || [])) {
+      if (matches(a.title) || matches(a.summary) || matches(a.article)) {
+        out.push({ id: `art:${a.id}`, title: a.title, path: '/portal/realestate' as any, parentTitle: 'כתבות וטיפים' });
+      }
+    }
+
+    // Brokers
+    for (const b of (data.brokers || [])) {
+      if (matches(b.name) || matches(b.title) || matches(b.description) || matches(b.city)) {
+        out.push({ id: `broker:${b.id}`, title: b.name, path: '/portal/brokers' as any, parentTitle: 'מתווכים' });
+      }
+    }
+
+    return out.slice(0, 50);
   }, [query, data]);
 
   const open = (r: Result) => {

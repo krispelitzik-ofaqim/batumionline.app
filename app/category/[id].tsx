@@ -1347,11 +1347,11 @@ const st = StyleSheet.create({
     shadowColor: Colors.TEXT, shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.07, shadowRadius: 8, elevation: 3, marginBottom: 4,
   },
-  cardTop: { height: 90, alignItems: 'center', justifyContent: 'center' },
-  cardIcon: { fontSize: 56 },
-  cardBottom: { backgroundColor: Colors.WHITE, paddingVertical: 8, paddingHorizontal: 10, minHeight: 56 },
-  cardTitle: { fontSize: 13, fontWeight: 'bold', color: '#1C2B35', textAlign: 'right', writingDirection: 'rtl' },
-  cardSub: { fontSize: 11, color: '#666', textAlign: 'right', writingDirection: 'rtl', marginTop: 2 },
+  cardTop: { height: 80, alignItems: 'center', justifyContent: 'center' },
+  cardIcon: { fontSize: 48 },
+  cardBottom: { backgroundColor: Colors.WHITE, paddingVertical: 6, paddingHorizontal: 10, minHeight: 44 },
+  cardTitle: { fontSize: 12, fontWeight: 'bold', color: '#1C2B35', textAlign: 'right', writingDirection: 'rtl' },
+  cardSub: { fontSize: 10, color: '#666', textAlign: 'right', writingDirection: 'rtl', marginTop: 1 },
 
   addCard: {
     backgroundColor: '#f0f2f5', borderWidth: 2, borderStyle: 'dashed',

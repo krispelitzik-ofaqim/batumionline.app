@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Image, Linking } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Image, Linking, Modal } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '../../constants/colors';
@@ -43,6 +43,7 @@ const FALLBACK: Broker[] = Array.from({ length: 6 }, (_, i) => ({
 
 export default function BrokersPortal() {
   const [items, setItems] = useState<Broker[]>(FALLBACK);
+  const [showCriteria, setShowCriteria] = useState(false);
 
   useEffect(() => {
     fetchContent().then(d => {
@@ -53,15 +54,38 @@ export default function BrokersPortal() {
   return (
     <SafeAreaView style={s.safe}>
       <View style={s.header}>
+        <Text style={s.title}>מתווכי נדל"ן מורשים</Text>
         <TouchableOpacity onPress={() => router.canGoBack() ? router.back() : router.replace('/portal/realestate' as any)} style={s.backBtn}>
           <Text style={s.backTxt}>‹</Text>
         </TouchableOpacity>
-        <Text style={s.title}>מתווכי נדל"ן מורשים</Text>
       </View>
 
-      <View style={s.intro}>
-        <Text style={s.introTxt}>✓ כל המתווכים נבדקו ואושרו על ידי פורטל הנדל"ן. רישיון, ניסיון, ושירות בעברית.</Text>
+      <View style={{ flexDirection: 'row-reverse', gap: 8, padding: 12, backgroundColor: '#f0fdf4', borderBottomWidth: 1, borderBottomColor: '#bbf7d0' }}>
+        <TouchableOpacity onPress={() => setShowCriteria(true)} style={[s.topBtn, { backgroundColor: '#fff', borderWidth: 1, borderColor: '#15803d' }]} activeOpacity={0.85}>
+          <Text style={[s.topBtnTxt, { color: '#15803d' }]}>📋 מה נדרש מהמתווכים?</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => Linking.openURL('https://wa.me/972502844867?text=' + encodeURIComponent('שלום, אני רוצה להמליץ על מתווך נדל"ן בבטומי. שם המתווך: '))} style={[s.topBtn, { backgroundColor: Colors.PRIMARY }]} activeOpacity={0.85}>
+          <Text style={[s.topBtnTxt, { color: '#fff' }]}>+ המלץ על מתווך</Text>
+        </TouchableOpacity>
       </View>
+
+      <Modal visible={showCriteria} transparent animationType="slide" onRequestClose={() => setShowCriteria(false)}>
+        <TouchableOpacity activeOpacity={1} onPress={() => setShowCriteria(false)} style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'flex-start' }}>
+          <TouchableOpacity activeOpacity={1} style={{ backgroundColor: '#fff', borderBottomLeftRadius: 20, borderBottomRightRadius: 20, padding: 20, paddingTop: 50 }}>
+            <Text style={{ fontSize: 16, fontWeight: '900', color: '#15803d', writingDirection: 'rtl', textAlign: 'right', marginBottom: 12 }}>✓ קריטריוני אימות מתווכים</Text>
+            <Text style={s.introBullet}>• ניסיון מוכח בנדל"ן בבטומי - מעל שנתיים</Text>
+            <Text style={s.introBullet}>• חשבון בנק פעיל בבטומי</Text>
+            <Text style={s.introBullet}>• ערוץ תקשורת (אתר, פייסבוק, אחר)</Text>
+            <Text style={s.introBullet}>• הצגת הסכם מכר שבוצע בעבר</Text>
+            <Text style={s.introBullet}>• שיחת טלפון אישית</Text>
+            <Text style={s.introBullet}>• שליחת פרטים, תמונה ומסמכים נוספים (ככל שיידרשו)</Text>
+            <Text style={s.introBullet}>• 2 ממליצים לפחות</Text>
+            <TouchableOpacity onPress={() => setShowCriteria(false)} style={{ marginTop: 16, paddingVertical: 10, borderRadius: 8, backgroundColor: '#15803d', alignItems: 'center' }}>
+              <Text style={{ color: '#fff', fontWeight: '900', fontSize: 14 }}>הבנתי</Text>
+            </TouchableOpacity>
+          </TouchableOpacity>
+        </TouchableOpacity>
+      </Modal>
 
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 16, gap: 12 }}>
         {items.map(b => (
@@ -103,7 +127,13 @@ const s = StyleSheet.create({
   backTxt: { color: '#fff', fontSize: 22, fontWeight: '300' },
   title: { flex: 1, fontSize: 18, fontWeight: '900', color: '#fff', textAlign: 'right', writingDirection: 'rtl' },
   intro: { padding: 12, backgroundColor: '#dcfce7', borderBottomWidth: 1, borderBottomColor: '#bbf7d0' },
-  introTxt: { fontSize: 12, color: '#166534', textAlign: 'right', writingDirection: 'rtl', lineHeight: 18 },
+  introTitle: { fontSize: 13, fontWeight: '900', color: '#166534', textAlign: 'right', writingDirection: 'rtl', marginBottom: 6 },
+  introBullet: { fontSize: 11, color: '#166534', textAlign: 'right', writingDirection: 'rtl', lineHeight: 18 },
+  topBtn: { flex: 1, paddingVertical: 10, borderRadius: 8, alignItems: 'center' },
+  topBtnTxt: { fontSize: 12, fontWeight: '900', writingDirection: 'rtl' },
+  recBtn: { marginHorizontal: 16, marginTop: 12, paddingVertical: 12, paddingHorizontal: 16, borderRadius: 12, backgroundColor: Colors.PRIMARY, alignItems: 'center' },
+  recBtnTitle: { fontSize: 15, fontWeight: '900', color: '#fff', writingDirection: 'rtl' },
+  recBtnSub: { fontSize: 11, color: 'rgba(255,255,255,0.85)', writingDirection: 'rtl', marginTop: 2 },
   card: { backgroundColor: '#fff', borderRadius: 14, padding: 12, borderWidth: 1, borderColor: '#e2e8f0' },
   img: { width: 80, height: 80, borderRadius: 8 },
   cardKicker: { fontSize: 11, fontWeight: '700', color: Colors.PRIMARY, textAlign: 'right', writingDirection: 'rtl' },

@@ -158,6 +158,7 @@ export default function HomeScreen() {
   const [reBannerKicker, setReBannerKicker] = useState('BATUMI');
   const [reBannerTitle, setReBannerTitle] = useState('פורטל הנדל״ן והעסקים');
   const [reBannerSub, setReBannerSub] = useState('כל העסקים והנכסים של בטומי במקום אחד');
+  const [bgColor, setBgColor] = useState(Colors.BACKGROUND);
   const { simulatedWidth } = useContext(PreviewContext);
   const w = simulatedWidth ? Math.min(simulatedWidth, screenW) : screenW;
   const cardW = (w - 48) / 2;
@@ -191,6 +192,7 @@ export default function HomeScreen() {
         if (re?.kicker !== undefined) setReBannerKicker(re.kicker || '');
         if (re?.bannerTitle !== undefined) setReBannerTitle(re.bannerTitle || '');
         if (re?.bannerSub !== undefined) setReBannerSub(re.bannerSub || '');
+        if (data.bgColor) setBgColor(data.bgColor);
       })
       .catch(() => {
         // Fallback to hardcoded data — already set as defaults
@@ -227,7 +229,7 @@ export default function HomeScreen() {
   };
 
   return (
-    <View style={[styles.safe, dark && { backgroundColor: Colors.TEXT }]}>
+    <View style={[styles.safe, { backgroundColor: bgColor }, dark && { backgroundColor: Colors.TEXT }]}>
       {editMode && <EditToolbar onSave={handleSaveEdit} onExit={handleExitEdit} />}
       <PopupDisplay page="home" />
       <ScrollView

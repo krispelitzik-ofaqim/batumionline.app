@@ -270,15 +270,12 @@ function RichEditor({ value, onChange }: { value: string; onChange: (v: string) 
   ]);
 
   const colorPicker = (key: string, cmd: string, label: string) =>
-    React.createElement('div', { key, style: { position: 'relative', display: 'inline-block' } }, [
-      React.createElement('button', {
-        key: 'btn', type: 'button',
-        onClick: () => {
-          const c = (window as any).prompt(`${label} (hex):`, '#000000');
-          if (c) exec(cmd, c);
-        },
-        style: btnStyle,
-      }, label),
+    React.createElement('label', { key, style: { ...btnStyle, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 4 } }, [
+      label,
+      React.createElement('input', {
+        key: 'inp', type: 'color', defaultValue: '#000000', style: { width: 0, height: 0, opacity: 0, position: 'absolute' },
+        onChange: (e: any) => exec(cmd, e.target.value),
+      }),
     ]);
 
   const promptLink = () => {
@@ -715,6 +712,118 @@ function CuratedListingsEditor() {
       )}
       </>
       )}
+    </View>
+  );
+}
+
+function HomeBannerEditor() {
+  const [imgs, setImgs] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    fetchContent().then(d => {
+      setImgs(Array.isArray(d?.homeBanner) ? d.homeBanner : []);
+      setLoading(false);
+    }).catch(() => setLoading(false));
+  }, []);
+
+  const upload = async (file: File): Promise<string | null> => {
+    const fd = new FormData();
+    fd.append('file', file);
+    try {
+      const r = await fetch(`${API_BASE}/api/upload`, { method: 'POST', body: fd });
+      const j = await r.json();
+      return j.success && j.filename ? `/uploads/${j.filename}` : null;
+    } catch { return null; }
+  };
+
+  const remove = (idx: number) => setImgs(p => p.filter((_, i) => i !== idx));
+
+  const save = async () => {
+    setSaving(true);
+    try {
+      await fetch(`${API_BASE}/api/content/homeBanner`, {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(imgs),
+      });
+      setSaved(true); setTimeout(() => setSaved(false), 2000);
+    } catch {}
+    setSaving(false);
+  };
+
+  return (
+    <View style={{ padding: 12, marginTop: 12, backgroundColor: '#f8fafc', borderRadius: 10, borderWidth: 1, borderColor: '#e2e8f0' }}>
+      <Text style={{ fontSize: 13, fontWeight: '900', color: '#1C2B35', writingDirection: 'rtl', textAlign: 'right', marginBottom: 4 }}>🖼️ באנר מתחלף בדף הבית</Text>
+      <Text style={{ fontSize: 10, color: '#64748b', writingDirection: 'rtl', textAlign: 'right', marginBottom: 8 }}>תמונות שמתחלפות בראש דף הבית (מומלץ 6-10)</Text>
+      <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 6, marginBottom: 8 }}>
+        {imgs.map((u, i) => (
+          <View key={i} style={{ position: 'relative' }}>
+            <Image source={{ uri: resolveUri(u) }} style={{ width: 80, height: 80, borderRadius: 6 }} />
+            <TouchableOpacity onPress={() => remove(i)} style={{ position: 'absolute', top: -6, left: -6, width: 20, height: 20, borderRadius: 10, backgroundColor: '#dc2626', alignItems: 'center', justifyContent: 'center' }}>
+              <Text style={{ color: '#fff', fontSize: 11, fontWeight: '900' }}>✕</Text>
+            </TouchableOpacity>
+          </View>
+        ))}
+      </View>
+      {Platform.OS === 'web' && React.createElement('div', { style: { marginBottom: 8 } }, [
+        React.createElement('input', {
+          key: 'inp', type: 'file', accept: 'image/*', id: 'home_banner_file', style: { display: 'none' },
+          onChange: async (e: any) => { const f = e.target.files?.[0]; if (!f) return; const url = await upload(f); if (url) setImgs(p => [...p, url]); e.target.value = ''; },
+        }),
+        React.createElement('button', {
+          key: 'btn', type: 'button',
+          onClick: () => { const el = (document as any).getElementById('home_banner_file'); if (el) el.click(); },
+          style: { width: '100%', backgroundColor: '#fff', border: '2px dashed #cbd5e1', borderRadius: 6, padding: 8, cursor: 'pointer', color: '#1C2B35', fontSize: 12, fontWeight: 800 },
+        }, '📤 הוסף תמונה'),
+      ])}
+      <TouchableOpacity onPress={save} disabled={saving} style={{ backgroundColor: Colors.PRIMARY, borderRadius: 8, paddingVertical: 8, alignItems: 'center', opacity: saving ? 0.5 : 1 }}>
+        <Text style={{ color: '#fff', fontWeight: '900', fontSize: 13 }}>{saved ? '✓ נשמר' : saving ? 'שומר...' : '💾 שמור באנר'}</Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
+
+function BgColorPicker() {
+  const [color, setColor] = useState('#F7F3ED');
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    fetchContent().then(d => {
+      if (d?.bgColor) setColor(d.bgColor);
+    }).catch(() => {});
+  }, []);
+
+  const presets = ['#F7F3ED', '#FFFFFF', '#F5F5F5', '#E8DCC4', '#FFF8E7', '#F0EDE5', '#1C2B35', '#0F172A'];
+
+  const save = async () => {
+    setSaving(true);
+    try {
+      await fetch(`${API_BASE}/api/content/bgColor`, {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(color),
+      });
+      setSaved(true); setTimeout(() => setSaved(false), 2000);
+    } catch {}
+    setSaving(false);
+  };
+
+  return (
+    <View style={{ padding: 12, marginTop: 12, backgroundColor: '#f8fafc', borderRadius: 10, borderWidth: 1, borderColor: '#e2e8f0' }}>
+      <Text style={{ fontSize: 13, fontWeight: '800', color: '#1C2B35', writingDirection: 'rtl', textAlign: 'right', marginBottom: 8 }}>🎨 צבע רקע האתר</Text>
+      <View style={{ flexDirection: 'row-reverse', gap: 8, alignItems: 'center', marginBottom: 8, flexWrap: 'wrap' }}>
+        {presets.map(c => (
+          <TouchableOpacity key={c} onPress={() => setColor(c)} style={{ width: 36, height: 36, borderRadius: 8, backgroundColor: c, borderWidth: color === c ? 3 : 1, borderColor: color === c ? Colors.PRIMARY : '#cbd5e1' }} />
+        ))}
+      </View>
+      <View style={{ flexDirection: 'row-reverse', gap: 8, alignItems: 'center' }}>
+        <Text style={{ fontSize: 11, color: '#475569' }}>HEX:</Text>
+        <TextInput style={{ flex: 1, borderWidth: 1, borderColor: '#cbd5e1', borderRadius: 6, padding: 6, fontSize: 12 }} value={color} onChangeText={setColor} placeholder="#F7F3ED" />
+        <View style={{ width: 36, height: 36, borderRadius: 8, backgroundColor: color, borderWidth: 1, borderColor: '#cbd5e1' }} />
+        <TouchableOpacity onPress={save} disabled={saving} style={{ paddingHorizontal: 14, paddingVertical: 8, borderRadius: 6, backgroundColor: Colors.PRIMARY, opacity: saving ? 0.5 : 1 }}>
+          <Text style={{ color: '#fff', fontSize: 12, fontWeight: '800' }}>{saved ? '✓' : 'שמור'}</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -3137,6 +3246,8 @@ export default function AdminDashboard() {
         <Text style={cs.contentTitle}>דף הבית</Text>
         <Text style={cs.contentSub}>תצוגה מקדימה של דף הבית כפי שהגולש רואה</Text>
 
+        <HomeBannerEditor />
+        <BgColorPicker />
         <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 12, padding: 12, marginTop: 12, backgroundColor: '#f8fafc', borderRadius: 10, borderWidth: 1, borderColor: '#e2e8f0' }}>
           <Text style={{ flex: 1, fontSize: 13, fontWeight: '700', color: '#1C2B35', writingDirection: 'rtl', textAlign: 'right' }}>הצג סרגל תצוגה (נייד/אייפד/מחשב)</Text>
           <TouchableOpacity

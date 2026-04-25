@@ -65,14 +65,14 @@ export default function InfoPage() {
               Platform.OS === 'web' ? (
                 React.createElement('img', {
                   src: portalItem.image,
-                  style: { width: '100%', height: 240, objectFit: 'cover', display: 'block' },
+                  style: { width: '100%', height: 160, objectFit: 'cover', display: 'block' },
                   alt: portalItem.title,
                 })
               ) : (
-                <Image source={{ uri: resolveUri(portalItem.image) }} style={{ width: '100%', height: 240 }} resizeMode="cover" />
+                <Image source={{ uri: resolveUri(portalItem.image) }} style={{ width: '100%', height: 160 }} resizeMode="cover" />
               )
             ) : (
-              <LinearGradient colors={['#1A6B8A', '#3DA5C4']} style={{ height: 240 }} />
+              <LinearGradient colors={['#1A6B8A', '#3DA5C4']} style={{ height: 160 }} />
             )}
             <LinearGradient colors={['transparent', 'rgba(0,0,0,0.8)']} style={{ position: 'absolute', bottom: 0, left: 0, right: 0, paddingHorizontal: 20, paddingBottom: 24, paddingTop: 60 }}>
               <Text style={{ fontSize: 26, fontWeight: '900', color: '#fff', textAlign: 'right', writingDirection: 'rtl' }}>{portalItem.title}</Text>
@@ -222,11 +222,11 @@ export default function InfoPage() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.BACKGROUND },
   topRow: { flexDirection: 'row-reverse', paddingHorizontal: 12, paddingTop: 16, paddingBottom: 8, gap: 8 },
-  bannerWrap: { flex: 1, borderRadius: 14, shadowColor: '#000', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.1, shadowRadius: 6, elevation: 3 },
-  banner: { borderRadius: 14, paddingVertical: 12, paddingHorizontal: 6, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.WHITE, borderWidth: 1, borderColor: Colors.SECONDARY + '30', minHeight: 74 },
+  bannerWrap: { flex: 1, borderRadius: 10, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.08, shadowRadius: 4, elevation: 2 },
+  banner: { borderRadius: 12, paddingVertical: 10, paddingHorizontal: 4, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.WHITE, borderWidth: 1, borderColor: Colors.SECONDARY + '30', minHeight: 64 },
   bannerOn: { borderColor: 'transparent' },
   icon: { fontSize: 24, marginBottom: 4 },
-  bannerTxt: { fontSize: 12, fontWeight: '800', color: Colors.PRIMARY, writingDirection: 'rtl', textAlign: 'center' },
+  bannerTxt: { fontSize: 11, fontWeight: '800', color: Colors.PRIMARY, writingDirection: 'rtl', textAlign: 'center' },
   bannerTxtOn: { color: Colors.WHITE },
   bodyWrap: { padding: 16, paddingTop: 8, paddingBottom: 40 },
   card: { backgroundColor: Colors.WHITE, borderRadius: 16, padding: 20, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 8, elevation: 2 },

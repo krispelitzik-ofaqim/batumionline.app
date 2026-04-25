@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Image, StyleSheet, TouchableOpacity, Text, useWindowDimensions } from 'react-native';
-import { API_BASE, resolveUri } from '../constants/api';
+import { API_BASE, resolveUri, fetchContent } from '../constants/api';
 
 type GalleryFile = { filename: string; url: string };
 
@@ -11,19 +11,21 @@ export default function HomeGallery() {
   const timer = useRef<any>(null);
 
   useEffect(() => {
-    (async () => {
-      try {
-        const r = await fetch(`${API_BASE}/api/uploads`);
-        const j = await r.json();
-        const galleryFiles = j.success ? (j.files || []).filter((f: any) => (f.tags || []).includes('gallery_main')) : [];
-        if (galleryFiles.length > 0) { setFiles(galleryFiles); return; }
-        // fallback: Unsplash Batumi photos
-        const ur = await fetch(`${API_BASE}/api/unsplash?q=batumi%20georgia&count=15`);
-        const uj = await ur.json();
-        const photos = (uj.photos || []).map((p: any, i: number) => ({ filename: `unsplash_${p.id}`, url: p.url }));
-        setFiles(photos);
-      } catch {}
-    })();
+    const FALLBACK: GalleryFile[] = [
+      { filename: 'b1', url: '/uploads/1775910069485-6.jpg' },
+      { filename: 'b2', url: '/uploads/1775910069516-30.jpg' },
+      { filename: 'b3', url: '/uploads/1775910069548-933.jpg' },
+      { filename: 'b4', url: '/uploads/1775910069562-341.jpg' },
+      { filename: 'b5', url: '/uploads/1775910069573-698.jpg' },
+      { filename: 'b6', url: '/uploads/1775910069590-365.jpg' },
+    ];
+    fetchContent().then((d: any) => {
+      if (Array.isArray(d?.homeBanner) && d.homeBanner.length > 0) {
+        setFiles(d.homeBanner.map((u: string, i: number) => ({ filename: `hb${i}`, url: u })));
+      } else {
+        setFiles(FALLBACK);
+      }
+    }).catch(() => setFiles(FALLBACK));
   }, []);
 
   useEffect(() => {
@@ -56,8 +58,9 @@ export default function HomeGallery() {
 
 const styles = StyleSheet.create({
   wrap: {
-    height: 180, borderRadius: 16, overflow: 'hidden',
+    height: 180, borderRadius: 18, overflow: 'hidden',
     alignSelf: 'center', marginBottom: 18, backgroundColor: '#eee',
+    shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.18, shadowRadius: 12, elevation: 5,
   },
   dots: {
     position: 'absolute', bottom: 10, left: 0, right: 0,

@@ -9,6 +9,7 @@ import BusinessServicesSlider from '../../components/BusinessServicesSlider';
 import RealEstateGallery from '../../components/RealEstateGallery';
 import CurrencyTicker from '../../components/CurrencyTicker';
 import BottomTabBar from '../../components/BottomTabBar';
+import AppHeader from '../../components/AppHeader';
 import FinanceStats from '../../components/FinanceStats';
 import ListingForm from '../../components/ListingForm';
 import ListingsList from '../../components/ListingsList';
@@ -151,6 +152,7 @@ export default function RealEstatePortal() {
 
   return (
     <View style={s.container}>
+      <AppHeader crumbs={[{ title: 'פורטל הנדל״ן' }]} />
       <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
         {/* Hero */}
         <ImageBackground
@@ -538,12 +540,14 @@ function BrokerBanner() {
   return (
     <View style={{ paddingHorizontal: 16, marginTop: 16 }}>
       <Text style={{ fontSize: 14, fontWeight: '700', color: '#888', textAlign: 'right', writingDirection: 'rtl', marginBottom: 8 }}>מתווכים מומלצים בבטומי</Text>
-      <TouchableOpacity activeOpacity={0.85} onPress={() => router.push('/portal/brokers' as any)} style={{ flexDirection: 'row-reverse', backgroundColor: '#fff', borderRadius: 14, overflow: 'hidden', borderWidth: 1, borderColor: '#e2e8f0', height: 110 }}>
-        <Image source={{ uri: resolveUri(broker.image) }} style={{ width: 110, height: '100%' }} resizeMode="cover" />
-        <View style={{ flex: 1, padding: 12, justifyContent: 'center' }}>
-          <Text style={{ fontSize: 12, fontWeight: '700', color: Colors.PRIMARY, textAlign: 'right', writingDirection: 'rtl' }}>✓ {broker.title}</Text>
-          <Text style={{ fontSize: 17, fontWeight: '900', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl', marginTop: 2 }}>{broker.name}</Text>
-          <Text style={{ fontSize: 12, color: '#475569', textAlign: 'right', writingDirection: 'rtl', marginTop: 4 }}>📞 {broker.phone}</Text>
+      <TouchableOpacity activeOpacity={0.85} onPress={() => router.push('/portal/brokers' as any)} style={{ flexDirection: 'row-reverse', backgroundColor: '#fff', borderRadius: 14, overflow: 'hidden', borderWidth: 1, borderColor: '#e2e8f0', minHeight: 110 }}>
+        <Image source={{ uri: resolveUri(broker.image) }} style={{ width: 110, height: 'auto', minHeight: 110 }} resizeMode="cover" />
+        <View style={{ flex: 1, padding: 10, justifyContent: 'space-between' }}>
+          <View>
+            <Text style={{ fontSize: 11, fontWeight: '700', color: Colors.PRIMARY, textAlign: 'right', writingDirection: 'rtl' }} numberOfLines={1}>✓ {broker.title}</Text>
+            <Text style={{ fontSize: 16, fontWeight: '900', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl', marginTop: 2 }} numberOfLines={1}>{broker.name}</Text>
+            <Text style={{ fontSize: 11, color: '#475569', textAlign: 'right', writingDirection: 'rtl', marginTop: 2 }} numberOfLines={1}>📞 {broker.phone}</Text>
+          </View>
           <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginTop: 6 }}>
             <Text style={{ fontSize: 10, color: '#64748b' }}>לכל המתווכים ›</Text>
             <View style={{ flexDirection: 'row', gap: 3 }}>
@@ -675,9 +679,9 @@ function FutureCard({ p, width }: { p: Listing; width: number }) {
 }
 
 function FutureSlider({ projects }: { projects: Listing[] }) {
-  const SLIDE_W = 340;
-  const GAP = 12;
   const { width } = useWindowDimensions();
+  const SLIDE_W = Math.min(width - 64, 360);
+  const GAP = 12;
   const scrollRef = useRef<ScrollView>(null);
   const [idx, setIdx] = useState(0);
   const goTo = (i: number) => {
@@ -720,7 +724,7 @@ function FutureSlider({ projects }: { projects: Listing[] }) {
 
 function NewsSliderArrows({ news }: { news: Article[] }) {
   const { width } = useWindowDimensions();
-  const SLIDE_W = Math.min(width - 64, 360);
+  const SLIDE_W = width - 32;
   const GAP = 12;
   const sidePad = 16;
   const scrollRef = useRef<ScrollView>(null);

@@ -57,8 +57,8 @@ export default function BusinessServicesSlider({ variant, onPressService }: Prop
 }
 
 const s = StyleSheet.create({
-  wrap: { marginTop: 18 },
-  header: { fontSize: 16, fontWeight: '800', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl', marginBottom: 10, paddingHorizontal: 16 },
+  wrap: { marginTop: 18, paddingHorizontal: 16 },
+  header: { fontSize: 18, fontWeight: '800', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl', marginBottom: 10 },
   row: { gap: 10, paddingHorizontal: 16 },
   card: {
     borderRadius: 16, overflow: 'hidden',

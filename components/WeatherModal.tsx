@@ -509,10 +509,10 @@ function SkCell({ icon, label, val }: { icon: string; label: string; val: string
 }
 
 const skS = StyleSheet.create({
-  cell: { width: '33.333%', paddingVertical: 10, paddingHorizontal: 4, alignItems: 'center' },
-  icon: { fontSize: 22, marginBottom: 4 },
-  val: { fontSize: 15, fontWeight: '900', color: '#fff', textShadowColor: 'rgba(0,0,0,0.35)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 2 },
-  label: { fontSize: 10, color: 'rgba(255,255,255,0.75)', marginTop: 2, fontWeight: '700', writingDirection: 'rtl', textAlign: 'center' },
+  cell: { width: '33.333%', paddingVertical: 8, paddingHorizontal: 2, alignItems: 'center' },
+  icon: { fontSize: 18, marginBottom: 3 },
+  val: { fontSize: 13, fontWeight: '900', color: '#fff', textShadowColor: 'rgba(0,0,0,0.35)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 2 },
+  label: { fontSize: 9, color: 'rgba(255,255,255,0.75)', marginTop: 2, fontWeight: '700', writingDirection: 'rtl', textAlign: 'center' },
 });
 
 function hourGradient(hour: number): [string, string] {
@@ -631,7 +631,7 @@ const s = StyleSheet.create({
   camBannerIcon: { fontSize: 20 },
   camBannerTxt: { flex: 1, fontSize: 15, fontWeight: '800', color: '#fff', textAlign: 'right', writingDirection: 'rtl' },
   camBannerArrow: { fontSize: 22, color: '#fff', opacity: 0.7 },
-  title: { fontSize: 24, fontWeight: '800', color: Colors.WHITE, textAlign: 'center', writingDirection: 'rtl', flex: 1, textShadowColor: 'rgba(0,0,0,0.35)', textShadowOffset: { width: 0, height: 2 }, textShadowRadius: 4 },
+  title: { fontSize: 20, fontWeight: '800', color: Colors.WHITE, textAlign: 'center', writingDirection: 'rtl', flex: 1, textShadowColor: 'rgba(0,0,0,0.35)', textShadowOffset: { width: 0, height: 2 }, textShadowRadius: 4 },
   liveHeader: { flexDirection: 'row-reverse', alignItems: 'center', gap: 10, marginBottom: 4 },
   liveBadge: { flexDirection: 'row-reverse', alignItems: 'center', gap: 5, backgroundColor: '#EF4444', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 },
   liveDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#fff' },
