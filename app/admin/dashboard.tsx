@@ -2278,7 +2278,23 @@ export default function AdminDashboard() {
         </View>
 
         {Platform.OS === 'web' && (
-          <View style={{ alignItems: 'center', marginTop: 20 }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 24, marginTop: 20, paddingLeft: 20 }}>
+            {/* iPhone 12 — actual size 390x844 */}
+            <View style={{
+              width: 410, height: 864, backgroundColor: '#1C2B35', borderRadius: 36,
+              padding: 10, alignItems: 'center', justifyContent: 'center',
+              shadowColor: '#000', shadowOffset: { width: 0, height: 10 },
+              shadowOpacity: 0.25, shadowRadius: 30,
+            }}>
+              <View style={{ width: 390, height: 844, backgroundColor: '#000', borderRadius: 28, overflow: 'hidden' }}>
+                {React.createElement('iframe', {
+                  src: '/',
+                  style: { width: '390px', height: '844px', border: 0, backgroundColor: '#fff' },
+                  title: 'iphone-preview',
+                })}
+              </View>
+            </View>
+            {/* iPad-sized preview (existing) */}
             <View style={{
               width: 591, height: 1246, backgroundColor: '#1C2B35', borderRadius: 48,
               padding: 14, alignItems: 'center', justifyContent: 'center',

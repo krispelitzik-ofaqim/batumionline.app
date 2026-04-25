@@ -131,8 +131,8 @@ function CatCard({ item, width }: { item: CatItem; width: number }) {
         </LinearGradient>
       )}
       <View style={styles.cardBottom}>
-        <Text style={styles.cardTitle}>{item.title}</Text>
-        <Text style={styles.cardSub}>{item.subtitle}</Text>
+        <Text style={styles.cardTitle} numberOfLines={1}>{item.title}</Text>
+        <Text style={styles.cardSub} numberOfLines={1}>{item.subtitle}</Text>
       </View>
     </TouchableOpacity>
   );
@@ -346,8 +346,8 @@ const styles = StyleSheet.create({
   scroll: { flex: 1 },
 
   header: { paddingHorizontal: 20, paddingTop: 16, paddingBottom: 12 },
-  headerTitle: { fontSize: 36, fontWeight: '800', color: Colors.TEXT, textAlign: 'left' },
-  headerSub: { fontSize: 16, fontWeight: 'normal', color: '#999999', textAlign: 'left', marginTop: 2 },
+  headerTitle: { fontSize: 28, fontWeight: '800', color: Colors.TEXT, textAlign: 'left' },
+  headerSub: { fontSize: 14, fontWeight: 'normal', color: '#999999', textAlign: 'left', marginTop: 2 },
 
   section: { paddingHorizontal: 16, marginBottom: 18 },
   grid: { flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 10 },
@@ -360,7 +360,7 @@ const styles = StyleSheet.create({
   },
   cardTop: { height: 100, alignItems: 'center', justifyContent: 'center' },
   cardIcon: { fontSize: 68 },
-  cardBottom: { backgroundColor: Colors.WHITE, paddingVertical: 10, paddingHorizontal: 12 },
+  cardBottom: { backgroundColor: Colors.WHITE, paddingVertical: 10, paddingHorizontal: 12, minHeight: 80 },
   cardTitle: { fontSize: 16, fontWeight: 'bold', color: '#1C2B35', textAlign: 'right', writingDirection: 'rtl' },
   cardSub: { fontSize: 12, fontWeight: 'normal', color: '#999999', marginTop: 2, lineHeight: 16, textAlign: 'right', writingDirection: 'rtl' },
   cardDesc: { fontSize: 11, color: '#777', marginTop: 4, lineHeight: 15, textAlign: 'right', writingDirection: 'rtl' },

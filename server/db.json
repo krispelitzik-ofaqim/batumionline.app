@@ -14299,6 +14299,244 @@
       "unit": "%",
       "values": {},
       "extraYears": []
+    },
+    {
+      "id": "ts_total_geo",
+      "label": "סך תיירים בגאורגיה",
+      "channel": "tourism",
+      "columns": [
+        {
+          "id": "col_year",
+          "name": "שנה"
+        },
+        {
+          "id": "col_il",
+          "name": "מבקרים מישראל"
+        },
+        {
+          "id": "col_world",
+          "name": "סך מהעולם"
+        },
+        {
+          "id": "col_share",
+          "name": "נתח השוק הישראלי"
+        }
+      ],
+      "tableRows": [
+        {
+          "id": "r1",
+          "cells": {
+            "col_year": "2025",
+            "col_il": "כ-402,400",
+            "col_world": "כ-7,803,000",
+            "col_share": "כ-5.2%"
+          }
+        },
+        {
+          "id": "r2",
+          "cells": {
+            "col_year": "2024",
+            "col_il": "כ-311,000",
+            "col_world": "כ-7,370,000",
+            "col_share": "כ-4.2%"
+          }
+        },
+        {
+          "id": "r3",
+          "cells": {
+            "col_year": "2023",
+            "col_il": "כ-210,000",
+            "col_world": "כ-7,096,000",
+            "col_share": "כ-3.0%"
+          }
+        },
+        {
+          "id": "r4",
+          "cells": {
+            "col_year": "2019",
+            "col_il": "כ-205,000",
+            "col_world": "כ-9,358,000",
+            "col_share": "כ-2.2%"
+          }
+        },
+        {
+          "id": "r5",
+          "cells": {
+            "col_year": "2010",
+            "col_il": "כ-20,000",
+            "col_world": "כ-2,031,000",
+            "col_share": "כ-1.0%"
+          }
+        }
+      ]
+    },
+    {
+      "id": "ts_il_batumi",
+      "label": "סך ישראלים בגאורגיה ובבטומי",
+      "channel": "tourism",
+      "columns": [
+        {
+          "id": "col_year",
+          "name": "שנה"
+        },
+        {
+          "id": "col_geo",
+          "name": "סך בגאורגיה"
+        },
+        {
+          "id": "col_bat",
+          "name": "מתוכם בבטומי"
+        },
+        {
+          "id": "col_pct",
+          "name": "אחוז בבטומי"
+        }
+      ],
+      "tableRows": [
+        {
+          "id": "r1",
+          "cells": {
+            "col_year": "2025",
+            "col_geo": "כ-402,400",
+            "col_bat": "כ-241,000",
+            "col_pct": "~60%"
+          }
+        },
+        {
+          "id": "r2",
+          "cells": {
+            "col_year": "2024",
+            "col_geo": "כ-311,000",
+            "col_bat": "כ-171,000",
+            "col_pct": "~55%"
+          }
+        },
+        {
+          "id": "r3",
+          "cells": {
+            "col_year": "2023",
+            "col_geo": "כ-217,000",
+            "col_bat": "כ-119,000",
+            "col_pct": "~55%"
+          }
+        },
+        {
+          "id": "r4",
+          "cells": {
+            "col_year": "2019",
+            "col_geo": "כ-205,000",
+            "col_bat": "כ-160,000",
+            "col_pct": "~78%"
+          }
+        },
+        {
+          "id": "r5",
+          "cells": {
+            "col_year": "2010",
+            "col_geo": "כ-20,000",
+            "col_bat": "כ-8,000",
+            "col_pct": "~40%"
+          }
+        }
+      ]
+    },
+    {
+      "id": "ts_il_spending_breakdown",
+      "label": "התפלגות ההוצאות של ישראלים בבטומי",
+      "channel": "tourism",
+      "columns": [
+        {
+          "id": "col_cat",
+          "name": "קטגוריה"
+        },
+        {
+          "id": "col_pct",
+          "name": "אחוז מהתקציב"
+        }
+      ],
+      "tableRows": [
+        {
+          "id": "r1",
+          "cells": {
+            "col_cat": "לינה",
+            "col_pct": "36%"
+          }
+        },
+        {
+          "id": "r2",
+          "cells": {
+            "col_cat": "קניות",
+            "col_pct": "25%"
+          }
+        },
+        {
+          "id": "r3",
+          "cells": {
+            "col_cat": "מזון ומשקאות",
+            "col_pct": "23%"
+          }
+        },
+        {
+          "id": "r4",
+          "cells": {
+            "col_cat": "בילויים ואטרקציות",
+            "col_pct": "11%"
+          }
+        },
+        {
+          "id": "r5",
+          "cells": {
+            "col_cat": "תחבורה מקומית",
+            "col_pct": "5%"
+          }
+        }
+      ]
+    },
+    {
+      "id": "ts_il_avg_visit",
+      "label": "כמה מוציא התייר הישראלי בבטומי בביקור אחד",
+      "channel": "tourism",
+      "notes": "הישראלים מוציאים סכום גבוה מהממוצע העולמי מכיוון שהם נוטים לצרוך שירותי פרימיום",
+      "columns": [
+        {
+          "id": "col_metric",
+          "name": "מדד פיננסי"
+        },
+        {
+          "id": "col_value",
+          "name": "נתון ממוצע לתייר ישראלי"
+        }
+      ],
+      "tableRows": [
+        {
+          "id": "r1",
+          "cells": {
+            "col_metric": "סך הוצאה לביקור",
+            "col_value": "$1,412 (כ-5,220 ש\"ח)"
+          }
+        },
+        {
+          "id": "r2",
+          "cells": {
+            "col_metric": "משך שהות ממוצע",
+            "col_value": "5.6 לילות"
+          }
+        },
+        {
+          "id": "r3",
+          "cells": {
+            "col_metric": "הוצאה יומית (ללא מלון)",
+            "col_value": "$70 - $120"
+          }
+        },
+        {
+          "id": "r4",
+          "cells": {
+            "col_metric": "דירוג הוצאה עולמי",
+            "col_value": "מקום 1 (התייר המבזבז ביותר בגאורגיה)"
+          }
+        }
+      ]
     }
   ]
 }

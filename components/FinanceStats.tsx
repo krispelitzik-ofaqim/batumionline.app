@@ -253,14 +253,14 @@ export default function FinanceStats({ cardBg, channel = 'money' }: { cardBg?: s
 
   const customCardsForChannel = customIndicators
     .filter((ci: any) => ci.label && (ci.channel || 'money') === channel && (
-      (Array.isArray(ci.tableRows) && ci.tableRows.some((tr: any) => tr.category || tr.value || tr.year))
+      (Array.isArray(ci.tableRows) && ci.tableRows.some((tr: any) => tr.category || tr.value || tr.year || (tr.cells && Object.values(tr.cells).some((v: any) => v))))
       || Object.values(ci.values || {}).some((v: any) => v !== '')
     ))
     .map((ci: any, i: number) => {
       const palette = ['#ec4899', '#06b6d4', '#84cc16', '#f97316', '#6366f1', '#14b8a6'];
       const color = palette[i % palette.length];
       if (Array.isArray(ci.tableRows) && ci.tableRows.length > 0) {
-        const filled = ci.tableRows.filter((tr: any) => tr.category || tr.value);
+        const filled = ci.tableRows.filter((tr: any) => tr.category || tr.value || (tr.cells && Object.values(tr.cells).some((v: any) => v)));
         // Auto-detect: if single category (or no category) and all have years => line
         const uniqueCats = new Set(filled.map((tr: any) => (tr.category || '').trim()).filter((c: string) => c));
         const allHaveYears = filled.every((tr: any) => tr.year && !isNaN(parseInt(tr.year)));
