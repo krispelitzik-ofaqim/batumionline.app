@@ -4,6 +4,7 @@ import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '../../constants/colors';
 import { fetchContent, resolveUri } from '../../constants/api';
+import BottomTabBar from '../../components/BottomTabBar';
 
 type Broker = {
   id: string;
@@ -90,6 +91,7 @@ export default function BrokersPortal() {
         ))}
         {items.length === 0 && <Text style={s.empty}>אין מתווכים זמינים כרגע</Text>}
       </ScrollView>
+      <BottomTabBar />
     </SafeAreaView>
   );
 }

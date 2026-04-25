@@ -4,6 +4,7 @@ import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '../../constants/colors';
 import { fetchContent, resolveUri } from '../../constants/api';
+import BottomTabBar from '../../components/BottomTabBar';
 
 type BusinessItem = {
   id: string;
@@ -95,6 +96,7 @@ export default function BusinessPortal() {
           </View>
         </View>
       </Modal>
+      <BottomTabBar />
     </SafeAreaView>
   );
 }

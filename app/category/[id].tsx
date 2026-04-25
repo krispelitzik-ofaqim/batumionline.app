@@ -744,7 +744,10 @@ function HotelCard({ h, dark, pageBtnLabel, mapPoints, layerColor, placesQuery, 
             activeOpacity={h.coords ? 0.7 : 1}
             onPress={() => {
               if (mapPoints && mapPoints.length > 0) setShowCatMapModal(true);
-              else if (h.coords) setShowMap(v => !v);
+              else if (h.coords) {
+                if (Platform.OS === 'web') setShowMap(v => !v);
+                else Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${h.coords.lat},${h.coords.lng}`).catch(() => {});
+              }
             }}
             disabled={!h.coords && !(mapPoints && mapPoints.length > 0)}
           >
@@ -1292,7 +1295,7 @@ export default function CategoryScreen() {
           <ArticleView cat={cat} darkCat={darkCat} />
         ) : cat.longText ? (
           <View style={st.body}>
-            <HtmlContent html={cat.longText} baseStyle={{ color: darkCat ? '#e2e8f0' : Colors.TEXT, lineHeight: 26, fontSize: 15 }} />
+            <HtmlContent html={cat.longText} baseStyle={{ color: darkCat ? '#e2e8f0' : Colors.TEXT, lineHeight: 26, fontSize: 15, textAlign: 'right', writingDirection: 'rtl' }} />
           </View>
         ) : (
           <View style={st.body}>

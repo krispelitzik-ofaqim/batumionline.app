@@ -49,12 +49,13 @@ export default function HtmlContent({ html, style, baseStyle }: Props) {
         }}
         enableExperimentalMarginCollapsing
         tagsStyles={{
-          p: { marginBottom: 10 },
-          h1: { fontSize: 22, fontWeight: '900', marginBottom: 10 },
-          h2: { fontSize: 18, fontWeight: '800', marginBottom: 8 },
-          h3: { fontSize: 16, fontWeight: '800', marginBottom: 6 },
-          ul: { marginBottom: 10 },
-          li: { marginBottom: 4 },
+          div: { textAlign: 'right', writingDirection: 'rtl' },
+          p: { marginBottom: 10, textAlign: 'right', writingDirection: 'rtl' },
+          h1: { fontSize: 22, fontWeight: '900', marginBottom: 10, textAlign: 'right', writingDirection: 'rtl' },
+          h2: { fontSize: 18, fontWeight: '800', marginBottom: 8, textAlign: 'right', writingDirection: 'rtl' },
+          h3: { fontSize: 16, fontWeight: '800', marginBottom: 6, textAlign: 'right', writingDirection: 'rtl' },
+          ul: { marginBottom: 10, textAlign: 'right' },
+          li: { marginBottom: 4, textAlign: 'right', writingDirection: 'rtl' },
           a: { color: '#1A6B8A', textDecorationLine: 'underline' },
           strong: { fontWeight: '800' },
           b: { fontWeight: '800' },
