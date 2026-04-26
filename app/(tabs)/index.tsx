@@ -18,6 +18,7 @@ import { fetchContent, resolveUri } from '../../constants/api';
 import { Colors } from '../../constants/colors';
 import WelcomeSlider from '../../components/WelcomeSlider';
 import HomeGallery from '../../components/HomeGallery';
+import AccessibilityButton from '../../components/AccessibilityButton';
 import InfoPortal from '../../components/InfoPortal';
 import { AdminFloatingButton, EditToolbar, EditableText, ReorderControls } from '../../components/AdminEditOverlay';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -337,6 +338,7 @@ export default function HomeScreen() {
 
       {/* Admin floating button */}
       {!editMode && <AdminFloatingButton onEnterEdit={() => setEditMode(true)} />}
+      <AccessibilityButton />
 
       {/* Bottom banner modals */}
       <WeatherModal visible={activeModal === 'weather'} onClose={() => setActiveModal(null)} bgColor={BOTTOM_BANNERS.find(b => b.id === 'weather')!.bg} />
