@@ -581,6 +581,38 @@ function TourCard({ t, onRate, nearbyRestaurants }: { t: TourBlock; onRate: (id:
   );
 }
 
+function CategoryNativeMap({ points, focus, setFocus, color, mapSrc }: { points: MapPoint[]; focus: MapPoint | null; setFocus: (p: MapPoint | null) => void; color: string; mapSrc: string }) {
+  if (Platform.OS === 'web') {
+    return <MapEmbed src={mapSrc} style={{ width: '100%', height: 350 }} />;
+  }
+  // @ts-ignore - react-native-maps lazy loaded only on native
+  const RNMaps = require('react-native-maps');
+  const MapView = RNMaps.default;
+  const Marker = RNMaps.Marker;
+  const center = focus
+    ? { latitude: focus.lat, longitude: focus.lng }
+    : { latitude: points.reduce((s, p) => s + p.lat, 0) / points.length, longitude: points.reduce((s, p) => s + p.lng, 0) / points.length };
+  return (
+    <View style={{ width: '100%', height: 350 }}>
+      <MapView
+        style={{ flex: 1 }}
+        region={{ latitude: center.latitude, longitude: center.longitude, latitudeDelta: focus ? 0.01 : 0.05, longitudeDelta: focus ? 0.01 : 0.05 }}
+        showsPointsOfInterest
+      >
+        {points.map((p, i) => (
+          <Marker
+            key={`${p.name}-${i}`}
+            coordinate={{ latitude: p.lat, longitude: p.lng }}
+            title={p.name}
+            pinColor={focus?.name === p.name ? '#dc2626' : color}
+            onPress={() => setFocus(p)}
+          />
+        ))}
+      </MapView>
+    </View>
+  );
+}
+
 function CategoryMapModal({ visible, points, focusName, focusCoords, layerColor, onClose }: { visible: boolean; points: MapPoint[]; focusName: string; focusCoords?: { lat: number; lng: number }; layerColor?: string; onClose: () => void }) {
   const [focus, setFocus] = useState<MapPoint | null>(null);
   const [listOpen, setListOpen] = useState(false);
@@ -667,27 +699,8 @@ function CategoryMapModal({ visible, points, focusName, focusCoords, layerColor,
               ])}
             </View>
           )}
-          {Platform.OS === 'web' ? (
-            <MapEmbed src={mapSrc} style={{ width: '100%', height: 350 }} />
-          ) : (
-            <ScrollView style={{ maxHeight: 380 }} contentContainerStyle={{ padding: 14, paddingTop: 50 }}>
-              <Text style={{ fontSize: 16, fontWeight: '900', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl', marginBottom: 10 }}>📍 בחר נקודה ({points.length})</Text>
-              {points.map((p, i) => {
-                const on = focus?.name === p.name;
-                const isKosher = p.name.includes('כשר') || p.name.toLowerCase().includes('kosher');
-                const itemColor = isKosher ? '#2E7D32' : color;
-                return (
-                  <TouchableOpacity key={p.name + i} onPress={() => setFocus(p)} style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', padding: 12, borderRadius: 10, backgroundColor: on ? itemColor : isKosher ? '#E8F5E9' : '#f8f9fa', borderWidth: 1.5, borderColor: on ? itemColor : itemColor + '30', marginBottom: 6 }}>
-                    <Text style={{ fontSize: 14, fontWeight: on ? '800' : '600', color: on ? '#fff' : itemColor, writingDirection: 'rtl', textAlign: 'right', flex: 1 }} numberOfLines={1}>{isKosher ? '✡️' : '📍'} {p.name}</Text>
-                    <TouchableOpacity onPress={() => Linking.openURL(`https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}`)} style={{ backgroundColor: on ? '#fff' : itemColor, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8, marginRight: 8 }}>
-                      <Text style={{ color: on ? itemColor : '#fff', fontSize: 12, fontWeight: '900' }}>🧭 נווט</Text>
-                    </TouchableOpacity>
-                  </TouchableOpacity>
-                );
-              })}
-            </ScrollView>
-          )}
-          {Platform.OS === 'web' && focus && (
+          <CategoryNativeMap points={points} focus={focus} setFocus={setFocus} color={color} mapSrc={mapSrc} />
+          {focus && (
             <View style={{ padding: 14, borderTopWidth: 1, borderTopColor: '#eee' }}>
               <Text style={{ fontSize: 16, fontWeight: '900', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl' }}>📍 {focus.name}</Text>
               <TouchableOpacity
@@ -803,14 +816,6 @@ function HotelCard({ h, dark, pageBtnLabel, mapPoints, layerColor, placesQuery, 
 }
 
 function HotelMap({ coords, title, onClose }: { coords: { lat: number; lng: number }; title: string; onClose: () => void }) {
-  useEffect(() => {
-    if (Platform.OS !== 'web') {
-      const url = `https://www.google.com/maps/search/?api=1&query=${coords.lat},${coords.lng}`;
-      Linking.openURL(url).catch(() => {});
-      onClose();
-    }
-  }, []);
-  if (Platform.OS !== 'web') return null;
   const src = `https://maps.google.com/maps?q=${coords.lat},${coords.lng}(${encodeURIComponent(title)})&z=15&output=embed`;
   return (
     <View style={{ height: 420, position: 'relative' }}>

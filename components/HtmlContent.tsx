@@ -10,7 +10,14 @@ type Props = {
 
 function stripGoogleDocsCss(h: string): string {
   return h
-    .replace(/style="[^"]*"/g, '')
+    .replace(/style="([^"]*)"/g, (_m, body) => {
+      const keep = (body as string)
+        .split(';')
+        .map(s => s.trim())
+        .filter(s => /^(text-align|direction|writing-direction|color|background|background-color|font-weight|font-style|text-decoration)\s*:/i.test(s))
+        .join(';');
+      return keep ? `style="${keep}"` : '';
+    })
     .replace(/class="[^"]*"/g, '')
     .replace(/<span[^>]*>/g, '<span>')
     .replace(/<font[^>]*>/g, '')
@@ -74,12 +81,11 @@ export default function HtmlContent({ html, style, baseStyle }: Props) {
   const cleanHtml = stripGoogleDocsCss(html);
 
   return (
-    <View style={[{ width: '100%' }, style]}>
+    <View style={[{ width: '100%', alignSelf: 'stretch' }, style]}>
       <RenderHtml
         contentWidth={width - 40}
         source={{ html: cleanHtml }}
         baseStyle={{
-          direction: 'rtl',
           textAlign: 'right',
           writingDirection: 'rtl',
           fontSize: 15,
@@ -87,14 +93,16 @@ export default function HtmlContent({ html, style, baseStyle }: Props) {
           color: '#1C2B35',
           ...(baseStyle || {}),
         }}
+        defaultTextProps={{ style: { textAlign: 'right', writingDirection: 'rtl' }, allowFontScaling: false }}
         enableExperimentalMarginCollapsing
         tagsStyles={{
-          div: { textAlign: 'right', writingDirection: 'rtl', alignSelf: 'stretch' },
-          p: { marginBottom: 10, textAlign: 'right', writingDirection: 'rtl', alignSelf: 'stretch' },
-          h1: { fontSize: 22, fontWeight: '900', marginBottom: 10, textAlign: 'right', writingDirection: 'rtl', alignSelf: 'stretch' },
-          h2: { fontSize: 18, fontWeight: '800', marginBottom: 8, textAlign: 'right', writingDirection: 'rtl', alignSelf: 'stretch' },
-          h3: { fontSize: 16, fontWeight: '800', marginBottom: 6, textAlign: 'right', writingDirection: 'rtl', alignSelf: 'stretch' },
-          ul: { marginBottom: 10, textAlign: 'right', alignSelf: 'stretch' },
+          body: { textAlign: 'right', writingDirection: 'rtl', alignSelf: 'stretch', width: '100%' },
+          div: { textAlign: 'right', writingDirection: 'rtl', alignSelf: 'stretch', width: '100%' },
+          p: { marginBottom: 10, textAlign: 'right', writingDirection: 'rtl', alignSelf: 'stretch', width: '100%' },
+          h1: { fontSize: 22, fontWeight: '900', marginBottom: 10, textAlign: 'right', writingDirection: 'rtl', alignSelf: 'stretch', width: '100%' },
+          h2: { fontSize: 18, fontWeight: '800', marginBottom: 8, textAlign: 'right', writingDirection: 'rtl', alignSelf: 'stretch', width: '100%' },
+          h3: { fontSize: 16, fontWeight: '800', marginBottom: 6, textAlign: 'right', writingDirection: 'rtl', alignSelf: 'stretch', width: '100%' },
+          ul: { marginBottom: 10, textAlign: 'right', alignSelf: 'stretch', width: '100%' },
           li: { marginBottom: 4, textAlign: 'right', writingDirection: 'rtl' },
           a: { color: '#1A6B8A', textDecorationLine: 'underline', writingDirection: 'rtl' },
           span: { writingDirection: 'rtl' },

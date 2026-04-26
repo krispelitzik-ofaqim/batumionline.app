@@ -357,12 +357,9 @@ export default function FlightsModal({ visible, onClose, bgColor }: { visible: b
               {/* Table header */}
               {filtered.length > 0 && (
                 <View style={s.tableHeader}>
-                  <Text style={[s.thCell, { width: 36, textAlign: 'center' }]}></Text>
-                  <Text style={[s.thCell, { flex: 1, textAlign: 'right', paddingLeft: 4 }]}>טיסה</Text>
-                  <Text style={[s.thCell, { width: 48, textAlign: 'center' }]}>המראה</Text>
-                  <Text style={[s.thCell, { width: 16, marginHorizontal: 2, textAlign: 'center' }]}></Text>
-                  <Text style={[s.thCell, { width: 48, textAlign: 'center' }]}>נחיתה</Text>
-                  <Text style={[s.thCell, { width: 80, textAlign: 'center' }]}>סטטוס</Text>
+                  <Text style={[s.thCell, { width: 70, textAlign: 'center' }]}>טיסה</Text>
+                  <Text style={[s.thCell, { flex: 1, textAlign: 'center' }]}>המראה / נחיתה</Text>
+                  <Text style={[s.thCell, { width: 70, textAlign: 'center' }]}>סטטוס</Text>
                 </View>
               )}
 
@@ -569,7 +566,9 @@ function formatDateShort(dateStr: string | undefined): string {
   if (!dateStr) return '—';
   const d = new Date(dateStr);
   if (isNaN(d.getTime())) return '—';
-  return d.toLocaleDateString('he-IL', { day: 'numeric', month: 'short' });
+  const dd = String(d.getDate()).padStart(2, '0');
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  return `${dd}.${mm}`;
 }
 
 function pad(h: number): string {
@@ -681,7 +680,7 @@ const s = StyleSheet.create({
   flightNum: { fontSize: 14, fontWeight: '900', color: Colors.WHITE, textAlign: 'right' },
   airline: { fontSize: 11, color: Colors.WHITE, opacity: 0.7, textAlign: 'right', fontWeight: '600' },
   timeCol: { alignItems: 'center', width: 42 },
-  timeVal: { fontSize: 14, fontWeight: '900', color: Colors.WHITE, fontVariant: ['tabular-nums'] },
+  timeVal: { fontSize: 12, fontWeight: '900', color: Colors.WHITE, fontVariant: ['tabular-nums'] },
   timeDateLabel: { fontSize: 11, color: Colors.WHITE, opacity: 0.7 },
   timeLabel: { fontSize: 11, color: Colors.WHITE, opacity: 0.6, fontWeight: '700' },
   timeArrow: { fontSize: 13, color: Colors.WHITE, opacity: 0.3, marginHorizontal: 1 },

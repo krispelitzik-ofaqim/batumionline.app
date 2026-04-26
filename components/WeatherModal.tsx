@@ -277,27 +277,17 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
         </TouchableOpacity>
 
         <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
-          <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+          <View style={{ alignItems: 'center', marginBottom: 4 }}>
             <View style={s.liveBadge}>
               <Animated.View style={[s.liveDot, { opacity: livePulse }]} />
               <Text style={s.liveTxt}>LIVE</Text>
             </View>
-            <Text style={s.batumiClock}>🕐 {batumiTime}</Text>
           </View>
-          <Text style={[s.title, { fontSize: 16, marginBottom: 4 }]}>מזג האוויר בבטומי</Text>
+          <Text style={[s.title, { fontSize: 16, marginBottom: 4, textAlign: 'center' }]}>מזג האוויר בבטומי</Text>
+          <Text style={[s.batumiClock, { textAlign: 'center', alignSelf: 'center', marginBottom: 6 }]}>🕐 {batumiTime}</Text>
           {lastUpdated && (
             <Text style={s.updatedTxt}>עודכן: {lastUpdated.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })} · מתרענן כל 10 דק׳</Text>
           )}
-
-          <View style={s.audioWrap}>
-            <AudioPlayer
-              tracks={[{ title: 'מזג האוויר בבטומי - סקירה שנתית', url: '/uploads/1776419283438-349.mp3' }]}
-              compact
-              playOnLeft
-              tint="transparent"
-              textLight
-            />
-          </View>
 
           <TouchableOpacity style={s.camBanner} activeOpacity={0.85} onPress={() => setCamerasOpen(true)}>
             <Text style={s.camBannerIcon}>📹</Text>
@@ -442,6 +432,15 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
               })}
 
               {/* Skippers panel */}
+              <View style={s.audioWrap}>
+                <AudioPlayer
+                  tracks={[{ title: 'מזג האוויר בבטומי - סקירה שנתית', url: '/uploads/1776419283438-349.mp3' }]}
+                  compact
+                  playOnLeft
+                  tint="transparent"
+                  textLight
+                />
+              </View>
               {marine && (
                 <View style={s.skippersWrap}>
                   <TouchableOpacity onPress={() => setSkippersOpen(o => !o)} style={s.skippersHeader} activeOpacity={0.85}>
@@ -638,7 +637,7 @@ const s = StyleSheet.create({
   liveBadge: { flexDirection: 'row-reverse', alignItems: 'center', gap: 5, backgroundColor: '#EF4444', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 },
   liveDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#fff' },
   liveTxt: { color: '#fff', fontSize: 11, fontWeight: '900', letterSpacing: 1 },
-  batumiClock: { color: 'rgba(255,255,255,0.85)', fontSize: 14, fontWeight: '700', fontVariant: ['tabular-nums'] },
+  batumiClock: { color: '#4ade80', fontSize: 16, fontWeight: '900', fontVariant: ['tabular-nums'], textShadowColor: '#4ade80', textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 8 },
   updatedTxt: { color: 'rgba(255,255,255,0.55)', fontSize: 11, textAlign: 'center', marginBottom: 18, writingDirection: 'rtl' },
   audioWrap: { marginBottom: 12, borderRadius: 18, borderWidth: 1, borderColor: 'rgba(255,255,255,0.35)' },
   hourlyScroll: { flexDirection: 'row-reverse', gap: 10, paddingVertical: 8, paddingHorizontal: 2, marginBottom: 20 },
