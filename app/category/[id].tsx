@@ -1177,7 +1177,7 @@ export default function CategoryScreen() {
             )}
             {cat.introAudio && (
               <View style={{ paddingHorizontal: 0, paddingTop: 4, paddingBottom: 8 }}>
-                <AudioPlayer tracks={[{ title: cat.title, url: cat.introAudio }]} compact playOnLeft tint={darkCat ? '#1A6B8A' : undefined} textLight={darkCat} />
+                <AudioPlayer tracks={[{ title: cat.title, url: cat.introAudio }]} compact playOnLeft tint={darkCat ? '#1A6B8A' : undefined} textLight={darkCat} ringPlay={darkCat} />
               </View>
             )}
             {cat.hotels.filter(h => h.visible !== false).map(h => (
@@ -1437,7 +1437,7 @@ const st = StyleSheet.create({
   tourBackTxt: { fontSize: 15, fontWeight: '700', color: Colors.PRIMARY, writingDirection: 'rtl' },
 });
 
-function TerminalClock() {
+function TerminalClock({ light }: { light?: boolean }) {
   const [time, setTime] = useState('');
   const [blink, setBlink] = useState(true);
   useEffect(() => {
@@ -1449,8 +1449,8 @@ function TerminalClock() {
   }, []);
   return (
     <View style={termSt.clockWrap}>
-      <Text style={termSt.clockLabel}>🕐 זמן בטומי</Text>
-      <Text style={termSt.clock}>{time.replace(/:/g, blink ? ':' : ' ')}</Text>
+      <Text style={[termSt.clockLabel, light && { color: '#475569' }]}>🕐 זמן בטומי</Text>
+      <Text style={[termSt.clock, light && { color: '#1C2B35' }]}>{time.replace(/:/g, blink ? ':' : ' ')}</Text>
     </View>
   );
 }
@@ -1482,18 +1482,18 @@ function TimetableTabs({ timetable, color, terminal }: { timetable: { title?: st
 
   return (
     <View style={[dark ? termSt.card : artSt.card, !dark && { backgroundColor: '#f8fafc' }]}>
-      {dark && (
-        <View style={termSt.headerRow}>
-          <View style={termSt.liveRow}>
+      <View style={{ alignItems: 'center', marginBottom: 12 }}>
+        <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 12, marginBottom: 6 }}>
+          <View style={[termSt.liveRow, !dark && { backgroundColor: '#10b981', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8 }]}>
             <BlinkDot />
-            <Text style={termSt.liveText}>LIVE</Text>
+            <Text style={[termSt.liveText, !dark && { color: '#fff' }]}>LIVE</Text>
           </View>
-          <TerminalClock />
-          <TouchableOpacity onPress={() => setRefreshKey(k => k + 1)} style={termSt.refreshBtn}>
-            <Text style={termSt.refreshTxt}>🔄 רענן</Text>
+          <TouchableOpacity onPress={() => setRefreshKey(k => k + 1)} style={[termSt.refreshBtn, !dark && { backgroundColor: '#fff', borderWidth: 1, borderColor: '#cbd5e1' }]}>
+            <Text style={[termSt.refreshTxt, !dark && { color: '#1C2B35' }]}>🔄 רענן</Text>
           </TouchableOpacity>
         </View>
-      )}
+        <TerminalClock light={!dark} />
+      </View>
       <View style={[artSt.cardHeader, dark && { marginBottom: 4 }]}>
         <Text style={[artSt.cardIcon, { fontSize: dark ? 22 : 28 }]}>{dark ? '🚆' : '🚌'}</Text>
         <Text style={[artSt.cardTitle, dark && { color: '#4ade80' }]}>{timetable.title || 'לוח זמנים'}</Text>
@@ -1503,29 +1503,57 @@ function TimetableTabs({ timetable, color, terminal }: { timetable: { title?: st
       ) : null}
 
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 6, paddingBottom: 10 }}>
-        {days.map((d, i) => (
-          <TouchableOpacity
-            key={i}
-            style={[termSt.dayBtn, selectedDay === i && { backgroundColor: dark ? '#86efac' : (color || Colors.PRIMARY) }]}
-            onPress={() => setSelectedDay(i)}
-          >
-            <Text style={[termSt.dayLabel, selectedDay === i && { color: dark ? '#0f172a' : Colors.WHITE }]}>{d.label}</Text>
-            <Text style={[termSt.dayDate, selectedDay === i && { color: dark ? '#0f172a' : Colors.WHITE }]}>{d.date}</Text>
-          </TouchableOpacity>
-        ))}
+        {days.map((d, i) => {
+          const isOn = selectedDay === i;
+          return (
+            <TouchableOpacity
+              key={i}
+              style={[
+                termSt.dayBtn,
+                !dark && { backgroundColor: '#fff', borderWidth: 1.5, borderColor: '#cbd5e1' },
+                isOn && (dark
+                  ? { backgroundColor: '#86efac' }
+                  : { backgroundColor: color || Colors.PRIMARY, borderColor: color || Colors.PRIMARY }),
+              ]}
+              onPress={() => setSelectedDay(i)}
+            >
+              <Text style={[
+                termSt.dayLabel,
+                !dark && { color: '#1C2B35', fontWeight: '900' },
+                isOn && { color: '#0f172a', fontWeight: '900' },
+              ]}>{d.label}</Text>
+              <Text style={[
+                termSt.dayDate,
+                !dark && { color: '#1C2B35', fontWeight: '700' },
+                isOn && { color: '#0f172a', fontWeight: '800' },
+              ]}>{d.date}</Text>
+            </TouchableOpacity>
+          );
+        })}
       </ScrollView>
 
-      <View style={artSt.tabRow}>
-        {timetable.tabs.map((t, i) => (
-          <TouchableOpacity
-            key={i}
-            style={[artSt.tab, { backgroundColor: dark ? '#1e293b' : '#e2e8f0' }, activeTab === i && { backgroundColor: dark ? '#4ade80' : (color || Colors.PRIMARY) }]}
-            onPress={() => setActiveTab(i)}
-          >
-            <Text style={[artSt.tabTxt, { color: dark ? '#94a3b8' : Colors.TEXT }, activeTab === i && { color: dark ? '#0f172a' : Colors.WHITE }]}>{t.label}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingBottom: 10 }}>
+        {timetable.tabs.map((t, i) => {
+          const on = activeTab === i;
+          return (
+            <TouchableOpacity
+              key={i}
+              style={[
+                artSt.tab,
+                { backgroundColor: dark ? '#1e293b' : '#fff', borderWidth: 1.5, borderColor: dark ? '#334155' : '#cbd5e1' },
+                on && { backgroundColor: '#22c55e', borderColor: '#22c55e' },
+              ]}
+              onPress={() => setActiveTab(i)}
+            >
+              <Text style={[
+                artSt.tabTxt,
+                { color: dark ? '#94a3b8' : '#475569', fontWeight: '700' },
+                on && { color: '#fff', fontWeight: '900' },
+              ]}>{t.label}</Text>
+            </TouchableOpacity>
+          );
+        })}
+      </ScrollView>
       <View style={[artSt.tableHeader, dark && { borderBottomColor: '#334155' }]}>
         <Text style={[artSt.tableCell, artSt.tableBold, dark && { color: '#94a3b8' }]}>יציאה</Text>
         <Text style={[artSt.tableCell, artSt.tableBold, dark && { color: '#94a3b8' }]}>הגעה</Text>
@@ -1578,6 +1606,7 @@ const termSt = StyleSheet.create({
 function ArticleView({ cat, darkCat }: { cat: Item; darkCat: boolean }) {
   const [showMap, setShowMap] = useState<{ lat: number; lng: number } | null>(null);
   const art = cat.article!;
+  const termMode = !!art.terminal;
   return (
     <View style={artSt.wrap}>
       {art.timetable && art.timetable.tabs && (
@@ -1607,18 +1636,29 @@ function ArticleView({ cat, darkCat }: { cat: Item; darkCat: boolean }) {
           {art.buttons.map((btn, i) => (
             <TouchableOpacity
               key={i}
-              style={[artSt.actionBtn, {
-                backgroundColor: btn.type === 'map' ? '#F4A94E' : btn.type === 'navigate' ? '#3DA5C4' : btn.type === 'ticket' ? '#10b981' : '#1A6B8A',
-              }]}
+              style={[artSt.actionBtn, termMode
+                ? { backgroundColor: '#0f172a', borderWidth: 1.5, borderColor: btn.type === 'map' ? '#fbbf24' : btn.type === 'navigate' ? '#38bdf8' : btn.type === 'ticket' ? '#4ade80' : '#94a3b8' }
+                : { backgroundColor: '#fff', borderWidth: 1.5, borderColor: btn.type === 'map' ? '#D97706' : btn.type === 'navigate' ? '#0E7490' : btn.type === 'ticket' ? '#047857' : '#1A6B8A' }
+              ]}
               onPress={() => {
                 if (btn.type === 'link' && btn.url) Linking.openURL(btn.url);
                 else if (btn.type === 'navigate' && btn.coords)
                   Linking.openURL(`https://www.google.com/maps/dir/?api=1&destination=${btn.coords.lat},${btn.coords.lng}`);
-                else if ((btn.type === 'map' || btn.type === 'ticket') && btn.coords)
-                  setShowMap(showMap ? null : btn.coords);
+                else if (btn.type === 'map' && btn.coords) {
+                  if (Platform.OS === 'web') setShowMap(showMap ? null : btn.coords);
+                  else Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${btn.coords.lat},${btn.coords.lng}`);
+                }
+                else if (btn.type === 'ticket' && btn.coords) {
+                  if (Platform.OS === 'web') setShowMap(showMap ? null : btn.coords);
+                  else Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${btn.coords.lat},${btn.coords.lng}`);
+                }
               }}
             >
-              <Text style={artSt.actionBtnTxt}>{btn.type === 'map' && showMap ? 'סגור מפה' : btn.label}</Text>
+              <Text style={[artSt.actionBtnTxt, { fontWeight: '900' },
+                termMode
+                  ? { color: btn.type === 'map' ? '#fbbf24' : btn.type === 'navigate' ? '#38bdf8' : btn.type === 'ticket' ? '#4ade80' : '#94a3b8' }
+                  : { color: btn.type === 'map' ? '#D97706' : btn.type === 'navigate' ? '#0E7490' : btn.type === 'ticket' ? '#047857' : '#1A6B8A' }
+              ]}>{btn.type === 'map' && showMap ? 'סגור מפה' : btn.label}</Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -1700,8 +1740,8 @@ const artSt = StyleSheet.create({
   actionBtnTxt: { color: Colors.WHITE, fontWeight: '800', fontSize: 13 },
   tableHeader: { flexDirection: 'row-reverse', borderBottomWidth: 2, borderBottomColor: '#cbd5e1', paddingBottom: 8, marginBottom: 4 },
   tableRow: { flexDirection: 'row-reverse', paddingVertical: 8, borderRadius: 6 },
-  tableCell: { flex: 1, fontSize: 12, color: '#334155', textAlign: 'center', writingDirection: 'rtl' },
-  tableBold: { fontWeight: '800', color: Colors.TEXT },
+  tableCell: { flex: 1, fontSize: 12, color: '#1C2B35', textAlign: 'center', writingDirection: 'rtl', fontWeight: '600' },
+  tableBold: { fontWeight: '900', color: Colors.TEXT },
 });
 
 const tourSt = StyleSheet.create({

@@ -1610,7 +1610,7 @@
           "subtitle": "כנסיות ומנזרים",
           "icon": "⛪",
           "bg": "#3DA5C4",
-          "longText": "<div dir=\"rtl\" style=\"font-family:Arial,sans-serif;color:#333;line-height:1.7;padding:14px;direction:rtl;text-align:right;font-size:14px\"><h3 style=\"color:#12396D;margin:0 0 10px;font-size:16px\">נצרות בבטומי</h3><p style=\"margin:0 0 10px\">כבר במאה הראשונה לספירה, כשהעולם העתיק עוד עבד אלילים, הגיע לכאן <b>אנדראס הקדוש</b>, אחד משליחיו של ישו, והביא איתו את הבשורה הראשונה לגאורגיה.</p><p style=\"margin:0 0 10px\">בשנת <b>326</b>, המדינה כולה כבר אימצה את הנצרות — אחת הראשונות בעולם לעשות זאת. לאורך אלפיים שנה, הנצרות הייתה הלב הפועם של הזהות הגאורגית.</p><p style=\"margin:0\">הכנסיות שתראו כאן הן עדות חיה לעמידות של העם הזה מול אימפריות ומשטרים שניסו לשנות אותו. בטומי היא לא רק עיר נופש — היא שער רוחני עתיק.</p></div>",
+          "longText": "<div dir=\"rtl\" style=\"font-family:Arial,sans-serif;color:#333;line-height:1.7;padding:14px;direction:rtl;text-align:right;font-size:14px\"><h3 style=\"text-align: right; color: rgb(18, 57, 109); margin: 0px 0px 10px; font-size: 16px;\">נצרות בבטומי</h3><p style=\"text-align: right; margin: 0px 0px 10px;\">כבר במאה הראשונה לספירה, כשהעולם העתיק עוד עבד אלילים, הגיע לכאן <b>אנדראס הקדוש</b>, אחד משליחיו של ישו, והביא איתו את הבשורה הראשונה לגאורגיה.</p><p style=\"text-align: right; margin: 0px 0px 10px;\">בשנת <b>326</b>, המדינה כולה כבר אימצה את הנצרות — אחת הראשונות בעולם לעשות זאת. לאורך אלפיים שנה, הנצרות הייתה הלב הפועם של הזהות הגאורגית.</p><p style=\"text-align: right; margin: 0px;\">הכנסיות שתראו כאן הן עדות חיה לעמידות של העם הזה מול אימפריות ומשטרים שניסו לשנות אותו. בטומי היא לא רק עיר נופש — היא שער רוחני עתיק.</p></div>",
           "introAudio": "/uploads/1776611674307-956.mp3",
           "hotels": [
             {
@@ -3822,7 +3822,7 @@
             "timetable": {
               "tabs": [
                 {
-                  "label": "קווים לטיילת וחוף",
+                  "label": "לטיילת וחוף",
                   "icon": "🏖️",
                   "rows": [
                     {
@@ -3846,7 +3846,7 @@
                   ]
                 },
                 {
-                  "label": "קווים למרכז ושווקים",
+                  "label": "למרכז ושווקים",
                   "icon": "🏬",
                   "rows": [
                     {
@@ -3870,7 +3870,7 @@
                   ]
                 },
                 {
-                  "label": "קווים לשדה התעופה",
+                  "label": "לשדה התעופה",
                   "icon": "✈️",
                   "rows": [
                     {
@@ -4156,7 +4156,7 @@
       "bg": "#1C2B35",
       "heroBg": "#1A6B8A",
       "bgDark": "#2D4A5E",
-      "longText": "<div style=\"font-family:Arial,sans-serif;padding:8px 16px;direction:rtl;text-align:right;font-size:13px;line-height:1.6;color:#e2e8f0\"><p style=\"margin:0 0 10px\">גולשים יקרים, בטומי שופעת בתי קזינו. הבאנו כאן את המלצות הגולשים הישראליים, כפי שנאספו ברשתות החברתיות. תוכלו למצוא אותם גם על המפה.</p><p style=\"margin:0;font-size:11px;color:#94a3b8\">*בעיר בטומי בתי קזינו נוספים וטובים שלא צויינו כאן בשל הבחירה המצומצמת שהחלטנו להציג.</p></div>",
+      "longText": "<div style=\"padding: 8px 16px; direction: rtl; text-align: right; line-height: 1.6;\"><p style=\"margin: 0px 0px 10px;\"><font face=\"Arial\">גולשים יקרים, בטומי שופעת בתי קזינו. הבאנו כאן את המלצות הגולשים הישראליים, כפי שנאספו ברשתות החברתיות. תוכלו למצוא אותם גם על המפה.</font></p><p style=\"margin: 0px;\"><font face=\"Arial\">*בעיר בטומי בתי קזינו נוספים וטובים שלא צויינו כאן בשל הבחירה המצומצמת שהחלטנו להציג.</font></p></div>",
       "hotels": [
         {
           "id": "cas_1",
@@ -9542,7 +9542,7 @@
       "title": "אודותינו",
       "icon": "👥",
       "bg": "#1A6B8A",
-      "longText": "",
+      "longText": "<div style=\"text-align:right;writing-direction:rtl;direction:rtl;text-align:right;font-family:Arial,sans-serif;font-size:14px;line-height:1.7;color:#1C2B35;padding:8px\">\n<p style=\"text-align:right;writing-direction:rtl;font-weight:900;font-size:18px;margin:0 0 12px\">אודותינו</p>\n<p style=\"text-align:right;writing-direction:rtl;margin:0 0 10px\"><strong>Batumi Online</strong> הוא המדריך הישראלי המקיף לבטומי, גאורגיה.</p>\n<p style=\"text-align:right;writing-direction:rtl;margin:0 0 10px\">נולדנו מתוך אהבה לעיר היפה הזו ורצון לעזור לכל ישראלי לחוות אותה בצורה הטובה ביותר.</p>\n<p style=\"text-align:right;writing-direction:rtl;margin:0 0 10px\">האפליקציה מרכזת במקום אחד את כל המידע שתייר ישראלי צריך:<br>מלונות, דירות, מסעדות, אטרקציות, תחבורה, מפות, פורטל נדל\"ן ופורטל עסקים, סיורים קוליים בעברית, מדריכים מורשים, מתווכי נדל\"ן מאומתים ועוד.</p>\n<p style=\"text-align:right;writing-direction:rtl;margin:0 0 10px\"><strong>המטרה שלנו:</strong> לתת לכם את כל הכלים לטיול חכם, בטוח ומהנה — בעברית, באייקונים פשוטים וברורים, ובלי בלבול.</p>\n<p style=\"text-align:right;writing-direction:rtl;margin:0 0 10px\">אם זה הביקור הראשון שלכם בבטומי או החמישי — אנחנו כאן כדי שתחזרו עם חוויה בלתי נשכחת.</p>\n<p style=\"text-align:right;writing-direction:rtl;margin:14px 0 0;font-weight:700;color:#1A6B8A\">— צוות Batumi Online</p>\n</div>",
       "body": "",
       "heroBg": "#3DA5C4",
       "summary": "",
@@ -9554,7 +9554,7 @@
       "title": "תקנון",
       "icon": "🪪",
       "bg": "#3DA5C4",
-      "longText": "",
+      "longText": "<div style=\"text-align:right;writing-direction:rtl;direction:rtl;text-align:right;font-family:Arial,sans-serif;font-size:13px;line-height:1.7;color:#1C2B35;padding:8px\">\n<p style=\"text-align:right;writing-direction:rtl;font-weight:900;font-size:18px;margin:0 0 12px\">תקנון השימוש</p>\n\n<p style=\"text-align:right;writing-direction:rtl;margin:0 0 8px\">ברוכים הבאים לאפליקציית <strong>Batumi Online</strong>. השימוש באפליקציה כפוף לתנאים הבאים. עצם השימוש מהווה הסכמתכם לתקנון זה.</p>\n\n<p style=\"text-align:right;writing-direction:rtl;font-weight:900;margin:14px 0 6px\">1. מטרת האפליקציה</p>\n<p style=\"text-align:right;writing-direction:rtl;margin:0 0 8px\">האפליקציה מספקת מידע, המלצות וכלים לתיירים ישראלים בעיר בטומי, גאורגיה. המידע מובא על בסיס \"כפי שהוא\" (As Is) ואינו מהווה תחליף לייעוץ מקצועי.</p>\n\n<p style=\"text-align:right;writing-direction:rtl;font-weight:900;margin:14px 0 6px\">2. תוכן צד שלישי</p>\n<p style=\"text-align:right;writing-direction:rtl;margin:0 0 8px\">חלק מהתכנים, המידע, התמונות והקישורים מקורם בצדדים שלישיים (גוגל, ספקי שירותים, מתווכים, מסעדות וכו'). איננו אחראים לדיוק, לזמינות או לאיכות התוכן הזה.</p>\n\n<p style=\"text-align:right;writing-direction:rtl;font-weight:900;margin:14px 0 6px\">3. מודעות ופרסומים מטעם משתמשים</p>\n<p style=\"text-align:right;writing-direction:rtl;margin:0 0 8px\">מודעות שמפורסמות באפליקציה (נדל\"ן, שירותים, מתווכים) הן באחריות המפרסמים בלבד. אנו עורכים בדיקה בסיסית אך אין הדבר מהווה ערבות. בדקו עצמאית כל פרט לפני התקשרות.</p>\n\n<p style=\"text-align:right;writing-direction:rtl;font-weight:900;margin:14px 0 6px\">4. הסרת מודעה</p>\n<p style=\"text-align:right;writing-direction:rtl;margin:0 0 8px\">מפרסם רשאי לבקש להסיר את מודעתו דרך כפתור \"אני המפרסם - הסר מודעה\". ההסרה תיעשה תוך 24 שעות לאחר אימות.</p>\n\n<p style=\"text-align:right;writing-direction:rtl;font-weight:900;margin:14px 0 6px\">5. שירותי צד שלישי</p>\n<p style=\"text-align:right;writing-direction:rtl;margin:0 0 8px\">לחיצה על קישורים חיצוניים (Booking, Agoda, Google Maps, GetYourGuide ועוד) מובילה לאתרי צד שלישי הפועלים תחת תקנון משלהם.</p>\n\n<p style=\"text-align:right;writing-direction:rtl;font-weight:900;margin:14px 0 6px\">6. הגבלת אחריות</p>\n<p style=\"text-align:right;writing-direction:rtl;margin:0 0 8px\">בכל מקרה, אחריותנו מוגבלת. איננו אחראים לנזק ישיר או עקיף שייגרם משימוש באפליקציה, בעסקאות שביצעתם בעקבותיה, או מהסתמכות על המידע.</p>\n\n<p style=\"text-align:right;writing-direction:rtl;font-weight:900;margin:14px 0 6px\">7. שינויים בתקנון</p>\n<p style=\"text-align:right;writing-direction:rtl;margin:0 0 8px\">אנו שומרים לעצמנו את הזכות לעדכן תקנון זה בכל עת. השינויים ייכנסו לתוקף עם פרסומם באפליקציה.</p>\n\n<p style=\"text-align:right;writing-direction:rtl;font-weight:900;margin:14px 0 6px\">8. דין שיפוט</p>\n<p style=\"text-align:right;writing-direction:rtl;margin:0 0 8px\">על תקנון זה יחול הדין הישראלי. סמכות שיפוט בלעדית לבתי המשפט המוסמכים בישראל.</p>\n\n<p style=\"text-align:right;writing-direction:rtl;margin:14px 0 0;font-size:11px;color:#64748b\">עדכון אחרון: אפריל 2026 · לפניות: krispelitzik@gmail.com</p>\n</div>",
       "body": "",
       "summary": "",
       "description": "",
@@ -9565,7 +9565,7 @@
       "title": "פרטיות",
       "icon": "⚖️",
       "bg": "#F4A94E",
-      "longText": "",
+      "longText": "<div style=\"text-align:right;writing-direction:rtl;direction:rtl;text-align:right;font-family:Arial,sans-serif;font-size:13px;line-height:1.7;color:#1C2B35;padding:8px\">\n<p style=\"text-align:right;writing-direction:rtl;font-weight:900;font-size:18px;margin:0 0 12px\">מדיניות פרטיות</p>\n\n<p style=\"text-align:right;writing-direction:rtl;margin:0 0 8px\">אנחנו ב-<strong>Batumi Online</strong> מכבדים את פרטיותכם. מסמך זה מסביר איזה מידע אנו אוספים, איך אנו משתמשים בו ואיך הוא נשמר.</p>\n\n<p style=\"text-align:right;writing-direction:rtl;font-weight:900;margin:14px 0 6px\">1. איזה מידע אנו אוספים</p>\n<p style=\"text-align:right;writing-direction:rtl;margin:0 0 8px\">• <strong>פרטי קשר</strong> - שם, אימייל, טלפון - כשאתם פונים אלינו או מפרסמים מודעה.<br>• <strong>נתוני שימוש</strong> - דפים שביקרתם, פעולות שעשיתם (אנליטיקה אנונימית).<br>• <strong>מיקום</strong> - רק אם נתתם הרשאה (לצורך מפות וטיולים).<br>• <strong>תוכן שהעליתם</strong> - תמונות, מודעות, ביקורות.</p>\n\n<p style=\"text-align:right;writing-direction:rtl;font-weight:900;margin:14px 0 6px\">2. איך אנו משתמשים במידע</p>\n<p style=\"text-align:right;writing-direction:rtl;margin:0 0 8px\">• להציג את התוכן והשירותים<br>• לשפר את האפליקציה ולתקן באגים<br>• לתת מענה לפניות שלכם<br>• לשלוח עדכונים חשובים (רק אם הסכמתם)</p>\n\n<p style=\"text-align:right;writing-direction:rtl;font-weight:900;margin:14px 0 6px\">3. שיתוף עם צד שלישי</p>\n<p style=\"text-align:right;writing-direction:rtl;margin:0 0 8px\">איננו מוכרים מידע אישי. שיתוף יבוצע רק:<br>• לספקי שירות (אחסון, אנליטיקה)<br>• לפי דרישת חוק<br>• בהסכמתכם המפורשת</p>\n\n<p style=\"text-align:right;writing-direction:rtl;font-weight:900;margin:14px 0 6px\">4. עוגיות (Cookies) ואחסון מקומי</p>\n<p style=\"text-align:right;writing-direction:rtl;margin:0 0 8px\">האפליקציה משתמשת באחסון מקומי לשיפור החוויה (העדפות, תמונות במטמון). ניתן למחוק כל עת דרך הגדרות המכשיר.</p>\n\n<p style=\"text-align:right;writing-direction:rtl;font-weight:900;margin:14px 0 6px\">5. אבטחת מידע</p>\n<p style=\"text-align:right;writing-direction:rtl;margin:0 0 8px\">אנו נוקטים אמצעי הגנה סבירים, כולל הצפנה (HTTPS) ומגבלות גישה. עם זאת, אבטחה מוחלטת ברשת לא קיימת.</p>\n\n<p style=\"text-align:right;writing-direction:rtl;font-weight:900;margin:14px 0 6px\">6. זכויותיכם</p>\n<p style=\"text-align:right;writing-direction:rtl;margin:0 0 8px\">יש לכם זכות לעיין במידע, לתקן אותו, לבקש מחיקה, או להפסיק קבלת התראות. פנו אלינו: krispelitzik@gmail.com.</p>\n\n<p style=\"text-align:right;writing-direction:rtl;font-weight:900;margin:14px 0 6px\">7. שירותי צד שלישי</p>\n<p style=\"text-align:right;writing-direction:rtl;margin:0 0 8px\">קישורים ל-Google Maps, Booking, Agoda, GetYourGuide ועוד פועלים תחת מדיניות הפרטיות שלהם. אנו לא אחראים להם.</p>\n\n<p style=\"text-align:right;writing-direction:rtl;font-weight:900;margin:14px 0 6px\">8. ילדים</p>\n<p style=\"text-align:right;writing-direction:rtl;margin:0 0 8px\">השירות מיועד לבני 4+. איננו אוספים מידע ביודעין מילדים מתחת לגיל 13. אם נודע על כך - נמחק מיידית.</p>\n\n<p style=\"text-align:right;writing-direction:rtl;font-weight:900;margin:14px 0 6px\">9. שינויים במדיניות</p>\n<p style=\"text-align:right;writing-direction:rtl;margin:0 0 8px\">נעדכן את המדיניות מעת לעת. שינויים מהותיים יפורסמו באפליקציה.</p>\n\n<p style=\"text-align:right;writing-direction:rtl;margin:14px 0 0;font-size:11px;color:#64748b\">עדכון אחרון: אפריל 2026 · לפניות: krispelitzik@gmail.com</p>\n</div>",
       "body": "",
       "summary": "",
       "description": "",
@@ -9576,7 +9576,7 @@
       "title": "כתוב לנו",
       "icon": "✉️",
       "bg": "#1C2B35",
-      "longText": "נשמח לשמוע מכם!\n\nאימייל: info@batumionline.app\nוואטסאפ: זמין דרך כפתור הוואטסאפ בסרגל התחתון\nאתר: www.batumionline.app\n\nיש לכם הצעה לשיפור? מצאתם טעות? רוצים לפרסם עסק באפליקציה? דברו איתנו!"
+      "longText": "נשמח לשמוע מכם!\n\nאימייל: krispelitzik@gmail.com\nוואטסאפ: זמין דרך כפתור הוואטסאפ בסרגל התחתון\nאתר: www.batumionline.app\n\nיש לכם הצעה לשיפור? מצאתם טעות? רוצים לפרסם עסק באפליקציה? דברו איתנו!"
     }
   ],
   "audio": [
@@ -9784,7 +9784,12 @@
     "1777122166832-578.jpeg": "WhatsApp Image 2026-04-24 at 21.14.18.jpeg",
     "1777122166846-518.jpeg": "WhatsApp Image 2026-04-24 at 21.14.36.jpeg",
     "1777122166857-101.jpeg": "WhatsApp Image 2026-04-24 at 21.14.53.jpeg",
-    "1777122166867-685.jpeg": "WhatsApp Image 2026-04-24 at 21.15.27.jpeg"
+    "1777122166867-685.jpeg": "WhatsApp Image 2026-04-24 at 21.15.27.jpeg",
+    "1777201173266-687.png": "צילום מסך 2026-02-06 ב-20.57.34.png",
+    "1777201220796-941.jpg": "batumionline1115.jpg",
+    "1777201253934-839.jpg": "batumionline1114.jpg",
+    "1777201289968-7.jpg": "batumionline1127.jpg",
+    "1777201325547-99.jpg": "batumionline1149.jpg"
   },
   "mapLayers": [
     {
@@ -9794,25 +9799,25 @@
           "name": "מלון המלך שלמה",
           "lat": 41.639603,
           "lng": 41.6171756,
-          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X4W6ACkpuPFGGlWPjj0rig4vxjIAFKkkfl3dfo--pQaxoMrN2lKlcJdH7VfJcAUQZGtsXPDn8AisjxFPIHuFbvO7d_w510bwgnMxqw89DDuxtIZCObLujqzOumVNRhUyyG9SMX1DM5ZlJs76fDB7pZsiDlhFIgBA1NT9DYEq1O05tFo8EsfNZbBVZCZ01U3uh0Ad047K8luiotsxKJJVIagXotQi__woZjoG-qT_NvEIHO06Ucg-vLou7I?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X523FPSmyBvVTChW4cNIycQIqEx3vx7e58FD40gpF341sinZ3NTC0IFkomCJJMdibBU_Sypeo2DQDLDbEkSY3mDIX85CakGqWBpKsXUvSYgjVW6uHHKrhNOEow0LgCdZT88PtBIGTbvNMnHFZetXNGP5hbIdvh_l3-sx7QGANSlIUW4I8uK8kclVjTQ5tcIc159an2Gtyr2eb830jMkJ4IuGitgwz2Hr4GEjb0detGw4pV6BOp_K48rxnU?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
         },
         {
           "name": "מלון שרתון בטומי",
           "lat": 41.6509788,
           "lng": 41.6303784,
-          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X7obnAO4tKEfJ6Q6SM0A7L9FOktzAT5p0IAfK4qERgOqJEPWU-Aexdr9e95ZRtqAbNpmS_V7bTNZkOUwhq5bEz26xcmcQFAeKgis-ON8bCgGN7-fgJulSmbsRuBQBNJQJ10-H5--vBua-omEtGFChLfA9TRp4A33uoQORxvUBvA67WiEx9Iw5zlISJ5LcqSFFFo6dx0rhZg1stAVUE-i57301QGwrALtPlRSUqLZH7u9yvLSRNk3XzS6uc?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X4fazxANSOnC_C3IQbBMXBqsZSHC2pGCDxZIf5u2Z1kqJugwzblbxwzTd0ahRPrty6K0aA1EaTI8dAmvUJAyde1-Hxq9v5CGwBntyZtA9E0hdRLT8slbW_35JZy3ILjPG3tvZrBrWvGSU9Z8s_m3VUse813xktrx7uSYoqZQWYL0aB6JKXt2ru1jWLeEwMQtYlGC0iNV4R5adth0y97Nxh9pHKJAgra253ENIxYQwnOVU7e_fwEY6uxa8c?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
         },
         {
           "name": "מלון הילטון בטומי",
           "lat": 41.6492249,
           "lng": 41.6257772,
-          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X5CRoIuVnwo-sBHYbVn16VgqvRT_M44xy-tJES4-YT802IypbWRYVNPLGa7FKXtntypoud21bPH3dUNO5QQbZPGLTSVa9fTzfNaPzz1tsx876a1rJmK05RbjIHjlcN4rqVepE-cUqBqYraqYvbK6ZESfPl-99JyaS9IeJJ1HGTbjfHduqxHP9ZmRPrZY4xkBwSGVcpULyA3cLArOpwVqF57J5wW4Bb1-5q0B2SQgXxSKq9B19dPfkQ0QNs?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X6dj9v9lvSL6QRIjl56GhiR3G6aTJOAN5jp4fly7u0hr3duhhgnefmyX30naTzx-DNDoAGJb2fCSkkbhE9InTZnjyMIkxze9jvOMmTC8XD0pd4mQfd6ur2iZNTP5xNOmYC_mwQDaOOHcSnXLJ76w5ICIP9A3Sh4vFzAjJxLNF4E6KZynPmqBUFhrfcVqLUU-saicispfB_2IRQXXV-zGiF_TUZoflsjFBmJXJwp7TYt1gk1guYP0-r_quo?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
         },
         {
           "name": "מלון ווינדהם",
           "lat": 41.6502244,
           "lng": 41.6361187,
-          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X4LZSE1J9SlVaRNsuvZ4KpQBXdRTwutGSxoxRSTvhmec2dNKlbN1pDx_eZ6lFrNllK9vygsFdtPMumVIb0GhYHOmNsii3uX4UCmUw6T6i16q4-BqojABsKPo2S1f-KGe4I5j0qfGSYgyVRdt28kw2zKyMlCndt3kzs80POun8mYQ1m5d-z5EqK6UI3KviXoJptLpUxqHvGNE-EcvNGHZhzvnykWWDwkKMYtDuE_8qIxt9KNa_Akdy-ymj0?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X44u8AxWKDnM20O_m4PawCUtiXwVSE7bOCWB8Vk72qR1kzmVmfwyXaKPJtZTOlz2hHa8z20NUB5naJeUIEQCTbfMUC_Otyb2x2CTcdTbKzKDvTMOVegcpUh2FjGeSB36kDMvGwxrjk7HmsBm36lgLKRsYjn3PCcJD_9x9jsa8VoPH0sxhPx7EytAWTE7qBPUl8EiPJo8Emh1uGKiHceMPGCMcmZA_UgdkuAFZQIY3d50SWFP3NA1_mG3g4?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
         },
         {
           "name": "מלון לה מרידיאן",
@@ -9824,7 +9829,7 @@
           "name": "מלון רדיסון בלו",
           "lat": 41.6537605,
           "lng": 41.6376418,
-          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X6GWVdwOvw3N8blDLOPYj7QIlwAGFx2lfsWL2mVDD8vFJCqTRwIDKYCnZ6yV55OkgrDxUaQ4TEmwSlMGzMk1w0OaDhaL7aCYQp9dLLXqEKrWDP5ecBObG9HBnW5lnCnstRlQRavtdVG1knJGvyW3e-a6iud8N14SPDrRgetmvo66PHuKe7lZBfZEtkRZHjrczUFWTKOFWxkjpUaqrh0eUQNlaiZA_jYhja3bwsKXuyYPKaEgfpds_jfhQM?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X6M0Y-_GJkkSgm6Ongl94eXjKApJ_-lGE5I8RS3zhrsIAD-a4ZD5JtjANJeaXevlWJpcVmQfSfYUvWgrwkXFDrASd5SHI2faSrnsuoEkVgoD6e4mX5ZVYVyJGTjfBrwngGISKJlj7AVqlRJEGtoK8rlSckvTHujc4mfjUDgZ4yvrEbyORkJntfbwyYpQFXDji11XFZrh248bjkJBb6mEh1ipbOoNmnSbBqsbWxbNdBe7X7iZ8CS0CT-pGc?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
         },
         {
           "name": "מלון אינטוריס פאלאס",
@@ -9836,37 +9841,37 @@
           "name": "מלון בולובארד",
           "lat": 41.6526783,
           "lng": 41.6342354,
-          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X6Ti5GJmQZNvLZavGbX5pcW4acbsIxsR2FCtwBKpVGx0Pi3wA70_CLcHPX1DRlZ6kTw3ItoWzk4C_KJ8Qw_vb6R1-i2u9PGhilXl6p7sM_aN559F0niZHmPq3uIHQbcR92OpfbJQMkekCVjoxnr1oNkMRSe2RzMBowFRiRjFUEi4UVeo8Tx-ldZNrYZaULY7Cwy4dRDhiuGpLIX7yhOHKvWXcYamQ1qI05jIBMKI5t_MGMOrGMKnZTVqcc?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X4elklnFuPB-hgCG4VbsV8B4a9sqI0ylg0wwXe_38514Ut9ZYaD_k3g9NYAjjECnNerxOvgyXbNas7moTohOT0m7wnVwe-kx-GIoY-5WpOQwn5pPp9f7WqpQcfDtzr_fSfohu2dhFgqpEj_ZFHtKGwpxFxtTlbMIetD1PJuzt9W8aLwbH3R1xSNWs8qZg0wGxMPgycCgo94K55t7svPumORksrPdIO_Q9WgomTI4zcMMlIinRJA9-K8efM?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
         },
         {
           "name": "מלון וולמונד",
           "lat": 41.6457437,
           "lng": 41.6489232,
-          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X5B_A6aKvcNYmJgkXvtI_gmIeQ8uKuwJjm1yVg2Jxoo8Z0qR1Y-2uDFpe8k9fu--7PveamOtGSfMzjzNAX9Z1wTBa5kjeqKDgUgjltmIIjx8D0sDbKneYlXO-ACSub_GX2irO4GXsG_K2RDvCASERP7NBFRJPlqnmUJYSTAxcHjNxC5XFh-bdXsZIOwhTuQP-UDsp0JoQmTJEPYsAaCtxMineGImZUXaRpXpwQ7DmUbiZp35-nc3JZpS5M?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X7kXn6ovwiK1UdgDDhuWF28oxHXgjBlOPleNCN_yi4zh4VVeTAjj9lulpeOHtMdbSty3KMEyUSkvPwuctKc6iSExsht2zyb7clifrtkeDjRcpR70LveQlPx_kPQcNP29FQUpZgQyt5Xo74GFVucxepHch40tttJFtVykBJC_3sNV0onWLtB0WxitYQQZgGJ_dkNNdBjfWkC7IpEY7zR4latfqRc6c4TiG0oZ7xtMIJBaCa5-jFalMKL4F4?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
         },
         {
           "name": "מלון אופוריה",
           "lat": 41.6271748,
           "lng": 41.6012827,
-          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X5LJ5XAAmQOdHuX-Y8TR6mHKd6j9h3MRg6K9k6Mu4v8MLQ7NCfZIPpEqD3w4ChSLt24QGjFcAeyjkxnahQGpfbI1fS0IddX40s3dUPqNvvBsoSJuSxIqtA-zy4Qa6tvpSrInaflz_95qzv3F8nGbQFdNt6xlNpgWN24juOR0D_vwS8olC3nyTvo08mbnMgiXtUPXlT1RAb3XMD66kSdwSE60WL7PilbYqvOf7RgisHZxFXjM5u-4wE3tcQ?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X4J_9cB_VWgiiL2Z39alncE97oleMPR1xBAoC1yvKfQswbHV_dCWKdWfRExA1TuX-ToOFI5jLQz9m1irIEo-qVyN6ORiT0drKyL6aoEZlVgj00Bz1RbxwLAXYI6FaScRFjwv0YO0JGhE_uR6enTAL1XjrTPWoHzhbVxIeWSS1k3V-2GOG_sY4FQogsoMHARN5-lf4lLpyCVs59hr3ELM5tIkOitMW_PYssOmPFaDD5l9wMjjYhok3zludE?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
         },
         {
           "name": "מלון קורט יארד",
           "lat": 41.6417569,
           "lng": 41.6157657,
-          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X7hfNnOqiNjQY9UcOp32Tm9p16Q81o7-xEd09vMHMN378n7BkcNOMxCF0kumVohcUfn1iiwq8jbaCvK6Q6XXqio92SWgSrlJkJKf-mmSunCqiV4RML7iXqr8PvTh5OCrfohj1SzGSMCJ4gg0VU-yT-AMIvEqkCwJh8ZQUoQt8GDKWcFZGtLtpYPjUar5P-EPNp-V6yhC87XaDIAUJgMCZXMQdom9-xNMWWU8d7wKzPpRdHWt8mLgoDNdto?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X5GCUngEfm3Nvl8Fz0kspX1ValfB1wvBC-H9Z5s9UvAHUGXgR9l-_wjTmcXvWukLNxTl-V6Z6Fnalb98Xgn6hpVOIAenixshpSwbAT33czElPMeMSSHR2Kc8Qov5BT_YWZNEg1vw_Y5RDIZVHkEbrK-ZaUWd2l9DJeB0iITqqAeeuUqywtJ9lTVRJBsk3P4-T0K_n3Fg4RBi8bsCfEcXpUFpg-gK3xV9nbiewagNvBaO1jQozRHaR1sqOs?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
         },
         {
           "name": "מלון גארנדיור",
           "lat": 41.6246582,
           "lng": 41.5980594,
-          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X5s_wb7Pf_JjPNFlzCgEUFdYM-XasRacULTM5NgWDBdMuANvSwuLTCiImQ6K4GxXxIxdej8mLvGLffR8zqzdAZG405Yo7yaiuVZIY7ISNquJu1fkGLZYDFamOJ00yEVf-syVIZPoB-bMmq8U9ViGjA0N1OuUyXd9WtRJEl4Uzx2DGlZqq-5l02gW2DBPEsBkZX5fDXmuFDH6uQMR4t-fQ265k5nLFLGIDgT_dxXdowjUheqZhVhS8Nvq1Q?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X7PiFLceFmvAetBNe2Mts3soERgz6jlXotYG-1Rs5LwGx_mn_2iLzlgeI9lfQ8Lee6uRrFz1W0gcyanq--T2ZlLmhp2YTTNIU87DOu-sPFygiv73LfcWOgqXq0MJfBO9V9a04RPxZ0Jv6mQ3Y9qMbI8oDkHQ2n3iMR99BAiykX67ykQ2KsnEzSC8uTBTaPOeXbCJ4F5QRWn3p32dibQgPojseLEbzwaPiv62oixgu9kZD8Fr8HyC6qxXOM?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
         },
         {
           "name": "מלון ביליונר",
           "lat": 41.6395134,
           "lng": 41.6165788,
-          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X6usFhoHGxxAGJvPgehiVT9PF5cYqta_JyWafmwgN8S7bfpH9E0OZtgmSn5eDQsuLUMlOKFdyZbRhhyWvuELqU9sd5vGlyv8BOFY_YY-TcEdzFTpxukrrlJZ8a2xbwyy0sssO3Ejba0HcdH5nTLUHxcURQdI0UP4a3X9JMLe3gfTZJBvamsBfK7pJn7a4-D8-3ffe9dNUSAgCkNFtjSSRuObgNnQLx8NclfAFdGeqgdYF_8hK5-vJb7Om0?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X7PefbjoO1NJelwSKs0a2ACo5cY7cv5-JC_3qLwTWQSBlciLEJ-7bTtI3esnLi8VV1cpG7TlCe_oZjrueYrn0TgLff9ufizjRiRXILmbTeS-Xoj_7Sr9E4vAtEEbEJWRAWSkr73FBrXiVUZjigalyTAfDmStg8P2c-LElhCwUyii9e3p-DW0Qtk2AIIIOSNH8keHhmZAR3t5r0WNVjydWObYXo4fYZ_2qbERPwPFhIJw_qQzPv10rRFO08?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
         },
         {
           "name": "מלון הולידיי אין",
@@ -9878,37 +9883,37 @@
           "name": "גראנד בלאגיו",
           "lat": 41.6253427,
           "lng": 41.5984435,
-          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X422okblw254tVmV2d98iD6C_ujPh2_RTf7foE7IR3x1U8vZlZCb1w-CceUnKAcLQTOWhasj8XCD_l6gPYQta1DMuHB3NP2hCIK3pGGAmI170gU23hSM9PkGIQfUqCcuSrRuTqlvRa1xVlxkcfkwNqbIdp12z51pyqb2OAwClrMWamYapbohR1lz3rgesIW8fW4FV6LoqHk59t_XBNa9yFc696uXA8HONN3lMYLCceToJxKTsCKe138ecM?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X6_MG6yfSixn0Yl1beml003ETb8GA0WDB8fPqsCN3elqe5cbTIbr-h_5fVsfyaYeyHUgTiH7lr7iOAkYjoILY1PMVXXzloH_UkRQIaD__QDqeAG2w7IGESz2NQCxCx9kMQ-mwdWKhz3s5jIIz5M2yU_2d8P9CGSiCQnBvWgMWDYiIcSHZhRY8G4eVqs4kvMMOhXN6A_gNl4nAZ4bMR-RWYxedap_NcXIaF4xCIycRtlm4EVItpeC-AqSv0?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
         },
         {
           "name": "מלון קולוסאום מרינה",
           "lat": 41.6375774,
           "lng": 41.609327,
-          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X5bXCRjOmGA4y-b1ICBPc0j2vFO7fnJpZaFtEF5njNtnC2Kd3NwQLigQslNz_rr8YuNUj2PtZEfeYgPHDYyQ11aBinPg8R8hF7ogUVjLdq53-YoaNI6wStHGcMemlFKR6L2Wd2AswRScGsWbIocKry4szFXZomsgq2_i8jEv9rF3k35XSGNwh0gqTk59UtIrLwYPz-c_bgpR2XfY7MyKYuPPlyPpzC_zwkyMuZwMQsdZBAH6itlvc_f3oo?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X5rn5yokfqpD2IFzuh1gNsLysfM-uS1Foxb7LezITz86COzKTGXtQhsVaecEtJTuAPiUUFlqs2oWy9323vZfby300FGlnP71iDX1LGmiJ805DSVmKFeFsrwuMiIv4OTtPElLKXL7z2N7k4rzbYScP4D9pUZ_viSdef3fG77VLvFYf_wulIB52BHp9eWDt1TfvHi_a0lwbaH0nVls9E4q0TrVcc4yYWZUjK7G2MB_F1vpolC7SFOJ02eeTw?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
         },
         {
           "name": "מלון לונדון 1889 בטומי",
           "lat": 41.6509758,
           "lng": 41.6413897,
-          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X7v-eAMIreeqGn-1-1ugNMB1IZovQWkoYhgq8F5aQg29zadf_ua9TZU3By0BhvYF_WMSM69z6lPFtdwMLXpJuPoCjJab82tNBHEMpZWNJxe5xUsq3X8isnnUWpn1xEhq0bQe-HxWoMCotd8cG5dDqEA585emev5kbmYfIh9d7GHAmVxPhdPetCjVe9Dj30KWbs9EavIer0-NbJX_57lIs5rkXWHdvXHG1927MH1LfVznUbcYqVRan5HtUI?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X7aRKKHJ0GAGjVPm2nBYt38NwaOJxOxtNqMXMLf91aQytxL0g978eO83PEUazVyqhkPCwMAx8_kzwFoqlMmHUxW_o385RKjA3KakzF-bn_X4Y-hyJeuuezkwMcpGZtl_okJTX2vk3jN2tq8eThGAF9LgK9WfEBs5P-XtCFfcByHcV_I-BLJdCpSNzxWQBRD2Wk5fU4QJNp3fxLRmbuF8QvBEr4tlZk8hQFu6z48EsaJnf9THywY2rTf1eY?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
         },
         {
           "name": "מלון אינדיגו בטומי",
           "lat": 41.651125,
           "lng": 41.637447,
-          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X47_NGNDnZHvdj2VrrU3b6K8MXb2fCq-L8ZnN0Cz5szrAtwngyOOQAeDwD57EOOsbT0B6guFKq7fov06yO5FQtFbtl7iPeqyHCu5rr32R9OlO_H5UmnA5SxrMNo2kE3ObAvEj4g7gsDK3iqGepIxnOo_MnuXuTpHKM9-fGh_CkM67sMf5d9evrDX7ymRHfwQaZFMNui9zPWXBL8MwxQVGCxPdSeoIHai2WntUGWmxA7TNbf_1kYN0gJ5KY?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X77SHJCI1aCZ-wE-XcCNwhgmvqF6MQ59wpDUykp9aY4Tb63H-u2DIk1ceLiw0EHFe9NvybyO060oaXv-79RBFASll6zfsuYS-udk7B3XNzhlGLAEDuEOA9yxEG1KxTCsKWOYjsk7t6uoa4xCTeFWJvTmO7kVaJrM4U_ZuELQcbjPdU1Sq5ve9GPofNCX4HupjCfHkziO4M52W0ZR4-kXmo1OaQLtZd2nEMU9jf7AOc_PbZsQRdo3GS-fz8?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
         },
         {
           "name": "מלון גולדן פאלאס",
           "lat": 41.6520641,
           "lng": 41.6367901,
-          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X4yiYfCfHsubgSTYozIVVRyjt1zG_RGhhcWmq3RC-Bum0MS6MOn4UKlsAF4aDnhFeDjYqO_Ay7gPo7t04Ra53x2d50Wbn1wM2WvKVpG4r4zWWDUkVktdYWKIhSLG-CPeR8q33yN_QdIEk1TPunQpzOjJGCN7wTp0bgafmSatJhkBB6S2YWPjPz5b7C7kRZNWZFEtLR93ZIfU7HW9RgAnW0jZ7KsyGIPSilkSjJikILfFvSE8XwtmuA1tGQ?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X53Vv8dv2k31MRXAIPhq9svKn9tV7OuNFj_ucSOJbrGVMgg6DlgYjnltARx6_RuFvfyLyKoVR46RL6mWTAWYkOUVB9z9drilF1Dy6FepsRrBt-AZSEQPI5WhDaCTUrcMbo6IW12bPowWHPAfm2ZvQNz86NvS19872FjwiclREQyeKqe5wxDuI_vPez5o4qpuNpMDQH1rE3Hhcfl7cEUpgKItKejZp-P4j2LKFqHJm3b3WgREJj9YIx9-As?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
         },
         {
           "name": "מלון גראנד גלוריה הוטל",
           "lat": 41.6362143,
           "lng": 41.6071066,
-          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X5HITzhpw4OsgrBCpsR5t05uFxr735_owkcnLqC6bsRshFcnzdsbp3ylAQ621C6URwJfnujDJbgq-MzkPckFdh9mdT2FQ0yEn4Dj_aloexmV5oqwMRHPyj7N8DXhy_UvPmnyDLJlzODO0zpHxNyqVLiDW5T44adHqEU4Te1TXsF48oTUN7Xzwk1cnRaJoWLCuxir-gAapNuRVC0MawWvZ6S1D_Q_JRuZvL0cC4MsHvduf5bvpVdg2GJ-hE?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X5Lrr1v0x4AN-I2HNzPSLS7JmEJP_Ks8U3e5T9HugZ26hTpAoaMUc43FSkTXzytDchgFsq3vzrPpXqioIIEF2WLxV85GtL-ucUoHg5ysreoLyKM7Q2L8xYgb0AEvggFOIE-gpVi7u-Jld7bisO3qY_U_zNrGOVnvw0UOqP2asAqL9BKJkgJkDkAl_qhtKMvPPaxipjmoGBhbCKyFkLs1-FvHYdLF7vxSzkUOn0wV0TbdPiBLbCVByPg2Hs?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
         }
       ],
       "color": "#0288d1"
@@ -9920,97 +9925,97 @@
           "name": "בלו סקיי טאוור",
           "lat": 41.6379794,
           "lng": 41.6187095,
-          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X6lfRifhFHzMCe_O5vHmg3bUF9HqddJfPbXDB3KItZU0y26eCxdSGdrwI27Ayc53UmAjIV_OeDUoAyFm3-QNgcFDj3MXN0pTi17rzJnYy3JjHlWiTf4HZUaoJgG6BimbWPvmMH5x9L30GiOMOxY3yFsf1nbyRT8SDRnUkHmqm0s04vGcItIF1yoTB3I_MmvNvPRkKX0k9a5RsiunXv-wZqoKdi2mrBiQHFxqy8JrCvZFHtEwdTOY2DUhh8?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X5T9VcTj71bMEgC_ru_P_-awesYmufuAq9nwbJNbMIfr7Vv4FJzxDdCql0D6wjrP9UyHd5irEBd8T5u9jeJ8r5GAHLqJwDh8NNyUTXtA9AhJHUQManzQgUGXdrceTPR7SOqhRqzqn5r6KcLi3GIrG6_e-8bTXpiCa56FbtnbJtb-d1W6hIYhh9WFqzIcbGspJRUysmn4myTRJ-1eNZfyCWAfbjRaefj6rQgkw9_1R2Eqh35P6AuLQWJJ-A?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
         },
         {
           "name": "אליאס פאלאס",
           "lat": 41.6415324,
           "lng": 41.6160339,
-          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X65OgrhmoF-QHS7eL-JcoDs7goIiSCFYvyhSfNY0jWMZXKkdhqlnXxDnyB1vfksPC-GS9PyZcOfjb_IdWQcEgaxKbFC9WtXjq0krnnJgpVggJVBmcPLh_rharHPpH2dknDOQBVxYV3GDT607-eJOunnc_12sy82IHwmtOguuVkxoFuIadWWxLR5QuOCCimMmuowbyPeA3TY8Uvqe4wQ505H5pA6N01PDUHOhC4kuUTR6O_crkcb8Pbg6Nw?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X6H7zA3Y87lqgqqU9YZqCtJhHkxpc6tpJKZMWhP-YEMPYHU8gtlO0ZvHFEFfsKQnV5W_hxBH4sJmpiepMehWZO2vqLaQo0L4Ze9DKRWP0us3YiILcwfkaLxbYBPYHpScza5OioS6RlwHVDISWjozqifCZxKw5xH-4Gbh4eA02SYgHK88zWOJluxX6HYUsr178f_v9B3cLvsp6hzpWWSd7gG7xWUHZtu-GyLRq7ABHGp8Fh6vovQCEgWtSw?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
         },
         {
           "name": "אורבי סיטי",
           "lat": 41.6401789,
           "lng": 41.6136713,
-          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X7YTtvZmFqATixkVYobGbhBkG-tFz_Ei51zsXIrO22aDeolFwlUNlTTC2BuhenBLWJOID5z7eL1x5l-x7wIUiWv3S2DEs8Sx3UTqe_1U2FZr1me4seB34JMHwQCGX84hamTHXCePRGVU49xcQDQb2shtFG_Ikd558Glvrad_KcguB8L61H3w-h1ldu_zUkp362pAb8gNekqC1CqfOXv7QwP8r16zjLPoGL85TjEkefjMgl89qwexooHyss?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X4HqBKQyIxKE1jhcVPdP0FNWH3WoS6D3btNy0xXCJwuf8tEPzEEk33qSGukNqpyCf4D-QJewk9qQXgLuyX3TtFMAEZ4rVqd71uTG3CV8-6kJWhQK5pp2FCnQEtk20bNOFcu5GpMqZ3yGp-yFzbdoKY13SIrlASAMWIEWkV3fCCRmFJrLBjKK2WQnneO7SZloLUeQp0ntdHnskATC7nJq5YWGk4lfvQ24-OhNdNk9HwUig5LQA8CIXPSEtI?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
         },
         {
           "name": "וואייט סליס",
           "lat": 41.6237332,
           "lng": 41.5979269,
-          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X5Boz65g2laALsluz8QYj8LXBVaEDz61tCID-aXzqFmnTeg0sun3xY9XRdcW7-UWaKCWAsB7P-SwO6EisOOufkg8BgFWkAr2t5nYL_-UQVCq5yEUqY4rZOD_dIqHsJUQmRuxwAy4BpKVbQTmHaW075fU1WU_mztJRXKjawHlxZTNH_lGDOU6a0KYfvFct9-BYTrVO0br0RcsU9WUbc0KnsnoPYN3YMRzL7VzrynSi9-bTcipYu2ZiBZhWY?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X7xBRyLnTcdBLnJ5G0IvCf2vLXhCRKw_EUz2Pu8oHa2h95k2t8mRgFFdbGst4eTMFcGPuITq-xHkjwrziBfKMLCu0m04QePNJHDigU5GckVBZ9pzx3cPh-y95K8X6xVOht2iHwYhTZUjkCVDYvSgsbZofKKMbhnwh-iNS673c4aUFRSuu-zUcBHUwbC0zc_DtPumGG747VyNPsEKc0oBa-f0WdwbpruVkwYiHUSzpMW47yvw32SkfAC2pA?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
         },
         {
           "name": "אורבי ביץ טאוור",
           "lat": 41.6301288,
           "lng": 41.6020986,
-          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X6dUat6BQclCqIazM4Q1Skn42SF8TKoPkeg5KsMfrhN_twT6fK3pjTZ6MiQWDHxDq_JPg7mkj7Ze6WxtioRukViWRgtR8kC-86XvDxeGoaSCyKUQyyufd4oV02AiWvfw2sx6KpC5X3VWTRFFOq8bUH5vV19l6H2FtnyOmqdGpkL5p_y695aHkZhtUkj_hZw76h-ornCDiDkiQ9D_v0B2qIm-0J4vKr4I3R60aEyE8AGZdJoMB7N3_ee-No?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר:https://www.batumionline.com/"
+          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X5SKWmvm6NpN6UqBJtQrH8Pui3909EX_aRooY6fTjl3mYl6lzczL42d70u9uoG-6QuTptslL_B09KcFNRmSNpOPAfruEfTzCaHLbqO6uFT59hkx8U9wpMyz9s7bkPm68iwbUYHb3iaOwptEO-q_AUGgoj4jwIvCMO5TPauGT6oeSq_Fm0XbmALModCj82AM25YZbL-L9CseiCL7iUKafAPSHMx_wy84pI2Rc4a7h8a-GBc2V8rpw9_OYaQ?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר:https://www.batumionline.com/"
         },
         {
           "name": "באטומי ואיו",
           "lat": 41.6232365,
           "lng": 41.5934302,
-          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X7ClN1gzMCmUzZm_4c9vupdXqv5FD8IlX8RVrqbNM31CyomKUElPnSEwL8JWWP1w2puf2HbxGrAdgk7GqQcnQT5g5iSXIhWGAfGzf6Rkj6J4VxG9FrAxj9vh7027yb3WoezUv54avE0vUi03ORatwHhst2_P8yovEXVwYUEGkSvGCssFRwSod5GDCRIwYdNnVuufgPhI3P9KDZpv1t5yz06fu9Fk6I54uD2hwagZm4_48HxDVyYYpY2U8k?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X6COr3Xc7dMQp6nfNFoXs51oWaQ4Y44eO_pmV3Ct9SqPlTsQH2YtzoT998vO84tonPScE15lLuzpkzQ2zAITCc_wAupNB2NtEDT0XvLZVDO-xaSXUZlDPbOdZZKf69tyoTxYVsmi7hsh2TqX7XWHa4b69dEwnDTYFks0ENP8AoEHCSXnO6AzwLTWPliZMI38uEcaYHh9fe4TYzX4agI5BLsPIYM65p3CYaIH1B8wp1KGEWUNyw9W6xFROI?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
         },
         {
           "name": "קליגראפי טאוור",
           "lat": 41.6362231,
           "lng": 41.6205742,
-          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X4KRUhn5SmxUAFW0CyYqWhHjrlX6BW9H-q2tDB5bVkCK-3m4NGaKzVm1FGyRMgjs_FO-uJvbWCskGJsP20ojlHP09is9bV_Ibx93B1LqPmRsTWOvU5nqfFW73xLBtg_iQPe0Gtul8neFidtyCFb9JJtQexgpi6YdETZ3sVB_NwXGfCzx9m3-bSdzBfcO-I8g8fCovrtDq5iByhPiVc7XVJ-syx5_jz_os6hXP0Gw5Sm5om0mRxl-8SOB8A?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X5TQmKt2hkyaDmwCGoIPH339girITsu3R0kS3gBYYv47kJlErLcj3wyviYQOvonOjAIoUferUN2MnEUi2m3aZd3TCF7S2zVgX29CXqktKPCPqcOids3FA1baLqGoVMT9oMN5NfXHNxe4c8BK54t3YNOvVu6bF2eknvjgpyiRTuY2mdb2YD7_Rd_6wV25CkbGkardJH5cp6n5Ig-aju1SEwvC3zSbIhQe1HSdC5tlMTyh9aBQrJ-7itz1hI?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
         },
         {
           "name": "נובה לוקסרי",
           "lat": 41.6256867,
           "lng": 41.6001095,
-          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X5wShwRELZxacckhOCHonHtt2qs08a6LaxbaWE5E92PlEVBsBNpBHb8e-eLEjAzyVjgCdor8MB7QNMTDxIXKSI4IFvUjuB-2H9rccxGDp8lJlPEyHQaHpwqA8EW4AwrQg0M2y4NbgrSXwsRE0jJIziDEmg5Pqt7n8c1edcYaAKIgk0IyJBKh6RMbVhSU99FCp1ia6oFomnMz7k-5EXNWpTqccQ6MsyDYqr7M6Gq4385OJI_zzRT6IL50F0?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X4h5rrv2JqKlR-4pWSH580UaOHtDMs6Zk8nfhSONaSpCNy4z3YkdZw_Mhs9wGg7q7i8IVB1TUWU6WU-rMUBzdHr8hkll1n2msQtlZHUbFYt--e2MVZJBPBOI4MEzDNr7M4SB3B0x_9lhI-Ktn60JCKhrQDD1BkAMh-EtlKt_5T6W66UjEsjxRVJ8aEY2TqL28aXZ6TZ-gaDFUivP9b14MhMePBLOyz6UZ8siXpz8eLbzHx7o3tSrp7ZZHs?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
         },
         {
           "name": "אורבי סקיי טאוור",
           "lat": 41.6373013,
           "lng": 41.6099654,
-          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X5EpJU-lXD-xw1IEcBD_4Xg45ZE99LBnLrq0oLsGUaYgWxXSiDh6qP4fQMaNMgXihzvHrdhzBniXsVd6GGqfckBcIFpbS2AbrVfOmkWd4RJ2Aa4c9do4rpAc-sU8boo8DQsfSzqi-gFpwPhb1JRLa6PcsIfPJ3dyLc23kivgByjrUPn0OETJwTzgWhSa8PhUI-GNdI_YmCcP4UgeKm6yRvJ5Rq9K8RHtdi7fSumlH_NtZdi9kC3v905F8A?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X7NPofn0TfRLHl3d0F6JVqrYrytW5Y0cxe2PYKJqtozV7UV1pLEaWRwXE41bmIKWgiITM7kY-ZZSoIVbeBkLqilkY6GmGV-4DyRwwI_IeoOzUJUHen9LMYuEYAgfJeiNU2mgeNYbtqr1Q7L_ctq1LyWeD3oZsoHKoE6jPvcd234-5Iy5aRcIfUOCsn5cWxnUYpqOXqqcy0__MqxV4DzMFVamL1_rfPbBHAfgilvTKxDEcPN6qVGyE7FH8c?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
         },
         {
           "name": "אורבי רזידנס",
           "lat": 41.6349578,
           "lng": 41.6074197,
-          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X4lsTb3uchleumHB-XmMD1Em3SnyCdl9LLU06z9hVLRTnoqVD0AL63_xgpd1JU-mNwukSbs7rVRBauePlvVjnoXmnILKvIWzFJptkHa8XZkKELsyTdr-pqXcca2tsVGm5VmlahNiQ4ButuVKqRFMmdWu_PLHfhwolOp8fLsxDQuq-g7aS2A8WthUY8KcCPPGH8giBNAE3gFRE2N0QaEZQUmuGfumOECAov7S1d_YiHoQhn20RsrxeMWLhw?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X7jJ0KiRsbWqcYSXEpK4wChk9G2J5BWamF_fn4zGKOKp1z6txFCNlrnclNE1NFekpqzvSJG5_laik8jqruVbZxt07gWtj5MWGRx5RPDVRm-UBMQUQe41jAA3Gae1fgC6LPlqT-UTl8MDzJOU4KsTxIyEiDQ8ldX1qVw3xO-ZrN5ydCOlISce3KRa2pN2Ra8I8z_vmxI5ABP-PxuGFBbGh4eeeIRGAGQRklRIKbgH4xY6yWHo1vZbfxb9uA?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
         },
         {
           "name": "פורטה בטומי",
           "lat": 41.654951,
           "lng": 41.6385595,
-          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X6HcBRDz-PDWmzuIwNa8eWSvD7IamK2en7s7TuHQEEM8cKqZTu9uB4N3XsEqrh4noLYp7oOjTBftLC88HBe85J_V6W4zhilWqo6zvveGWT1Nm4bi7r_Vr8UUaN2i_-naVwplCRuz-6OuIskZreDKblyTy-BMxPld7HvRRK8pu5k-2cyBwAJSeh58nzcuXXcpUNvPtH8kYNT9NUN4t0nStDXi5z3OAdJ672FYN3_NZO_K4rvoFs3UazRhKM?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X6HhF3JIn1OljsrCbhrZLGIMNSfe6bvLSKFayhK-3bVHM5efZbOX1p2E3QlJHbum58CYPPM2DaPnvpWHIgExF7MuVJanz3bsyjtPYijgHsFVBZq9HLPWG_acOJ_1oKLdO3y-ktMe1IYRyyXCeWsfHTn4QS-dcicc-cMN3AAD54ELSmfszd_eoMVuxntnlsY6CjupaIN5La1lBxyBrHdp_SrI5zRP2VOdyPHZrS4d3zahVTcp-hLHX6g18I?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
         },
         {
           "name": "next אפרטמנטס",
           "lat": 41.632886,
           "lng": 41.6070325,
-          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X6czztAt8zuhgxiQUcNWqzWP7lL-o9mM1g2H9InXLM1U9tYZ9Awt1I3OgvKOnk-XUiWoMN3LoT-7HSzhBv_tBz-rtvlpo1krqb2_ZBM0YgX4Vt7iJ1F40oMe-kPQ6c0aJHgZsEWNYzWs8XR5ldKrVgUfE-MBCZRakSF0V-vw-YIG2bSd1jsM9phR6VPhcxDAGtIryUrDm-wXHVWlPV8FuL0hbEU3hmLVj4H3egrQmPVvVgczdjkS44zSBE?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X7ym-aTRXW48wLpcSnie2gVCTS0WABJVEzlOSZcqLpc2m-Z2tCfM7TfSusxNFwZq1yl2Y1bRFtqgU6Aa31WZ9ChyicCRApzYA3kyEVGXCbPvpw-3LuWmHiakEIHLRcBYDvTwYXpZdoQZRHDjqRJ36DkwIkHbRpouLGz_wCnv4tWKhHMBlYTaLJcZw7FEOoGbirEAbS96dH-wjKQ6-jOJyMkCKsZ6gf507OMzpDPb0CAIhf5xjoGTho0rc8?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
         },
         {
           "name": "דאר בילדינג",
           "lat": 41.6395584,
           "lng": 41.6166528,
-          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X7jocTICiOiAMJH81qsv_3B-hnFwISD8a0SAJkkDh8JX9uo_7HBakDgYaIJpGBEyU341bQT5cDfx8Fh1T2mNs_xs51d-AaMdzNiVL3m9zyroFBJfjoK_W1gn3N8PLv6CC2ylpXfh1taAnjd0dgOAuqTLJd4kbnMjex5HkkByoPjAVuZQk3GOOCId8_riAfcBpo2xEhP8whoy1hKWQ3ZqWCl78xQAJmqhSL1TsTMkEcAt1Sl7bT8nujinl0?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/‏"
+          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X70Vk1ERMuXnANqj12NWxD3QiymsUP6hXQLyYroVhCOGvLhyWs5KwVmdWgkOa7qoZ1RPU6kMnE8INx1elHofqvTEFhIcJxZUMACdF5tODT4Hd9htRPk0L3FYoqxoVJm1_6BzrD99yjkpMSSpYhZPKsnXON1p_vhNlgxBg6sWHuszpmfyq6joR1ka_wlFCmNwnwH00QinupfpgN_QjwJAuAGdZ9plEfbVH4qLn5soTqd8qn1aR8IJZtQy9Q?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/‏"
         },
         {
           "name": "פאלם אפאטמנט",
           "lat": 41.6555482,
           "lng": 41.6374061,
-          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X5oGsEHqTUR8d9QE16ag6GMEqkYSkBucsvZljEAhnuizld0NgC-YOpiTnqD_miAfAFElbNNLfpYcU14A1-OnDDtjQHKUGtz5GzxlkRiUt_ITLRG9UOwIbk5jKjkdPrCue_7tvsbtJDsTwpynI_zDm7nhesTMk1VmB-lLn30tstlNgq2keVfo-tMFfBH3l9JTWYerreAXgHXVRb2uyw8g79nwrIBCdxd19sXfLBSc9RNB9jyT9i1a8SMWA0?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>יותר פרטים קרא באתר: https://www.batumionline.com/"
+          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X7s6J_AmIFGCkzuzQ3thHtbhkolL5SjBegalWFJyWIUC3vHkMvLP-edW10ZH9mOAYGTUQCesdcT_PsE7AbjTCvuo5F2xTMooOR_vud5HDc7AMcY3JY_dic-iSQrYR2DsiepgPOMYv22V75EG2Eh_OFbd-JK8sOmfJ2V_APCWWZwSrUUYlGfQJreIHTOmCgZqGxy0tVj5XtUQ95OPBXtYDP_Qva_fMokKxWmjzMKan3RFa2ymmTIupcvZcc?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>יותר פרטים קרא באתר: https://www.batumionline.com/"
         },
         {
           "name": "אקווה הוטל אנד אפרטמנט",
           "lat": 41.6207769,
           "lng": 41.5902841,
-          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X60_pdCReyyQcMIjOsLPW2Ab5HV-oiqRBsadwNfnWvLSeaLMk0Md4VdWSUaEL1mPjqgpdsy_3NItAK45Bu6gEN9EMvcJddsHv3PUkWbpAcvTSyRvpImJaZrY4J2nPZ5gtfPBJZp3Qtw_BScEX5VX3FtM7EgOEGAoWEzlw8omjH_1p6j2bvFMY3s_JmqCupJBlImSnevmuZOz4M7RvX8NaMraInlm9ekAnhOaZNibrSJ2xQmJHbrdOnPTv4?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X4k48_o-p2zpALKG8SKZzGmSwwIHBm8E7YqribwzU0juFMR_JHXdRfZ0FdoXEVDh9Ai-RYoFpyNLROOmdhmmm6E6Vydj5UFmyWoq4PQmUyiHFg-r175ETWB205Tjs6QRhhoZAAQsd6EeJeZqnGr2uGOR9FKEUMeSqA9x8dN3RRQ71_cnMfxIwkoyaWCJbyve0s45WR1bMCDowjsPxTvExVtKKvFkIFV7jS2eh8lkx9FSrz7JTqvBDgHid0?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
         },
         {
           "name": "הורייזן אפרטמנט",
           "lat": 41.6316996,
           "lng": 41.603161,
-          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X7WUHoNjYoWKCxUy1yErprzL0Z5FJUR3Hg4dVeN2yARMmMBaiuczLV36mhJDor0XBSXKMdGB4MDdjFJ-LqVlQPF4epB_xyDszRV92iBQISphd7J8aCvww5RQr7AHLw0XZ2BZNix0odtUVkTvQnzuBLKcsqzLXclDnIV0T7T87KjxdzXdYtopN55dhx1wNu2gnAhWLsJcpC5qXMwGCK6J6rCreQJwtY4c0C9IY5QfcynN8AsZcbLI-oABHQ?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X7h_n-z9S3YT8OLKBnjAYbwEt_h-4pJh_cOnPX1H5wWuwVFr-BGN_cafNwHJl4NyrVbX8bJ__48e_pVne0G-PsBGZpoXh8LfuhOLzs2-8n1k9UUiP6rJjbJvgRITDVK5bzahMk48B18DZuJ-i0uf75foTBo91n3TmM4cxej8STU26Rf14P4-we2kUsQb5CQf0kg27LwxQZEaZTO452hz9yyA9h96ftboWQhuVe_q5yvGmeUV582yykW66Y?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
         }
       ],
       "color": "#f57c00"
@@ -10022,25 +10027,25 @@
           "name": "Dreamland Oasis Hotel",
           "lat": 41.7215496,
           "lng": 41.7281611,
-          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X6nXyyybzTzA-OomlfB5Zd_p0IByGjt2pUx4BxvYu-qz7o3eansARa4V7QVzcVJ8LZckdA3db5zhjlYyDfTvvvn1H0wKbbOP1XVjJAf8A6cH1nUyDdUhh_cmVzeMlYnI5kHbWXn88enqehw6obHFpkJzIDerU6BdMTEMDODEgoTQsIwv40RqfcaEcMtuvH3mtsiHrruZnI_6EuDUUnJJq4tjqcawfMztxP5TvuJ0yn1pM-_rGEx2ZsVQ9I?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X5b45l1A0KKunT63TvlsYmKOkPjtk4Su8DMczDpS-ZL-8K5REzZSWuzL-3p5RtR4Dvnwp019ehntXXw2Bkfx5sq7C9TN5pnLUY53WU3vUaqMiJeeS4XXQeAiMBbIOmgqy7awdXCWEuWzboq-an4c5w-vUyOHo-kmnDvs1RGwxThx-NhROrvjsXVvC9AIBOAxXuGUu672OHHZk1Eb5mdS0jUYxw65dPMMtI5tBHpjP4HvryRB0T0U5ZzXu4?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
         },
         {
           "name": "Castello Mare All Inclusive Resort",
           "lat": 41.7585099,
           "lng": 41.7428511,
-          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X7OsPWYMPwHLR969yVla8SeLlXNcRM7Pgn9w__Fi_gVyNbfSnPFMIc14l2Pka7p_hapVPdyKcEsjO05wsPHdIA5H8fUKjek9f-modfyKQYgk7oAmZg7Ha8GSX4M9aB8JNLWDudEd4ctsQJ3ShtTpmpmwomGmnXGZ2epu2NTk4TJrC-X8vjI-ZkKD6rHSdZSw8KbZV4z2Bs_2uqR-pEQd7cy97A00dBKPzfhq8DT9wONMy5RHhdqohJvC4o?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X4pwSbeXSJBBsqaU7leE8DGwH_1eXU-xgYlRGyVju99VInggQA_rtuc1XMGN88QMlkkV1Zxjh60xEKgcLRnIYbkdeKGMBev1_yW2eqcD2l2vZLXz2GqPHbWKJhu6odbC8ila2s3buH2zz9qe1HWB-GWFExNfv-ZnT_H07rE-K3tgVoIz0SO4v11B_rgcH5WDsyJ4z3eZ4Jf6moBYkda9yYJJS8KIjDH3Ll2R6L5Qw1qjCi4x702xPkkDCg?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
         },
         {
           "name": "georgia palace hotel spa",
           "lat": 41.8409711,
           "lng": 41.7769855,
-          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X580fVo1HNia8pJQrjLJiaegdL_kK389iazawBx22M3wwm_c7XFve50m0ZDFwFO_NFgBwm0Yo-Gpr-wxpLf3CDsG4JbL-vbHLTvysGZ7cykQcYiobDXbyDJHOjcALaXyCe-70sild3v0N_U0JGLjjsE7npT0qReYvt24exvO2L2Vr0AJAOoE57BqIV9P9Px1K-1fhLPrMCuSY3u7JKn27H0d-RRMKJOKZUx4UAqe4vJqkIKVH9u8ihxX2o?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/‏"
+          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X7XiWdGEovZ8yIpHIap-cNimizApBQoICYU3FImP6TFhPt5PFUc8wsGj1CpWeaUgfBaz1oGFqgFbZO_pwpUZfxtYheAsz-eQBiqbAfFE4lpnPTVAVrrIonVYRig3rAHJ1YAOMuDfg9BBaZd76gfjxQishXEt0c3Vgw5FZVw8BRyS5hX5v6QnGAT30W7tcQGDagwWmLZF0cu63FeuKgaxZw2MFbi4FpxA-tMqqrvY55ZSAndIjjpa0B8ZVs?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/‏"
         },
         {
           "name": "<![CDATA[Paragraph Resort & Spa Shekvetili]]>",
           "lat": 41.9537643,
           "lng": 41.7650936,
-          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X7Pg29TC2UtCDrAAnjfwbL2b-SePLwxDU2RL-6wyZWL3clnx82kT4V2ojUifqo_PZCYD16Tp-Il1pdYZ7s6Z4o6PUGyj8cZRAJReSfYc0kinJympwr_1LXJsyoO5upYH3DAjYpN-Ub1d7wiBBo5KGq9lJ-Yv3CCfBcjdGp880qwHzcd4OkRexLolUWiB0KJesC7ipZAVKOTZ1PZS9-RjGcYFb3nloFxqIcabCkCEfGPP2NI2cOn5CD7InU?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באת��: https://www.batumionline.com/"
+          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X70EhRCJa6ORiWjFi19lfIpOUl1Inh_9uTtV4vWYw3XA4GaayLEb2OsLf-8UHaWwphK3fT6Zkv9oq8JE_YcBartBwadJ_H_M4JeYIsxAzysonqu5k-B8CChzxGj2PbQiRsfUDF-8F49jovpREr9WHBOu_W7du2zmBVJTJiHNinsmIt9ju7pRUUs0D8n9qYqULgfDEj2z_k4nKpmAxSHhxT-qV1SXND17a45RXCWFXc-MdQe4Kg9cgSjb1w?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
         }
       ],
       "color": "#d4a017"
@@ -10109,7 +10114,7 @@
       "name": "אתרים פופולריים",
       "points": [
         {
-          "name": "העיר העתיקה - כיכר אירופה",
+          "name": "העיר העתיקה - כיכר ��ירופה",
           "lat": 41.6510061,
           "lng": 41.6360698,
           "description": ""
@@ -10154,13 +10159,13 @@
           "name": "בית הכנסת העתיק בבטומי",
           "lat": 41.6472692,
           "lng": 41.6342943,
-          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X4-c5QTFIh21XBUsq9RaR8qhUgbAmwx3sl2LWIXQcXoIUoqlNeBlPugJb5RAn9h6L0ghYZz_Cj-nEoKH2VU8qbpFTOExukAfvFQAOnqxOtugzri4tAH8zUBfZK3viFMmFPbmyo-lqGOrYPBeXTAcZKLSuXok6o3byXAj9jg9vcq0j8MgYpqMDnu4fQsWC5Uu5dfJ1ti2xOT9tiJHVDM5070RPuqsZAwCqnTI_UwKji4_DGWR9ejypZM8Tk?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X4alrBQOHHwgP41usBEr6ooftEWS1Bzd5bz6dOpO3kdtW7HcB4CIpmv3EUxvJqgFxWccxunThnrYfkJdqMLgEG0Vlbujei3OKKaCdHn34SlntxUg2dFMg6quI3YmAXy3IMPY87BRWy7dQn--k6YEvRhZFN-ATWwSYZUoELNOpye7Je76aY647xt9HLDQAkqaPg58Y3IvzUypsbRtvjnIHdsZBDAYChK_zk5kYJwp0LxqO5BCEnZSbMd9ek?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
         },
         {
           "name": "בית חב״ד בטומי",
           "lat": 41.6495209,
           "lng": 41.6418132,
-          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X6nSwZonIUXbRP4BGdET3wewq1ws6NXXAA5kYR8nzTZEJNv4RWGtgVkCc6skZ9ETyP71w33P1apw3xsblrm_CcXCMWrm_yvIqU38JH146GAmicy4kFUsprs8I5fSm3ZsRMmQKdm7gJa1XmBMSC0v3vSYBuqNgqiB_saDSk3dTgDZxi2w466Ba6S7FQce_mjJ0JJmS3BH4BPCStJAhyDtF7rKTm3mjSYmjETkWVVJONxxEl2LQCAAVecAZs?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/‏"
+          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X7Hx85djDPPFuaqnC7sjCn_QPwv2zoPu3N3xFNIL59uBqu4OF0YtolRx1pLi0eeEq_rWSlCALE7SRUovbQS2IcWC8PjVIHMunDxbRUfpv9ThDLIJlAtiDI2ySJ_t87g7cZfiWWNeKt1P8-KF4kmpPgQ00yxlmn03wUesJtWOl77NiU0sXVdjneiPfm-YcAdRcM5Ixu_0CD_W2nX9nBYGvMrbSpe2kXbyNqcMjnNpIHHPmkaCGRgXpAJkz8?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/‏"
         },
         {
           "name": "קתדרלת האם הקדושה",
@@ -10292,25 +10297,25 @@
           "name": "360 Sky Bar",
           "lat": 41.6509908,
           "lng": 41.6303976,
-          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X71a9oBQO3yK1zikSfKhqV84o0OZsnML8te0Ee2i4cOtfut0Lj2tgZUi5jXgTapLnAexuNe2xrQ_ubebyklHl-ZgyM5cdN-o_wqD5eBCwGK8_6qAkwy0_ndh5XZK7z0CvY05tcykfyRybGqePL9lYtuqm8QUwKfdPR_JJWAFF6yhUZKTIwOrIN_GRjDGOBbe1mcI8VvXtK0YHKoP3ZCf6L0TvyAoMaSRUl76lWjGEzG4rqS_xtNhAOGemU?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X5qNfUKMt8s6qr97_AqZ8wDUmUX1yLmq3DFxbXPj44JdPCjzGf65D0Avlu-DzokUYIxihY5nX-JE6jqKa66vT5Emf0nq5nGE3bi0QJcYybScy3gOmBu79KWYUahSH8P2sVuocExW3DszRt0-4I5lMIU2q_3Nu664IgaGrM1p_EjPF_jLhn1PKDfwC1yulYbZgx8s2__fEpwR6Wb_krAoK5_brDW8HGX6Q5M4hC1OfUF-5eQxTieXIC4fX4?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
         },
         {
           "name": "The Kitchen",
           "lat": 41.6512601,
           "lng": 41.6432578,
-          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X5Xpcud4CCFUp1Fo3uwWiY6tWhQG3x7aBtsqB23v_oxunl8Rq8SDq2eeq5xAz2ANLxGhW2tRwu7e8yaktZhlQYHB-lJWVweY3GvuMZBu3sx3rdbgS-U1t4Pyr8OIrYyG8NWar-cWFe5gYwnJoyziAX5vgfgP6hQ4lokZozzf4-o0JQt6oFvnzjivsmhF6y53jUDYUeewr3RRnPlfhrMmvHFAHwn-DqteVVNsnYgRKGW60qi2Gtz4uQg_QI?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X4KxWXR9FniuKZyMOmonLn8ArQ1YPnwbvEEIvw7wOnKnfFP_P8TeWebrqIuVs2MHPjnnVggkoekjKikgBNFiOlDhjpiZ-YNdaxMzfU_THZHdEx-Pv_yNuDyEXGKYqsq6DHXE-e-Tr_Kslvl2CP-yLX8F8wCUPqDFojcpE9b6nzr0cJ1WM8UFQv_8yAUnw4UxhX5pxpD5seVifmOwAHy-KzemZRncCb_7hse2gqZi15qPiR6qKlEGywpNfk?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
         },
         {
           "name": "Umami at Clouds",
           "lat": 41.6537509,
           "lng": 41.6376573,
-          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X7Q7AAgqdfhww8BB-qU_DaJuvE0HD7bJVS2VyORI2r_Y7-OZ6zBRqm0RyFxwgjUMYtiz5f85mWSG4evg7X7MqfhhZfz2QT9R094Plg85sHf7KO-KKzk9Zso1Mx1eZFowjyrCXtAoNhCZmxZCu_KZyU8i935AO_DYUS5OhFrwL5KobCxLceE3KRk3xx4GY-2K9v9bhZC73I2vw_9CfXfaYyHtULx7LmhPlfbLLdnYyy3DCCJrM4d-D8MNyE?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X5PViOyw1cavQ8AIEm_LBfgLjjTqe9L0esVT7jdwjU9xtARi5Y_3Qnxof_ViXIQh6I5LhxOj8k4aY2A555lzxp5goktaXwroYgInXiBxI3WGePK87ImbfuyhcRqdfZcKRfHnzkx2l9Zwkf_FjYnLKKcUkvfbber_mF7eQrL6WueVGlKBRHrlEbp8_j5V1573_1cMcCZxW9RIbIEk9qPcu1qwaqkkIeEQbVD7Aq3S01WXCNT58l1ZW6xcRs?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
         },
         {
           "name": "Nephele Sky Bar",
           "lat": 41.6491253,
           "lng": 41.6257474,
-          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X72gAafBt5UBzXW5BL3TwfJESNdycyHBzp5IFvwpsc_sQ2pUAMjMSjzbOLG8qnsEVizQ5LvcU6OA4ly6DMaYPQmIps0eG63P8-zIaLPGlbdp39mYoNoKR1AK0ly6nRBXFHpGNexozl5Qk_2yd6v6tbXZjKFYafXljLVimK4IgA8NFgcxyS5X8S3lN0DBRseDLfvIkq7tQyB3x9DPUVoxxnsoKhPfnD6IRhLrsGcWx4-8lRILIGk3wRUKpY?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X4TcExvvJ-ZLIUQD7_CWhOZipaROD17LQ_zC3qHglemfY3J-B0vijeWLczj0nSIfFGBl-wH5s7W7moD9Os-YVIUBYtuHZOuMDXBGUvPhfYBkPuuOy0QNAIENIDmK4pWF3ga0BnI3SqqKCWQi3ARf6qSY2OqMthI1xrIdHz-oq1yPcZWQkZL6XvWRHlHUuTDfZnfMQOkPPZuCD2T64-ZFqxhWfrj2wuV0obaHIjc3qdyxus-fLdsiaGgHys?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
         },
         {
           "name": "Restaurant Ambassadori",
@@ -10391,7 +10396,7 @@
           "description": ""
         },
         {
-          "name": "שוק הפשפשים (ליד כיכר אירופה / העיר העתיקה)",
+          "name": "ש��ק הפשפשים (ליד כיכר אירופה / העיר העתיקה)",
           "lat": 41.6512397,
           "lng": 41.637034,
           "description": ""
@@ -10504,6 +10509,18 @@
   "ratings": {
     "t_3": {
       "sum": 5,
+      "count": 1
+    },
+    "t_4": {
+      "sum": 4,
+      "count": 1
+    },
+    "t_1": {
+      "sum": 5,
+      "count": 1
+    },
+    "t_2": {
+      "sum": 4,
       "count": 1
     }
   },
@@ -10620,6 +10637,132 @@
   ],
   "mapLayersBackup": {
     "מלונות": [
+      {
+        "timestamp": "2026-04-26T12:30:08.994Z",
+        "points": [
+          {
+            "name": "מלון המלך שלמה",
+            "lat": 41.639603,
+            "lng": 41.6171756,
+            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X4W6ACkpuPFGGlWPjj0rig4vxjIAFKkkfl3dfo--pQaxoMrN2lKlcJdH7VfJcAUQZGtsXPDn8AisjxFPIHuFbvO7d_w510bwgnMxqw89DDuxtIZCObLujqzOumVNRhUyyG9SMX1DM5ZlJs76fDB7pZsiDlhFIgBA1NT9DYEq1O05tFo8EsfNZbBVZCZ01U3uh0Ad047K8luiotsxKJJVIagXotQi__woZjoG-qT_NvEIHO06Ucg-vLou7I?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          },
+          {
+            "name": "מלון שרתון בטומי",
+            "lat": 41.6509788,
+            "lng": 41.6303784,
+            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X7obnAO4tKEfJ6Q6SM0A7L9FOktzAT5p0IAfK4qERgOqJEPWU-Aexdr9e95ZRtqAbNpmS_V7bTNZkOUwhq5bEz26xcmcQFAeKgis-ON8bCgGN7-fgJulSmbsRuBQBNJQJ10-H5--vBua-omEtGFChLfA9TRp4A33uoQORxvUBvA67WiEx9Iw5zlISJ5LcqSFFFo6dx0rhZg1stAVUE-i57301QGwrALtPlRSUqLZH7u9yvLSRNk3XzS6uc?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          },
+          {
+            "name": "מלון הילטון בטומי",
+            "lat": 41.6492249,
+            "lng": 41.6257772,
+            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X5CRoIuVnwo-sBHYbVn16VgqvRT_M44xy-tJES4-YT802IypbWRYVNPLGa7FKXtntypoud21bPH3dUNO5QQbZPGLTSVa9fTzfNaPzz1tsx876a1rJmK05RbjIHjlcN4rqVepE-cUqBqYraqYvbK6ZESfPl-99JyaS9IeJJ1HGTbjfHduqxHP9ZmRPrZY4xkBwSGVcpULyA3cLArOpwVqF57J5wW4Bb1-5q0B2SQgXxSKq9B19dPfkQ0QNs?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          },
+          {
+            "name": "מלון ווינדהם",
+            "lat": 41.6502244,
+            "lng": 41.6361187,
+            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X4LZSE1J9SlVaRNsuvZ4KpQBXdRTwutGSxoxRSTvhmec2dNKlbN1pDx_eZ6lFrNllK9vygsFdtPMumVIb0GhYHOmNsii3uX4UCmUw6T6i16q4-BqojABsKPo2S1f-KGe4I5j0qfGSYgyVRdt28kw2zKyMlCndt3kzs80POun8mYQ1m5d-z5EqK6UI3KviXoJptLpUxqHvGNE-EcvNGHZhzvnykWWDwkKMYtDuE_8qIxt9KNa_Akdy-ymj0?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          },
+          {
+            "name": "מלון לה מרידיאן",
+            "lat": 41.6541655,
+            "lng": 41.6366392,
+            "description": ""
+          },
+          {
+            "name": "מלון רדיסון בלו",
+            "lat": 41.6537605,
+            "lng": 41.6376418,
+            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X6GWVdwOvw3N8blDLOPYj7QIlwAGFx2lfsWL2mVDD8vFJCqTRwIDKYCnZ6yV55OkgrDxUaQ4TEmwSlMGzMk1w0OaDhaL7aCYQp9dLLXqEKrWDP5ecBObG9HBnW5lnCnstRlQRavtdVG1knJGvyW3e-a6iud8N14SPDrRgetmvo66PHuKe7lZBfZEtkRZHjrczUFWTKOFWxkjpUaqrh0eUQNlaiZA_jYhja3bwsKXuyYPKaEgfpds_jfhQM?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          },
+          {
+            "name": "מלון אינטוריס פאלאס",
+            "lat": 41.6527184,
+            "lng": 41.6352118,
+            "description": ""
+          },
+          {
+            "name": "מלון בולובארד",
+            "lat": 41.6526783,
+            "lng": 41.6342354,
+            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X6Ti5GJmQZNvLZavGbX5pcW4acbsIxsR2FCtwBKpVGx0Pi3wA70_CLcHPX1DRlZ6kTw3ItoWzk4C_KJ8Qw_vb6R1-i2u9PGhilXl6p7sM_aN559F0niZHmPq3uIHQbcR92OpfbJQMkekCVjoxnr1oNkMRSe2RzMBowFRiRjFUEi4UVeo8Tx-ldZNrYZaULY7Cwy4dRDhiuGpLIX7yhOHKvWXcYamQ1qI05jIBMKI5t_MGMOrGMKnZTVqcc?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          },
+          {
+            "name": "מלון וולמונד",
+            "lat": 41.6457437,
+            "lng": 41.6489232,
+            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X5B_A6aKvcNYmJgkXvtI_gmIeQ8uKuwJjm1yVg2Jxoo8Z0qR1Y-2uDFpe8k9fu--7PveamOtGSfMzjzNAX9Z1wTBa5kjeqKDgUgjltmIIjx8D0sDbKneYlXO-ACSub_GX2irO4GXsG_K2RDvCASERP7NBFRJPlqnmUJYSTAxcHjNxC5XFh-bdXsZIOwhTuQP-UDsp0JoQmTJEPYsAaCtxMineGImZUXaRpXpwQ7DmUbiZp35-nc3JZpS5M?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          },
+          {
+            "name": "מלון אופוריה",
+            "lat": 41.6271748,
+            "lng": 41.6012827,
+            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X5LJ5XAAmQOdHuX-Y8TR6mHKd6j9h3MRg6K9k6Mu4v8MLQ7NCfZIPpEqD3w4ChSLt24QGjFcAeyjkxnahQGpfbI1fS0IddX40s3dUPqNvvBsoSJuSxIqtA-zy4Qa6tvpSrInaflz_95qzv3F8nGbQFdNt6xlNpgWN24juOR0D_vwS8olC3nyTvo08mbnMgiXtUPXlT1RAb3XMD66kSdwSE60WL7PilbYqvOf7RgisHZxFXjM5u-4wE3tcQ?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          },
+          {
+            "name": "מלון קורט יארד",
+            "lat": 41.6417569,
+            "lng": 41.6157657,
+            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X7hfNnOqiNjQY9UcOp32Tm9p16Q81o7-xEd09vMHMN378n7BkcNOMxCF0kumVohcUfn1iiwq8jbaCvK6Q6XXqio92SWgSrlJkJKf-mmSunCqiV4RML7iXqr8PvTh5OCrfohj1SzGSMCJ4gg0VU-yT-AMIvEqkCwJh8ZQUoQt8GDKWcFZGtLtpYPjUar5P-EPNp-V6yhC87XaDIAUJgMCZXMQdom9-xNMWWU8d7wKzPpRdHWt8mLgoDNdto?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          },
+          {
+            "name": "מלון גארנדיור",
+            "lat": 41.6246582,
+            "lng": 41.5980594,
+            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X5s_wb7Pf_JjPNFlzCgEUFdYM-XasRacULTM5NgWDBdMuANvSwuLTCiImQ6K4GxXxIxdej8mLvGLffR8zqzdAZG405Yo7yaiuVZIY7ISNquJu1fkGLZYDFamOJ00yEVf-syVIZPoB-bMmq8U9ViGjA0N1OuUyXd9WtRJEl4Uzx2DGlZqq-5l02gW2DBPEsBkZX5fDXmuFDH6uQMR4t-fQ265k5nLFLGIDgT_dxXdowjUheqZhVhS8Nvq1Q?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          },
+          {
+            "name": "מלון ביליונר",
+            "lat": 41.6395134,
+            "lng": 41.6165788,
+            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X6usFhoHGxxAGJvPgehiVT9PF5cYqta_JyWafmwgN8S7bfpH9E0OZtgmSn5eDQsuLUMlOKFdyZbRhhyWvuELqU9sd5vGlyv8BOFY_YY-TcEdzFTpxukrrlJZ8a2xbwyy0sssO3Ejba0HcdH5nTLUHxcURQdI0UP4a3X9JMLe3gfTZJBvamsBfK7pJn7a4-D8-3ffe9dNUSAgCkNFtjSSRuObgNnQLx8NclfAFdGeqgdYF_8hK5-vJb7Om0?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          },
+          {
+            "name": "מלון הולידיי אין",
+            "lat": 41.6384443,
+            "lng": 41.6183763,
+            "description": ""
+          },
+          {
+            "name": "גראנד בלאגיו",
+            "lat": 41.6253427,
+            "lng": 41.5984435,
+            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X422okblw254tVmV2d98iD6C_ujPh2_RTf7foE7IR3x1U8vZlZCb1w-CceUnKAcLQTOWhasj8XCD_l6gPYQta1DMuHB3NP2hCIK3pGGAmI170gU23hSM9PkGIQfUqCcuSrRuTqlvRa1xVlxkcfkwNqbIdp12z51pyqb2OAwClrMWamYapbohR1lz3rgesIW8fW4FV6LoqHk59t_XBNa9yFc696uXA8HONN3lMYLCceToJxKTsCKe138ecM?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          },
+          {
+            "name": "מלון קולוסאום מרינה",
+            "lat": 41.6375774,
+            "lng": 41.609327,
+            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X5bXCRjOmGA4y-b1ICBPc0j2vFO7fnJpZaFtEF5njNtnC2Kd3NwQLigQslNz_rr8YuNUj2PtZEfeYgPHDYyQ11aBinPg8R8hF7ogUVjLdq53-YoaNI6wStHGcMemlFKR6L2Wd2AswRScGsWbIocKry4szFXZomsgq2_i8jEv9rF3k35XSGNwh0gqTk59UtIrLwYPz-c_bgpR2XfY7MyKYuPPlyPpzC_zwkyMuZwMQsdZBAH6itlvc_f3oo?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          },
+          {
+            "name": "מלון לונדון 1889 בטומי",
+            "lat": 41.6509758,
+            "lng": 41.6413897,
+            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X7v-eAMIreeqGn-1-1ugNMB1IZovQWkoYhgq8F5aQg29zadf_ua9TZU3By0BhvYF_WMSM69z6lPFtdwMLXpJuPoCjJab82tNBHEMpZWNJxe5xUsq3X8isnnUWpn1xEhq0bQe-HxWoMCotd8cG5dDqEA585emev5kbmYfIh9d7GHAmVxPhdPetCjVe9Dj30KWbs9EavIer0-NbJX_57lIs5rkXWHdvXHG1927MH1LfVznUbcYqVRan5HtUI?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          },
+          {
+            "name": "מלון אינדיגו בטומי",
+            "lat": 41.651125,
+            "lng": 41.637447,
+            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X47_NGNDnZHvdj2VrrU3b6K8MXb2fCq-L8ZnN0Cz5szrAtwngyOOQAeDwD57EOOsbT0B6guFKq7fov06yO5FQtFbtl7iPeqyHCu5rr32R9OlO_H5UmnA5SxrMNo2kE3ObAvEj4g7gsDK3iqGepIxnOo_MnuXuTpHKM9-fGh_CkM67sMf5d9evrDX7ymRHfwQaZFMNui9zPWXBL8MwxQVGCxPdSeoIHai2WntUGWmxA7TNbf_1kYN0gJ5KY?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          },
+          {
+            "name": "מלון גולדן פאלאס",
+            "lat": 41.6520641,
+            "lng": 41.6367901,
+            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X4yiYfCfHsubgSTYozIVVRyjt1zG_RGhhcWmq3RC-Bum0MS6MOn4UKlsAF4aDnhFeDjYqO_Ay7gPo7t04Ra53x2d50Wbn1wM2WvKVpG4r4zWWDUkVktdYWKIhSLG-CPeR8q33yN_QdIEk1TPunQpzOjJGCN7wTp0bgafmSatJhkBB6S2YWPjPz5b7C7kRZNWZFEtLR93ZIfU7HW9RgAnW0jZ7KsyGIPSilkSjJikILfFvSE8XwtmuA1tGQ?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          },
+          {
+            "name": "מלון גראנד גלוריה הוטל",
+            "lat": 41.6362143,
+            "lng": 41.6071066,
+            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X5HITzhpw4OsgrBCpsR5t05uFxr735_owkcnLqC6bsRshFcnzdsbp3ylAQ621C6URwJfnujDJbgq-MzkPckFdh9mdT2FQ0yEn4Dj_aloexmV5oqwMRHPyj7N8DXhy_UvPmnyDLJlzODO0zpHxNyqVLiDW5T44adHqEU4Te1TXsF48oTUN7Xzwk1cnRaJoWLCuxir-gAapNuRVC0MawWvZ6S1D_Q_JRuZvL0cC4MsHvduf5bvpVdg2GJ-hE?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          }
+        ],
+        "color": "#0288d1"
+      },
       {
         "timestamp": "2026-04-25T14:28:36.694Z",
         "points": [
@@ -11123,135 +11266,111 @@
           }
         ],
         "color": "#0288d1"
-      },
-      {
-        "timestamp": "2026-04-24T11:15:58.526Z",
-        "points": [
-          {
-            "name": "מלון המלך שלמה",
-            "lat": 41.639603,
-            "lng": 41.6171756,
-            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X6BGUSixOwIxWkYCGe8yYzjUO36CGoBqyrhcaFRvceqrfwMDC7RIPvkc_yuVWWFDdNAVKbALXDuojWael0jmiPoLp9A8FwtHjBwb-DSBTp57gLhvScvQoYsbBPsmAzAjEy81BTZqGH1Gu8AncIgh6iHb6ojfz5yNFyoSecwmzblglRWbisgf2wDkgqs60bd1EOXZzU5pxYlm8yYndR2jJEOmIU-aKymJYWVvjZNcs276QsdLIuIHf_tPqc?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
-          },
-          {
-            "name": "מלון שרתון בטומי",
-            "lat": 41.6509788,
-            "lng": 41.6303784,
-            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X4jna9HkV9W8tYjFFsaIZ_OJI4hJvEi_baxEmqsqTDbry-Wpy3wHSvLtGhTh2wWjF2j8jf0qEgWrba1x1ibYHCkXtFxqMBItb6659eJ0c0F_NbeZr-cJPqIbKI4-5I8f1LkWcqyb_RPVD9Q5eq6IsZE4K-cLTbD8sTm81NboLNP386ECcZCLbM9j1wFDBwNZan-AAB7et3CBP-OLhKZ1Ai0T0utUDOPXH-yPind3wPZGuB5InbblMZG3oM?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
-          },
-          {
-            "name": "מלון הילטון בטומי",
-            "lat": 41.6492249,
-            "lng": 41.6257772,
-            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X714cNJTXM6pJjADRNTi6odz7QHS-UOc-y84vKF3XXf9wN6AO3s1Gb0BDJMLdHtcKvH0MOsVTbYFP-C9sP4TWlyihe6hRzTgRxu4R-_CRBL0gkNA-uWRSaXCt5pV-HAkT6IF4rfoTOZtHy4ZqgqcWlkMtZA00AwpoyosEizXxLYOwOR15Ua607xrEsPxFS2NLf9h5cvDsdJdY3yJAnYMV90_K8GnynWHnd5tpf5eBDKD5Szqkp6mgNGQ4I?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
-          },
-          {
-            "name": "מלון ווינדהם",
-            "lat": 41.6502244,
-            "lng": 41.6361187,
-            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X6XemLG3Cl6JmWduqUPcPe8gswiLdxJfeOk6HPirttpSvUkFS6x7fmGDWy4vPgiTnLyEMRGe4DTLzWZzXHMQDv5cbbpgsepIwhkmQjt0-mmt_0M1JclAlVK807I8UMI5lq1_V57VWHmGcNDdrdNaoKfI1ltDBsY-4oQgahi8wFEdEr2aEWM-yp3bpw74EY6W6YfCLkwBPCqT4MqDfUPqFQJNm8aDROOCYWFgGGi72A_Bfv8sjEDVHXuHmU?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
-          },
-          {
-            "name": "מלון לה מרידיאן",
-            "lat": 41.6541655,
-            "lng": 41.6366392,
-            "description": ""
-          },
-          {
-            "name": "מלון רדיסון בלו",
-            "lat": 41.6537605,
-            "lng": 41.6376418,
-            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X6ddIlHst4dfCmjEgUbOOeWN-kgoZaNSISXOQ9MkvilVqisS6OaOwLLkJdTW33QGO55DYan2KLyc7JGu9rgy3v2C9Y6ZKT5hNrkRBS-F26MdN1Xe2JdyELlFk7ToYBFFhriQT0eP6XohZ-fHpaYBPpZU0mVRUZgY37uiitFjxl8NImVk3smCFNKgLKHlHwxkllFHdxiDGbbsK4MpkeuQi5ig4D4tgtEsIk4TVKU2_4sAeWodvXQ3cZrKOA?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
-          },
-          {
-            "name": "מלון אינטוריס פאלאס",
-            "lat": 41.6527184,
-            "lng": 41.6352118,
-            "description": ""
-          },
-          {
-            "name": "מלון בולובארד",
-            "lat": 41.6526783,
-            "lng": 41.6342354,
-            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X6_xQ1yfefGWb4inoGLYavxG-GEgXHJVxXzb2sHYCQ3MjQjunSll2d7aS5OCcKOkgWZMYCrXKKmzOUK0Zo7saLB0cuvC8fYRWACp6Aes53SBQTF02xEomtXhksc0JEqVAM5WlyGpajJtUTq2YDQWwQ4hfiCb7xyoOKm3kTLJBjtWhywY1csdGwgKr4VMzzo1VCQvE_k6wXakrdAWN3SD-SzVvUGGStEet6aRNAYsWck7_YRfcXCc98XfJU?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
-          },
-          {
-            "name": "מלון וולמונד",
-            "lat": 41.6457437,
-            "lng": 41.6489232,
-            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X57Fe8q2czqxdDdT6eVX7izY-aVkdgawtBLtM84LAp9OOvRhCRL1h6E_5WJIffDo49wOtm3jqZgVvuPRAhQmny0ioQyDLdAMZahDGesevcuBdtZQyLuQQarui5zGOIKexZDEs-7svG6GinD0AAzrBBZUTu-do5nicA_by3W7qq0uST31pmAowR1sTBdGPMBJmdWdWHVfljCv30qaDlsM9tjDHYDjqZibI5O3NVqzTidQa2mERd_n5knV5o?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
-          },
-          {
-            "name": "מלון אופוריה",
-            "lat": 41.6271748,
-            "lng": 41.6012827,
-            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X4eFsEUFKMGBFq7To0tVYxbJC8rjJMP5haDkliyox5P66gow2HpBxfGEFqQarv6QfVz9kEjwu1ewIT8l9JkEj9hnI_jzOyZIH-XG6J9jc5aJ5UyDyCj-oeE1dy0it0LOOZytPGR80b1NpapYc2TYjdxULyXpXuxOOIMF8f5lFO1fYTOH7rfFEsfTFMNBamDGp_-PnhpORdLTXZy8KdJVkzOceewYwKjXxHGh5Fd8XfXubzquwsCkhoZRuE?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
-          },
-          {
-            "name": "מלון קורט יארד",
-            "lat": 41.6417569,
-            "lng": 41.6157657,
-            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X5UOTYEn1PmN45NJeCuxUzZvDYKisL-gJxp64LtC-sOsJjpS7j75T0ne51OcqpO_YscqNnAbs_qZi8l9IeQKoCiPidjxUTtAYYMOHILwkM1aScZvLf1GuBC3x6TL0GtAo-GK5BSFy6bmucrjtI1OUgh4RNm7o6_GVh_OuwDrBzXA5SPW3C6FI002EsS1po7-NoSD0_dbykV9mHWgGEM7_TTUJx7xGGm086s5875EdZ2XfaTfKwEZFHl5gg?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
-          },
-          {
-            "name": "מלון גארנדיור",
-            "lat": 41.6246582,
-            "lng": 41.5980594,
-            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X6EjdoSluKAmsBwJtILa7aSNp_pi34iGRZBw47KLTGadIfJ2OJ7Q1dw5sOcmqDUQEAJCaaM2NiMIOiLLaSO8_Q50DtKCNiQt8cgrKoiJfqR8QbjqEfeY4h3rVK39ElkfwYL4QyWzotJNDcnXdO-Jp7wScnpm9DwAbKSQfarVXkLScSOgmgk56rGs_pRg6lnVfYujPgu1wFze8I-S57nw8IsRfoaaGhwkedOb2t1m-dBaafSSXz0tKrZNww?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
-          },
-          {
-            "name": "מלון ביליונר",
-            "lat": 41.6395134,
-            "lng": 41.6165788,
-            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X63A9ou35_lOLk_2C1Wh5qYpi1C5OYKIJ3VIuna2spTiW5MKNyjwfjNCsfHv3shoYSYgOlRdngJ8P-HdMmQN1tfApVt8kzUye_gxoCNLtwoW6izwiFpY7u25g1xIqLDNSkUL_dAX_MlTGhxd9-oQf1CfrVLiuYhjnRZN7OYlfjh7TtcevzPmc2XYOVBAvvAXJDMLLU6uu9T7sQ33V0rr9O4c-AfvNuXfIY82At9vmV0VLXDQggVL5DB_M0?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
-          },
-          {
-            "name": "מלון הולידיי אין",
-            "lat": 41.6384443,
-            "lng": 41.6183763,
-            "description": ""
-          },
-          {
-            "name": "גראנד בלאגיו",
-            "lat": 41.6253427,
-            "lng": 41.5984435,
-            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X7q0tdFizFa_dgKvyO8f_RZSRpN09j_NVmeucYRXkW1BbCDUFWt7LeKDHI4nhIvyiCups-MCg8OtbgPgHjLduBpIxsRaVvzelxrmPj872LPtZoogfFeRkkRKB3fZp2xaDaz9Rw74TalxYtNWInHOLBtxG2--NsMCAYApjfjI-albVXf_wphfz1jmiej8-O3Ls3Z9twbKR62J2zCI-GDX16SevxbdXr3fV8mgm-Dx2yepFOJQ7HVHcTryHg?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
-          },
-          {
-            "name": "מלון קולוסאום מרינה",
-            "lat": 41.6375774,
-            "lng": 41.609327,
-            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X4a-4S4e15NYIs8OizASgzcXlAAskk17CPMdA8X8EcMRE87MJM9MOFi76zhAoWXh5i3J9Mwb_FH8DXC_JyRSUbaKtr3fKq4V38oN71FIh3RqYbY7f_s7bIWlsZeccOXjs3dzMo3NteWif2-gZug-IDox5_ZQEewz0UAvi6iL7iexQmZ12ITB_EJB74g5mYxKVCWd9oxqlh6FDiY4KUpB5nug6kLHIegp5vo4edEuOvLh5X9Yc-0bKiY_Rw?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
-          },
-          {
-            "name": "מלון לונדון 1889 בטומי",
-            "lat": 41.6509758,
-            "lng": 41.6413897,
-            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X7BGc-z56IcAP6lN4ptUgOTKw_DsCnEfMf-deM4acMFNisooTUwkWgw0D6N0lRlwklrSDVZXgah7nt0Br-z4NSdkCTNLbssLNybX70V3fPn2E67W7Zdvr2Z7Bt6SCPcfSxXwgbFiRUmJIhU9INW01Mtc7nqavHtAa1b1lhtWg-QMwtBuQzDve4K_PYmPXArfI-EwxkDYj0dBc5WdFohYPwDfNITrc6jMVlaT_QF9vYLiXzOknmsWdbEGqQ?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
-          },
-          {
-            "name": "מלון אינדיגו בטומי",
-            "lat": 41.651125,
-            "lng": 41.637447,
-            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X4FjdPkr_7Owe0-BqUtefcnTVAl4wcvROfJoM1f7G6T4wfLkoBnk3c3qP_inEbrIFl-yAQW7etRu9hoaAdJ4Jnugj7oaSMBgc-jRiIJIphTxXk0hn--7eXUSgzm0K-y0TgqiIfOCCQ5nGsMCeH7u3CJC5ewZMebKImF50sRV0R0Bu4hDIcJfY2OtqXKM58A6CNE-p4a4p7F1opW5b2xZX4Ar8IF48kdEaYpe0zOtm7tqwPnZG15ANSyeOU?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
-          },
-          {
-            "name": "מלון גולדן פאלאס",
-            "lat": 41.6520641,
-            "lng": 41.6367901,
-            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X70ETuZdY6TAuknEpdtYAEf9wf7fwPRnKvUwCejZgM7kdTrPc7liJ9oLhrDNnzMNjQFdx39wOowRyMx6XnIwyjkO17uERV9Jcg0p671f1NSemWMeHROg30X3vl62_mWxC9Kx3wXKh4FNLUZJFLTsAiBiAkYUKMSItWce1Qvb8WChdvPeojCwue3yESRnNqF3MlQ7zfYU4V2kbbXa_YLIbIh4oUFNO61zZjw-FIAelrKED_qgyI6SCSNJXE?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
-          },
-          {
-            "name": "מלון גראנד גלוריה הוטל",
-            "lat": 41.6362143,
-            "lng": 41.6071066,
-            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X42fg-1en_r3K1uoEi4ZgcRrUXOoaYVPKQ2feueTmHTWzFgWMM_dl58S0j0I386bHCTcc3tyL4GLExb0Ndug9mEA-rVdTVy4SPjupAapHivzKrdPIbvr1vBph0dq5VwBH-4VMsXGysoSSP2u9wsJAzxv9KAazwryQzlA717Pg0Wwisql4baLkk45WWZ3Ro0oykb12d94IIjeZs3mwK1B9guwXVafzSSZZ38TDSK3FICrhsV04PXLB2CQdE?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
-          }
-        ],
-        "color": "#0288d1"
       }
     ],
     "דירות": [
+      {
+        "timestamp": "2026-04-26T12:30:08.994Z",
+        "points": [
+          {
+            "name": "בלו סקיי טאוור",
+            "lat": 41.6379794,
+            "lng": 41.6187095,
+            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X6lfRifhFHzMCe_O5vHmg3bUF9HqddJfPbXDB3KItZU0y26eCxdSGdrwI27Ayc53UmAjIV_OeDUoAyFm3-QNgcFDj3MXN0pTi17rzJnYy3JjHlWiTf4HZUaoJgG6BimbWPvmMH5x9L30GiOMOxY3yFsf1nbyRT8SDRnUkHmqm0s04vGcItIF1yoTB3I_MmvNvPRkKX0k9a5RsiunXv-wZqoKdi2mrBiQHFxqy8JrCvZFHtEwdTOY2DUhh8?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          },
+          {
+            "name": "אליאס פאלאס",
+            "lat": 41.6415324,
+            "lng": 41.6160339,
+            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X65OgrhmoF-QHS7eL-JcoDs7goIiSCFYvyhSfNY0jWMZXKkdhqlnXxDnyB1vfksPC-GS9PyZcOfjb_IdWQcEgaxKbFC9WtXjq0krnnJgpVggJVBmcPLh_rharHPpH2dknDOQBVxYV3GDT607-eJOunnc_12sy82IHwmtOguuVkxoFuIadWWxLR5QuOCCimMmuowbyPeA3TY8Uvqe4wQ505H5pA6N01PDUHOhC4kuUTR6O_crkcb8Pbg6Nw?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          },
+          {
+            "name": "אורבי סיטי",
+            "lat": 41.6401789,
+            "lng": 41.6136713,
+            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X7YTtvZmFqATixkVYobGbhBkG-tFz_Ei51zsXIrO22aDeolFwlUNlTTC2BuhenBLWJOID5z7eL1x5l-x7wIUiWv3S2DEs8Sx3UTqe_1U2FZr1me4seB34JMHwQCGX84hamTHXCePRGVU49xcQDQb2shtFG_Ikd558Glvrad_KcguB8L61H3w-h1ldu_zUkp362pAb8gNekqC1CqfOXv7QwP8r16zjLPoGL85TjEkefjMgl89qwexooHyss?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          },
+          {
+            "name": "וואייט סליס",
+            "lat": 41.6237332,
+            "lng": 41.5979269,
+            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X5Boz65g2laALsluz8QYj8LXBVaEDz61tCID-aXzqFmnTeg0sun3xY9XRdcW7-UWaKCWAsB7P-SwO6EisOOufkg8BgFWkAr2t5nYL_-UQVCq5yEUqY4rZOD_dIqHsJUQmRuxwAy4BpKVbQTmHaW075fU1WU_mztJRXKjawHlxZTNH_lGDOU6a0KYfvFct9-BYTrVO0br0RcsU9WUbc0KnsnoPYN3YMRzL7VzrynSi9-bTcipYu2ZiBZhWY?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          },
+          {
+            "name": "אורבי ביץ טאוור",
+            "lat": 41.6301288,
+            "lng": 41.6020986,
+            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X6dUat6BQclCqIazM4Q1Skn42SF8TKoPkeg5KsMfrhN_twT6fK3pjTZ6MiQWDHxDq_JPg7mkj7Ze6WxtioRukViWRgtR8kC-86XvDxeGoaSCyKUQyyufd4oV02AiWvfw2sx6KpC5X3VWTRFFOq8bUH5vV19l6H2FtnyOmqdGpkL5p_y695aHkZhtUkj_hZw76h-ornCDiDkiQ9D_v0B2qIm-0J4vKr4I3R60aEyE8AGZdJoMB7N3_ee-No?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר:https://www.batumionline.com/"
+          },
+          {
+            "name": "באטומי ואיו",
+            "lat": 41.6232365,
+            "lng": 41.5934302,
+            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X7ClN1gzMCmUzZm_4c9vupdXqv5FD8IlX8RVrqbNM31CyomKUElPnSEwL8JWWP1w2puf2HbxGrAdgk7GqQcnQT5g5iSXIhWGAfGzf6Rkj6J4VxG9FrAxj9vh7027yb3WoezUv54avE0vUi03ORatwHhst2_P8yovEXVwYUEGkSvGCssFRwSod5GDCRIwYdNnVuufgPhI3P9KDZpv1t5yz06fu9Fk6I54uD2hwagZm4_48HxDVyYYpY2U8k?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          },
+          {
+            "name": "קליגראפי טאוור",
+            "lat": 41.6362231,
+            "lng": 41.6205742,
+            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X4KRUhn5SmxUAFW0CyYqWhHjrlX6BW9H-q2tDB5bVkCK-3m4NGaKzVm1FGyRMgjs_FO-uJvbWCskGJsP20ojlHP09is9bV_Ibx93B1LqPmRsTWOvU5nqfFW73xLBtg_iQPe0Gtul8neFidtyCFb9JJtQexgpi6YdETZ3sVB_NwXGfCzx9m3-bSdzBfcO-I8g8fCovrtDq5iByhPiVc7XVJ-syx5_jz_os6hXP0Gw5Sm5om0mRxl-8SOB8A?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          },
+          {
+            "name": "נובה לוקסרי",
+            "lat": 41.6256867,
+            "lng": 41.6001095,
+            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X5wShwRELZxacckhOCHonHtt2qs08a6LaxbaWE5E92PlEVBsBNpBHb8e-eLEjAzyVjgCdor8MB7QNMTDxIXKSI4IFvUjuB-2H9rccxGDp8lJlPEyHQaHpwqA8EW4AwrQg0M2y4NbgrSXwsRE0jJIziDEmg5Pqt7n8c1edcYaAKIgk0IyJBKh6RMbVhSU99FCp1ia6oFomnMz7k-5EXNWpTqccQ6MsyDYqr7M6Gq4385OJI_zzRT6IL50F0?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          },
+          {
+            "name": "אורבי סקיי טאוור",
+            "lat": 41.6373013,
+            "lng": 41.6099654,
+            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X5EpJU-lXD-xw1IEcBD_4Xg45ZE99LBnLrq0oLsGUaYgWxXSiDh6qP4fQMaNMgXihzvHrdhzBniXsVd6GGqfckBcIFpbS2AbrVfOmkWd4RJ2Aa4c9do4rpAc-sU8boo8DQsfSzqi-gFpwPhb1JRLa6PcsIfPJ3dyLc23kivgByjrUPn0OETJwTzgWhSa8PhUI-GNdI_YmCcP4UgeKm6yRvJ5Rq9K8RHtdi7fSumlH_NtZdi9kC3v905F8A?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          },
+          {
+            "name": "אורבי רזידנס",
+            "lat": 41.6349578,
+            "lng": 41.6074197,
+            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X4lsTb3uchleumHB-XmMD1Em3SnyCdl9LLU06z9hVLRTnoqVD0AL63_xgpd1JU-mNwukSbs7rVRBauePlvVjnoXmnILKvIWzFJptkHa8XZkKELsyTdr-pqXcca2tsVGm5VmlahNiQ4ButuVKqRFMmdWu_PLHfhwolOp8fLsxDQuq-g7aS2A8WthUY8KcCPPGH8giBNAE3gFRE2N0QaEZQUmuGfumOECAov7S1d_YiHoQhn20RsrxeMWLhw?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          },
+          {
+            "name": "פורטה בטומי",
+            "lat": 41.654951,
+            "lng": 41.6385595,
+            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X6HcBRDz-PDWmzuIwNa8eWSvD7IamK2en7s7TuHQEEM8cKqZTu9uB4N3XsEqrh4noLYp7oOjTBftLC88HBe85J_V6W4zhilWqo6zvveGWT1Nm4bi7r_Vr8UUaN2i_-naVwplCRuz-6OuIskZreDKblyTy-BMxPld7HvRRK8pu5k-2cyBwAJSeh58nzcuXXcpUNvPtH8kYNT9NUN4t0nStDXi5z3OAdJ672FYN3_NZO_K4rvoFs3UazRhKM?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          },
+          {
+            "name": "next אפרטמנטס",
+            "lat": 41.632886,
+            "lng": 41.6070325,
+            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X6czztAt8zuhgxiQUcNWqzWP7lL-o9mM1g2H9InXLM1U9tYZ9Awt1I3OgvKOnk-XUiWoMN3LoT-7HSzhBv_tBz-rtvlpo1krqb2_ZBM0YgX4Vt7iJ1F40oMe-kPQ6c0aJHgZsEWNYzWs8XR5ldKrVgUfE-MBCZRakSF0V-vw-YIG2bSd1jsM9phR6VPhcxDAGtIryUrDm-wXHVWlPV8FuL0hbEU3hmLVj4H3egrQmPVvVgczdjkS44zSBE?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          },
+          {
+            "name": "דאר בילדינג",
+            "lat": 41.6395584,
+            "lng": 41.6166528,
+            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X7jocTICiOiAMJH81qsv_3B-hnFwISD8a0SAJkkDh8JX9uo_7HBakDgYaIJpGBEyU341bQT5cDfx8Fh1T2mNs_xs51d-AaMdzNiVL3m9zyroFBJfjoK_W1gn3N8PLv6CC2ylpXfh1taAnjd0dgOAuqTLJd4kbnMjex5HkkByoPjAVuZQk3GOOCId8_riAfcBpo2xEhP8whoy1hKWQ3ZqWCl78xQAJmqhSL1TsTMkEcAt1Sl7bT8nujinl0?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/‏"
+          },
+          {
+            "name": "פאלם אפאטמנט",
+            "lat": 41.6555482,
+            "lng": 41.6374061,
+            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X5oGsEHqTUR8d9QE16ag6GMEqkYSkBucsvZljEAhnuizld0NgC-YOpiTnqD_miAfAFElbNNLfpYcU14A1-OnDDtjQHKUGtz5GzxlkRiUt_ITLRG9UOwIbk5jKjkdPrCue_7tvsbtJDsTwpynI_zDm7nhesTMk1VmB-lLn30tstlNgq2keVfo-tMFfBH3l9JTWYerreAXgHXVRb2uyw8g79nwrIBCdxd19sXfLBSc9RNB9jyT9i1a8SMWA0?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>יותר פרטים קרא באתר: https://www.batumionline.com/"
+          },
+          {
+            "name": "אקווה הוטל אנד אפרטמנט",
+            "lat": 41.6207769,
+            "lng": 41.5902841,
+            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X60_pdCReyyQcMIjOsLPW2Ab5HV-oiqRBsadwNfnWvLSeaLMk0Md4VdWSUaEL1mPjqgpdsy_3NItAK45Bu6gEN9EMvcJddsHv3PUkWbpAcvTSyRvpImJaZrY4J2nPZ5gtfPBJZp3Qtw_BScEX5VX3FtM7EgOEGAoWEzlw8omjH_1p6j2bvFMY3s_JmqCupJBlImSnevmuZOz4M7RvX8NaMraInlm9ekAnhOaZNibrSJ2xQmJHbrdOnPTv4?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          },
+          {
+            "name": "הורייזן אפרטמנט",
+            "lat": 41.6316996,
+            "lng": 41.603161,
+            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X7WUHoNjYoWKCxUy1yErprzL0Z5FJUR3Hg4dVeN2yARMmMBaiuczLV36mhJDor0XBSXKMdGB4MDdjFJ-LqVlQPF4epB_xyDszRV92iBQISphd7J8aCvww5RQr7AHLw0XZ2BZNix0odtUVkTvQnzuBLKcsqzLXclDnIV0T7T87KjxdzXdYtopN55dhx1wNu2gnAhWLsJcpC5qXMwGCK6J6rCreQJwtY4c0C9IY5QfcynN8AsZcbLI-oABHQ?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          }
+        ],
+        "color": "#f57c00"
+      },
       {
         "timestamp": "2026-04-25T14:28:36.694Z",
         "points": [
@@ -11659,111 +11778,39 @@
           }
         ],
         "color": "#f57c00"
-      },
-      {
-        "timestamp": "2026-04-24T11:15:58.526Z",
-        "points": [
-          {
-            "name": "בלו סקיי טאוור",
-            "lat": 41.6379794,
-            "lng": 41.6187095,
-            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X7J04aK-spEHK9rwBZOTCV6TMgvWe70U6XXmtNpJDauYxKqcdfgIjT8_XMO1-osqgnVlWMpaiMnkbiGqNq5cAvCJ4TmyXvLo3iYJ1J-wXsSF6Eb55NSXnjvwtAXCZOB4NLJUooE4WdPU5MXuyHncQ1i65qkS2ul4IfiFMt_Mmvo71RZJWS7tSIB31JcJ3jW2MexRZTeyhnpk_dWm7mvTE6yNus0I6JjeON3PnsyZd18ky7pHzIR4t03nTE?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
-          },
-          {
-            "name": "אליאס פאלאס",
-            "lat": 41.6415324,
-            "lng": 41.6160339,
-            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X7SxyV2Fe764tn9EGVlHIqd8LDUzOCpPrFU98z9EJmYfpakPzj3R3gYtOrGfdtDADuwGRbTSegV_wGwk_G2Ne4faciK2c9plKdHAYclu8uC7S5pvLW8JlF8_30673lblKdXgLFpjPWkCcbltx2Kh3h-8RI-Fy82rODH8zIDCbBhL0ug1g4zRhHMn1BWEqXu5e2yhn1-EnrA3B1zdIWdhKmHCLGzP6vYY6Gw31ylz4P3FFcvrW3k7PgORJA?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
-          },
-          {
-            "name": "אורבי סיטי",
-            "lat": 41.6401789,
-            "lng": 41.6136713,
-            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X5zifmPHs0ly5C917F1OrHoltc4D_1voIBN3BhkwKo1ekDqZ5xqP7YuxKtQ9lCmi9fV-aef6za6TtC9ffhDBbqnGAYXN2tk2-LXeMhxJob6GqmSmKe6Lad1VvqBAftj-m_vxiK_EHjr5I69qDInWGShi4yGgLJEARz1B17bjL8HoLvZWlmk3U8U9FJWM1xyA-Uywzmq67izzKBwnuyeOgsCPWmVPUU12MjxlM2-WkeWy33FV5OhXG4fq5Y?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
-          },
-          {
-            "name": "וואייט סליס",
-            "lat": 41.6237332,
-            "lng": 41.5979269,
-            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X7oc0JrtLHFM1M6USI4YsS41rHyCx9T1m9t6KN2IiDUmehGmHr9jP6ULA7mz2hWqxFwG8lMKEfKdMFqN_9Q1m4UyNtCFsNpnEhgDnIOuv09ObqEEIlyU5kA_aj1z6t6xsQ7g3rXZsvLYBnRQ1sip1uf4m8OGmB5OWrBGcs-widfnZJxzSKGTNaQ6Ctt5aOsV241iyzam77qYxBJgBtN_e21OnIAlqNHNwyFKohpmxeGHOHZct9tgHJFAi0?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
-          },
-          {
-            "name": "אורבי ביץ טאוור",
-            "lat": 41.6301288,
-            "lng": 41.6020986,
-            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X6gTLKV6GwsyCPsVsr-Ms354YnFX1HGLGV-2jUjVja51Mj7r4QfID8TOt3qozncszmgwz9Q3RsXRmEy11d1RoU97u7pyrRpetQm6RcEPcBBKhwXt7QsRqcybanFDZWW5XdJerDIi5L0mW1aPOhLNg7xJYcJuXtWxQMDiZETSClkSg2tO_EIcusIj_wSgmU0NPKFocS0uWHCAeu8WyMBks7hlVZYo1Ojv78Z0RzNAJ5oe0GKJM6TNF2OWd0?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר:https://www.batumionline.com/"
-          },
-          {
-            "name": "באטומי ואיו",
-            "lat": 41.6232365,
-            "lng": 41.5934302,
-            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X7SRFSkSHbU6JT-8hvvqa35Vu2xA5aiTKBtB7r1k2I-Uuh0rG2KWeYJdpjLIc55bbsATHZKppZzPjzkoens3F1YITOP2yXROAs5XVLpJxMKZyIp3fdOhzREPENYJyswSSxnh8LSPZPh4S-astOufOHb45196LfcsQEMO1dhEGF8t7LtZiIKv65Z0N_5lfLHTwbZ6DSEdLzBgYYueR8zTkmEvdqL4PE22fuOyixtX7CQF7NVwWKxOzEaQaQ?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
-          },
-          {
-            "name": "קליגראפי טאוור",
-            "lat": 41.6362231,
-            "lng": 41.6205742,
-            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X6BincTUk2-kf07re8I5i3fbVv3yDiTZNu1RyPEMSHGfC7e7uXnAy-bIIseQIeU13jEWWLN8Bq3TY-3MWiPycCwY3r9tokUyN4yhyDMCiZ0Ny2TBdlBI3vBoTfoUKI7I6RXYsLjYLCnCP-MIzmK46NTlA-jnaoTvIxkYkAaoBjPr9QZrBGd3WmHQD2DlWhg-9ivbNe9beMY3Pim9MoR5PPfqb2nO4wNDD9g3t_Pkuq5QI_ATRGXyq2ByzA?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
-          },
-          {
-            "name": "נובה לוקסרי",
-            "lat": 41.6256867,
-            "lng": 41.6001095,
-            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X7VD9pFQ9hSGKuhGvamYz1-gZdvi0O4KexqTM9tS95HLZmcqSwTM5QJkHk-pEeFIh2T-uqUT4ZIbm0YSRmAwqGM2U3S60LUjLzR138fOo8eP20t_VDr_S2uhrvrJCoYA2iJQK5eZ66duNn_tCoiXxPpQlFp-tqc2sqMCpjl5PwVisM7mYDB7GGnWTDmQvk1r3C97tFj7uhW-O75NEbFAGo-Xd6Q5EwMxDVpXgi0C1WyhOJSzDmku3AyozU?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
-          },
-          {
-            "name": "אורבי סקיי טאוור",
-            "lat": 41.6373013,
-            "lng": 41.6099654,
-            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X6CUe_eDdFAMVnmladcfgvAoDwYHTD_WvItc19p4UUI5RYbdG5mTx-5JhcI0Veu3kXi8LNv87XKiNFa3cs7DSuZqJCRGDqUe-Z7tX8aS_pUMs7xM3TavutWPJxLdooiaK9DWXKPJ5x3OR2D72prMq8q6XE-tAZsjTDlJxaJyqcY_4PQ7_ECy0cICazjABQzqtrJsoy51f3HQt9gyKVborKJYOWGWys6EDNARbDizeXDFByXJs4EkI3DT7s?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
-          },
-          {
-            "name": "אורבי רזידנס",
-            "lat": 41.6349578,
-            "lng": 41.6074197,
-            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X4ZyxKGSUxouEus61IE5y4E6BtU3oM1g8YAsiHRrCN2klAy6akQu8QQd815qfNTKCgYXqnG9ff3yRC9CAuZwFIYflmzZkhy8PRoPLHnOin2P1BNR0rGXjtnhiKuq_0s4hqzGAcXYRtZq80BsTnLHIfk8umX7fpFsUDhXKvZYDWgqcv7-FQAw5S5fg0YiSjKA8J6ka7pR7ZHeTfYQslCkOi6oZR6MmRCh-J6vo6NaJ5LEw2v1l1-Lc9aJy8?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
-          },
-          {
-            "name": "פורטה בטומי",
-            "lat": 41.654951,
-            "lng": 41.6385595,
-            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X6Z9fOc8qyHCxDxsfT30r3g6fjv_UbNBXGysuxGKp5HLReJjUVniTp-kXjdQLxdEANdUXJi4xlBXTL3O2xWP_Zep2uHQuJO8y5Qw051jI9Innvah2QpzluzBxmFrq0OcvJz17niwoBonMi4r7G-dH7fhQ8J_Jk6jkG7WGsooPdYxmZltCP1mk192JWdBl_FyK6HnLWmR1Cc29HFhmal1wC2gq424BD3UcDeW7BUhRNSHW7cRkKEbdKgDPc?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
-          },
-          {
-            "name": "next אפרטמנטס",
-            "lat": 41.632886,
-            "lng": 41.6070325,
-            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X4l1Xo0QGQJue-whqSR5CPbc8Cb-73juGkvw0uK8Wh-YAJPW9BGrrRxQ9ZiCj4YmEzSWGQSjutljqv1zIkRnZtyKIcOuRndK5o9nIKZwMgw9zyVyXDVmTiwz9sbhAAuYr5QunXS0J5Vrr8Koi-GmCWSsFBkln851-nxP8uFk1jKszLUFznORrBJaf_sVYjT_wIJzLGBxKkMYvGpkM86DwD38rZJUS-RjUP3fCId7QlBbOR_Wf8UDCjpuPA?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
-          },
-          {
-            "name": "דאר בילדינג",
-            "lat": 41.6395584,
-            "lng": 41.6166528,
-            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X7omiCSWk8Kdkxa7eKsFhXixzOxpzG7TMYrlaz_BtxNpSEthr11C9fG2LT9vw0t1bqb21xVqe7F2WVx5Y5aGBwrF16VqJRyKoqN6uvrvTgKvrDUDsM_5df2Sntn42mfZR-XJ6CArMnmeb27xnRkUZOXo_Qio1CJIDKJ6pOtqd5ZMLYTwnEWWAyZ1t_23hjdFIdh-LBwcKVokjusziZSggxocXPfHFPmmuuy96IMr_R7YpzifN433mxOWos?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/‏"
-          },
-          {
-            "name": "פאלם אפאטמנט",
-            "lat": 41.6555482,
-            "lng": 41.6374061,
-            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X5VBw2tBxFEE5WIFuB-uwHJomLWrWHtuWoxN3vRf9qqHTsn8JsfiLgmNMBCcRsettlnGrwh2ieK33dMZvu7GLyWFs4BqW9c8KIPyulHtEb7AIxd2HUgz_xdt_W2Y8bGtrXFLcbK10UUk80o1ag50Pef99rGGFaARcv8NH5v6PajZapFavUGlSWISuMDwh6ALh3_HjiWQ2VNgO79puc1hwjzU0LE5gomtvcclJFDVhJtfIYPaK46_WFr9lc?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>יותר פרטים קרא באתר: https://www.batumionline.com/"
-          },
-          {
-            "name": "אקווה הוטל אנד אפרטמנט",
-            "lat": 41.6207769,
-            "lng": 41.5902841,
-            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X6gVIEsIlQjzKqSHI43vA0zH9wtYmYCyK59S64k1RsDzuuk-1SY7LZnasuHhcaWlMiRoUhJqmlWLWsGVRP9oxtvQCP8gNh_98ePHiMoA_kpvzeOFcnT7dhrwYAw-VcwkZsaEtJ6lMYdYJ-MpTyjROsZVSFCEhFqsVNrWuxBdKmo8Axx9H__MgadqA7OoNG1linCLTm-Sju9ECJRrYtiDXqD8OdVvehJBcBn-DO5XZCAoqhTEH2DaEksip0?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
-          },
-          {
-            "name": "הורייזן אפרטמנט",
-            "lat": 41.6316996,
-            "lng": 41.603161,
-            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X4KN9N78-izWlDlGKku_rYM3O2T0xIKCg4aVpxtygRmoPRR7bixxbNluY5gMCkQi2Iekjtweo5uTYJNMW6m2IMYIaeHixIFLhgOv3RbA1TX1f5xfrI3dKMAwaKZph8kv95jNm4KZs_C_OTH5RekhyB81pl19h_NmCZt51fTLvBiFDPygPKLROrFNyoL-Yuhqmieh2yZI83Xd-qPQ44XzAP90IQfBPyxa7lSehNLCRQGkK0xloPRiLi96T8?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
-          }
-        ],
-        "color": "#f57c00"
       }
     ],
     "כפר נופש": [
+      {
+        "timestamp": "2026-04-26T12:30:08.994Z",
+        "points": [
+          {
+            "name": "Dreamland Oasis Hotel",
+            "lat": 41.7215496,
+            "lng": 41.7281611,
+            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X6nXyyybzTzA-OomlfB5Zd_p0IByGjt2pUx4BxvYu-qz7o3eansARa4V7QVzcVJ8LZckdA3db5zhjlYyDfTvvvn1H0wKbbOP1XVjJAf8A6cH1nUyDdUhh_cmVzeMlYnI5kHbWXn88enqehw6obHFpkJzIDerU6BdMTEMDODEgoTQsIwv40RqfcaEcMtuvH3mtsiHrruZnI_6EuDUUnJJq4tjqcawfMztxP5TvuJ0yn1pM-_rGEx2ZsVQ9I?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          },
+          {
+            "name": "Castello Mare All Inclusive Resort",
+            "lat": 41.7585099,
+            "lng": 41.7428511,
+            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X7OsPWYMPwHLR969yVla8SeLlXNcRM7Pgn9w__Fi_gVyNbfSnPFMIc14l2Pka7p_hapVPdyKcEsjO05wsPHdIA5H8fUKjek9f-modfyKQYgk7oAmZg7Ha8GSX4M9aB8JNLWDudEd4ctsQJ3ShtTpmpmwomGmnXGZ2epu2NTk4TJrC-X8vjI-ZkKD6rHSdZSw8KbZV4z2Bs_2uqR-pEQd7cy97A00dBKPzfhq8DT9wONMy5RHhdqohJvC4o?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          },
+          {
+            "name": "georgia palace hotel spa",
+            "lat": 41.8409711,
+            "lng": 41.7769855,
+            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X580fVo1HNia8pJQrjLJiaegdL_kK389iazawBx22M3wwm_c7XFve50m0ZDFwFO_NFgBwm0Yo-Gpr-wxpLf3CDsG4JbL-vbHLTvysGZ7cykQcYiobDXbyDJHOjcALaXyCe-70sild3v0N_U0JGLjjsE7npT0qReYvt24exvO2L2Vr0AJAOoE57BqIV9P9Px1K-1fhLPrMCuSY3u7JKn27H0d-RRMKJOKZUx4UAqe4vJqkIKVH9u8ihxX2o?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/‏"
+          },
+          {
+            "name": "<![CDATA[Paragraph Resort & Spa Shekvetili]]>",
+            "lat": 41.9537643,
+            "lng": 41.7650936,
+            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X7Pg29TC2UtCDrAAnjfwbL2b-SePLwxDU2RL-6wyZWL3clnx82kT4V2ojUifqo_PZCYD16Tp-Il1pdYZ7s6Z4o6PUGyj8cZRAJReSfYc0kinJympwr_1LXJsyoO5upYH3DAjYpN-Ub1d7wiBBo5KGq9lJ-Yv3CCfBcjdGp880qwHzcd4OkRexLolUWiB0KJesC7ipZAVKOTZ1PZS9-RjGcYFb3nloFxqIcabCkCEfGPP2NI2cOn5CD7InU?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באת��: https://www.batumionline.com/"
+          }
+        ],
+        "color": "#d4a017"
+      },
       {
         "timestamp": "2026-04-25T14:28:36.694Z",
         "points": [
@@ -11883,39 +11930,69 @@
           }
         ],
         "color": "#d4a017"
-      },
-      {
-        "timestamp": "2026-04-24T11:15:58.526Z",
-        "points": [
-          {
-            "name": "Dreamland Oasis Hotel",
-            "lat": 41.7215496,
-            "lng": 41.7281611,
-            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X7ACPByOsg4YTUrhWuDihf0fluQ2c0AmIYa-aA1TKcbw-EUMZ_29s9vi-oeAbPYSkfpHJWISuWcKK6Yhi2wMnaEpiO59VgHoXYDfDXfPaocZw97w52DrGcIrHJ9Bi_JgPOp-QgbeSiPKgJg6TUffzCmdT6-lNUReDi-l-MSArD-RaRl2bBQlO7WSg2QugPMMOARrKoW5f5XIi4Ed-xgdREiU94ffmqhrhaAdDuDFVoLv-QeZ7AAEG6fOss?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
-          },
-          {
-            "name": "Castello Mare All Inclusive Resort",
-            "lat": 41.7585099,
-            "lng": 41.7428511,
-            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X4zeGrcVKBEd7YMCvSrFxYRNbV7HLVaCow5qI8Asr0FSNSGNC57c94WPDXXPa3Y1dbTAiuYoLMEB2hYQbr19fSGJ8h7eSKrSkJBt-hawT6G8x6-LkjiBT0BCWn2pUeIoPfnerzwRmmN-PVxFVm_qV_lB6tOJYvpl1_YgP7JLp_oIQtumwrhicZfWJgQmAokI3GT8RwNNf0T2Yk8_HFNwBHedCE2PKltFjFVHiYoL3azTijfWOGflBTiiuM?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
-          },
-          {
-            "name": "georgia palace hotel spa",
-            "lat": 41.8409711,
-            "lng": 41.7769855,
-            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X5amCKs3Ga8t1TInOEwhSIsfA2Oxh8gus6uPIGYi2FSKT1LSh6BFacKVhUj2hcJN74Y5pkTEoPJfrY0YRiq07hE_eIVmogajFpAxD1-jztGbA39l4tvQFmsMYVDr6t8fstn1MPQ_OstZ6no7NanmhtR41Umvr4zhUW7CvFRE_YmBq5tUACEULkyx6x9uG4jNU1QGVY08azS9aS3pObgZi5vcl5kJKtOUCEcLSsjDqtsyo0W2DQ8AbMVuiw?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/‏"
-          },
-          {
-            "name": "<![CDATA[Paragraph Resort & Spa Shekvetili]]>",
-            "lat": 41.9537643,
-            "lng": 41.7650936,
-            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X5RypSMg42uBrsVxU1tYTBIZT_9cexp4MLyuMwSTGR93NDCd7tCnXqDMX11eULIQzKjZHB7CcN4ugRIJhfAnavskT9K4KpuhYRDJ9kFQ9fD7uniyBA60eC2XwxFMJsvWQhv04dUAjOJGZD4Mr45apCzEbTv5RKRBggcEurl3ucvpxghDlcPf2YVPQGNTcrqkt8hTijscHbPAtdjt41HmZtu2Rqyt2_xvNjZMSblkuJteXjcTUXvOGB6WBU?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באת��: https://www.batumionline.com/"
-          }
-        ],
-        "color": "#d4a017"
       }
     ],
     "אטרקציות": [
+      {
+        "timestamp": "2026-04-26T12:30:08.994Z",
+        "points": [
+          {
+            "name": "הדולפינריום",
+            "lat": 41.6476869,
+            "lng": 41.6235319,
+            "description": ""
+          },
+          {
+            "name": "האקווראיום של בטומי",
+            "lat": 41.6473943,
+            "lng": 41.6224429,
+            "description": ""
+          },
+          {
+            "name": "פארק השישה במאי",
+            "lat": 41.6480122,
+            "lng": 41.6285563,
+            "description": ""
+          },
+          {
+            "name": "הרכבל argo",
+            "lat": 41.6476122,
+            "lng": 41.6455312,
+            "description": ""
+          },
+          {
+            "name": "פסל האוהבים עלי ונינו",
+            "lat": 41.655845,
+            "lng": 41.6431088,
+            "description": ""
+          },
+          {
+            "name": "מגדל האלפאבית",
+            "lat": 41.6563173,
+            "lng": 41.6398591,
+            "description": ""
+          },
+          {
+            "name": "בטומי אקוואה פארק והלונה פארק",
+            "lat": 41.6347621,
+            "lng": 41.6054041,
+            "description": ""
+          },
+          {
+            "name": "המזרקות המרקדות",
+            "lat": 41.6414648,
+            "lng": 41.6134526,
+            "description": ""
+          },
+          {
+            "name": "פארק הקסם - Miracle Park",
+            "lat": 41.6561406,
+            "lng": 41.6404693,
+            "description": ""
+          }
+        ],
+        "color": "#ff5252"
+      },
       {
         "timestamp": "2026-04-25T14:28:36.694Z",
         "points": [
@@ -12155,69 +12232,75 @@
           }
         ],
         "color": "#ff5252"
-      },
-      {
-        "timestamp": "2026-04-24T11:15:58.526Z",
-        "points": [
-          {
-            "name": "הדולפינריום",
-            "lat": 41.6476869,
-            "lng": 41.6235319,
-            "description": ""
-          },
-          {
-            "name": "האקווראיום של בטומי",
-            "lat": 41.6473943,
-            "lng": 41.6224429,
-            "description": ""
-          },
-          {
-            "name": "פארק השישה במאי",
-            "lat": 41.6480122,
-            "lng": 41.6285563,
-            "description": ""
-          },
-          {
-            "name": "הרכבל argo",
-            "lat": 41.6476122,
-            "lng": 41.6455312,
-            "description": ""
-          },
-          {
-            "name": "פסל האוהבים עלי ונינו",
-            "lat": 41.655845,
-            "lng": 41.6431088,
-            "description": ""
-          },
-          {
-            "name": "מגדל האלפאבית",
-            "lat": 41.6563173,
-            "lng": 41.6398591,
-            "description": ""
-          },
-          {
-            "name": "בטומי אקוואה פארק והלונה פארק",
-            "lat": 41.6347621,
-            "lng": 41.6054041,
-            "description": ""
-          },
-          {
-            "name": "המזרקות המרקדות",
-            "lat": 41.6414648,
-            "lng": 41.6134526,
-            "description": ""
-          },
-          {
-            "name": "פארק הקסם - Miracle Park",
-            "lat": 41.6561406,
-            "lng": 41.6404693,
-            "description": ""
-          }
-        ],
-        "color": "#ff5252"
       }
     ],
     "אתרים פופולריים": [
+      {
+        "timestamp": "2026-04-26T12:30:08.994Z",
+        "points": [
+          {
+            "name": "העיר העתיקה - כיכר אירופה",
+            "lat": 41.6510061,
+            "lng": 41.6360698,
+            "description": ""
+          },
+          {
+            "name": "פיאצה בטומי",
+            "lat": 41.6495551,
+            "lng": 41.6411831,
+            "description": ""
+          },
+          {
+            "name": "טיילת בולובארד",
+            "lat": 41.6494292,
+            "lng": 41.6231903,
+            "description": ""
+          },
+          {
+            "name": "הפארק הלאומי מטיראלה (Mtirala National Park)",
+            "lat": 41.6617342,
+            "lng": 41.8778963,
+            "description": ""
+          },
+          {
+            "name": "מבצר גוניו - (12 ק״מ מבטומי)",
+            "lat": 41.5737146,
+            "lng": 41.5730329,
+            "description": ""
+          },
+          {
+            "name": "הגנים הבוטניים",
+            "lat": 41.6947525,
+            "lng": 41.7067745,
+            "description": ""
+          },
+          {
+            "name": "פארק צ׳ינצ׳ילה - Tsitsinatela park",
+            "lat": 41.9081645,
+            "lng": 41.7756435,
+            "description": ""
+          },
+          {
+            "name": "בית הכנסת העתיק בבטומי",
+            "lat": 41.6472692,
+            "lng": 41.6342943,
+            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X4-c5QTFIh21XBUsq9RaR8qhUgbAmwx3sl2LWIXQcXoIUoqlNeBlPugJb5RAn9h6L0ghYZz_Cj-nEoKH2VU8qbpFTOExukAfvFQAOnqxOtugzri4tAH8zUBfZK3viFMmFPbmyo-lqGOrYPBeXTAcZKLSuXok6o3byXAj9jg9vcq0j8MgYpqMDnu4fQsWC5Uu5dfJ1ti2xOT9tiJHVDM5070RPuqsZAwCqnTI_UwKji4_DGWR9ejypZM8Tk?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          },
+          {
+            "name": "בית חב״ד בטומי",
+            "lat": 41.6495209,
+            "lng": 41.6418132,
+            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X6nSwZonIUXbRP4BGdET3wewq1ws6NXXAA5kYR8nzTZEJNv4RWGtgVkCc6skZ9ETyP71w33P1apw3xsblrm_CcXCMWrm_yvIqU38JH146GAmicy4kFUsprs8I5fSm3ZsRMmQKdm7gJa1XmBMSC0v3vSYBuqNgqiB_saDSk3dTgDZxi2w466Ba6S7FQce_mjJ0JJmS3BH4BPCStJAhyDtF7rKTm3mjSYmjETkWVVJONxxEl2LQCAAVecAZs?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/‏"
+          },
+          {
+            "name": "קתדרלת האם הקדושה",
+            "lat": 41.6463767,
+            "lng": 41.6385451,
+            "description": ""
+          }
+        ],
+        "color": "#e91e63"
+      },
       {
         "timestamp": "2026-04-25T14:28:36.694Z",
         "points": [
@@ -12481,75 +12564,123 @@
           }
         ],
         "color": "#e91e63"
-      },
-      {
-        "timestamp": "2026-04-24T11:15:58.526Z",
-        "points": [
-          {
-            "name": "העיר העתיקה - כיכר אירופה",
-            "lat": 41.6510061,
-            "lng": 41.6360698,
-            "description": ""
-          },
-          {
-            "name": "פיאצה בטומי",
-            "lat": 41.6495551,
-            "lng": 41.6411831,
-            "description": ""
-          },
-          {
-            "name": "טיילת בולובארד",
-            "lat": 41.6494292,
-            "lng": 41.6231903,
-            "description": ""
-          },
-          {
-            "name": "הפארק הלאומי מטיראלה (Mtirala National Park)",
-            "lat": 41.6617342,
-            "lng": 41.8778963,
-            "description": ""
-          },
-          {
-            "name": "מבצר גוניו - (12 ק״מ מבטומי)",
-            "lat": 41.5737146,
-            "lng": 41.5730329,
-            "description": ""
-          },
-          {
-            "name": "הגנים הבוטניים",
-            "lat": 41.6947525,
-            "lng": 41.7067745,
-            "description": ""
-          },
-          {
-            "name": "פארק צ׳ינצ׳ילה - Tsitsinatela park",
-            "lat": 41.9081645,
-            "lng": 41.7756435,
-            "description": ""
-          },
-          {
-            "name": "בית הכנסת העתיק בבטומי",
-            "lat": 41.6472692,
-            "lng": 41.6342943,
-            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X5E8nbXrwaSI91iIOK57ZH3oA7w6QG-EDPI1oHk0y2o-E5qLhqCiWCEM3hawH_riM3Fhb3u-wUo966VWoDLKQxa5dH3KmDGwEg2nGDET-_MGXniPRRDqvi4iXGWTe0iVDThf2mR-s3Y7hWkkK_DER_mQs1aLuW2iM8h5mjzdI2EM7AjW4xndwyYNxYmoo_uCYWxp2fJkk4BFIanO0hjP4nZzjGtGJhBqvupUU5eFFU4E-XhJtBHfHIl7kQ?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
-          },
-          {
-            "name": "בית חב״ד בטומי",
-            "lat": 41.6495209,
-            "lng": 41.6418132,
-            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X50DhmxXCKh1KAyw0_4OD8N3SPoefer8FfTOM07rX8okAaUnBdfxPAnFU4jNEoVgjDf_Wz7zpr7HrQz3YgAG2CAm8-AJeZvQCY_FMiOvXGDSW-vJBAECCJG_llJ3S1KMjOemjPxq-NER8KSVEUzonN7ul3a7FfZeiEwXHc5l06dX_zKGnNSAk5NNme-VCjoIYh0j_ilsOb2ieJxfVHKvvRfcaOpfYO1hhp_8RbvT4aSAP5HH8fhPufxC0c?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/‏"
-          },
-          {
-            "name": "קתדרלת האם הקדושה",
-            "lat": 41.6463767,
-            "lng": 41.6385451,
-            "description": ""
-          }
-        ],
-        "color": "#e91e63"
       }
     ],
     "מסעדות": [
+      {
+        "timestamp": "2026-04-26T12:30:08.994Z",
+        "points": [
+          {
+            "name": "Heart of Batumi",
+            "lat": 41.6509931,
+            "lng": 41.6395064,
+            "description": ""
+          },
+          {
+            "name": "Restaurant Oval",
+            "lat": 41.6412765,
+            "lng": 41.6163164,
+            "description": ""
+          },
+          {
+            "name": "Bren Resturant",
+            "lat": 41.6514251,
+            "lng": 41.634121,
+            "description": ""
+          },
+          {
+            "name": "Tavaduri",
+            "lat": 41.6400818,
+            "lng": 41.6275197,
+            "description": ""
+          },
+          {
+            "name": "Laguna",
+            "lat": 41.6476914,
+            "lng": 41.6322427,
+            "description": ""
+          },
+          {
+            "name": "Old Boulevard",
+            "lat": 41.6506885,
+            "lng": 41.6294256,
+            "description": ""
+          },
+          {
+            "name": "Senate Restaurant",
+            "lat": 41.638389,
+            "lng": 41.6102405,
+            "description": ""
+          },
+          {
+            "name": "Exodus",
+            "lat": 41.6407738,
+            "lng": 41.6134088,
+            "description": ""
+          },
+          {
+            "name": "Shemoikhede Genatsvale",
+            "lat": 41.6510716,
+            "lng": 41.6417114,
+            "description": ""
+          },
+          {
+            "name": "Blue wave",
+            "lat": 41.649663,
+            "lng": 41.6632451,
+            "description": ""
+          },
+          {
+            "name": "Fanfan",
+            "lat": 41.6506891,
+            "lng": 41.6284622,
+            "description": ""
+          },
+          {
+            "name": "Clouds",
+            "lat": 41.6535319,
+            "lng": 41.6375423,
+            "description": ""
+          },
+          {
+            "name": "Kiziki",
+            "lat": 41.6442472,
+            "lng": 41.6320574,
+            "description": ""
+          },
+          {
+            "name": "(כשר) King solomon",
+            "lat": 41.6395916,
+            "lng": 41.616838,
+            "description": ""
+          },
+          {
+            "name": "הבית הירושלמי (כשר)",
+            "lat": 41.6501658,
+            "lng": 41.631631,
+            "description": ""
+          },
+          {
+            "name": "מסעדת בית חב״ד (כשר)",
+            "lat": 41.6495284,
+            "lng": 41.6418119,
+            "description": ""
+          },
+          {
+            "name": "<![CDATA[מענדי'ס Mendi's (כשר)]]>",
+            "lat": 41.6498471,
+            "lng": 41.6399839,
+            "description": ""
+          },
+          {
+            "name": "עין הים. (כשר)",
+            "lat": 41.6461823,
+            "lng": 41.648875,
+            "description": ""
+          }
+        ],
+        "color": "#1a237e"
+      },
       {
         "timestamp": "2026-04-25T14:28:36.694Z",
         "points": [
@@ -13005,123 +13136,75 @@
           }
         ],
         "color": "#1a237e"
-      },
-      {
-        "timestamp": "2026-04-24T11:15:58.526Z",
-        "points": [
-          {
-            "name": "Heart of Batumi",
-            "lat": 41.6509931,
-            "lng": 41.6395064,
-            "description": ""
-          },
-          {
-            "name": "Restaurant Oval",
-            "lat": 41.6412765,
-            "lng": 41.6163164,
-            "description": ""
-          },
-          {
-            "name": "Bren Resturant",
-            "lat": 41.6514251,
-            "lng": 41.634121,
-            "description": ""
-          },
-          {
-            "name": "Tavaduri",
-            "lat": 41.6400818,
-            "lng": 41.6275197,
-            "description": ""
-          },
-          {
-            "name": "Laguna",
-            "lat": 41.6476914,
-            "lng": 41.6322427,
-            "description": ""
-          },
-          {
-            "name": "Old Boulevard",
-            "lat": 41.6506885,
-            "lng": 41.6294256,
-            "description": ""
-          },
-          {
-            "name": "Senate Restaurant",
-            "lat": 41.638389,
-            "lng": 41.6102405,
-            "description": ""
-          },
-          {
-            "name": "Exodus",
-            "lat": 41.6407738,
-            "lng": 41.6134088,
-            "description": ""
-          },
-          {
-            "name": "Shemoikhede Genatsvale",
-            "lat": 41.6510716,
-            "lng": 41.6417114,
-            "description": ""
-          },
-          {
-            "name": "Blue wave",
-            "lat": 41.649663,
-            "lng": 41.6632451,
-            "description": ""
-          },
-          {
-            "name": "Fanfan",
-            "lat": 41.6506891,
-            "lng": 41.6284622,
-            "description": ""
-          },
-          {
-            "name": "Clouds",
-            "lat": 41.6535319,
-            "lng": 41.6375423,
-            "description": ""
-          },
-          {
-            "name": "Kiziki",
-            "lat": 41.6442472,
-            "lng": 41.6320574,
-            "description": ""
-          },
-          {
-            "name": "(כשר) King solomon",
-            "lat": 41.6395916,
-            "lng": 41.616838,
-            "description": ""
-          },
-          {
-            "name": "הבית הירושלמי (כשר)",
-            "lat": 41.6501658,
-            "lng": 41.631631,
-            "description": ""
-          },
-          {
-            "name": "מסעדת בית חב״ד (כשר)",
-            "lat": 41.6495284,
-            "lng": 41.6418119,
-            "description": ""
-          },
-          {
-            "name": "<![CDATA[מענדי'ס Mendi's (כשר)]]>",
-            "lat": 41.6498471,
-            "lng": 41.6399839,
-            "description": ""
-          },
-          {
-            "name": "עין הים. (כשר)",
-            "lat": 41.6461823,
-            "lng": 41.648875,
-            "description": ""
-          }
-        ],
-        "color": "#1a237e"
       }
     ],
     "מסעדות במלונות": [
+      {
+        "timestamp": "2026-04-26T12:30:08.994Z",
+        "points": [
+          {
+            "name": "360 Sky Bar",
+            "lat": 41.6509908,
+            "lng": 41.6303976,
+            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X71a9oBQO3yK1zikSfKhqV84o0OZsnML8te0Ee2i4cOtfut0Lj2tgZUi5jXgTapLnAexuNe2xrQ_ubebyklHl-ZgyM5cdN-o_wqD5eBCwGK8_6qAkwy0_ndh5XZK7z0CvY05tcykfyRybGqePL9lYtuqm8QUwKfdPR_JJWAFF6yhUZKTIwOrIN_GRjDGOBbe1mcI8VvXtK0YHKoP3ZCf6L0TvyAoMaSRUl76lWjGEzG4rqS_xtNhAOGemU?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          },
+          {
+            "name": "The Kitchen",
+            "lat": 41.6512601,
+            "lng": 41.6432578,
+            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X5Xpcud4CCFUp1Fo3uwWiY6tWhQG3x7aBtsqB23v_oxunl8Rq8SDq2eeq5xAz2ANLxGhW2tRwu7e8yaktZhlQYHB-lJWVweY3GvuMZBu3sx3rdbgS-U1t4Pyr8OIrYyG8NWar-cWFe5gYwnJoyziAX5vgfgP6hQ4lokZozzf4-o0JQt6oFvnzjivsmhF6y53jUDYUeewr3RRnPlfhrMmvHFAHwn-DqteVVNsnYgRKGW60qi2Gtz4uQg_QI?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          },
+          {
+            "name": "Umami at Clouds",
+            "lat": 41.6537509,
+            "lng": 41.6376573,
+            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X7Q7AAgqdfhww8BB-qU_DaJuvE0HD7bJVS2VyORI2r_Y7-OZ6zBRqm0RyFxwgjUMYtiz5f85mWSG4evg7X7MqfhhZfz2QT9R094Plg85sHf7KO-KKzk9Zso1Mx1eZFowjyrCXtAoNhCZmxZCu_KZyU8i935AO_DYUS5OhFrwL5KobCxLceE3KRk3xx4GY-2K9v9bhZC73I2vw_9CfXfaYyHtULx7LmhPlfbLLdnYyy3DCCJrM4d-D8MNyE?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          },
+          {
+            "name": "Nephele Sky Bar",
+            "lat": 41.6491253,
+            "lng": 41.6257474,
+            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X72gAafBt5UBzXW5BL3TwfJESNdycyHBzp5IFvwpsc_sQ2pUAMjMSjzbOLG8qnsEVizQ5LvcU6OA4ly6DMaYPQmIps0eG63P8-zIaLPGlbdp39mYoNoKR1AK0ly6nRBXFHpGNexozl5Qk_2yd6v6tbXZjKFYafXljLVimK4IgA8NFgcxyS5X8S3lN0DBRseDLfvIkq7tQyB3x9DPUVoxxnsoKhPfnD6IRhLrsGcWx4-8lRILIGk3wRUKpY?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
+          },
+          {
+            "name": "Restaurant Ambassadori",
+            "lat": 41.6553603,
+            "lng": 41.6358021,
+            "description": "מידע נוסף באתר: https://www.batumionline.com/<br>‏"
+          },
+          {
+            "name": "<![CDATA[Brasserie & Latitude Bar]]>",
+            "lat": 41.6540979,
+            "lng": 41.6367599,
+            "description": ""
+          },
+          {
+            "name": "A La Turca",
+            "lat": 41.6501514,
+            "lng": 41.636147,
+            "description": "מידע נוסף באתר: https://www.batumionline.com/<br>‏"
+          },
+          {
+            "name": "Wave Restaurant",
+            "lat": 41.6361832,
+            "lng": 41.607059,
+            "description": ""
+          },
+          {
+            "name": "Cena Restaurant",
+            "lat": 41.637688,
+            "lng": 41.6095029,
+            "description": ""
+          },
+          {
+            "name": "<![CDATA[Kitchen & Bar]]>",
+            "lat": 41.6418021,
+            "lng": 41.6157287,
+            "description": ""
+          }
+        ],
+        "color": "#0288d1"
+      },
       {
         "timestamp": "2026-04-25T14:28:36.694Z",
         "points": [
@@ -13385,75 +13468,69 @@
           }
         ],
         "color": "#0288d1"
-      },
-      {
-        "timestamp": "2026-04-24T11:15:58.526Z",
-        "points": [
-          {
-            "name": "360 Sky Bar",
-            "lat": 41.6509908,
-            "lng": 41.6303976,
-            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X4zgS2kgYrO-uKTCTSLD65vhrDyAICcvHBJujbRJSmRF0XA1ENyQSgSobIfT-xofR-YZTPbpk-Ii9Rp9xnJsfy38e2tzIB21oUxzINNEwRAtpXHiqFw6fko7WKK7O8SuIAk5eqrRutjVMQ1-tFBRPWvLaW7r78ky0zClznt0jR7LF6_ZXj1yM_fIiTig-VEwBWYJNboyHcdpi-_72MB-X4xyVSwxPijqKFPmKnnjNuTfJeJ-fE1abRWc7Q?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
-          },
-          {
-            "name": "The Kitchen",
-            "lat": 41.6512601,
-            "lng": 41.6432578,
-            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X56KqM2DX7A-AQaMSoRzd7TKvGzeEZTQhexEZya3hD7_ln3dFheXLXFiG0_cHbStJ0RB54z2lbx1tYBZgOEtpNouQXoHs_4dO20wrvShqiovEboDYgVGRnM-LDfH1LAjIgLNQa4-35hsfvR6r0FPwf2AsT-oZUPECrqvLJLkoj2ftkYyuJK9-a7L9sFSCeXQ7TTqFoRWjTwyJsT46y5kWbw1cZh-fcaGvv4jjYiJ6Gjkk6Pk8B4g6raIog?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
-          },
-          {
-            "name": "Umami at Clouds",
-            "lat": 41.6537509,
-            "lng": 41.6376573,
-            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X7ueufCHoSkz7Rs_d7pcCoPCjhfXi02Zdad7VyddjSKcDKQN8qyIWpSJgLKM7tAoI9QHRm_TmTKf4T2eNKC_lz_Aywby-rfNE2Vhk7eDZEjpuydsCwh2CB-4mg56Rde4CmDSwd_pdMiIrj_2BfyFrIOCeQAm_j8SD82XizGbN4ufAFVVaxku_XpeaI0X5jXY6o7QOmBxuovqAWiBbyQsRx8gVKmE6B5rlYiis2m5SSWr20ES-_EufOvDpw?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
-          },
-          {
-            "name": "Nephele Sky Bar",
-            "lat": 41.6491253,
-            "lng": 41.6257474,
-            "description": "<img src=\"https://mymaps.usercontent.google.com/hostedimage/m/*/3AL_Y2X5tR7CDIw0B7qkUzsvIM3DPBW5IxWp6GaAYKRYnHyZHxIzLa-YuWHEMF3wjt83VaoK_d1dlpGvCDwWFEYMVqupZoQzSmPpbUvciYokW7x49oVHW3yQDGYmyzR967LrqFy12dE0FoZADKdpwiQU1iKWbykW9jF6I6BukagZKVNIOZqcUEsiCXwnP7nOZYVUegTlXLcbzcCIqOS_dMk5Onk2igBcGtKZnLyZxnuWXV1JVh0JhysHdhLa7FFg?fife=s16383\" height=\"200\" width=\"auto\" /><br><br>מידע נוסף באתר: https://www.batumionline.com/"
-          },
-          {
-            "name": "Restaurant Ambassadori",
-            "lat": 41.6553603,
-            "lng": 41.6358021,
-            "description": "מידע נוסף באתר: https://www.batumionline.com/<br>‏"
-          },
-          {
-            "name": "<![CDATA[Brasserie & Latitude Bar]]>",
-            "lat": 41.6540979,
-            "lng": 41.6367599,
-            "description": ""
-          },
-          {
-            "name": "A La Turca",
-            "lat": 41.6501514,
-            "lng": 41.636147,
-            "description": "מידע נוסף באתר: https://www.batumionline.com/<br>‏"
-          },
-          {
-            "name": "Wave Restaurant",
-            "lat": 41.6361832,
-            "lng": 41.607059,
-            "description": ""
-          },
-          {
-            "name": "Cena Restaurant",
-            "lat": 41.637688,
-            "lng": 41.6095029,
-            "description": ""
-          },
-          {
-            "name": "<![CDATA[Kitchen & Bar]]>",
-            "lat": 41.6418021,
-            "lng": 41.6157287,
-            "description": ""
-          }
-        ],
-        "color": "#0288d1"
       }
     ],
     "קניות": [
+      {
+        "timestamp": "2026-04-26T12:30:08.994Z",
+        "points": [
+          {
+            "name": "קניון גראנד Grand Mall",
+            "lat": 41.6354923,
+            "lng": 41.6076743,
+            "description": ""
+          },
+          {
+            "name": "קניון המטרוסיטי - Metro City",
+            "lat": 41.6278905,
+            "lng": 41.6018406,
+            "description": ""
+          },
+          {
+            "name": "הופה באזר Hopa Bazar",
+            "lat": 41.6237383,
+            "lng": 41.6205953,
+            "description": ""
+          },
+          {
+            "name": "רחוב זביאד גמסחורדיה (Zviad Gamsakhurdia St)",
+            "lat": 41.6502432,
+            "lng": 41.6417444,
+            "description": ""
+          },
+          {
+            "name": "רחוב ממת אבאשידזה (Memed Abashidze Ave)",
+            "lat": 41.6496874,
+            "lng": 41.6339547,
+            "description": ""
+          },
+          {
+            "name": "רחוב קוטאיסי (Kutaisi St)",
+            "lat": 41.6500933,
+            "lng": 41.6429271,
+            "description": ""
+          },
+          {
+            "name": "שוק הפשפשים (ליד כיכר אירופה / העיר העתיקה)",
+            "lat": 41.6512397,
+            "lng": 41.637034,
+            "description": ""
+          },
+          {
+            "name": "בונום מרקט Bonoi Market",
+            "lat": 41.6438614,
+            "lng": 41.6559899,
+            "description": ""
+          },
+          {
+            "name": "Batumi Fish Market שוק הדגים",
+            "lat": 41.6491628,
+            "lng": 41.663385,
+            "description": ""
+          }
+        ],
+        "color": "#afb42b"
+      },
       {
         "timestamp": "2026-04-25T14:28:36.694Z",
         "points": [
@@ -13636,66 +13713,6 @@
       },
       {
         "timestamp": "2026-04-24T12:13:19.958Z",
-        "points": [
-          {
-            "name": "קניון גראנד Grand Mall",
-            "lat": 41.6354923,
-            "lng": 41.6076743,
-            "description": ""
-          },
-          {
-            "name": "קניון המטרוסיטי - Metro City",
-            "lat": 41.6278905,
-            "lng": 41.6018406,
-            "description": ""
-          },
-          {
-            "name": "הופה באזר Hopa Bazar",
-            "lat": 41.6237383,
-            "lng": 41.6205953,
-            "description": ""
-          },
-          {
-            "name": "רחוב זביאד גמסחורדיה (Zviad Gamsakhurdia St)",
-            "lat": 41.6502432,
-            "lng": 41.6417444,
-            "description": ""
-          },
-          {
-            "name": "רחוב ממת אבאשידזה (Memed Abashidze Ave)",
-            "lat": 41.6496874,
-            "lng": 41.6339547,
-            "description": ""
-          },
-          {
-            "name": "רחוב קוטאיסי (Kutaisi St)",
-            "lat": 41.6500933,
-            "lng": 41.6429271,
-            "description": ""
-          },
-          {
-            "name": "שוק הפשפשים (ליד כיכר אירופה / העיר העתיקה)",
-            "lat": 41.6512397,
-            "lng": 41.637034,
-            "description": ""
-          },
-          {
-            "name": "בונום מרקט Bonoi Market",
-            "lat": 41.6438614,
-            "lng": 41.6559899,
-            "description": ""
-          },
-          {
-            "name": "Batumi Fish Market שוק הדגים",
-            "lat": 41.6491628,
-            "lng": 41.663385,
-            "description": ""
-          }
-        ],
-        "color": "#afb42b"
-      },
-      {
-        "timestamp": "2026-04-24T11:15:58.526Z",
         "points": [
           {
             "name": "קניון גראנד Grand Mall",
@@ -13757,6 +13774,36 @@
     ],
     "מצלמות": [
       {
+        "timestamp": "2026-04-26T12:30:08.994Z",
+        "points": [
+          {
+            "name": "מצלמת רשת 1",
+            "lat": 41.6367488,
+            "lng": 41.6185401,
+            "description": ""
+          },
+          {
+            "name": "מצלמת רשת 2",
+            "lat": 41.6349559,
+            "lng": 41.6221504,
+            "description": ""
+          },
+          {
+            "name": "מצלמת רשת - חוף גוניו",
+            "lat": 41.5608224,
+            "lng": 41.5661794,
+            "description": ""
+          },
+          {
+            "name": "מצלמת רשת 3",
+            "lat": 41.6292738,
+            "lng": 41.602505,
+            "description": ""
+          }
+        ],
+        "color": "#c2185b"
+      },
+      {
         "timestamp": "2026-04-25T14:28:36.694Z",
         "points": [
           {
@@ -13848,36 +13895,6 @@
       },
       {
         "timestamp": "2026-04-24T12:13:19.958Z",
-        "points": [
-          {
-            "name": "מצלמת רשת 1",
-            "lat": 41.6367488,
-            "lng": 41.6185401,
-            "description": ""
-          },
-          {
-            "name": "מצלמת רשת 2",
-            "lat": 41.6349559,
-            "lng": 41.6221504,
-            "description": ""
-          },
-          {
-            "name": "מצלמת רשת - חוף גוניו",
-            "lat": 41.5608224,
-            "lng": 41.5661794,
-            "description": ""
-          },
-          {
-            "name": "מצלמת רשת 3",
-            "lat": 41.6292738,
-            "lng": 41.602505,
-            "description": ""
-          }
-        ],
-        "color": "#c2185b"
-      },
-      {
-        "timestamp": "2026-04-24T11:15:58.526Z",
         "points": [
           {
             "name": "מצלמת רשת 1",
@@ -13909,6 +13926,66 @@
     ],
     "קזינו": [
       {
+        "timestamp": "2026-04-26T12:30:08.994Z",
+        "points": [
+          {
+            "name": "Casino International (מלון Hilton)",
+            "lat": 41.6491956,
+            "lng": 41.6256706,
+            "description": ""
+          },
+          {
+            "name": "JRW Welmond (מלון וולמונד)",
+            "lat": 41.6457283,
+            "lng": 41.6489239,
+            "description": ""
+          },
+          {
+            "name": "Casino Iveria (מלון Radisson Blu)",
+            "lat": 41.6537497,
+            "lng": 41.6376288,
+            "description": ""
+          },
+          {
+            "name": "(מלון אופוריה) Eclipse Casino",
+            "lat": 41.6271715,
+            "lng": 41.6012663,
+            "description": ""
+          },
+          {
+            "name": "Casino Colosseum (מלון Colosseum Marina)",
+            "lat": 41.6375792,
+            "lng": 41.6093035,
+            "description": ""
+          },
+          {
+            "name": "Courtyard by Marriott Batumi (קזינו Otium)",
+            "lat": 41.6417659,
+            "lng": 41.6157218,
+            "description": ""
+          },
+          {
+            "name": "Casino Empire (מלון Le Méridien)",
+            "lat": 41.6541129,
+            "lng": 41.6369532,
+            "description": ""
+          },
+          {
+            "name": "Princess Casino (מלון Wyndham)",
+            "lat": 41.6501512,
+            "lng": 41.6360543,
+            "description": ""
+          },
+          {
+            "name": "Sheraton Batumi Hotel (קזינו Peace)",
+            "lat": 41.6509813,
+            "lng": 41.6303975,
+            "description": ""
+          }
+        ],
+        "color": ""
+      },
+      {
         "timestamp": "2026-04-25T14:28:36.694Z",
         "points": [
           {
@@ -14090,66 +14167,6 @@
       },
       {
         "timestamp": "2026-04-24T12:13:19.958Z",
-        "points": [
-          {
-            "name": "Casino International (מלון Hilton)",
-            "lat": 41.6491956,
-            "lng": 41.6256706,
-            "description": ""
-          },
-          {
-            "name": "JRW Welmond (מלון וולמונד)",
-            "lat": 41.6457283,
-            "lng": 41.6489239,
-            "description": ""
-          },
-          {
-            "name": "Casino Iveria (מלון Radisson Blu)",
-            "lat": 41.6537497,
-            "lng": 41.6376288,
-            "description": ""
-          },
-          {
-            "name": "(מלון אופוריה) Eclipse Casino",
-            "lat": 41.6271715,
-            "lng": 41.6012663,
-            "description": ""
-          },
-          {
-            "name": "Casino Colosseum (מלון Colosseum Marina)",
-            "lat": 41.6375792,
-            "lng": 41.6093035,
-            "description": ""
-          },
-          {
-            "name": "Courtyard by Marriott Batumi (קזינו Otium)",
-            "lat": 41.6417659,
-            "lng": 41.6157218,
-            "description": ""
-          },
-          {
-            "name": "Casino Empire (מלון Le Méridien)",
-            "lat": 41.6541129,
-            "lng": 41.6369532,
-            "description": ""
-          },
-          {
-            "name": "Princess Casino (מלון Wyndham)",
-            "lat": 41.6501512,
-            "lng": 41.6360543,
-            "description": ""
-          },
-          {
-            "name": "Sheraton Batumi Hotel (קזינו Peace)",
-            "lat": 41.6509813,
-            "lng": 41.6303975,
-            "description": ""
-          }
-        ],
-        "color": ""
-      },
-      {
-        "timestamp": "2026-04-24T11:15:58.526Z",
         "points": [
           {
             "name": "Casino International (מלון Hilton)",
@@ -14212,6 +14229,22 @@
   },
   "contactSubmissions": [
     {
+      "id": "1777208190104-54",
+      "name": "איציק",
+      "email": "1@2.com",
+      "message": "akuo lfכם",
+      "createdAt": "2026-04-26T12:56:30.104Z",
+      "read": false
+    },
+    {
+      "id": "1777197367603-10",
+      "name": "איציק קריספל",
+      "email": "1@3.com",
+      "message": "חדש",
+      "createdAt": "2026-04-26T09:56:07.603Z",
+      "read": false
+    },
+    {
       "id": "1776872864010-468",
       "name": "שליחת הודעה חדשה למערכת האפליקציה",
       "email": "123@123.com",
@@ -14259,7 +14292,7 @@
     }
   ],
   "adminAuth": {
-    "password": "",
+    "password": "batumi2024",
     "users": [
       {
         "id": "usr_1776878737319",
@@ -14914,8 +14947,9 @@
           "חניה",
           "מרוהטת"
         ],
-        "size": "half",
-        "visible": false
+        "size": "full",
+        "visible": true,
+        "highlightStyle": "blue"
       },
       {
         "id": "ap3",
@@ -14930,7 +14964,8 @@
           "מוכן להשכרה"
         ],
         "size": "half",
-        "visible": false
+        "visible": true,
+        "highlightStyle": "yellow"
       }
     ],
     "rent": [
@@ -15129,5 +15164,12 @@
     }
   ],
   "bgColor": "#f0ede5",
-  "homeBanner": []
+  "homeBanner": [
+    "/uploads/1775910069562-341.jpg",
+    "/uploads/1777201173266-687.png",
+    "/uploads/1777201220796-941.jpg",
+    "/uploads/1777201253934-839.jpg",
+    "/uploads/1777201289968-7.jpg",
+    "/uploads/1777201325547-99.jpg"
+  ]
 }

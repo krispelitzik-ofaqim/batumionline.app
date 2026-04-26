@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Image, StyleSheet, TouchableOpacity, Text, useWindowDimensions } from 'react-native';
 import { API_BASE, resolveUri, fetchContent } from '../constants/api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type GalleryFile = { filename: string; url: string };
 
@@ -19,13 +20,21 @@ export default function HomeGallery() {
       { filename: 'b5', url: '/uploads/1775910069573-698.jpg' },
       { filename: 'b6', url: '/uploads/1775910069590-365.jpg' },
     ];
-    fetchContent().then((d: any) => {
-      if (Array.isArray(d?.homeBanner) && d.homeBanner.length > 0) {
-        setFiles(d.homeBanner.map((u: string, i: number) => ({ filename: `hb${i}`, url: u })));
-      } else {
-        setFiles(FALLBACK);
+    AsyncStorage.getItem('@homeBanner').then(cached => {
+      if (cached) {
+        try { const arr = JSON.parse(cached); if (Array.isArray(arr) && arr.length > 0) setFiles(arr); }
+        catch {}
       }
-    }).catch(() => setFiles(FALLBACK));
+    });
+    fetchContent().then((d: any) => {
+      let next: GalleryFile[] = FALLBACK;
+      if (Array.isArray(d?.homeBanner)) {
+        const valid = d.homeBanner.filter((u: any) => typeof u === 'string' && u.trim().length > 0);
+        if (valid.length > 0) next = valid.map((u: string, i: number) => ({ filename: `hb${i}`, url: u }));
+      }
+      setFiles(next);
+      AsyncStorage.setItem('@homeBanner', JSON.stringify(next)).catch(() => {});
+    }).catch(() => setFiles(prev => prev.length === 0 ? FALLBACK : prev));
   }, []);
 
   useEffect(() => {

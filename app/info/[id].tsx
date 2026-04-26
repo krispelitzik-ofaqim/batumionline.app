@@ -19,7 +19,7 @@ const DEFAULTS: Tab[] = [
   { id: 'contact', title: 'כתוב לנו', icon: '✉️', body: '' },
 ];
 
-const EMAIL = 'info@batumionline.app';
+const EMAIL = 'krispelitzik@gmail.com';
 const WHATSAPP = '972502844867';
 const SITE = 'https://www.batumionline.app';
 
@@ -56,7 +56,8 @@ export default function InfoPage() {
     const hasImage = portalItem.image && (portalItem.image.startsWith('http') || portalItem.image.startsWith('data:') || portalItem.image.startsWith('/'));
     return (
       <View style={styles.container}>
-        <TouchableOpacity style={{ position: 'absolute', top: 50, left: 16, zIndex: 10, width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(0,0,0,0.5)', alignItems: 'center', justifyContent: 'center' }} onPress={() => (router.canGoBack() ? router.back() : router.replace("/"))}>
+        <View style={{ height: Platform.OS === 'ios' ? 50 : 24, backgroundColor: '#1A6B8A' }} />
+        <TouchableOpacity style={{ position: 'absolute', top: Platform.OS === 'ios' ? 58 : 32, left: 16, zIndex: 10, width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(0,0,0,0.5)', alignItems: 'center', justifyContent: 'center' }} onPress={() => (router.canGoBack() ? router.back() : router.replace("/"))}>
           <Text style={{ fontSize: 22, color: '#fff', fontWeight: '900' }}>←</Text>
         </TouchableOpacity>
         <ScrollView contentContainerStyle={{ paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
@@ -79,12 +80,14 @@ export default function InfoPage() {
               {portalItem.subtitle ? <Text style={{ fontSize: 14, color: 'rgba(255,255,255,0.85)', textAlign: 'right', writingDirection: 'rtl', marginTop: 4 }}>{portalItem.subtitle}</Text> : null}
             </LinearGradient>
           </View>
-          <View style={{ marginTop: -16, borderTopLeftRadius: 20, borderTopRightRadius: 20, backgroundColor: Colors.BACKGROUND, paddingTop: 20, paddingHorizontal: 16, minHeight: 400 }}>
-            {portalItem.body.includes('<') ? (
-              <HtmlContent html={portalItem.body} baseStyle={{ fontSize: 14, color: '#444', lineHeight: 24 }} />
-            ) : (
-              <Text style={styles.cardBody}>{portalItem.body || 'תוכן יתווסף בקרוב'}</Text>
-            )}
+          <View style={{ marginTop: -20, borderTopLeftRadius: 24, borderTopRightRadius: 24, backgroundColor: Colors.BACKGROUND, paddingTop: 16, paddingHorizontal: 12, minHeight: 400, paddingBottom: 30 }}>
+            <View style={{ backgroundColor: '#fff', borderRadius: 16, padding: 18, shadowColor: '#0f172a', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.06, shadowRadius: 12, elevation: 3 }}>
+              {portalItem.body.includes('<') ? (
+                <HtmlContent html={portalItem.body} />
+              ) : (
+                <Text style={styles.cardBody}>{portalItem.body || 'תוכן יתווסף בקרוב'}</Text>
+              )}
+            </View>
           </View>
         </ScrollView>
       </View>

@@ -106,16 +106,45 @@ function Sparkline({ data, color, unit }: { data: Point[]; color: string; unit: 
   const yTicks = [max, (max + min) / 2, min];
 
   if (Platform.OS !== 'web') {
+    const chartH = 110;
+    const chartPadT = 14;
+    const chartPadB = 22;
+    const innerChartH = chartH - chartPadT - chartPadB;
+    const last = data.slice(-4);
+    const lmin = Math.min(...last.map(d => d.value));
+    const lmax = Math.max(...last.map(d => d.value));
+    const lrange = lmax - lmin || 1;
     return (
-      <View style={{ paddingVertical: 8, paddingHorizontal: 4, backgroundColor: '#f8fafc', borderRadius: 8, borderWidth: 1, borderColor: '#e2e8f0' }}>
-        <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 6, justifyContent: 'space-around' }}>
-          {data.slice(-8).map((p, i) => (
-            <View key={i} style={{ alignItems: 'center', minWidth: 56 }}>
-              <View style={{ width: 6, height: Math.max(8, ((p.value - min) / range) * 60), backgroundColor: color, borderRadius: 3, marginBottom: 4 }} />
-              <Text style={{ fontSize: 10, fontWeight: '900', color: '#1C2B35' }}>{p.value.toFixed(1)}{unit}</Text>
-              <Text style={{ fontSize: 9, color: '#64748b' }}>{p.year}</Text>
-            </View>
+      <View style={{ paddingVertical: 8, paddingHorizontal: 8, backgroundColor: '#f8fafc', borderRadius: 8, borderWidth: 1, borderColor: '#e2e8f0' }}>
+        <View style={{ height: chartH, position: 'relative' }}>
+          {[0, 0.5, 1].map((p, i) => (
+            <View key={`grid-${i}`} style={{ position: 'absolute', left: 0, right: 0, top: chartPadT + p * innerChartH, height: 1, backgroundColor: '#e2e8f0' }} />
           ))}
+          {last.map((p, i) => {
+            const xPct = i / Math.max(1, last.length - 1);
+            const yPx = chartPadT + innerChartH - ((p.value - lmin) / lrange) * innerChartH;
+            const next = last[i + 1];
+            let line = null;
+            if (next) {
+              const xPctNext = (i + 1) / Math.max(1, last.length - 1);
+              const yPxNext = chartPadT + innerChartH - ((next.value - lmin) / lrange) * innerChartH;
+              const dxPct = xPctNext - xPct;
+              const dyPx = yPxNext - yPx;
+              const lengthPct = dxPct;
+              const angle = Math.atan2(dyPx, dxPct * 280) * 180 / Math.PI;
+              line = (
+                <View key={`ln-${i}`} style={{ position: 'absolute', left: `${xPct * 100}%`, top: yPx, width: `${lengthPct * 100}%`, height: 2, backgroundColor: color, transformOrigin: '0 50%', transform: [{ rotate: `${angle}deg` }] as any }} />
+              );
+            }
+            return (
+              <React.Fragment key={`pt-${i}`}>
+                {line}
+                <View style={{ position: 'absolute', left: `${xPct * 100}%`, top: yPx - 4, width: 8, height: 8, borderRadius: 4, backgroundColor: color, marginLeft: -4 }} />
+                <Text style={{ position: 'absolute', left: `${xPct * 100}%`, top: yPx - 22, fontSize: 9, color, fontWeight: '700', marginLeft: -14, width: 28, textAlign: 'center' }}>{p.value.toFixed(1)}</Text>
+                <Text style={{ position: 'absolute', left: `${xPct * 100}%`, top: chartH - 14, fontSize: 9, color: '#64748b', marginLeft: -14, width: 28, textAlign: 'center' }}>{p.year}</Text>
+              </React.Fragment>
+            );
+          })}
         </View>
       </View>
     );
@@ -376,12 +405,12 @@ export default function FinanceStats({ cardBg, channel = 'money' }: { cardBg?: s
               const filled = (c as any).tableRows.filter((tr: any) => {
                 if (tr.cells && Object.values(tr.cells).some((v: any) => v)) return true;
                 return tr.category || tr.value || tr.year;
-              });
+              }).slice(-4);
               return (
                 <View style={{ gap: 4, paddingVertical: 4 }}>
                   <View style={{ flexDirection: 'row-reverse', paddingHorizontal: 10, paddingVertical: 4, gap: 8 }}>
                     {cols.map((col: any) => (
-                      <Text key={col.id} style={{ flex: 1, fontSize: 11, fontWeight: '800', color: '#64748b', textAlign: 'center', writingDirection: 'rtl' }}>{col.name}</Text>
+                      <Text key={col.id} numberOfLines={2} style={{ flex: 1, fontSize: 9, fontWeight: '800', color: '#64748b', textAlign: 'center', writingDirection: 'rtl' }}>{col.name}</Text>
                     ))}
                   </View>
                   {filled.map((tr: any) => (
@@ -392,7 +421,7 @@ export default function FinanceStats({ cardBg, channel = 'money' }: { cardBg?: s
                         const unit = (c as any).unit;
                         const suffix = isValue && v && unit ? (unit === '%' ? '%' : ` ${unit}`) : '';
                         return (
-                          <Text key={col.id} style={{ flex: 1, fontSize: 13, color: '#374151', fontWeight: isValue ? '800' : '600', textAlign: 'center', writingDirection: 'rtl' }}>{v}{suffix}</Text>
+                          <Text key={col.id} numberOfLines={1} adjustsFontSizeToFit style={{ flex: 1, fontSize: 11, color: '#374151', fontWeight: isValue ? '800' : '600', textAlign: 'center', writingDirection: 'rtl' }}>{v}{suffix}</Text>
                         );
                       })}
                     </View>

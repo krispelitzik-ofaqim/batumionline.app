@@ -16,7 +16,7 @@ const DEFAULTS: Tab[] = [
   { id: 'contact', title: 'כתוב לנו', icon: '✉️', body: '' },
 ];
 
-const EMAIL = 'info@batumionline.app';
+const EMAIL = 'krispelitzik@gmail.com';
 const WHATSAPP = '972502844867';
 const SITE = 'https://www.batumionline.app';
 
@@ -151,8 +151,8 @@ export default function InfoScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.BACKGROUND },
-  topRow: { flexDirection: 'row-reverse', paddingHorizontal: 12, paddingTop: 16, paddingBottom: 8, gap: 8 },
-  bannerWrap: { flex: 1, borderRadius: 14, shadowColor: '#000', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.1, shadowRadius: 6, elevation: 3 },
+  topRow: { flexDirection: 'row-reverse', flexWrap: 'wrap', paddingHorizontal: 12, paddingTop: 16, paddingBottom: 8, gap: 8 },
+  bannerWrap: { width: '48%', borderRadius: 14, shadowColor: '#000', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.1, shadowRadius: 6, elevation: 3 },
   banner: { borderRadius: 14, paddingVertical: 12, paddingHorizontal: 6, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.WHITE, borderWidth: 1, borderColor: Colors.SECONDARY + '30', minHeight: 74 },
   bannerOn: { borderColor: 'transparent' },
   icon: { fontSize: 24, marginBottom: 4 },

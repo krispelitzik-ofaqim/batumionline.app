@@ -16,6 +16,7 @@ import ListingsList from '../../components/ListingsList';
 import DeveloperCard, { Developer } from '../../components/DeveloperCard';
 import DeveloperForm from '../../components/DeveloperForm';
 import { Modal } from 'react-native';
+import HtmlContent from '../../components/HtmlContent';
 
 const DEMO_DEVELOPERS: Developer[] = [
   {
@@ -40,7 +41,7 @@ const DEMO_DEVELOPERS: Developer[] = [
 ];
 
 type TopButton = { id: string; label: string };
-type Article = { id: string; title: string; summary: string; image?: string; link?: string; date?: string };
+type Article = { id: string; title: string; summary: string; image?: string; link?: string; date?: string; body?: string; longText?: string; article?: string };
 type Listing = { id: string; title: string; image: string; images?: string[]; price: string; features: string[]; cta: string; link?: string; size?: 'full' | 'half'; article?: string };
 
 const DEFAULT_TOP_BUTTONS: TopButton[] = [
@@ -127,6 +128,11 @@ export default function RealEstatePortal() {
       .then(data => {
         if (data?.realEstate?.topButtons?.length) setTopButtons(data.realEstate.topButtons);
         if (data?.realEstate?.news?.length) setNews(data.realEstate.news.filter((n: Article) => !!n.image));
+        else if (Array.isArray(data?.realEstate?.newsCategories) && data.realEstate.newsCategories.length > 0) {
+          const flat: Article[] = [];
+          data.realEstate.newsCategories.forEach((c: any) => (c.items || []).forEach((i: any) => flat.push(i)));
+          if (flat.length) setNews(flat.filter(n => !!n.image));
+        }
         const side = data?.sideBanners || [];
         const re = side.find((b: any) => b.id === 'realestate');
         if (re?.icon?.startsWith('http')) setRealEstateImage(re.icon);
@@ -310,6 +316,7 @@ export default function RealEstatePortal() {
             {(activeTop === 'sale' || activeTop === 'rent' || activeTop === 'hotels') && (
               <View style={{ marginTop: 14 }}>
                 <ListingsList type={activeTop as 'sale' | 'rent' | 'hotels'} reloadKey={listingsKey} />
+                <BrokerBannerSmall />
               </View>
             )}
             {false && (activeTop === 'sale' || activeTop === 'rent') && (
@@ -514,6 +521,47 @@ const BROKER_FALLBACK_IMAGES = [
   '/uploads/1775910069573-698.jpg',
   '/uploads/1775910069590-365.jpg',
 ];
+
+function BrokerBannerSmall() {
+  const [brokers, setBrokers] = useState<any[]>(BROKER_FALLBACK_IMAGES.map((img, i) => ({ id: `b${i+1}`, name: 'דודי ספיר', title: 'מתווך נדל״ן מומלץ', phone: '+995-555-123-456', image: img })));
+  const [idx, setIdx] = useState(0);
+
+  useEffect(() => {
+    fetchContent().then(d => {
+      if (Array.isArray(d?.brokers) && d.brokers.length > 0) {
+        const visible = d.brokers.filter((b: any) => b.visible !== false);
+        if (visible.length > 0) setBrokers(visible);
+      }
+    }).catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    if (brokers.length < 2) return;
+    const t = setInterval(() => setIdx(i => (i + 1) % brokers.length), 5000);
+    return () => clearInterval(t);
+  }, [brokers.length]);
+
+  const broker = brokers[idx % brokers.length] || brokers[0];
+  if (!broker) return null;
+
+  return (
+    <View style={{ paddingHorizontal: 16, marginTop: 14 }}>
+      <Text style={{ fontSize: 12, fontWeight: '700', color: '#888', textAlign: 'right', writingDirection: 'rtl', marginBottom: 6 }}>מתווכים מומלצים בבטומי</Text>
+      <TouchableOpacity activeOpacity={0.85} onPress={() => router.push('/portal/brokers' as any)} style={{ flexDirection: 'row-reverse', backgroundColor: '#fff', borderRadius: 10, overflow: 'hidden', borderWidth: 1, borderColor: '#e2e8f0', minHeight: 55 }}>
+        <Image source={{ uri: resolveUri(broker.image) }} style={{ width: 55, height: 55 }} resizeMode="cover" />
+        <View style={{ flex: 1, paddingHorizontal: 10, paddingVertical: 6, justifyContent: 'center' }}>
+          <Text style={{ fontSize: 13, fontWeight: '900', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl' }} numberOfLines={1}>{broker.name}</Text>
+          <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginTop: 2 }}>
+            <Text style={{ fontSize: 10, color: '#475569' }} numberOfLines={1}>📞 {broker.phone}</Text>
+            <View style={{ flexDirection: 'row', gap: 3 }}>
+              {brokers.map((_, i) => <View key={i} style={{ width: 4, height: 4, borderRadius: 2, backgroundColor: i === idx ? Colors.PRIMARY : '#cbd5e1' }} />)}
+            </View>
+          </View>
+        </View>
+      </TouchableOpacity>
+    </View>
+  );
+}
 
 function BrokerBanner() {
   const [brokers, setBrokers] = useState<any[]>(BROKER_FALLBACK_IMAGES.map((img, i) => ({ id: `b${i+1}`, name: 'דודי ספיר', title: 'מתווך נדל״ן מומלץ בבטומי', phone: '+995-555-123-456', image: img })));
@@ -729,6 +777,7 @@ function NewsSliderArrows({ news }: { news: Article[] }) {
   const sidePad = 16;
   const scrollRef = useRef<ScrollView>(null);
   const [idx, setIdx] = useState(0);
+  const [openNews, setOpenNews] = useState<Article | null>(null);
   const scrollTo = (i: number) => {
     const next = Math.max(0, Math.min(news.length - 1, i));
     setIdx(next);
@@ -746,7 +795,12 @@ function NewsSliderArrows({ news }: { news: Article[] }) {
         onMomentumScrollEnd={(e) => setIdx(Math.round(e.nativeEvent.contentOffset.x / (SLIDE_W + GAP)))}
       >
         {news.map(n => (
-          <TouchableOpacity key={n.id} activeOpacity={0.85} style={[s.newsCardLike, { width: SLIDE_W, height: 200 }]} onPress={() => n.link && Linking.openURL(n.link)}>
+          <TouchableOpacity key={n.id} activeOpacity={0.85} style={[s.newsCardLike, { width: SLIDE_W, height: 200 }]} onPress={() => {
+            const hasArticle = !!(n.body || n.longText || n.article);
+            if (hasArticle) setOpenNews(n);
+            else if (n.link) Linking.openURL(n.link);
+            else setOpenNews(n);
+          }}>
             <View style={{ width: SLIDE_W, height: 140, position: 'relative' }}>
               {n.image ? (
                 <Image source={{ uri: resolveUri(n.image) }} style={{ width: SLIDE_W, height: 140 }} />
@@ -769,6 +823,46 @@ function NewsSliderArrows({ news }: { news: Article[] }) {
       <TouchableOpacity style={[s.arrowBtn, { left: 12, top: 32 }]} onPress={() => scrollTo(idx + 1)} disabled={idx === news.length - 1}>
         <Text style={[s.arrowTxt, idx === news.length - 1 && { opacity: 0.3 }]}>‹</Text>
       </TouchableOpacity>
+
+      <Modal visible={!!openNews} transparent animationType="fade" onRequestClose={() => setOpenNews(null)}>
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'center', padding: 16 }}>
+          <View style={{ backgroundColor: '#fff', borderRadius: 18, overflow: 'hidden', maxHeight: '90%' }}>
+            {openNews?.image ? (
+              <View style={{ width: '100%', height: 200, position: 'relative' }}>
+                <Image source={{ uri: resolveUri(openNews.image) }} style={{ width: '100%', height: 200 }} resizeMode="cover" />
+                <TouchableOpacity onPress={() => setOpenNews(null)} style={{ position: 'absolute', top: 12, left: 12, width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(0,0,0,0.6)', alignItems: 'center', justifyContent: 'center' }}>
+                  <Text style={{ color: '#fff', fontSize: 20, fontWeight: '900' }}>✕</Text>
+                </TouchableOpacity>
+                <LinearGradient colors={['transparent', 'rgba(0,0,0,0.85)']} style={{ position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: 16, paddingTop: 40, paddingBottom: 12 }}>
+                  <Text style={{ fontSize: 17, fontWeight: '900', color: '#fff', textAlign: 'right', writingDirection: 'rtl' }}>{openNews?.title}</Text>
+                  {openNews?.date ? <Text style={{ fontSize: 11, color: 'rgba(255,255,255,0.85)', textAlign: 'right', writingDirection: 'rtl', marginTop: 2 }}>{openNews.date}</Text> : null}
+                </LinearGradient>
+              </View>
+            ) : (
+              <View style={{ padding: 16, paddingTop: 40, position: 'relative' }}>
+                <TouchableOpacity onPress={() => setOpenNews(null)} style={{ position: 'absolute', top: 8, left: 8, width: 32, height: 32, borderRadius: 16, backgroundColor: '#f1f5f9', alignItems: 'center', justifyContent: 'center' }}>
+                  <Text style={{ color: '#475569', fontSize: 16, fontWeight: '900' }}>✕</Text>
+                </TouchableOpacity>
+                <Text style={{ fontSize: 17, fontWeight: '900', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl' }}>{openNews?.title}</Text>
+              </View>
+            )}
+            <ScrollView contentContainerStyle={{ padding: 16 }}>
+              {openNews?.summary ? <Text style={{ fontSize: 14, color: '#475569', textAlign: 'right', writingDirection: 'rtl', lineHeight: 21, marginBottom: 12, fontWeight: '600' }}>{openNews.summary}</Text> : null}
+              {(openNews?.body || openNews?.longText || openNews?.article) ? (
+                ((openNews.body || openNews.longText || openNews.article || '').includes('<')
+                  ? <HtmlContent html={openNews.body || openNews.longText || openNews.article || ''} />
+                  : <Text style={{ fontSize: 14, color: '#1C2B35', textAlign: 'right', writingDirection: 'rtl', lineHeight: 22 }}>{openNews.body || openNews.longText || openNews.article}</Text>
+                )
+              ) : null}
+              {openNews?.link ? (
+                <TouchableOpacity onPress={() => openNews?.link && Linking.openURL(openNews.link)} style={{ marginTop: 14, backgroundColor: Colors.PRIMARY, borderRadius: 10, paddingVertical: 12, alignItems: 'center' }}>
+                  <Text style={{ color: '#fff', fontWeight: '900', fontSize: 14 }}>↗ למקור המלא</Text>
+                </TouchableOpacity>
+              ) : null}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }

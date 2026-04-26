@@ -190,7 +190,7 @@ const styles = StyleSheet.create({
   heroTitle: { fontSize: 22, fontWeight: '900', color: Colors.WHITE, textAlign: 'right', writingDirection: 'rtl' },
   heroSub: { fontSize: 13, color: 'rgba(255,255,255,0.9)', marginTop: 4, writingDirection: 'rtl', textAlign: 'right' },
   card: {
-    backgroundColor: Colors.WHITE, borderRadius: 16, padding: 20, marginTop: 16,
+    backgroundColor: Colors.WHITE, borderRadius: 16, padding: 16, marginTop: 8, marginHorizontal: 8,
     shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 8, elevation: 2,
   },
   cardBody: { fontSize: 14, color: '#444', textAlign: 'right', writingDirection: 'rtl', lineHeight: 24 },

@@ -379,17 +379,22 @@ export default function FlightsModal({ visible, onClose, bgColor }: { visible: b
                     <Text style={[s.airline, { textAlign: 'center', marginTop: 2 }]} numberOfLines={1}>{f.airline}</Text>
                     <Text style={[s.flightNum, { textAlign: 'center', fontSize: 11 }]} numberOfLines={1}>{f.flight}</Text>
                   </View>
-                  <View style={{ flex: 1, flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
-                    <View style={s.timeCol}>
-                      <Text style={s.timeVal}>{f.depTime}</Text>
-                      <Text style={s.timeDateLabel}>{f.depDate}</Text>
-                      <Text style={s.timeLabel}>{tab === 'arrival' ? 'TLV' : 'BUS'}</Text>
+                  <View style={{ flex: 1, justifyContent: 'center', gap: 4 }}>
+                    <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 4 }}>
+                      <Text style={[s.timeLabel, { fontSize: 9, color: 'rgba(255,255,255,0.6)' }]}>המראה</Text>
+                      <View style={{ flexDirection: 'row-reverse', alignItems: 'baseline', gap: 6 }}>
+                        <Text style={s.timeVal}>{f.depTime}</Text>
+                        <Text style={s.timeLabel}>{tab === 'arrival' ? 'TLV' : 'BUS'}</Text>
+                        <Text style={s.timeDateLabel}>{f.depDate}</Text>
+                      </View>
                     </View>
-                    <Text style={s.timeArrow}>←</Text>
-                    <View style={s.timeCol}>
-                      <Text style={s.timeVal}>{f.arrTime}</Text>
-                      <Text style={s.timeDateLabel}>{f.arrDate}</Text>
-                      <Text style={s.timeLabel}>{tab === 'arrival' ? 'BUS' : 'TLV'}</Text>
+                    <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 4 }}>
+                      <Text style={[s.timeLabel, { fontSize: 9, color: 'rgba(255,255,255,0.6)' }]}>נחיתה</Text>
+                      <View style={{ flexDirection: 'row-reverse', alignItems: 'baseline', gap: 6 }}>
+                        <Text style={s.timeVal}>{f.arrTime}</Text>
+                        <Text style={s.timeLabel}>{tab === 'arrival' ? 'BUS' : 'TLV'}</Text>
+                        <Text style={s.timeDateLabel}>{f.arrDate}</Text>
+                      </View>
                     </View>
                   </View>
                   <View style={[s.statusBadge, statusColor(f.status)]}>

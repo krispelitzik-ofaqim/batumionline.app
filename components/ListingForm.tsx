@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, Modal, TextInput, TouchableOpacity, ScrollView, StyleSheet, Image, Platform, Linking } from 'react-native';
+import { View, Text, Modal, TextInput, TouchableOpacity, ScrollView, StyleSheet, Image, Platform, Linking, KeyboardAvoidingView } from 'react-native';
 import { Colors } from '../constants/colors';
 import { API_BASE } from '../constants/api';
 
@@ -81,7 +81,7 @@ export default function ListingForm({ visible, onClose, defaultType, onSubmitted
 
   return (
     <Modal visible={visible} animationType="slide" transparent>
-      <View style={s.backdrop}>
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={s.backdrop}>
         <View style={s.sheet}>
           <View style={s.header}>
             <TouchableOpacity onPress={() => { reset(); onClose(); }}>
@@ -100,7 +100,7 @@ export default function ListingForm({ visible, onClose, defaultType, onSubmitted
               </TouchableOpacity>
             </View>
           ) : (
-            <ScrollView contentContainerStyle={{ padding: 14, gap: 10 }}>
+            <ScrollView contentContainerStyle={{ padding: 14, gap: 10, paddingBottom: 60 }} keyboardShouldPersistTaps="handled" automaticallyAdjustKeyboardInsets showsVerticalScrollIndicator={false}>
               <TextInput style={s.input} placeholder="כותרת (לדוגמה: דירת 2 חדרים מפוארת)" value={title} onChangeText={setTitle} textAlign="right" placeholderTextColor="#94a3b8" />
               {defaultType === 'rent' && (
                 <View>
@@ -163,7 +163,7 @@ export default function ListingForm({ visible, onClose, defaultType, onSubmitted
             </ScrollView>
           )}
         </View>
-      </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }

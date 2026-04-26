@@ -114,7 +114,7 @@ const DEFAULT_LEGAL: DataItem[] = [
   { id: 'about', title: 'אודותינו', icon: '👥', bg: '#1A6B8A', longText: 'Batumi Online הוא המדריך הישראלי המקיף לטיול בבטומי, גאורגיה. נולדנו מתוך אהבה לעיר היפה הזו ורצון לעזור לכל ישראלי לחוות אותה בצורה הטובה ביותר. האפליקציה מרכזת את כל המידע שתייר ישראלי צריך – מלונות, מסעדות, אטרקציות, תחבורה, פורטל נדל"ן ועסקים, סיורים קוליים בעברית ועוד.' },
   { id: 'terms', title: 'תקנון', icon: '🪪', bg: '#3DA5C4', longText: 'השימוש באפליקציית Batumi Online כפוף לתנאים הבאים:\n\n1. כל התוכן באפליקציה מיועד למטרות מידע בלבד.\n2. איננו אחראים לדיוק המחירים, זמינות השירותים או פרטי הקשר המוצגים.\n3. המידע מתעדכן מעת לעת אך ייתכנו שינויים שאינם תחת שליטתנו.\n4. השימוש באפליקציה הוא חופשי וללא תשלום.\n5. בעת לחיצה על קישורים חיצוניים המשתמש עובר לאתרי צד שלישי שאין להם קשר אלינו.' },
   { id: 'privacy', title: 'פרטיות', icon: '⚖️', bg: '#F4A94E', longText: 'אנחנו מכבדים את פרטיות המשתמשים שלנו:\n\n• אין אנו אוספים מידע אישי מזהה ללא הסכמה מפורשת.\n• שימוש באפליקציה אינו דורש הרשמה או יצירת חשבון.\n• נתוני שימוש אנונימיים נאספים לצורך שיפור האפליקציה בלבד.\n• איננו מוכרים או מעבירים מידע לצדדים שלישיים.\n• עוגיות (Cookies) – האפליקציה עלולה להשתמש בטכנולוגיות אחסון מקומיות לשמירת העדפות.' },
-  { id: 'contact', title: 'כתוב לנו', icon: '✉️', bg: '#1C2B35', longText: 'נשמח לשמוע מכם!\n\nאימייל: info@batumionline.app\nוואטסאפ: זמין דרך כפתור הוואטסאפ בסרגל התחתון\nאתר: www.batumionline.app\n\nיש לכם הצעה לשיפור? מצאתם טעות? רוצים לפרסם עסק באפליקציה? דברו איתנו!' },
+  { id: 'contact', title: 'כתוב לנו', icon: '✉️', bg: '#1C2B35', longText: 'נשמח לשמוע מכם!\n\nאימייל: krispelitzik@gmail.com\nוואטסאפ: זמין דרך כפתור הוואטסאפ בסרגל התחתון\nאתר: www.batumionline.app\n\nיש לכם הצעה לשיפור? מצאתם טעות? רוצים לפרסם עסק באפליקציה? דברו איתנו!' },
 ];
 
 const DEFAULT_BOTTOM_BANNERS: DataItem[] = [
@@ -224,6 +224,7 @@ const COLORS_PALETTE = ['#000000','#333333','#666666','#999999','#ffffff','#004a
 
 function RichEditor({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   const ref = React.useRef<any>(null);
+  const savedRange = React.useRef<Range | null>(null);
   const [showCode, setShowCode] = React.useState(false);
 
   React.useEffect(() => {
@@ -232,9 +233,24 @@ function RichEditor({ value, onChange }: { value: string; onChange: (v: string) 
     }
   }, [value, showCode]);
 
+  const saveSelection = () => {
+    const sel = (window as any).getSelection();
+    if (sel && sel.rangeCount > 0) savedRange.current = sel.getRangeAt(0).cloneRange();
+  };
+  const restoreSelection = () => {
+    const sel = (window as any).getSelection();
+    if (savedRange.current && sel) {
+      sel.removeAllRanges();
+      sel.addRange(savedRange.current);
+    }
+  };
+
   const exec = (cmd: string, arg?: string) => {
+    if (ref.current) ref.current.focus();
+    restoreSelection();
     (window as any).document.execCommand(cmd, false, arg);
     if (ref.current) onChange(ref.current.innerHTML);
+    saveSelection();
   };
 
   const btnStyle: any = {
@@ -242,15 +258,19 @@ function RichEditor({ value, onChange }: { value: string; onChange: (v: string) 
     background: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 600, color: '#1A6B8A',
   };
 
+  const preventBlur = (e: any) => e.preventDefault();
+
   const btn = (label: string, cmd: string, arg?: string) =>
     React.createElement('button', {
       type: 'button', key: label + cmd,
+      onMouseDown: preventBlur,
       onClick: () => exec(cmd, arg), style: btnStyle,
     }, label);
 
   const selectEl = (key: string, options: { label: string; val: string }[], cmd: string, placeholder: string) =>
     React.createElement('select', {
       key,
+      onFocus: saveSelection,
       onChange: (e: any) => { if (e.target.value) exec(cmd, e.target.value); e.target.value = ''; },
       defaultValue: '',
       style: { ...btnStyle, paddingRight: 4 },
@@ -261,6 +281,7 @@ function RichEditor({ value, onChange }: { value: string; onChange: (v: string) 
 
   const fontSelect = React.createElement('select', {
     key: 'fontFamily',
+    onFocus: saveSelection,
     onChange: (e: any) => { if (e.target.value) exec('fontName', e.target.value); e.target.value = ''; },
     defaultValue: '',
     style: { ...btnStyle, paddingRight: 4 },
@@ -270,7 +291,7 @@ function RichEditor({ value, onChange }: { value: string; onChange: (v: string) 
   ]);
 
   const colorPicker = (key: string, cmd: string, label: string) =>
-    React.createElement('label', { key, style: { ...btnStyle, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 4 } }, [
+    React.createElement('label', { key, onMouseDown: preventBlur, style: { ...btnStyle, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 4 } }, [
       label,
       React.createElement('input', {
         key: 'inp', type: 'color', defaultValue: '#000000', style: { width: 0, height: 0, opacity: 0, position: 'absolute' },
@@ -311,12 +332,12 @@ function RichEditor({ value, onChange }: { value: string; onChange: (v: string) 
       btn('מרכז', 'justifyCenter'),
       btn('שמאל', 'justifyLeft'),
       React.createElement('button', {
-        type: 'button', key: 'linkbtn', onClick: promptLink, style: btnStyle,
+        type: 'button', key: 'linkbtn', onMouseDown: preventBlur, onClick: promptLink, style: btnStyle,
       }, '🔗 קישור'),
       btn('הסר קישור', 'unlink'),
       btn('קו אופקי', 'insertHorizontalRule'),
       React.createElement('button', {
-        type: 'button', key: 'codebtn', onClick: toggleCode,
+        type: 'button', key: 'codebtn', onMouseDown: preventBlur, onClick: toggleCode,
         style: { ...btnStyle, background: showCode ? '#1A6B8A' : '#fff', color: showCode ? '#fff' : '#1A6B8A' },
       }, showCode ? 'תצוגה' : '</> קוד'),
       btn('ניקוי', 'removeFormat'),
@@ -339,6 +360,9 @@ function RichEditor({ value, onChange }: { value: string; onChange: (v: string) 
           contentEditable: true,
           suppressContentEditableWarning: true,
           onInput: (e: any) => onChange(e.currentTarget.innerHTML),
+          onMouseUp: saveSelection,
+          onKeyUp: saveSelection,
+          onBlur: saveSelection,
           style: {
             minHeight: 200, maxHeight: 400, overflowY: 'auto',
             border: '1px solid #e0e0e0', borderRadius: 10, padding: 12,
@@ -756,12 +780,12 @@ function HomeBannerEditor() {
     <View style={{ padding: 12, marginTop: 12, backgroundColor: '#f8fafc', borderRadius: 10, borderWidth: 1, borderColor: '#e2e8f0' }}>
       <Text style={{ fontSize: 13, fontWeight: '900', color: '#1C2B35', writingDirection: 'rtl', textAlign: 'right', marginBottom: 4 }}>🖼️ באנר מתחלף בדף הבית</Text>
       <Text style={{ fontSize: 10, color: '#64748b', writingDirection: 'rtl', textAlign: 'right', marginBottom: 8 }}>תמונות שמתחלפות בראש דף הבית (מומלץ 6-10)</Text>
-      <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 6, marginBottom: 8 }}>
+      <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 4, marginBottom: 8 }}>
         {imgs.map((u, i) => (
           <View key={i} style={{ position: 'relative' }}>
-            <Image source={{ uri: resolveUri(u) }} style={{ width: 80, height: 80, borderRadius: 6 }} />
-            <TouchableOpacity onPress={() => remove(i)} style={{ position: 'absolute', top: -6, left: -6, width: 20, height: 20, borderRadius: 10, backgroundColor: '#dc2626', alignItems: 'center', justifyContent: 'center' }}>
-              <Text style={{ color: '#fff', fontSize: 11, fontWeight: '900' }}>✕</Text>
+            <Image source={{ uri: resolveUri(u) }} style={{ width: 50, height: 50, borderRadius: 4 }} />
+            <TouchableOpacity onPress={() => remove(i)} style={{ position: 'absolute', top: -4, left: -4, width: 16, height: 16, borderRadius: 8, backgroundColor: '#dc2626', alignItems: 'center', justifyContent: 'center' }}>
+              <Text style={{ color: '#fff', fontSize: 10, fontWeight: '900' }}>✕</Text>
             </TouchableOpacity>
           </View>
         ))}
@@ -2899,6 +2923,8 @@ export default function AdminDashboard() {
   useEffect(() => { loadClientBanners(); }, [loadClientBanners]);
   const [authForm, setAuthForm] = useState<{ id: string; name: string; phone: string; password: string; role: 'owner'|'editor'|'viewer' }>({ id: '', name: '', phone: '', password: '', role: 'viewer' });
   const [authNewPassword, setAuthNewPassword] = useState('');
+  const [authPinInput, setAuthPinInput] = useState('');
+  const [authPinUnlocked, setAuthPinUnlocked] = useState(false);
 
   const loadAuth = useCallback(async () => {
     try {
@@ -2918,6 +2944,8 @@ export default function AdminDashboard() {
 
   useEffect(() => { loadAuth(); }, [loadAuth]);
   const [contactMessages, setContactMessages] = useState<Array<{ id: string; name: string; email: string; message: string; createdAt: string; read?: boolean; replied?: boolean; repliedAt?: string; replyNote?: string }>>([]);
+  const [messagesPage, setMessagesPage] = useState(1);
+  const MESSAGES_PER_PAGE = 10;
   const [popups, setPopups] = useState<Array<{ id: string; title: string; message: string; target: string; position: 'top'|'center'|'bottom'; visible: boolean; startAt?: string; endAt?: string; bgColor?: string; redeemCode?: string }>>([]);
   const [popupForm, setPopupForm] = useState<{ id: string; title: string; message: string; target: string; position: 'top'|'center'|'bottom'; visible: boolean; startAt: string; endAt: string; bgColor: string; redeemCode: string }>({ id: '', title: '', message: '', target: 'home', position: 'center', visible: true, startAt: '', endAt: '', bgColor: '#ffffff', redeemCode: '' });
   const [popupEditing, setPopupEditing] = useState(false);
@@ -3216,6 +3244,11 @@ export default function AdminDashboard() {
                 <Text style={{ fontSize: 10, color: '#fff', fontWeight: '900' }}>{listings.filter(l => !l.approved).length}</Text>
               </View>
             )}
+            {item.key === 'subscription' && contactMessages.filter(m => !m.read).length > 0 && (
+              <View style={{ position: 'absolute', top: 6, left: 6, minWidth: 20, paddingHorizontal: 6, height: 20, borderRadius: 10, backgroundColor: '#dc2626', alignItems: 'center', justifyContent: 'center' }}>
+                <Text style={{ fontSize: 10, color: '#fff', fontWeight: '900' }}>{contactMessages.filter(m => !m.read).length}</Text>
+              </View>
+            )}
             {item.key !== 'texts' && (
               <Text key={`${item.key}-${mediaVersion}`} style={ns.navBadge}>{item.key === 'media' ? mediaFiles.length : item.key === 'gallery' ? galleryFiles.length : item.key === 'audio' ? mediaFiles.filter(f => /\.(mp3|wav|m4a|aac)$/i.test(f.filename)).length : (data[item.key] || []).length}</Text>
             )}
@@ -3241,10 +3274,41 @@ export default function AdminDashboard() {
 
   // ─── Home Preview ───────────────────────────────────────────
   const renderTexts = () => {
+    const unreadMessages = contactMessages.filter(m => !m.read).length;
+    const pendingListings = listings.filter(l => !l.approved).length;
     return (
       <View style={cs.contentCard}>
         <Text style={cs.contentTitle}>דף הבית</Text>
         <Text style={cs.contentSub}>תצוגה מקדימה של דף הבית כפי שהגולש רואה</Text>
+
+        {(unreadMessages > 0 || pendingListings > 0) && (
+          <View style={{ flexDirection: 'row-reverse', gap: 10, marginTop: 12, marginBottom: 6, flexWrap: 'wrap' }}>
+            {unreadMessages > 0 && (
+              <TouchableOpacity onPress={() => { setActiveNav('subscription'); setSubTab('messages'); }} activeOpacity={0.85} style={{ flex: 1, minWidth: 240, flexDirection: 'row-reverse', alignItems: 'center', gap: 12, backgroundColor: '#fef2f2', borderWidth: 2, borderColor: '#fecaca', borderRadius: 12, padding: 14 }}>
+                <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: '#dc2626', alignItems: 'center', justifyContent: 'center' }}>
+                  <Text style={{ fontSize: 16, fontWeight: '900', color: '#fff' }}>{unreadMessages > 99 ? '99+' : unreadMessages}</Text>
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontSize: 14, fontWeight: '900', color: '#7f1d1d', writingDirection: 'rtl', textAlign: 'right' }}>📨 {unreadMessages} הודעות מהאתר</Text>
+                  <Text style={{ fontSize: 11, color: '#991b1b', writingDirection: 'rtl', textAlign: 'right', marginTop: 2 }}>שלא נקראו · לחץ לצפייה</Text>
+                </View>
+                <Text style={{ fontSize: 18, color: '#dc2626', fontWeight: '900' }}>‹</Text>
+              </TouchableOpacity>
+            )}
+            {pendingListings > 0 && (
+              <TouchableOpacity onPress={() => { setActiveNav('side'); setSideTab('listings'); }} activeOpacity={0.85} style={{ flex: 1, minWidth: 240, flexDirection: 'row-reverse', alignItems: 'center', gap: 12, backgroundColor: '#fffbeb', borderWidth: 2, borderColor: '#fde68a', borderRadius: 12, padding: 14 }}>
+                <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: '#f59e0b', alignItems: 'center', justifyContent: 'center' }}>
+                  <Text style={{ fontSize: 16, fontWeight: '900', color: '#fff' }}>{pendingListings > 99 ? '99+' : pendingListings}</Text>
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontSize: 14, fontWeight: '900', color: '#78350f', writingDirection: 'rtl', textAlign: 'right' }}>⏳ {pendingListings} מודעות ממתינות לאישור</Text>
+                  <Text style={{ fontSize: 11, color: '#92400e', writingDirection: 'rtl', textAlign: 'right', marginTop: 2 }}>נדל״ן · לחץ לאישור</Text>
+                </View>
+                <Text style={{ fontSize: 18, color: '#f59e0b', fontWeight: '900' }}>‹</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        )}
 
         <HomeBannerEditor />
         <BgColorPicker />
@@ -3408,20 +3472,43 @@ export default function AdminDashboard() {
         <View style={{ backgroundColor: '#fff1f2', borderWidth: 2, borderColor: '#e11d48', borderRadius: 14, padding: 18, gap: 12 }}>
           <Text style={{ fontSize: 17, fontWeight: '900', color: '#9f1239', writingDirection: 'rtl' }}>🔒 סיסמת מנהל ראשי</Text>
           <Text style={{ fontSize: 14, color: '#4b5563', writingDirection: 'rtl' }}>סיסמה נוכחית: {adminAuth.password ? '••••••••' : '(לא הוגדרה)'}</Text>
-          {Platform.OS === 'web' ? (
-            React.createElement('input', { type: 'password', placeholder: 'סיסמה חדשה', value: authNewPassword, onChange: (e: any) => setAuthNewPassword(e.target.value), style: fld })
+          {!authPinUnlocked ? (
+            <>
+              <Text style={{ fontSize: 13, color: '#9f1239', writingDirection: 'rtl', fontWeight: '700' }}>🔐 הקלד PIN להחלפת סיסמה</Text>
+              {Platform.OS === 'web' ? (
+                React.createElement('input', { type: 'password', placeholder: 'PIN', value: authPinInput, onChange: (e: any) => setAuthPinInput(e.target.value), onKeyDown: (e: any) => { if (e.key === 'Enter') { if (authPinInput === '33578521') { setAuthPinUnlocked(true); setAuthPinInput(''); } else { (window as any).alert('PIN שגוי'); setAuthPinInput(''); } } }, style: fld })
+              ) : (
+                <TextInput secureTextEntry placeholder="PIN" value={authPinInput} onChangeText={setAuthPinInput} keyboardType="number-pad" textAlign="right" style={{ borderWidth: 2, borderColor: '#fecdd3', borderRadius: 10, padding: 12, fontSize: 15 }} />
+              )}
+              <TouchableOpacity onPress={() => { if (authPinInput === '33578521') { setAuthPinUnlocked(true); setAuthPinInput(''); } else { if (typeof window !== 'undefined') (window as any).alert('PIN שגוי'); setAuthPinInput(''); } }} style={{ backgroundColor: '#9f1239', paddingVertical: 14, borderRadius: 10, alignItems: 'center' }}>
+                <Text style={{ color: '#fff', fontWeight: '900', fontSize: 15 }}>🔓 פתח</Text>
+              </TouchableOpacity>
+            </>
           ) : (
-            <TextInput secureTextEntry placeholder="סיסמה חדשה" value={authNewPassword} onChangeText={setAuthNewPassword} textAlign="right" style={{ borderWidth: 2, borderColor: '#fecdd3', borderRadius: 10, padding: 12, fontSize: 15 }} />
+            <>
+              {Platform.OS === 'web' ? (
+                React.createElement('input', { type: 'password', placeholder: 'סיסמה חדשה', value: authNewPassword, onChange: (e: any) => setAuthNewPassword(e.target.value), style: fld })
+              ) : (
+                <TextInput secureTextEntry placeholder="סיסמה חדשה" value={authNewPassword} onChangeText={setAuthNewPassword} textAlign="right" style={{ borderWidth: 2, borderColor: '#fecdd3', borderRadius: 10, padding: 12, fontSize: 15 }} />
+              )}
+              <View style={{ flexDirection: 'row-reverse', gap: 8 }}>
+                <TouchableOpacity onPress={() => { saveNewPassword(); setAuthPinUnlocked(false); }} style={{ flex: 1, backgroundColor: '#e11d48', paddingVertical: 14, borderRadius: 10, alignItems: 'center' }}>
+                  <Text style={{ color: '#fff', fontWeight: '900', fontSize: 16 }}>💾 עדכן סיסמה</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => { setAuthPinUnlocked(false); setAuthNewPassword(''); }} style={{ backgroundColor: '#475569', paddingHorizontal: 18, paddingVertical: 14, borderRadius: 10 }}>
+                  <Text style={{ color: '#fff', fontWeight: '900', fontSize: 14 }}>🔒 נעל</Text>
+                </TouchableOpacity>
+              </View>
+            </>
           )}
-          <TouchableOpacity onPress={saveNewPassword} style={{ backgroundColor: '#e11d48', paddingVertical: 14, borderRadius: 10, alignItems: 'center' }}>
-            <Text style={{ color: '#fff', fontWeight: '900', fontSize: 16 }}>💾 עדכן סיסמה</Text>
-          </TouchableOpacity>
         </View>
 
         {/* Add/edit admin user */}
         <View style={{ backgroundColor: '#fff7ed', borderWidth: 2, borderColor: '#f59e0b', borderRadius: 14, padding: 18, gap: 12 }}>
           <Text style={{ fontSize: 17, fontWeight: '900', color: '#78350f', writingDirection: 'rtl' }}>{authForm.id ? '✏️ עריכת משתמש' : '➕ הוסף משתמש עם הרשאה'}</Text>
-          {Platform.OS === 'web' ? (
+          {!authPinUnlocked ? (
+            <Text style={{ fontSize: 13, color: '#78350f', writingDirection: 'rtl', textAlign: 'right', fontWeight: '700', backgroundColor: '#fffbeb', borderRadius: 8, padding: 12, borderWidth: 1, borderColor: '#fde68a' }}>🔐 בלוק נעול. הקלד PIN בבלוק שלמעלה כדי לפתוח.</Text>
+          ) : Platform.OS === 'web' ? (
             <>
               {React.createElement('input', { placeholder: 'שם', value: authForm.name, onChange: (e: any) => setAuthForm({ ...authForm, name: e.target.value }), style: { ...fld, border: '2px solid #fed7aa' } })}
               {React.createElement('input', { placeholder: 'טלפון (ישמש כשם משתמש)', value: authForm.phone, onChange: (e: any) => setAuthForm({ ...authForm, phone: e.target.value }), style: { ...fld, border: '2px solid #fed7aa' } })}
@@ -3439,16 +3526,18 @@ export default function AdminDashboard() {
               <TextInput secureTextEntry placeholder={authForm.id ? 'סיסמה חדשה (השאר ריק – לשמירת הישנה)' : 'סיסמה'} value={authForm.password} onChangeText={v => setAuthForm({ ...authForm, password: v })} textAlign="right" style={{ borderWidth: 2, borderColor: '#fed7aa', borderRadius: 10, padding: 12, fontSize: 15 }} />
             </>
           )}
-          <View style={{ flexDirection: 'row-reverse', gap: 8 }}>
-            <TouchableOpacity onPress={saveUser} style={{ flex: 1, backgroundColor: '#f59e0b', paddingVertical: 12, borderRadius: 10, alignItems: 'center' }}>
-              <Text style={{ color: '#fff', fontWeight: '900', fontSize: 15 }}>{authForm.id ? '💾 עדכן' : '➕ הוסף'}</Text>
-            </TouchableOpacity>
-            {authForm.id && (
-              <TouchableOpacity onPress={() => setAuthForm({ id: '', name: '', phone: '', password: '', role: 'viewer' })} style={{ backgroundColor: '#475569', paddingHorizontal: 20, paddingVertical: 12, borderRadius: 10, alignItems: 'center' }}>
-                <Text style={{ color: '#fff', fontWeight: '900', fontSize: 15 }}>ביטול</Text>
+          {authPinUnlocked && (
+            <View style={{ flexDirection: 'row-reverse', gap: 8 }}>
+              <TouchableOpacity onPress={saveUser} style={{ flex: 1, backgroundColor: '#f59e0b', paddingVertical: 12, borderRadius: 10, alignItems: 'center' }}>
+                <Text style={{ color: '#fff', fontWeight: '900', fontSize: 15 }}>{authForm.id ? '💾 עדכן' : '➕ הוסף'}</Text>
               </TouchableOpacity>
-            )}
-          </View>
+              {authForm.id && (
+                <TouchableOpacity onPress={() => setAuthForm({ id: '', name: '', phone: '', password: '', role: 'viewer' })} style={{ backgroundColor: '#475569', paddingHorizontal: 20, paddingVertical: 12, borderRadius: 10, alignItems: 'center' }}>
+                  <Text style={{ color: '#fff', fontWeight: '900', fontSize: 15 }}>ביטול</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          )}
         </View>
 
         {/* Users list */}
@@ -3670,6 +3759,13 @@ export default function AdminDashboard() {
   const renderMessages = () => {
     const fmt = (iso: string) => { try { return new Date(iso).toLocaleString('he-IL'); } catch { return iso; } };
     const unread = contactMessages.filter(m => !m.read).length;
+    const activeMsgs = contactMessages.filter(m => !m.replied);
+    const repliedMsgs = contactMessages.filter(m => m.replied);
+    const totalPages = Math.max(1, Math.ceil(repliedMsgs.length / MESSAGES_PER_PAGE));
+    const currentPage = Math.min(messagesPage, totalPages);
+    const startIdx = (currentPage - 1) * MESSAGES_PER_PAGE;
+    const pagedReplied = repliedMsgs.slice(startIdx, startIdx + MESSAGES_PER_PAGE);
+    const visibleMsgs = [...activeMsgs, ...pagedReplied];
     return (
       <View style={{ gap: 18 }}>
         <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -3686,7 +3782,7 @@ export default function AdminDashboard() {
             <Text style={{ color: '#64748b', fontWeight: '700', marginTop: 8, writingDirection: 'rtl' }}>אין הודעות כרגע</Text>
           </View>
         ) : (
-          contactMessages.map(m => {
+          visibleMsgs.map(m => {
             const bg = m.replied ? '#dcfce7' : (!m.read ? '#dbeafe' : '#fff');
             const border = m.replied ? '#22c55e' : (!m.read ? '#3b82f6' : '#cbd5e1');
             const statusBadge = m.replied ? '✅ הושב' : (!m.read ? '🔵 חדש' : '👁️ נקרא');
@@ -3745,6 +3841,22 @@ export default function AdminDashboard() {
               </View>
             );
           })
+        )}
+        {repliedMsgs.length > MESSAGES_PER_PAGE && (
+          <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 12, marginTop: 6, backgroundColor: '#f8fafc', borderRadius: 10 }}>
+            <TouchableOpacity disabled={currentPage === 1} onPress={() => setMessagesPage(p => Math.max(1, p - 1))} style={{ backgroundColor: currentPage === 1 ? '#cbd5e1' : '#0284c7', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 8 }}>
+              <Text style={{ color: '#fff', fontWeight: '900', fontSize: 13 }}>› הקודם</Text>
+            </TouchableOpacity>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map(n => (
+              <TouchableOpacity key={n} onPress={() => setMessagesPage(n)} style={{ minWidth: 32, height: 32, borderRadius: 6, backgroundColor: n === currentPage ? '#0284c7' : '#fff', borderWidth: 1, borderColor: n === currentPage ? '#0284c7' : '#cbd5e1', alignItems: 'center', justifyContent: 'center', paddingHorizontal: 6 }}>
+                <Text style={{ fontSize: 13, fontWeight: '800', color: n === currentPage ? '#fff' : '#475569' }}>{n}</Text>
+              </TouchableOpacity>
+            ))}
+            <TouchableOpacity disabled={currentPage === totalPages} onPress={() => setMessagesPage(p => Math.min(totalPages, p + 1))} style={{ backgroundColor: currentPage === totalPages ? '#cbd5e1' : '#0284c7', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 8 }}>
+              <Text style={{ color: '#fff', fontWeight: '900', fontSize: 13 }}>הבא ‹</Text>
+            </TouchableOpacity>
+            <Text style={{ fontSize: 12, color: '#64748b', fontWeight: '700', marginRight: 8, writingDirection: 'rtl' }}>עמוד {currentPage} מתוך {totalPages} · {repliedMsgs.length} הודעות שהושבו</Text>
+          </View>
         )}
       </View>
     );
@@ -5439,8 +5551,38 @@ export default function AdminDashboard() {
           const monthlyRevenue = activeBigCount * 10;
           const daysSince = (iso: string) => { try { return Math.floor((Date.now() - new Date(iso).getTime()) / 86400000); } catch { return 0; } };
           const expiryDays = (iso: string) => Math.max(0, 30 - daysSince(iso));
+          const unreadMessages = contactMessages.filter(m => !m.read).length;
+          const totalAlerts = unreadMessages + pending.length;
           return (
             <View>
+              {totalAlerts > 0 && (
+                <View style={{ flexDirection: 'row-reverse', gap: 10, marginBottom: 14, flexWrap: 'wrap' }}>
+                  {unreadMessages > 0 && (
+                    <TouchableOpacity onPress={() => { setActiveNav('subscription'); setSubTab('messages'); }} activeOpacity={0.85} style={{ flex: 1, minWidth: 240, flexDirection: 'row-reverse', alignItems: 'center', gap: 12, backgroundColor: '#fef2f2', borderWidth: 2, borderColor: '#fecaca', borderRadius: 12, padding: 14 }}>
+                      <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: '#dc2626', alignItems: 'center', justifyContent: 'center' }}>
+                        <Text style={{ fontSize: 16, fontWeight: '900', color: '#fff' }}>{unreadMessages > 99 ? '99+' : unreadMessages}</Text>
+                      </View>
+                      <View style={{ flex: 1 }}>
+                        <Text style={{ fontSize: 14, fontWeight: '900', color: '#7f1d1d', writingDirection: 'rtl', textAlign: 'right' }}>📨 הודעות חדשות מהאתר</Text>
+                        <Text style={{ fontSize: 11, color: '#991b1b', writingDirection: 'rtl', textAlign: 'right', marginTop: 2 }}>{unreadMessages} הודעות שלא נקראו · לחץ לצפייה</Text>
+                      </View>
+                      <Text style={{ fontSize: 18, color: '#dc2626', fontWeight: '900' }}>‹</Text>
+                    </TouchableOpacity>
+                  )}
+                  {pending.length > 0 && (
+                    <TouchableOpacity onPress={() => setSideTab('listings')} activeOpacity={0.85} style={{ flex: 1, minWidth: 240, flexDirection: 'row-reverse', alignItems: 'center', gap: 12, backgroundColor: '#fffbeb', borderWidth: 2, borderColor: '#fde68a', borderRadius: 12, padding: 14 }}>
+                      <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: '#f59e0b', alignItems: 'center', justifyContent: 'center' }}>
+                        <Text style={{ fontSize: 16, fontWeight: '900', color: '#fff' }}>{pending.length > 99 ? '99+' : pending.length}</Text>
+                      </View>
+                      <View style={{ flex: 1 }}>
+                        <Text style={{ fontSize: 14, fontWeight: '900', color: '#78350f', writingDirection: 'rtl', textAlign: 'right' }}>⏳ מודעות ממתינות לאישור</Text>
+                        <Text style={{ fontSize: 11, color: '#92400e', writingDirection: 'rtl', textAlign: 'right', marginTop: 2 }}>{pending.length} מודעות נדל״ן · לחץ לאישור</Text>
+                      </View>
+                      <Text style={{ fontSize: 18, color: '#f59e0b', fontWeight: '900' }}>‹</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+              )}
               <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 10, marginBottom: 14 }}>
                 {[
                   { label: 'סה"כ מודעות', value: totalListings, color: '#1A6B8A', icon: '📋' },

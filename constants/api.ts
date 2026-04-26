@@ -3,7 +3,7 @@ import { Platform } from 'react-native';
 const DEV_HOST = Platform.OS === 'android' ? '10.0.2.2' : 'localhost';
 
 export const API_BASE = Platform.OS === 'web'
-  ? ''
+  ? (typeof window !== 'undefined' && (window.location.port === '8081' || window.location.port === '19006') ? 'http://localhost:3001' : '')
   : __DEV__
     ? `http://${DEV_HOST}:3001`
     : 'https://www.batumionline.app';

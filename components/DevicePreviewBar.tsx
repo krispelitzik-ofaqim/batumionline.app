@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
 import { Colors } from '../constants/colors';
 import { PreviewContext, PreviewMode } from '../constants/previewContext';
 import { fetchContent } from '../constants/api';
@@ -12,14 +12,16 @@ const MODES: { key: PreviewMode; label: string; icon: string; w: number }[] = [
 
 export default function DevicePreviewBar() {
   const { mode, setMode, simulatedWidth } = useContext(PreviewContext);
-  const [visible, setVisible] = useState(true);
+  const [visible, setVisible] = useState(false);
 
   useEffect(() => {
+    if (Platform.OS !== 'web') return;
     fetchContent().then((d: any) => {
       if (typeof d.showDevBar === 'boolean') setVisible(d.showDevBar);
     }).catch(() => {});
   }, []);
 
+  if (Platform.OS !== 'web') return null;
   if (!visible) return null;
 
   return (

@@ -1230,8 +1230,29 @@ app.delete('/api/subscribers/:phone', (req, res) => {
   res.json({ success: true, deleted: before - db.subscribers.length });
 });
 
-// ─── Serve Expo web build ─────────────────────────────────────
+// ─── Serve Expo web (dev proxy if running, else static dist) ────
+const http = require('http');
 const WEB_DIST = path.join(__dirname, '..', 'dist');
+const DEV_TARGET = 'http://localhost:8081';
+let devUp = false;
+function pingDev() {
+  http.get(DEV_TARGET, (r) => { devUp = r.statusCode === 200; r.resume(); }).on('error', () => { devUp = false; });
+}
+pingDev();
+setInterval(pingDev, 5000);
+
+app.use((req, res, next) => {
+  if (req.method !== 'GET') return next();
+  if (req.path.startsWith('/api/') || req.path.startsWith('/uploads/') || req.path.startsWith('/batumi-images/')) return next();
+  if (!devUp) return next();
+  const url = DEV_TARGET + req.originalUrl;
+  http.get(url, { headers: { ...req.headers, host: 'localhost:8081' } }, (upstream) => {
+    res.status(upstream.statusCode || 200);
+    Object.entries(upstream.headers || {}).forEach(([k, v]) => { if (v !== undefined) res.setHeader(k, v); });
+    upstream.pipe(res);
+  }).on('error', () => next());
+});
+
 if (fs.existsSync(WEB_DIST)) {
   app.use(express.static(WEB_DIST));
   app.use((req, res, next) => {
