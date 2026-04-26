@@ -1,42 +1,39 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Image, StyleSheet, TouchableOpacity, Text, useWindowDimensions } from 'react-native';
-import { API_BASE, resolveUri, fetchContent } from '../constants/api';
+import { View, Image, StyleSheet, TouchableOpacity, useWindowDimensions } from 'react-native';
+import { resolveUri, fetchContent } from '../constants/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { HOME_IMAGES } from '../assets/images/home';
 
-type GalleryFile = { filename: string; url: string };
+type GalleryItem = { key: string; source: any; url?: string };
 
-const HOME_FALLBACK: GalleryFile[] = [
-  { filename: 'b1', url: '/uploads/1775910069485-6.jpg' },
-  { filename: 'b2', url: '/uploads/1775910069516-30.jpg' },
-  { filename: 'b3', url: '/uploads/1775910069548-933.jpg' },
-  { filename: 'b4', url: '/uploads/1775910069562-341.jpg' },
-  { filename: 'b5', url: '/uploads/1775910069573-698.jpg' },
-  { filename: 'b6', url: '/uploads/1775910069590-365.jpg' },
-];
+const LOCAL_FALLBACK: GalleryItem[] = HOME_IMAGES.map(h => ({ key: h.key, source: h.source }));
 
 export default function HomeGallery() {
   const { width } = useWindowDimensions();
-  const [files, setFiles] = useState<GalleryFile[]>(HOME_FALLBACK);
+  const [files, setFiles] = useState<GalleryItem[]>(LOCAL_FALLBACK);
   const [idx, setIdx] = useState(0);
   const timer = useRef<any>(null);
 
   useEffect(() => {
-    const FALLBACK = HOME_FALLBACK;
     AsyncStorage.getItem('@homeBanner').then(cached => {
       if (cached) {
-        try { const arr = JSON.parse(cached); if (Array.isArray(arr) && arr.length > 0) setFiles(arr); }
-        catch {}
+        try {
+          const arr = JSON.parse(cached);
+          if (Array.isArray(arr) && arr.length > 0) {
+            setFiles(arr.map((u: string, i: number) => ({ key: `hb${i}`, source: { uri: resolveUri(u) }, url: u })));
+          }
+        } catch {}
       }
     });
     fetchContent().then((d: any) => {
-      let next: GalleryFile[] = FALLBACK;
       if (Array.isArray(d?.homeBanner)) {
         const valid = d.homeBanner.filter((u: any) => typeof u === 'string' && u.trim().length > 0);
-        if (valid.length > 0) next = valid.map((u: string, i: number) => ({ filename: `hb${i}`, url: u }));
+        if (valid.length > 0) {
+          setFiles(valid.map((u: string, i: number) => ({ key: `hb${i}`, source: { uri: resolveUri(u) }, url: u })));
+          AsyncStorage.setItem('@homeBanner', JSON.stringify(valid)).catch(() => {});
+        }
       }
-      setFiles(next);
-      AsyncStorage.setItem('@homeBanner', JSON.stringify(next)).catch(() => {});
-    }).catch(() => setFiles(prev => prev.length === 0 ? FALLBACK : prev));
+    }).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -53,7 +50,7 @@ export default function HomeGallery() {
 
   return (
     <View style={[styles.wrap, { width: width - 32 }]}>
-      <Image source={{ uri: resolveUri(current.url) }} style={StyleSheet.absoluteFillObject} resizeMode="cover" />
+      <Image source={current.source} style={StyleSheet.absoluteFillObject} resizeMode="cover" />
       {files.length > 1 && (
         <View style={styles.dots}>
           {files.map((_, i) => (

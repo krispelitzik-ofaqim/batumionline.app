@@ -604,6 +604,78 @@ type ManualRow = {
   notes?: string;
 };
 
+function RecommendationsList() {
+  const [items, setItems] = React.useState<any[]>([]);
+  const [loading, setLoading] = React.useState(false);
+
+  const load = React.useCallback(async () => {
+    setLoading(true);
+    try {
+      const r = await fetch(`${API_BASE}/api/recommendations/all`);
+      const j = await r.json();
+      if (j.success || Array.isArray(j.data)) setItems(j.data || []);
+    } catch {}
+    setLoading(false);
+  }, []);
+
+  React.useEffect(() => { load(); }, [load]);
+
+  const setApproved = async (id: string, approved: boolean) => {
+    try {
+      await fetch(`${API_BASE}/api/recommendations/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ approved }),
+      });
+      load();
+    } catch {}
+  };
+
+  const remove = async (id: string) => {
+    if (typeof window !== 'undefined' && !(window as any).confirm('למחוק המלצה?')) return;
+    try {
+      await fetch(`${API_BASE}/api/recommendations/${id}`, { method: 'DELETE' });
+      load();
+    } catch {}
+  };
+
+  if (loading) return <Text style={{ color: '#92400e', writingDirection: 'rtl' }}>טוען…</Text>;
+  if (items.length === 0) return <Text style={{ color: '#94a3b8', writingDirection: 'rtl', textAlign: 'right' }}>אין המלצות כרגע</Text>;
+
+  return (
+    <View style={{ gap: 8, marginTop: 4 }}>
+      {items.map((r: any) => {
+        const approved = r.approved === true;
+        const pending = r.approved == null;
+        return (
+          <View key={r.id} style={{ backgroundColor: pending ? '#fff' : approved ? '#dcfce7' : '#fee2e2', borderRadius: 10, padding: 12, borderWidth: 1, borderColor: pending ? '#fde68a' : approved ? '#86efac' : '#fca5a5' }}>
+            <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+              <Text style={{ fontSize: 14, fontWeight: '900', color: '#1C2B35', writingDirection: 'rtl', textAlign: 'right' }}>{r.name || 'אנונימי'}</Text>
+              <Text style={{ fontSize: 11, color: '#64748b' }}>{pending ? '🔵 ממתין' : approved ? '✅ אושר' : '❌ נדחה'}</Text>
+            </View>
+            <Text style={{ fontSize: 13, color: '#475569', writingDirection: 'rtl', textAlign: 'right', marginBottom: 6 }}>{r.text}</Text>
+            <View style={{ flexDirection: 'row-reverse', gap: 6 }}>
+              {!approved && (
+                <TouchableOpacity onPress={() => setApproved(r.id, true)} style={{ backgroundColor: '#16a34a', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 6 }}>
+                  <Text style={{ color: '#fff', fontSize: 12, fontWeight: '900' }}>✓ אשר</Text>
+                </TouchableOpacity>
+              )}
+              {approved && (
+                <TouchableOpacity onPress={() => setApproved(r.id, false)} style={{ backgroundColor: '#f59e0b', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 6 }}>
+                  <Text style={{ color: '#fff', fontSize: 12, fontWeight: '900' }}>↩️ בטל אישור</Text>
+                </TouchableOpacity>
+              )}
+              <TouchableOpacity onPress={() => remove(r.id)} style={{ backgroundColor: '#dc2626', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 6 }}>
+                <Text style={{ color: '#fff', fontSize: 12, fontWeight: '900' }}>🗑️ מחק</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        );
+      })}
+    </View>
+  );
+}
+
 function CuratedListingsEditor() {
   const [tab, setTab] = useState<'sale' | 'rent' | 'hotels'>('sale');
   const [items, setItems] = useState<any[]>([]);
@@ -2869,7 +2941,7 @@ export default function AdminDashboard() {
   const [mediaVersion, setMediaVersion] = useState(0);
   const [ratings, setRatings] = useState<Record<string, { sum: number; count: number }>>({});
   const [subBlock, setSubBlock] = useState<any>(null);
-  const [subTab, setSubTab] = useState<'banner' | 'dashboard' | 'crm' | 'paywall' | 'marketing' | 'accounting' | 'cancels' | 'subscribers' | 'messages' | 'popup' | 'auth'>('dashboard');
+  const [subTab, setSubTab] = useState<'banner' | 'dashboard' | 'crm' | 'paywall' | 'marketing' | 'accounting' | 'cancels' | 'subscribers' | 'messages' | 'popup' | 'auth' | 'recommendations' | 'photos' | 'ratings'>('dashboard');
   const [adminAuth, setAdminAuth] = useState<{ password: string; users: Array<{ id: string; name: string; phone: string; password: string; role: 'owner'|'editor'|'viewer' }> }>({ password: '', users: [] });
   type ClientBanner = { id: string; client: string; mediaUrl: string; mediaType: 'image'|'video'; position: 'top'|'middle'|'bottom'; size: 'small'|'medium'|'large'; targetPage: string; clickUrl: string; startAt: string; endAt: string; visible: boolean };
   const [clientBanners, setClientBanners] = useState<ClientBanner[]>([]);
@@ -2946,6 +3018,36 @@ export default function AdminDashboard() {
   const [contactMessages, setContactMessages] = useState<Array<{ id: string; name: string; email: string; message: string; createdAt: string; read?: boolean; replied?: boolean; repliedAt?: string; replyNote?: string }>>([]);
   const [messagesPage, setMessagesPage] = useState(1);
   const MESSAGES_PER_PAGE = 10;
+  const [pendingRecsCount, setPendingRecsCount] = useState(0);
+  const [pendingPhotosCount, setPendingPhotosCount] = useState(0);
+  const [newRatingsCount, setNewRatingsCount] = useState(0);
+  useEffect(() => {
+    const loadCounts = () => {
+      fetch(`${API_BASE}/api/recommendations/all`).then(r => r.json()).then(j => {
+        const arr = Array.isArray(j.data) ? j.data : Array.isArray(j) ? j : [];
+        setPendingRecsCount(arr.filter((r: any) => r.approved == null).length);
+      }).catch(() => {});
+      fetch(`${API_BASE}/api/tour-album`).then(r => r.json()).then(j => {
+        const albums = j.data || {};
+        let pending = 0;
+        Object.values(albums).forEach((arr: any) => {
+          if (Array.isArray(arr)) pending += arr.filter((p: any) => p.status === 'pending').length;
+        });
+        setPendingPhotosCount(pending);
+      }).catch(() => {});
+      fetch(`${API_BASE}/api/ratings`).then(r => r.json()).then(j => {
+        const ratings = j.data || j || {};
+        let total = 0;
+        Object.values(ratings).forEach((r: any) => {
+          if (r && typeof r.count === 'number') total += r.count;
+        });
+        setNewRatingsCount(total);
+      }).catch(() => {});
+    };
+    loadCounts();
+    const iv = setInterval(loadCounts, 30000);
+    return () => clearInterval(iv);
+  }, []);
   const [popups, setPopups] = useState<Array<{ id: string; title: string; message: string; target: string; position: 'top'|'center'|'bottom'; visible: boolean; startAt?: string; endAt?: string; bgColor?: string; redeemCode?: string }>>([]);
   const [popupForm, setPopupForm] = useState<{ id: string; title: string; message: string; target: string; position: 'top'|'center'|'bottom'; visible: boolean; startAt: string; endAt: string; bgColor: string; redeemCode: string }>({ id: '', title: '', message: '', target: 'home', position: 'center', visible: true, startAt: '', endAt: '', bgColor: '#ffffff', redeemCode: '' });
   const [popupEditing, setPopupEditing] = useState(false);
@@ -3244,9 +3346,9 @@ export default function AdminDashboard() {
                 <Text style={{ fontSize: 10, color: '#fff', fontWeight: '900' }}>{listings.filter(l => !l.approved).length}</Text>
               </View>
             )}
-            {item.key === 'subscription' && contactMessages.filter(m => !m.read).length > 0 && (
+            {item.key === 'subscription' && (contactMessages.filter(m => !m.read).length + pendingRecsCount + pendingPhotosCount) > 0 && (
               <View style={{ position: 'absolute', top: 6, left: 6, minWidth: 20, paddingHorizontal: 6, height: 20, borderRadius: 10, backgroundColor: '#dc2626', alignItems: 'center', justifyContent: 'center' }}>
-                <Text style={{ fontSize: 10, color: '#fff', fontWeight: '900' }}>{contactMessages.filter(m => !m.read).length}</Text>
+                <Text style={{ fontSize: 10, color: '#fff', fontWeight: '900' }}>{contactMessages.filter(m => !m.read).length + pendingRecsCount + pendingPhotosCount}</Text>
               </View>
             )}
             {item.key !== 'texts' && (
@@ -3369,6 +3471,9 @@ export default function AdminDashboard() {
     { key: 'dashboard' as const, label: 'דשבורד לקוחות', icon: '👥' },
     { key: 'crm' as const, label: 'CRM', icon: '🤝' },
     { key: 'messages' as const, label: 'הודעות', icon: '📨' },
+    { key: 'recommendations' as const, label: 'המלצות', icon: '⭐' },
+    { key: 'photos' as const, label: 'תמונות מסיורים', icon: '📸' },
+    { key: 'ratings' as const, label: 'דירוגי סיורים', icon: '⭐' },
     { key: 'popup' as const, label: 'פופ אפ', icon: '💬' },
     { key: 'banner' as const, label: 'באנר פרסום', icon: '📢' },
     { key: 'marketing' as const, label: 'שיווק ופרסום', icon: '📣' },
@@ -3756,6 +3861,19 @@ export default function AdminDashboard() {
     );
   };
 
+  const renderRecommendations = () => {
+    return (
+      <View style={{ gap: 14 }}>
+        <Text style={{ fontSize: 22, fontWeight: '900', color: '#7c2d12', writingDirection: 'rtl' }}>⭐ המלצות גולשים</Text>
+        <View style={{ backgroundColor: '#fffbeb', borderWidth: 2, borderColor: '#fde68a', borderRadius: 14, padding: 18, gap: 10 }}>
+          <Text style={{ fontSize: 16, fontWeight: '900', color: '#78350f', writingDirection: 'rtl', textAlign: 'right' }}>🍢 המלצות לדוכני מזון</Text>
+          <Text style={{ fontSize: 12, color: '#92400e', writingDirection: 'rtl', textAlign: 'right' }}>המלצות חדשות מגולשים - ממתינות לאישור לפני שיופיעו באפליקציה.</Text>
+          <RecommendationsList />
+        </View>
+      </View>
+    );
+  };
+
   const renderMessages = () => {
     const fmt = (iso: string) => { try { return new Date(iso).toLocaleString('he-IL'); } catch { return iso; } };
     const unread = contactMessages.filter(m => !m.read).length;
@@ -4057,7 +4175,7 @@ export default function AdminDashboard() {
             style: { display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 8, marginBottom: 16 },
           }, subTabOrder.map((t, i) => {
             const on = subTab === t.key;
-            const unread = t.key === 'messages' ? contactMessages.filter(m => !m.read).length : 0;
+            const unread = t.key === 'messages' ? contactMessages.filter(m => !m.read).length : t.key === 'recommendations' ? pendingRecsCount : t.key === 'photos' ? pendingPhotosCount : t.key === 'ratings' ? newRatingsCount : 0;
             const accent = tabColors[t.key] || '#64748b';
             return React.createElement('div', {
               key: t.key,
@@ -4103,7 +4221,7 @@ export default function AdminDashboard() {
           <View style={{ flexDirection: 'row-reverse', gap: 8, marginBottom: 20, flexWrap: 'wrap' }}>
             {subTabOrder.map(t => {
               const on = subTab === t.key;
-              const unread = t.key === 'messages' ? contactMessages.filter(m => !m.read).length : 0;
+              const unread = t.key === 'messages' ? contactMessages.filter(m => !m.read).length : t.key === 'recommendations' ? pendingRecsCount : t.key === 'photos' ? pendingPhotosCount : t.key === 'ratings' ? newRatingsCount : 0;
               const accent = tabColors[t.key] || '#64748b';
               return (
                 <TouchableOpacity key={t.key} onPress={() => setSubTab(t.key)} style={{ minWidth: 120, paddingVertical: 8, paddingHorizontal: 10, borderRadius: 10, backgroundColor: on ? accent : '#fff', borderWidth: 1, borderColor: on ? accent : '#e2e8f0', alignItems: 'center', gap: 3 }}>
@@ -4124,6 +4242,7 @@ export default function AdminDashboard() {
           : subTab === 'paywall' ? renderPaywall()
           : subTab === 'marketing' ? renderSubMarketing()
           : subTab === 'accounting' ? renderSubAccounting()
+          : subTab === 'recommendations' ? renderRecommendations()
           : renderSubCancels()}
       </View>
     );

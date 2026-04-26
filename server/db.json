@@ -15172,5 +15172,809 @@
     "/uploads/1777201253934-839.jpg",
     "/uploads/1777201289968-7.jpg",
     "/uploads/1777201325547-99.jpg"
-  ]
+  ],
+  "tourAlbums": {
+    "t_1": [
+      {
+        "id": "demo_1",
+        "name": "רונית",
+        "city": "תל אביב",
+        "image": "https://picsum.photos/seed/batumi1/400/400",
+        "date": "2026-04-27",
+        "status": "approved"
+      },
+      {
+        "id": "demo_2",
+        "name": "דני",
+        "city": "חיפה",
+        "image": "https://picsum.photos/seed/batumi2/400/400",
+        "date": "2026-04-26",
+        "status": "approved"
+      },
+      {
+        "id": "demo_3",
+        "name": "שרה",
+        "city": "ירושלים",
+        "image": "https://picsum.photos/seed/batumi3/400/400",
+        "date": "2026-04-25",
+        "status": "approved"
+      },
+      {
+        "id": "demo_4",
+        "name": "משה",
+        "city": "באר שבע",
+        "image": "https://picsum.photos/seed/batumi4/400/400",
+        "date": "2026-04-24",
+        "status": "approved"
+      },
+      {
+        "id": "demo_5",
+        "name": "רחל",
+        "city": "אשדוד",
+        "image": "https://picsum.photos/seed/batumi5/400/400",
+        "date": "2026-04-23",
+        "status": "approved"
+      },
+      {
+        "id": "demo_6",
+        "name": "דוד",
+        "city": "נתניה",
+        "image": "https://picsum.photos/seed/batumi6/400/400",
+        "date": "2026-04-22",
+        "status": "approved"
+      },
+      {
+        "id": "demo_7",
+        "name": "מיכל",
+        "city": "חולון",
+        "image": "https://picsum.photos/seed/batumi7/400/400",
+        "date": "2026-04-21",
+        "status": "approved"
+      },
+      {
+        "id": "demo_8",
+        "name": "יוסי",
+        "city": "רמת גן",
+        "image": "https://picsum.photos/seed/batumi8/400/400",
+        "date": "2026-04-20",
+        "status": "approved"
+      },
+      {
+        "id": "demo_9",
+        "name": "נעמה",
+        "city": "פתח תקווה",
+        "image": "https://picsum.photos/seed/batumi9/400/400",
+        "date": "2026-04-19",
+        "status": "approved"
+      },
+      {
+        "id": "demo_10",
+        "name": "אבי",
+        "city": "רחובות",
+        "image": "https://picsum.photos/seed/batumi10/400/400",
+        "date": "2026-04-18",
+        "status": "approved"
+      },
+      {
+        "id": "demo_11",
+        "name": "ליאת",
+        "city": "כפר סבא",
+        "image": "https://picsum.photos/seed/batumi11/400/400",
+        "date": "2026-04-17",
+        "status": "approved"
+      },
+      {
+        "id": "demo_12",
+        "name": "איתי",
+        "city": "הרצליה",
+        "image": "https://picsum.photos/seed/batumi12/400/400",
+        "date": "2026-04-16",
+        "status": "approved"
+      },
+      {
+        "id": "demo_13",
+        "name": "שירה",
+        "city": "רעננה",
+        "image": "https://picsum.photos/seed/batumi13/400/400",
+        "date": "2026-04-15",
+        "status": "approved"
+      },
+      {
+        "id": "demo_14",
+        "name": "אלי",
+        "city": "מודיעין",
+        "image": "https://picsum.photos/seed/batumi14/400/400",
+        "date": "2026-04-14",
+        "status": "approved"
+      },
+      {
+        "id": "demo_15",
+        "name": "ענת",
+        "city": "בת ים",
+        "image": "https://picsum.photos/seed/batumi15/400/400",
+        "date": "2026-04-13",
+        "status": "approved"
+      },
+      {
+        "id": "demo_16",
+        "name": "גיל",
+        "city": "ראשל״צ",
+        "image": "https://picsum.photos/seed/batumi16/400/400",
+        "date": "2026-04-12",
+        "status": "approved"
+      },
+      {
+        "id": "demo_17",
+        "name": "דנה",
+        "city": "אשקלון",
+        "image": "https://picsum.photos/seed/batumi17/400/400",
+        "date": "2026-04-11",
+        "status": "approved"
+      },
+      {
+        "id": "demo_18",
+        "name": "אסי",
+        "city": "קריות",
+        "image": "https://picsum.photos/seed/batumi18/400/400",
+        "date": "2026-04-10",
+        "status": "approved"
+      },
+      {
+        "id": "demo_19",
+        "name": "יעל",
+        "city": "אילת",
+        "image": "https://picsum.photos/seed/batumi19/400/400",
+        "date": "2026-04-09",
+        "status": "approved"
+      },
+      {
+        "id": "demo_20",
+        "name": "עומר",
+        "city": "גבעתיים",
+        "image": "https://picsum.photos/seed/batumi20/400/400",
+        "date": "2026-04-08",
+        "status": "approved"
+      },
+      {
+        "id": "demo_21",
+        "name": "חן",
+        "city": "תל אביב",
+        "image": "https://picsum.photos/seed/batumi21/400/400",
+        "date": "2026-04-07",
+        "status": "approved"
+      },
+      {
+        "id": "demo_22",
+        "name": "רונן",
+        "city": "חיפה",
+        "image": "https://picsum.photos/seed/batumi22/400/400",
+        "date": "2026-04-06",
+        "status": "approved"
+      },
+      {
+        "id": "demo_23",
+        "name": "קרן",
+        "city": "ירושלים",
+        "image": "https://picsum.photos/seed/batumi23/400/400",
+        "date": "2026-04-05",
+        "status": "approved"
+      },
+      {
+        "id": "demo_24",
+        "name": "אורן",
+        "city": "באר שבע",
+        "image": "https://picsum.photos/seed/batumi24/400/400",
+        "date": "2026-04-04",
+        "status": "approved"
+      },
+      {
+        "id": "demo_25",
+        "name": "טל",
+        "city": "אשדוד",
+        "image": "https://picsum.photos/seed/batumi25/400/400",
+        "date": "2026-04-03",
+        "status": "approved"
+      },
+      {
+        "id": "demo_26",
+        "name": "אמיר",
+        "city": "נתניה",
+        "image": "https://picsum.photos/seed/batumi26/400/400",
+        "date": "2026-04-02",
+        "status": "approved"
+      },
+      {
+        "id": "demo_27",
+        "name": "אורית",
+        "city": "חולון",
+        "image": "https://picsum.photos/seed/batumi27/400/400",
+        "date": "2026-04-01",
+        "status": "approved"
+      },
+      {
+        "id": "demo_28",
+        "name": "נדב",
+        "city": "רמת גן",
+        "image": "https://picsum.photos/seed/batumi28/400/400",
+        "date": "2026-03-31",
+        "status": "approved"
+      },
+      {
+        "id": "demo_29",
+        "name": "הילה",
+        "city": "פתח תקווה",
+        "image": "https://picsum.photos/seed/batumi29/400/400",
+        "date": "2026-03-30",
+        "status": "approved"
+      },
+      {
+        "id": "demo_30",
+        "name": "איציק",
+        "city": "רחובות",
+        "image": "https://picsum.photos/seed/batumi30/400/400",
+        "date": "2026-03-29",
+        "status": "approved"
+      },
+      {
+        "id": "demo_31",
+        "name": "עדי",
+        "city": "כפר סבא",
+        "image": "https://picsum.photos/seed/batumi31/400/400",
+        "date": "2026-03-28",
+        "status": "approved"
+      },
+      {
+        "id": "demo_32",
+        "name": "גיא",
+        "city": "הרצליה",
+        "image": "https://picsum.photos/seed/batumi32/400/400",
+        "date": "2026-03-27",
+        "status": "approved"
+      },
+      {
+        "id": "demo_33",
+        "name": "שירלי",
+        "city": "רעננה",
+        "image": "https://picsum.photos/seed/batumi33/400/400",
+        "date": "2026-03-26",
+        "status": "approved"
+      },
+      {
+        "id": "demo_34",
+        "name": "אלון",
+        "city": "מודיעין",
+        "image": "https://picsum.photos/seed/batumi34/400/400",
+        "date": "2026-03-25",
+        "status": "approved"
+      },
+      {
+        "id": "demo_35",
+        "name": "יפה",
+        "city": "בת ים",
+        "image": "https://picsum.photos/seed/batumi35/400/400",
+        "date": "2026-03-24",
+        "status": "approved"
+      },
+      {
+        "id": "demo_36",
+        "name": "רן",
+        "city": "ראשל״צ",
+        "image": "https://picsum.photos/seed/batumi36/400/400",
+        "date": "2026-03-23",
+        "status": "approved"
+      },
+      {
+        "id": "demo_37",
+        "name": "מאיה",
+        "city": "אשקלון",
+        "image": "https://picsum.photos/seed/batumi37/400/400",
+        "date": "2026-03-22",
+        "status": "approved"
+      },
+      {
+        "id": "demo_38",
+        "name": "בועז",
+        "city": "קריות",
+        "image": "https://picsum.photos/seed/batumi38/400/400",
+        "date": "2026-03-21",
+        "status": "approved"
+      },
+      {
+        "id": "demo_39",
+        "name": "איילת",
+        "city": "אילת",
+        "image": "https://picsum.photos/seed/batumi39/400/400",
+        "date": "2026-03-20",
+        "status": "approved"
+      },
+      {
+        "id": "demo_40",
+        "name": "חיים",
+        "city": "גבעתיים",
+        "image": "https://picsum.photos/seed/batumi40/400/400",
+        "date": "2026-03-19",
+        "status": "approved"
+      },
+      {
+        "id": "demo_41",
+        "name": "אילן",
+        "city": "תל אביב",
+        "image": "https://picsum.photos/seed/batumi41/400/400",
+        "date": "2026-03-18",
+        "status": "approved"
+      },
+      {
+        "id": "demo_42",
+        "name": "נועה",
+        "city": "חיפה",
+        "image": "https://picsum.photos/seed/batumi42/400/400",
+        "date": "2026-03-17",
+        "status": "approved"
+      },
+      {
+        "id": "demo_43",
+        "name": "שלי",
+        "city": "ירושלים",
+        "image": "https://picsum.photos/seed/batumi43/400/400",
+        "date": "2026-03-16",
+        "status": "approved"
+      },
+      {
+        "id": "demo_44",
+        "name": "מתן",
+        "city": "באר שבע",
+        "image": "https://picsum.photos/seed/batumi44/400/400",
+        "date": "2026-03-15",
+        "status": "approved"
+      },
+      {
+        "id": "demo_45",
+        "name": "גלית",
+        "city": "אשדוד",
+        "image": "https://picsum.photos/seed/batumi45/400/400",
+        "date": "2026-03-14",
+        "status": "approved"
+      },
+      {
+        "id": "demo_46",
+        "name": "עמית",
+        "city": "נתניה",
+        "image": "https://picsum.photos/seed/batumi46/400/400",
+        "date": "2026-03-13",
+        "status": "approved"
+      },
+      {
+        "id": "demo_47",
+        "name": "סיון",
+        "city": "חולון",
+        "image": "https://picsum.photos/seed/batumi47/400/400",
+        "date": "2026-03-12",
+        "status": "approved"
+      },
+      {
+        "id": "demo_48",
+        "name": "ליטל",
+        "city": "רמת גן",
+        "image": "https://picsum.photos/seed/batumi48/400/400",
+        "date": "2026-03-11",
+        "status": "approved"
+      },
+      {
+        "id": "demo_49",
+        "name": "דורון",
+        "city": "פתח תקווה",
+        "image": "https://picsum.photos/seed/batumi49/400/400",
+        "date": "2026-03-10",
+        "status": "approved"
+      },
+      {
+        "id": "demo_50",
+        "name": "ליאם",
+        "city": "רחובות",
+        "image": "https://picsum.photos/seed/batumi50/400/400",
+        "date": "2026-03-09",
+        "status": "approved"
+      },
+      {
+        "id": "demo_51",
+        "name": "רונית",
+        "city": "כפר סבא",
+        "image": "https://picsum.photos/seed/batumi51/400/400",
+        "date": "2026-03-08",
+        "status": "approved"
+      },
+      {
+        "id": "demo_52",
+        "name": "דני",
+        "city": "הרצליה",
+        "image": "https://picsum.photos/seed/batumi52/400/400",
+        "date": "2026-03-07",
+        "status": "approved"
+      },
+      {
+        "id": "demo_53",
+        "name": "שרה",
+        "city": "רעננה",
+        "image": "https://picsum.photos/seed/batumi53/400/400",
+        "date": "2026-03-06",
+        "status": "approved"
+      },
+      {
+        "id": "demo_54",
+        "name": "משה",
+        "city": "מודיעין",
+        "image": "https://picsum.photos/seed/batumi54/400/400",
+        "date": "2026-03-05",
+        "status": "approved"
+      },
+      {
+        "id": "demo_55",
+        "name": "רחל",
+        "city": "בת ים",
+        "image": "https://picsum.photos/seed/batumi55/400/400",
+        "date": "2026-03-04",
+        "status": "approved"
+      },
+      {
+        "id": "demo_56",
+        "name": "דוד",
+        "city": "ראשל״צ",
+        "image": "https://picsum.photos/seed/batumi56/400/400",
+        "date": "2026-03-03",
+        "status": "approved"
+      },
+      {
+        "id": "demo_57",
+        "name": "מיכל",
+        "city": "אשקלון",
+        "image": "https://picsum.photos/seed/batumi57/400/400",
+        "date": "2026-03-02",
+        "status": "approved"
+      },
+      {
+        "id": "demo_58",
+        "name": "יוסי",
+        "city": "קריות",
+        "image": "https://picsum.photos/seed/batumi58/400/400",
+        "date": "2026-03-01",
+        "status": "approved"
+      },
+      {
+        "id": "demo_59",
+        "name": "נעמה",
+        "city": "אילת",
+        "image": "https://picsum.photos/seed/batumi59/400/400",
+        "date": "2026-02-28",
+        "status": "approved"
+      },
+      {
+        "id": "demo_60",
+        "name": "אבי",
+        "city": "גבעתיים",
+        "image": "https://picsum.photos/seed/batumi60/400/400",
+        "date": "2026-02-27",
+        "status": "approved"
+      },
+      {
+        "id": "demo_61",
+        "name": "ליאת",
+        "city": "תל אביב",
+        "image": "https://picsum.photos/seed/batumi61/400/400",
+        "date": "2026-02-26",
+        "status": "approved"
+      },
+      {
+        "id": "demo_62",
+        "name": "איתי",
+        "city": "חיפה",
+        "image": "https://picsum.photos/seed/batumi62/400/400",
+        "date": "2026-02-25",
+        "status": "approved"
+      },
+      {
+        "id": "demo_63",
+        "name": "שירה",
+        "city": "ירושלים",
+        "image": "https://picsum.photos/seed/batumi63/400/400",
+        "date": "2026-02-24",
+        "status": "approved"
+      },
+      {
+        "id": "demo_64",
+        "name": "אלי",
+        "city": "באר שבע",
+        "image": "https://picsum.photos/seed/batumi64/400/400",
+        "date": "2026-02-23",
+        "status": "approved"
+      },
+      {
+        "id": "demo_65",
+        "name": "ענת",
+        "city": "אשדוד",
+        "image": "https://picsum.photos/seed/batumi65/400/400",
+        "date": "2026-02-22",
+        "status": "approved"
+      },
+      {
+        "id": "demo_66",
+        "name": "גיל",
+        "city": "נתניה",
+        "image": "https://picsum.photos/seed/batumi66/400/400",
+        "date": "2026-02-21",
+        "status": "approved"
+      },
+      {
+        "id": "demo_67",
+        "name": "דנה",
+        "city": "חולון",
+        "image": "https://picsum.photos/seed/batumi67/400/400",
+        "date": "2026-02-20",
+        "status": "approved"
+      },
+      {
+        "id": "demo_68",
+        "name": "אסי",
+        "city": "רמת גן",
+        "image": "https://picsum.photos/seed/batumi68/400/400",
+        "date": "2026-02-19",
+        "status": "approved"
+      },
+      {
+        "id": "demo_69",
+        "name": "יעל",
+        "city": "פתח תקווה",
+        "image": "https://picsum.photos/seed/batumi69/400/400",
+        "date": "2026-02-18",
+        "status": "approved"
+      },
+      {
+        "id": "demo_70",
+        "name": "עומר",
+        "city": "רחובות",
+        "image": "https://picsum.photos/seed/batumi70/400/400",
+        "date": "2026-02-17",
+        "status": "approved"
+      },
+      {
+        "id": "demo_71",
+        "name": "חן",
+        "city": "כפר סבא",
+        "image": "https://picsum.photos/seed/batumi71/400/400",
+        "date": "2026-02-16",
+        "status": "approved"
+      },
+      {
+        "id": "demo_72",
+        "name": "רונן",
+        "city": "הרצליה",
+        "image": "https://picsum.photos/seed/batumi72/400/400",
+        "date": "2026-02-15",
+        "status": "approved"
+      },
+      {
+        "id": "demo_73",
+        "name": "קרן",
+        "city": "רעננה",
+        "image": "https://picsum.photos/seed/batumi73/400/400",
+        "date": "2026-02-14",
+        "status": "approved"
+      },
+      {
+        "id": "demo_74",
+        "name": "אורן",
+        "city": "מודיעין",
+        "image": "https://picsum.photos/seed/batumi74/400/400",
+        "date": "2026-02-13",
+        "status": "approved"
+      },
+      {
+        "id": "demo_75",
+        "name": "טל",
+        "city": "בת ים",
+        "image": "https://picsum.photos/seed/batumi75/400/400",
+        "date": "2026-02-12",
+        "status": "approved"
+      },
+      {
+        "id": "demo_76",
+        "name": "אמיר",
+        "city": "ראשל״צ",
+        "image": "https://picsum.photos/seed/batumi76/400/400",
+        "date": "2026-02-11",
+        "status": "approved"
+      },
+      {
+        "id": "demo_77",
+        "name": "אורית",
+        "city": "אשקלון",
+        "image": "https://picsum.photos/seed/batumi77/400/400",
+        "date": "2026-02-10",
+        "status": "approved"
+      },
+      {
+        "id": "demo_78",
+        "name": "נדב",
+        "city": "קריות",
+        "image": "https://picsum.photos/seed/batumi78/400/400",
+        "date": "2026-02-09",
+        "status": "approved"
+      },
+      {
+        "id": "demo_79",
+        "name": "הילה",
+        "city": "אילת",
+        "image": "https://picsum.photos/seed/batumi79/400/400",
+        "date": "2026-02-08",
+        "status": "approved"
+      },
+      {
+        "id": "demo_80",
+        "name": "איציק",
+        "city": "גבעתיים",
+        "image": "https://picsum.photos/seed/batumi80/400/400",
+        "date": "2026-02-07",
+        "status": "approved"
+      },
+      {
+        "id": "demo_81",
+        "name": "עדי",
+        "city": "תל אביב",
+        "image": "https://picsum.photos/seed/batumi81/400/400",
+        "date": "2026-02-06",
+        "status": "approved"
+      },
+      {
+        "id": "demo_82",
+        "name": "גיא",
+        "city": "חיפה",
+        "image": "https://picsum.photos/seed/batumi82/400/400",
+        "date": "2026-02-05",
+        "status": "approved"
+      },
+      {
+        "id": "demo_83",
+        "name": "שירלי",
+        "city": "ירושלים",
+        "image": "https://picsum.photos/seed/batumi83/400/400",
+        "date": "2026-02-04",
+        "status": "approved"
+      },
+      {
+        "id": "demo_84",
+        "name": "אלון",
+        "city": "באר שבע",
+        "image": "https://picsum.photos/seed/batumi84/400/400",
+        "date": "2026-02-03",
+        "status": "approved"
+      },
+      {
+        "id": "demo_85",
+        "name": "יפה",
+        "city": "אשדוד",
+        "image": "https://picsum.photos/seed/batumi85/400/400",
+        "date": "2026-02-02",
+        "status": "approved"
+      },
+      {
+        "id": "demo_86",
+        "name": "רן",
+        "city": "נתניה",
+        "image": "https://picsum.photos/seed/batumi86/400/400",
+        "date": "2026-02-01",
+        "status": "approved"
+      },
+      {
+        "id": "demo_87",
+        "name": "מאיה",
+        "city": "חולון",
+        "image": "https://picsum.photos/seed/batumi87/400/400",
+        "date": "2026-01-31",
+        "status": "approved"
+      },
+      {
+        "id": "demo_88",
+        "name": "בועז",
+        "city": "רמת גן",
+        "image": "https://picsum.photos/seed/batumi88/400/400",
+        "date": "2026-01-30",
+        "status": "approved"
+      },
+      {
+        "id": "demo_89",
+        "name": "איילת",
+        "city": "פתח תקווה",
+        "image": "https://picsum.photos/seed/batumi89/400/400",
+        "date": "2026-01-29",
+        "status": "approved"
+      },
+      {
+        "id": "demo_90",
+        "name": "חיים",
+        "city": "רחובות",
+        "image": "https://picsum.photos/seed/batumi90/400/400",
+        "date": "2026-01-28",
+        "status": "approved"
+      },
+      {
+        "id": "demo_91",
+        "name": "אילן",
+        "city": "כפר סבא",
+        "image": "https://picsum.photos/seed/batumi91/400/400",
+        "date": "2026-01-27",
+        "status": "approved"
+      },
+      {
+        "id": "demo_92",
+        "name": "נועה",
+        "city": "הרצליה",
+        "image": "https://picsum.photos/seed/batumi92/400/400",
+        "date": "2026-01-26",
+        "status": "approved"
+      },
+      {
+        "id": "demo_93",
+        "name": "שלי",
+        "city": "רעננה",
+        "image": "https://picsum.photos/seed/batumi93/400/400",
+        "date": "2026-01-25",
+        "status": "approved"
+      },
+      {
+        "id": "demo_94",
+        "name": "מתן",
+        "city": "מודיעין",
+        "image": "https://picsum.photos/seed/batumi94/400/400",
+        "date": "2026-01-24",
+        "status": "approved"
+      },
+      {
+        "id": "demo_95",
+        "name": "גלית",
+        "city": "בת ים",
+        "image": "https://picsum.photos/seed/batumi95/400/400",
+        "date": "2026-01-23",
+        "status": "approved"
+      },
+      {
+        "id": "demo_96",
+        "name": "עמית",
+        "city": "ראשל״צ",
+        "image": "https://picsum.photos/seed/batumi96/400/400",
+        "date": "2026-01-22",
+        "status": "approved"
+      },
+      {
+        "id": "demo_97",
+        "name": "סיון",
+        "city": "אשקלון",
+        "image": "https://picsum.photos/seed/batumi97/400/400",
+        "date": "2026-01-21",
+        "status": "approved"
+      },
+      {
+        "id": "demo_98",
+        "name": "ליטל",
+        "city": "קריות",
+        "image": "https://picsum.photos/seed/batumi98/400/400",
+        "date": "2026-01-20",
+        "status": "approved"
+      },
+      {
+        "id": "demo_99",
+        "name": "דורון",
+        "city": "אילת",
+        "image": "https://picsum.photos/seed/batumi99/400/400",
+        "date": "2026-01-19",
+        "status": "approved"
+      },
+      {
+        "id": "demo_100",
+        "name": "ליאם",
+        "city": "גבעתיים",
+        "image": "https://picsum.photos/seed/batumi100/400/400",
+        "date": "2026-01-18",
+        "status": "approved"
+      }
+    ]
+  }
 }

@@ -88,18 +88,35 @@ export default function BrokersPortal() {
       </Modal>
 
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 16, gap: 12 }}>
-        {items.map(b => (
-          <View key={b.id} style={s.card}>
+        {items.map((b, i) => {
+          const earthColors = ['#92400e', '#65a30d', '#F4A94E', '#9f1239', '#ca8a04'];
+          const borderColor = earthColors[i % earthColors.length];
+          return (
+          <View key={b.id} style={[s.card, { borderColor, borderWidth: 1.5, position: 'relative' }]}>
+            <View style={{ position: 'absolute', top: 6, left: 6, zIndex: 5, transform: [{ rotate: '-12deg' }], width: 70, height: 70, borderRadius: 35, borderWidth: 2, borderColor, alignItems: 'center', justifyContent: 'center', opacity: 0.5, backgroundColor: 'transparent' }}>
+              <View style={{ width: 60, height: 60, borderRadius: 30, borderWidth: 1, borderColor, alignItems: 'center', justifyContent: 'center' }}>
+                <Text style={{ fontSize: 8, fontWeight: '900', color: borderColor, textAlign: 'center', letterSpacing: 0.3 }}>Batumi</Text>
+                <Text style={{ fontSize: 8, fontWeight: '900', color: borderColor, textAlign: 'center', letterSpacing: 0.3 }}>On LINE</Text>
+              </View>
+            </View>
             <View style={{ flexDirection: 'row-reverse', gap: 12 }}>
-              {b.image && <Image source={{ uri: resolveUri(b.image) }} style={s.img} resizeMode="cover" />}
+              {b.image && (
+                <View style={{ position: 'relative' }}>
+                  <Image source={{ uri: resolveUri(b.image) }} style={s.img} resizeMode="cover" />
+                  <View style={{ position: 'absolute', bottom: -2, right: -2, width: 22, height: 22, borderRadius: 11, backgroundColor: '#1d9bf0', borderWidth: 2, borderColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
+                    <Text style={{ color: '#fff', fontSize: 12, fontWeight: '900', lineHeight: 14 }}>✓</Text>
+                  </View>
+                </View>
+              )}
               <View style={{ flex: 1 }}>
-                {!!b.title && <Text style={s.cardKicker}>✓ {b.title}</Text>}
+                <Text style={s.cardKicker}>✓ סוכן נדל״ן מומלץ בבטומי</Text>
                 <Text style={s.cardName}>{b.name}</Text>
+                {!!b.title && <Text style={[s.cardMeta, { fontWeight: '700' }]}>{b.title}</Text>}
                 {!!b.city && <Text style={s.cardMeta}>📍 {b.city}{b.yearsActive ? ` · ${b.yearsActive}` : ''}</Text>}
               </View>
             </View>
             {!!b.description && <Text style={s.desc}>{b.description}</Text>}
-            <View style={{ flexDirection: 'row-reverse', gap: 8, marginTop: 10 }}>
+            <View style={{ flexDirection: 'row-reverse', gap: 8, marginTop: 10, justifyContent: 'center' }}>
               {b.whatsapp && (
                 <TouchableOpacity onPress={() => Linking.openURL(`https://wa.me/${String(b.whatsapp).replace(/\D/g, '')}`)} style={[s.btn, { backgroundColor: '#25D366' }]}>
                   <Text style={s.btnTxt}>💬 WhatsApp</Text>
@@ -112,7 +129,8 @@ export default function BrokersPortal() {
               )}
             </View>
           </View>
-        ))}
+          );
+        })}
         {items.length === 0 && <Text style={s.empty}>אין מתווכים זמינים כרגע</Text>}
       </ScrollView>
       <BottomTabBar />

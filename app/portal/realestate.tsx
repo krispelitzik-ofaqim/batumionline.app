@@ -115,8 +115,14 @@ export default function RealEstatePortal() {
   const [openArticle, setOpenArticle] = useState<any | null>(null);
   const [curated, setCurated] = useState<Record<string, Listing[]>>({});
 
-  const handleService = useCallback((id: string) => {
-    if (id === 'bank') {
+  const [openServiceArticle, setOpenServiceArticle] = useState<any>(null);
+  const handleService = useCallback((svc: any) => {
+    const type = svc.actionType;
+    if (type === 'link' && svc.url) {
+      Linking.openURL(svc.url);
+    } else if (type === 'modal' || type === 'article') {
+      setOpenServiceArticle(svc);
+    } else if (svc.id === 'bank') {
       Linking.openURL('https://batumionline.biz');
     }
   }, []);
@@ -405,6 +411,36 @@ export default function RealEstatePortal() {
           </View>
         </View>
       </Modal>
+      <Modal visible={!!openServiceArticle} transparent animationType="fade" onRequestClose={() => setOpenServiceArticle(null)}>
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'center', padding: 16 }}>
+          <View style={{ backgroundColor: '#fff', borderRadius: 18, overflow: 'hidden', maxHeight: '90%' }}>
+            {openServiceArticle?.image && (
+              <View style={{ width: '100%', height: 180, position: 'relative' }}>
+                <Image source={{ uri: resolveUri(openServiceArticle.image) }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+                <TouchableOpacity onPress={() => setOpenServiceArticle(null)} style={{ position: 'absolute', top: 10, left: 10, width: 32, height: 32, borderRadius: 16, backgroundColor: 'rgba(0,0,0,0.6)', alignItems: 'center', justifyContent: 'center' }}>
+                  <Text style={{ color: '#fff', fontWeight: '900' }}>✕</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+            <ScrollView contentContainerStyle={{ padding: 18 }}>
+              <Text style={{ fontSize: 20, fontWeight: '900', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl' }}>{openServiceArticle?.title}</Text>
+              {openServiceArticle?.subtitle ? <Text style={{ fontSize: 13, color: '#64748b', textAlign: 'right', writingDirection: 'rtl', marginTop: 4 }}>{openServiceArticle.subtitle}</Text> : null}
+              {openServiceArticle?.body ? (
+                openServiceArticle.body.includes('<')
+                  ? <View style={{ marginTop: 12 }}><HtmlContent html={openServiceArticle.body} /></View>
+                  : <Text style={{ fontSize: 14, color: '#1C2B35', textAlign: 'right', writingDirection: 'rtl', marginTop: 12, lineHeight: 22 }}>{openServiceArticle.body}</Text>
+              ) : (
+                <Text style={{ fontSize: 13, color: '#94a3b8', textAlign: 'right', writingDirection: 'rtl', marginTop: 14 }}>תוכן יתווסף בקרוב</Text>
+              )}
+              {openServiceArticle?.url ? (
+                <TouchableOpacity onPress={() => Linking.openURL(openServiceArticle.url)} style={{ marginTop: 16, backgroundColor: Colors.PRIMARY, borderRadius: 10, paddingVertical: 12, alignItems: 'center' }}>
+                  <Text style={{ color: '#fff', fontWeight: '900', fontSize: 14 }}>↗ למידע נוסף</Text>
+                </TouchableOpacity>
+              ) : null}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
       <BottomTabBar />
       <ListingForm
         visible={formOpen}
@@ -546,8 +582,8 @@ function BrokerBannerSmall() {
 
   return (
     <View style={{ paddingHorizontal: 16, marginTop: 14 }}>
-      <Text style={{ fontSize: 12, fontWeight: '700', color: '#888', textAlign: 'right', writingDirection: 'rtl', marginBottom: 6 }}>מתווכים מומלצים בבטומי</Text>
-      <TouchableOpacity activeOpacity={0.85} onPress={() => router.push('/portal/brokers' as any)} style={{ flexDirection: 'row-reverse', backgroundColor: '#fff', borderRadius: 10, overflow: 'hidden', borderWidth: 1, borderColor: '#e2e8f0', minHeight: 55 }}>
+      <Text style={{ fontSize: 12, fontWeight: '700', color: '#888', textAlign: 'right', writingDirection: 'rtl', marginBottom: 6 }}>סוכני נדל״ן מומלצים בבטומי</Text>
+      <TouchableOpacity activeOpacity={0.85} onPress={() => router.push('/portal/brokers' as any)} style={{ flexDirection: 'row-reverse', backgroundColor: '#fff', borderRadius: 10, overflow: 'hidden', borderWidth: 1.5, borderColor: '#92400e', minHeight: 55 }}>
         <Image source={{ uri: resolveUri(broker.image) }} style={{ width: 55, height: 55 }} resizeMode="cover" />
         <View style={{ flex: 1, paddingHorizontal: 10, paddingVertical: 6, justifyContent: 'center' }}>
           <Text style={{ fontSize: 13, fontWeight: '900', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl' }} numberOfLines={1}>{broker.name}</Text>
@@ -587,8 +623,8 @@ function BrokerBanner() {
 
   return (
     <View style={{ paddingHorizontal: 16, marginTop: 16 }}>
-      <Text style={{ fontSize: 14, fontWeight: '700', color: '#888', textAlign: 'right', writingDirection: 'rtl', marginBottom: 8 }}>מתווכים מומלצים בבטומי</Text>
-      <TouchableOpacity activeOpacity={0.85} onPress={() => router.push('/portal/brokers' as any)} style={{ flexDirection: 'row-reverse', backgroundColor: '#fff', borderRadius: 14, overflow: 'hidden', borderWidth: 1, borderColor: '#e2e8f0', minHeight: 110 }}>
+      <Text style={{ fontSize: 14, fontWeight: '700', color: '#888', textAlign: 'right', writingDirection: 'rtl', marginBottom: 8 }}>סוכני נדל״ן מומלצים בבטומי</Text>
+      <TouchableOpacity activeOpacity={0.85} onPress={() => router.push('/portal/brokers' as any)} style={{ flexDirection: 'row-reverse', backgroundColor: '#fff', borderRadius: 14, overflow: 'hidden', borderWidth: 1.5, borderColor: '#92400e', minHeight: 110 }}>
         <Image source={{ uri: resolveUri(broker.image) }} style={{ width: 110, height: 'auto', minHeight: 110 }} resizeMode="cover" />
         <View style={{ flex: 1, padding: 10, justifyContent: 'space-between' }}>
           <View>
@@ -663,7 +699,7 @@ function FutureCard({ p, width }: { p: Listing; width: number }) {
   const prev = () => setImgIdx((imgIdx - 1 + imgs.length) % imgs.length);
   return (
     <>
-      <TouchableOpacity activeOpacity={0.85} style={{ width, height: 260, borderRadius: 14, overflow: 'hidden', backgroundColor: Colors.WHITE, borderWidth: 1, borderColor: '#e2e8f0' }} onPress={() => setOpen(true)}>
+      <TouchableOpacity activeOpacity={0.85} style={{ width, height: 260, borderRadius: 14, overflow: 'hidden', backgroundColor: Colors.WHITE, borderWidth: 1.5, borderColor: '#F4A94E' }} onPress={() => setOpen(true)}>
         <View style={{ width, height: 140, position: 'relative' }}>
           {imgs.length > 0 && <Image source={{ uri: resolveUri(imgs[imgIdx]) }} style={{ width, height: 140 }} />}
           {imgs.length > 1 && (
@@ -672,7 +708,7 @@ function FutureCard({ p, width }: { p: Listing; width: number }) {
             </View>
           )}
         </View>
-        <View style={{ padding: 12, flex: 1, justifyContent: 'space-between' }}>
+        <View style={{ padding: 12, flex: 1, justifyContent: 'space-between', backgroundColor: '#fff', borderTopWidth: 1, borderTopColor: '#f1f5f9' }}>
           <View>
             <Text style={{ fontSize: 15, fontWeight: '900', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl' }} numberOfLines={1}>{p.title}</Text>
             <Text style={{ fontSize: 12, color: '#64748b', textAlign: 'right', writingDirection: 'rtl', marginTop: 2 }} numberOfLines={1}>{p.price || ''}</Text>
@@ -795,25 +831,26 @@ function NewsSliderArrows({ news }: { news: Article[] }) {
         onMomentumScrollEnd={(e) => setIdx(Math.round(e.nativeEvent.contentOffset.x / (SLIDE_W + GAP)))}
       >
         {news.map(n => (
-          <TouchableOpacity key={n.id} activeOpacity={0.85} style={[s.newsCardLike, { width: SLIDE_W, height: 200 }]} onPress={() => {
+          <TouchableOpacity key={n.id} activeOpacity={0.85} style={[s.newsCardLike, { width: SLIDE_W, height: 200, position: 'relative' }]} onPress={() => {
             const hasArticle = !!(n.body || n.longText || n.article);
             if (hasArticle) setOpenNews(n);
             else if (n.link) Linking.openURL(n.link);
             else setOpenNews(n);
           }}>
-            <View style={{ width: SLIDE_W, height: 140, position: 'relative' }}>
-              {n.image ? (
-                <Image source={{ uri: resolveUri(n.image) }} style={{ width: SLIDE_W, height: 140 }} />
-              ) : (
-                <View style={{ width: SLIDE_W, height: 140, backgroundColor: '#e2e8f0', alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: 36 }}>🏙️</Text></View>
-              )}
-              <LinearGradient colors={['transparent', 'rgba(0,0,0,0.85)']} style={{ position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: 12, paddingTop: 30, paddingBottom: 8 }}>
-                <Text style={{ fontSize: 14, fontWeight: '900', color: '#fff', textAlign: 'right', writingDirection: 'rtl' }} numberOfLines={2}>{n.title}</Text>
-              </LinearGradient>
-            </View>
-            <View style={{ height: 60, padding: 10, backgroundColor: Colors.WHITE, justifyContent: 'center' }}>
-              <Text style={{ fontSize: 12, color: '#555', textAlign: 'right', writingDirection: 'rtl', lineHeight: 16 }} numberOfLines={2}>{n.summary}</Text>
-            </View>
+            {n.image ? (
+              <Image source={{ uri: resolveUri(n.image) }} style={{ width: SLIDE_W, height: 200 }} />
+            ) : (
+              <View style={{ width: SLIDE_W, height: 200, backgroundColor: '#e2e8f0', alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: 50 }}>🏙️</Text></View>
+            )}
+            <LinearGradient colors={['transparent', 'rgba(0,0,0,0.4)', 'rgba(0,0,0,0.92)']} style={{ position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: 14, paddingTop: 80, paddingBottom: 14 }}>
+              <Text style={{ fontSize: 18, fontWeight: '900', color: '#fff', textAlign: 'right', writingDirection: 'rtl', marginBottom: 4, lineHeight: 22 }} numberOfLines={2}>{n.title}</Text>
+              {n.summary ? (
+                <Text style={{ fontSize: 12, color: 'rgba(255,255,255,0.92)', textAlign: 'right', writingDirection: 'rtl', lineHeight: 16, marginBottom: 6 }} numberOfLines={2}>{n.summary}</Text>
+              ) : null}
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
+                <Text style={{ fontSize: 12, fontWeight: '900', color: '#F4A94E' }}>‹ קרא עוד</Text>
+              </View>
+            </LinearGradient>
           </TouchableOpacity>
         ))}
       </ScrollView>

@@ -845,6 +845,12 @@ app.post('/api/tour-album/:tourId', upload.single('file'), (req, res) => {
       status: 'pending',
     };
     db.tourAlbums[tourId].push(photo);
+    // Cap album at 100 approved photos - delete oldest approved when exceeded
+    const approved = db.tourAlbums[tourId].filter(p => p.status === 'approved');
+    if (approved.length > 100) {
+      const oldestApprovedId = approved[0].id;
+      db.tourAlbums[tourId] = db.tourAlbums[tourId].filter(p => p.id !== oldestApprovedId);
+    }
     writeDB(db);
     res.json({ success: true, data: photo });
   } catch (e) {

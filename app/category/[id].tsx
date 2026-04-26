@@ -300,7 +300,7 @@ function TourStations({ audios, color, onNavigate, onActiveChange, nearbyRestaur
 
   return (
     <View style={{ gap: 6 }}>
-      <Text style={{ fontSize: 11, color: '#555', textAlign: 'center', writingDirection: 'rtl', paddingVertical: 2 }}>▶ לחץ להאזנה | 📌 נווט למקום | ≡ לשינוי הסדר</Text>
+      <Text style={{ fontSize: 11, color: '#555', textAlign: 'center', writingDirection: 'rtl', paddingVertical: 2 }}>▶ לחץ להאזנה | ≡ לשינוי הסדר</Text>
       {tracks.map((au, i) => {
         const isPlaying = playingIdx === i;
         const pct = isPlaying && dur > 0 ? (pos / dur) * 100 : 0;
@@ -312,14 +312,9 @@ function TourStations({ audios, color, onNavigate, onActiveChange, nearbyRestaur
                 <Text style={{ color: isPlaying ? (isLight(color) ? '#1C2B35' : '#fff') : '#fff', fontSize: 14, fontWeight: '900' }}>{isPlaying ? '❚❚' : '▶'}</Text>
               </TouchableOpacity>
               <View style={{ flex: 1 }}>
-                <Text style={{ fontSize: 14, fontWeight: isPlaying ? '900' : '700', color: '#1C2B35', textAlign: 'right', writingDirection: 'rtl' }}>{au.title || `תחנה ${i + 1}`}</Text>
+                <Text style={{ fontSize: 14, fontWeight: isPlaying ? '900' : '700', color: '#1C2B35', textAlign: 'right', writingDirection: 'rtl' }} numberOfLines={1}>{au.title || `תחנה ${i + 1}`}</Text>
                 {isPlaying && <Text style={{ fontSize: 10, color: '#888', textAlign: 'right' }}>{fmt(pos)} / {fmt(dur)}</Text>}
               </View>
-              {au.coords && (
-                <TouchableOpacity onPress={() => onNavigate(au.coords!)} style={{ paddingHorizontal: 12, paddingVertical: 8, borderRadius: 10, backgroundColor: color }}>
-                  <Text style={{ fontSize: 12, fontWeight: '800', color: isLight(color) ? '#1C2B35' : '#fff' }}>📌 נווט</Text>
-                </TouchableOpacity>
-              )}
             </View>
             {isPlaying && (
               <View style={{ height: 4, backgroundColor: 'rgba(0,0,0,0.1)', borderRadius: 2, marginTop: 6 }}>
@@ -376,62 +371,114 @@ function buildTourRouteUrl(audios: { title?: string; url: string; coords?: { lat
   return `https://www.google.com/maps?q=${avgLat},${avgLng}&hl=iw&z=15&output=embed`;
 }
 
-function TourAlbum({ tourId, color }: { tourId: string; color: string }) {
-  const [open, setOpen] = useState(false);
+function TourAlbum({ tourId, color, refreshKey }: { tourId: string; color: string; refreshKey?: number }) {
   const [photos, setPhotos] = useState<any[]>([]);
-  const [name, setName] = useState('');
-  const [city, setCity] = useState('');
-  const [uploaded, setUploaded] = useState(false);
+  const [previewPhoto, setPreviewPhoto] = useState<any>(null);
+  const [visibleCount, setVisibleCount] = useState(20);
+  const PHOTOS_PER_FAN = 20;
+  const visiblePhotos = photos.slice(0, visibleCount);
+  const hasMore = photos.length > visibleCount;
 
   useEffect(() => {
-    if (open) {
-      fetch(`${API_BASE}/api/tour-album/${tourId}`).then(r => r.json()).then(j => { if (j.success) setPhotos(j.data); }).catch(() => {});
-    }
-  }, [open, uploaded]);
-
-  if (!open) {
-    return (
-      <TouchableOpacity onPress={() => setOpen(true)} style={{ marginHorizontal: 12, marginTop: 8, paddingVertical: 10, borderRadius: 10, backgroundColor: color, alignItems: 'center' }}>
-        <Text style={{ fontSize: 13, fontWeight: '800', color: isLight(color) ? '#1C2B35' : '#fff' }}>📸 פתח אלבום גולשים</Text>
-      </TouchableOpacity>
-    );
-  }
+    fetch(`${API_BASE}/api/tour-album/${tourId}`).then(r => r.json()).then(j => { if (j.success) setPhotos(j.data); }).catch(() => {});
+  }, [tourId, refreshKey]);
 
   return (
-    <View style={{ margin: 12, backgroundColor: '#fff', borderRadius: 14, padding: 12, borderWidth: 1, borderColor: '#e0e0e0' }}>
-      <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+    <View>
+      <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8, marginHorizontal: 12, marginTop: 8 }}>
         <Text style={{ fontSize: 14, fontWeight: '900', color: '#1C2B35', writingDirection: 'rtl' }}>📸 אלבום גולשים</Text>
-        <TouchableOpacity onPress={() => setOpen(false)} style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: '#f0f0f0', alignItems: 'center', justifyContent: 'center' }}>
-          <Text style={{ fontSize: 14, fontWeight: '800', color: '#999' }}>✕</Text>
-        </TouchableOpacity>
+        {photos.length > 0 && <Text style={{ fontSize: 11, color: '#64748b' }}>{photos.length}/100</Text>}
       </View>
 
       {photos.length > 0 ? (
-        <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 4, marginBottom: 12 }}>
-          {photos.map((p: any) => (
-            <View key={p.id} style={{ width: '32%' }}>
-              <View style={{ aspectRatio: 1, borderRadius: 8, overflow: 'hidden', backgroundColor: '#f0f0f0' }}>
-                <Image source={{ uri: resolveUri(p.image) }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
-              </View>
-              <Text style={{ fontSize: 9, color: '#1C2B35', fontWeight: '700', textAlign: 'center', marginTop: 3, writingDirection: 'rtl' }}>{p.name}</Text>
-              <Text style={{ fontSize: 8, color: '#888', textAlign: 'center', writingDirection: 'rtl' }}>{p.city} · {p.date}</Text>
-            </View>
-          ))}
-        </View>
+        <>
+          <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 0, marginBottom: 8 }}>
+            {visiblePhotos.map((p: any) => (
+              <TouchableOpacity key={p.id} onPress={() => setPreviewPhoto(p)} style={{ width: '25%' }} activeOpacity={0.85}>
+                <View style={{ aspectRatio: 1, overflow: 'hidden', backgroundColor: '#f0f0f0', position: 'relative' }}>
+                  <Image source={{ uri: resolveUri(p.image) }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+                  <LinearGradient colors={['transparent', 'rgba(0,0,0,0.95)']} style={{ position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: 4, paddingTop: 20, paddingBottom: 6 }}>
+                    <Text style={{ fontSize: 12, color: '#fff', fontWeight: '900', textAlign: 'center', writingDirection: 'rtl', textShadowColor: 'rgba(0,0,0,0.8)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 2 }} numberOfLines={1}>{p.name}</Text>
+                    <Text style={{ fontSize: 10, color: '#fff', textAlign: 'center', writingDirection: 'rtl', textShadowColor: 'rgba(0,0,0,0.8)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 2 }} numberOfLines={1}>{p.city}</Text>
+                  </LinearGradient>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </View>
+          {hasMore && (
+            <TouchableOpacity onPress={() => setVisibleCount(c => Math.min(c + PHOTOS_PER_FAN, photos.length))} style={{ marginHorizontal: 12, marginVertical: 6, paddingVertical: 10, borderRadius: 10, backgroundColor: color, alignItems: 'center', flexDirection: 'row-reverse', justifyContent: 'center', gap: 8 }}>
+              <Text style={{ fontSize: 14, fontWeight: '900', color: '#fff' }}>פתח עוד {Math.min(PHOTOS_PER_FAN, photos.length - visibleCount)} תמונות ▼</Text>
+            </TouchableOpacity>
+          )}
+          {visibleCount > PHOTOS_PER_FAN && (
+            <TouchableOpacity onPress={() => setVisibleCount(PHOTOS_PER_FAN)} style={{ marginHorizontal: 12, marginVertical: 6, paddingVertical: 10, borderRadius: 10, backgroundColor: '#94a3b8', alignItems: 'center' }}>
+              <Text style={{ fontSize: 13, fontWeight: '800', color: '#fff' }}>סגור ▲</Text>
+            </TouchableOpacity>
+          )}
+        </>
       ) : (
         <Text style={{ fontSize: 12, color: '#888', textAlign: 'center', marginBottom: 12, writingDirection: 'rtl' }}>עדיין אין תמונות. היו הראשונים!</Text>
       )}
 
-      {uploaded ? (
+      <Modal visible={!!previewPhoto} transparent animationType="fade" onRequestClose={() => setPreviewPhoto(null)}>
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.92)', justifyContent: 'center', alignItems: 'center', padding: 20 }}>
+          <TouchableOpacity onPress={() => setPreviewPhoto(null)} style={{ position: 'absolute', top: 50, left: 20, width: 44, height: 44, borderRadius: 22, backgroundColor: 'rgba(255,255,255,0.2)', alignItems: 'center', justifyContent: 'center', zIndex: 10 }}>
+            <Text style={{ color: '#fff', fontSize: 22, fontWeight: '900' }}>✕</Text>
+          </TouchableOpacity>
+          {previewPhoto && (
+            <>
+              <Image source={{ uri: resolveUri(previewPhoto.image) }} style={{ width: '100%', aspectRatio: 1, borderRadius: 12 }} resizeMode="contain" />
+              <View style={{ marginTop: 16, alignItems: 'center', paddingHorizontal: 16 }}>
+                <Text style={{ color: '#fff', fontSize: 18, fontWeight: '900', writingDirection: 'rtl', textAlign: 'center' }}>{previewPhoto.name}</Text>
+                <Text style={{ color: 'rgba(255,255,255,0.85)', fontSize: 14, writingDirection: 'rtl', textAlign: 'center', marginTop: 4 }}>📍 {previewPhoto.city} · {previewPhoto.date}</Text>
+              </View>
+            </>
+          )}
+        </View>
+      </Modal>
+
+    </View>
+  );
+}
+
+function TourAlbumUpload({ tourId, color, onUploaded }: { tourId: string; color: string; onUploaded?: () => void }) {
+  const [name, setName] = useState('');
+  const [city, setCity] = useState('');
+  const [uploadedSlots, setUploadedSlots] = useState<string[]>([]);
+  const [open, setOpen] = useState(false);
+  const MAX_UPLOADS = 5;
+  const uploaded = uploadedSlots.length >= MAX_UPLOADS;
+
+  return (
+    <View style={{ margin: 12, backgroundColor: '#fff', borderRadius: 14, padding: 12, borderWidth: 1, borderColor: '#e0e0e0' }}>
+      <TouchableOpacity onPress={() => setOpen(o => !o)} style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginBottom: open ? 10 : 0 }}>
+        <Text style={{ fontSize: 14, fontWeight: '900', color: '#1C2B35', writingDirection: 'rtl' }}>📸 העלאת תמונות לאלבום</Text>
+        <View style={{ flexDirection: 'row', gap: 4, alignItems: 'center' }}>
+          <Text style={{ fontSize: 12, color: open ? '#cbd5e1' : '#1A6B8A', fontWeight: '900' }}>▼</Text>
+          <Text style={{ fontSize: 12, color: open ? '#1A6B8A' : '#cbd5e1', fontWeight: '900' }}>▲</Text>
+        </View>
+      </TouchableOpacity>
+      {open && (uploaded ? (
         <View style={{ padding: 10, backgroundColor: '#dcfce7', borderRadius: 8, alignItems: 'center' }}>
-          <Text style={{ fontSize: 13, fontWeight: '800', color: '#16a34a' }}>✓ התמונה נשלחה לאישור. תודה!</Text>
+          <Text style={{ fontSize: 13, fontWeight: '800', color: '#16a34a' }}>✓ העלת {MAX_UPLOADS} תמונות. תודה!</Text>
         </View>
       ) : (
         <View style={{ gap: 6 }}>
           <RNTextInput value={name} onChangeText={setName} placeholder="✏️ השם שלך" placeholderTextColor="#888" style={{ backgroundColor: '#f8f8f8', borderRadius: 8, padding: 8, fontSize: 13, textAlign: 'right', writingDirection: 'rtl', borderWidth: 1, borderColor: '#e0e0e0' }} />
           <RNTextInput value={city} onChangeText={setCity} placeholder="🏙️ מאיפה את/ה?" placeholderTextColor="#888" style={{ backgroundColor: '#f8f8f8', borderRadius: 8, padding: 8, fontSize: 13, textAlign: 'right', writingDirection: 'rtl', borderWidth: 1, borderColor: '#e0e0e0' }} />
-          {Platform.OS === 'web' && React.createElement('label', {
-            style: { display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: color, borderRadius: 8, padding: 10, cursor: 'pointer' },
+          <Text style={{ fontSize: 11, color: '#64748b', textAlign: 'center', writingDirection: 'rtl' }}>📷 ניתן להעלות עד {MAX_UPLOADS} תמונות ({uploadedSlots.length}/{MAX_UPLOADS})</Text>
+          <View style={{ flexDirection: 'row-reverse', gap: 5, justifyContent: 'center', marginVertical: 4 }}>
+            {Array.from({ length: MAX_UPLOADS }).map((_, i) => {
+              const filled = i < uploadedSlots.length;
+              return (
+                <View key={i} style={{ width: 36, height: 36, borderRadius: 8, backgroundColor: filled ? color : '#f1f5f9', borderWidth: 1.5, borderColor: filled ? color : '#cbd5e1', alignItems: 'center', justifyContent: 'center' }}>
+                  <Text style={{ fontSize: 16, color: filled ? '#fff' : '#94a3b8', fontWeight: '900' }}>{filled ? '✓' : i + 1}</Text>
+                </View>
+              );
+            })}
+          </View>
+          {Platform.OS === 'web' ? React.createElement('label', {
+            style: { display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#1A6B8A', borderRadius: 10, padding: 14, cursor: 'pointer', borderWidth: 2, borderColor: '#fff', boxShadow: '0 2px 8px rgba(0,0,0,0.15)' },
           }, [
             React.createElement('input', { key: 'inp', type: 'file', accept: 'image/*', style: { display: 'none' },
               onChange: (e: any) => {
@@ -442,14 +489,38 @@ function TourAlbum({ tourId, color }: { tourId: string; color: string }) {
                   fd.append('name', name || 'גולש');
                   fd.append('city', city || '');
                   fetch(`${API_BASE}/api/tour-album/${tourId}`, { method: 'POST', body: fd })
-                    .then(r => r.json()).then(() => setUploaded(true)).catch(() => {});
+                    .then(r => r.json()).then((j: any) => { setUploadedSlots(prev => [...prev, j?.data?.id || String(Date.now())]); onUploaded?.(); }).catch(() => {});
                 }
               },
             }),
-            React.createElement('span', { key: 'txt', style: { color: '#fff', fontSize: 13, fontWeight: 800 } }, '📸 העלה תמונה'),
-          ])}
+            React.createElement('span', { key: 'txt', style: { color: '#fff', fontSize: 16, fontWeight: 900, letterSpacing: 0.3 } }, '📸 העלה תמונה'),
+          ]) : (
+            <TouchableOpacity
+              onPress={async () => {
+                try {
+                  const ImagePicker = require('expo-image-picker');
+                  const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
+                  if (!perm.granted) return;
+                  const r = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ImagePicker.MediaTypeOptions.Images, quality: 0.8 });
+                  if (r.canceled || !r.assets?.[0]) return;
+                  const asset = r.assets[0];
+                  const fd = new FormData();
+                  fd.append('file', { uri: asset.uri, type: 'image/jpeg', name: 'photo.jpg' } as any);
+                  fd.append('name', name || 'גולש');
+                  fd.append('city', city || '');
+                  const r2 = await fetch(`${API_BASE}/api/tour-album/${tourId}`, { method: 'POST', body: fd });
+                  const j2 = await r2.json();
+                  setUploadedSlots(prev => [...prev, j2?.data?.id || String(Date.now())]);
+                  onUploaded?.();
+                } catch {}
+              }}
+              style={{ backgroundColor: '#1A6B8A', borderRadius: 10, padding: 14, alignItems: 'center', borderWidth: 2, borderColor: '#fff', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.2, shadowRadius: 6, elevation: 3 }}
+            >
+              <Text style={{ color: '#fff', fontSize: 16, fontWeight: '900', letterSpacing: 0.3 }}>📸 העלה תמונה</Text>
+            </TouchableOpacity>
+          )}
         </View>
-      )}
+      ))}
     </View>
   );
 }
@@ -463,6 +534,7 @@ function TourCard({ t, onRate, nearbyRestaurants }: { t: TourBlock; onRate: (id:
   const [ratingSubmitted, setRatingSubmitted] = useState(false);
   const [foodRec, setFoodRec] = useState(false);
   const [nearbyFood, setNearbyFood] = useState<{ name: string; dist: number; mapUrl?: string } | null>(null);
+  const [albumKey, setAlbumKey] = useState(0);
   const demoScore = 4;
   const displayedScore = ratingSubmitted ? rating : demoScore;
   const images = t.images && t.images.length > 0 ? t.images : [];
@@ -504,8 +576,7 @@ function TourCard({ t, onRate, nearbyRestaurants }: { t: TourBlock; onRate: (id:
           </View>
         )}
       </View>
-      <Text style={tourSt.title}>{t.title || 'ללא כותרת'}</Text>
-      {t.subtitle ? <Text style={tourSt.subtitle}>{t.subtitle}</Text> : null}
+      <Text style={tourSt.title} numberOfLines={2}>{t.title || 'ללא כותרת'}</Text>
       <Text style={[tourSt.text, !t.text && { fontStyle: 'italic', color: '#777' }]}>
         {t.text || 'תיאור הסיור יופיע כאן — ערוך דרך פאנל הניהול'}
       </Text>
@@ -558,25 +629,28 @@ function TourCard({ t, onRate, nearbyRestaurants }: { t: TourBlock; onRate: (id:
         )}
       </View>
 
-      <TourAlbum tourId={t.id} color={t.color} />
-
-      <View style={tourSt.ratingRow}>
-        <Text style={tourSt.ratingLabel}>דרג את הסיור</Text>
-        <View style={tourSt.stars}>
-          {[1, 2, 3, 4, 5].map(n => (
-            <TouchableOpacity key={n} onPress={() => !ratingSubmitted && setRating(n)} disabled={ratingSubmitted}>
-              <Text style={[tourSt.star, n <= rating && tourSt.starOn]}>★</Text>
-            </TouchableOpacity>
-          ))}
+      <View style={[tourSt.ratingRow, { flexDirection: 'column', gap: 8 }]}>
+        <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+          <Text style={tourSt.ratingLabel}>דרג את הסיור</Text>
+          <View style={tourSt.stars}>
+            {[1, 2, 3, 4, 5].map(n => (
+              <TouchableOpacity key={n} onPress={() => !ratingSubmitted && setRating(n)} disabled={ratingSubmitted}>
+                <Text style={[tourSt.star, n <= rating && tourSt.starOn]}>★</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
         </View>
         <TouchableOpacity
-          style={[tourSt.submitBtn, (rating === 0 || ratingSubmitted) && { opacity: 0.4 }]}
+          style={[tourSt.submitBtn, { alignSelf: 'stretch', alignItems: 'center' }, (rating === 0 || ratingSubmitted) && { opacity: 0.4 }]}
           onPress={() => { if (rating > 0) { setRatingSubmitted(true); onRate(t.id, rating); } }}
           disabled={rating === 0 || ratingSubmitted}
         >
           <Text style={tourSt.submitTxt}>{ratingSubmitted ? '✓ תודה' : 'בחר'}</Text>
         </TouchableOpacity>
       </View>
+
+      <TourAlbumUpload tourId={t.id} color={t.color} onUploaded={() => setAlbumKey(k => k + 1)} />
+      <TourAlbum tourId={t.id} color={t.color} refreshKey={albumKey} />
     </View>
   );
 }
@@ -1106,8 +1180,7 @@ export default function CategoryScreen() {
                       {r && r.count > 0 && <Text style={{ fontSize: 9, color: 'rgba(0,0,0,0.5)', marginRight: 3 }}>({r.count})</Text>}
                     </View>
                     <Text style={st.tourGridIcon}>🎧</Text>
-                    <Text style={st.tourGridTitle} numberOfLines={2}>{t.title || 'ללא כותרת'}</Text>
-                    <Text style={st.tourGridSub} numberOfLines={2}>{t.subtitle || ' '}</Text>
+                    <Text style={st.tourGridTitle} numberOfLines={3}>{t.title || 'ללא כותרת'}</Text>
                   </TouchableOpacity>
                 );
               })}
@@ -1777,17 +1850,17 @@ const tourSt = StyleSheet.create({
   audioWrap: { backgroundColor: 'rgba(255,255,255,0.4)', borderRadius: 12, padding: 8 },
   hint: { fontSize: 11, color: '#555', textAlign: 'center', writingDirection: 'rtl', paddingVertical: 4 },
   ratingRow: {
-    marginTop: 12, paddingVertical: 8, paddingHorizontal: 10, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.5)',
-    flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: 4,
+    marginTop: 12, paddingVertical: 6, paddingHorizontal: 8, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.5)',
+    flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: 2,
   },
-  ratingLabel: { fontSize: 12, fontWeight: '800', color: Colors.TEXT, writingDirection: 'rtl' },
-  stars: { flexDirection: 'row-reverse', gap: 1 },
-  star: { fontSize: 18, color: '#d1d5db', paddingHorizontal: 1 },
+  ratingLabel: { fontSize: 15, fontWeight: '900', color: Colors.TEXT, writingDirection: 'rtl' },
+  stars: { flexDirection: 'row-reverse', gap: 2 },
+  star: { fontSize: 26, color: '#d1d5db', paddingHorizontal: 1 },
   starOn: { color: '#F4A94E' },
   submitBtn: {
-    paddingHorizontal: 18, paddingVertical: 8, borderRadius: 10, backgroundColor: Colors.PRIMARY,
+    paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8, backgroundColor: Colors.PRIMARY,
   },
-  submitTxt: { color: Colors.WHITE, fontSize: 13, fontWeight: '800' },
+  submitTxt: { color: Colors.WHITE, fontSize: 11, fontWeight: '800' },
   topStars: {
     flexDirection: 'row-reverse', alignItems: 'center', gap: 2, marginBottom: 8,
   },

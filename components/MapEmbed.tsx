@@ -51,22 +51,17 @@ export default function MapEmbed({ src, style }: { src: string; style?: StylePro
   const title = extractTitle(src);
 
   if (coords) {
+    const region = { latitude: coords.lat, longitude: coords.lng, latitudeDelta: 0.01, longitudeDelta: 0.01 };
     return (
       <View style={[style, { overflow: 'hidden' }]}>
         <MapView
           style={{ flex: 1 }}
-          initialRegion={{ latitude: coords.lat, longitude: coords.lng, latitudeDelta: 0.01, longitudeDelta: 0.01 }}
+          region={region}
           showsUserLocation={false}
           showsPointsOfInterest
         >
           <Marker coordinate={{ latitude: coords.lat, longitude: coords.lng }} title={title || ''} />
         </MapView>
-        <TouchableOpacity
-          onPress={() => Linking.openURL(`https://www.google.com/maps/dir/?api=1&destination=${coords.lat},${coords.lng}`)}
-          style={{ position: 'absolute', bottom: 12, alignSelf: 'center', backgroundColor: '#1A6B8A', paddingHorizontal: 18, paddingVertical: 10, borderRadius: 20, flexDirection: 'row-reverse', alignItems: 'center', gap: 6, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 4 }}
-        >
-          <Text style={{ color: '#fff', fontWeight: '900', fontSize: 13 }}>🧭 נווט</Text>
-        </TouchableOpacity>
       </View>
     );
   }

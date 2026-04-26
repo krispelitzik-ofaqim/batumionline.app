@@ -412,7 +412,7 @@ export default function FinanceStats({ cardBg, channel = 'money' }: { cardBg?: s
                 <View style={{ gap: 4, paddingVertical: 4 }}>
                   <View style={{ flexDirection: 'row-reverse', paddingHorizontal: 10, paddingVertical: 4, gap: 8 }}>
                     {cols.map((col: any) => (
-                      <Text key={col.id} numberOfLines={2} adjustsFontSizeToFit style={{ flex: 1, fontSize: 8, fontWeight: '800', color: '#64748b', textAlign: 'center', writingDirection: 'rtl' }}>{col.name}</Text>
+                      <Text key={col.id} numberOfLines={2} adjustsFontSizeToFit style={{ flex: 1, fontSize: 8, fontWeight: '800', color: '#1A6B8A', textAlign: 'center', writingDirection: 'rtl' }}>{col.name}</Text>
                     ))}
                   </View>
                   {filled.map((tr: any) => (
@@ -423,7 +423,7 @@ export default function FinanceStats({ cardBg, channel = 'money' }: { cardBg?: s
                         const unit = (c as any).unit;
                         const suffix = isValue && v && unit ? (unit === '%' ? '%' : ` ${unit}`) : '';
                         return (
-                          <Text key={col.id} numberOfLines={1} adjustsFontSizeToFit style={{ flex: 1, fontSize: 6, color: '#374151', fontWeight: isValue ? '800' : '600', textAlign: 'center', writingDirection: 'rtl' }}>{v}{suffix}</Text>
+                          <Text key={col.id} numberOfLines={1} adjustsFontSizeToFit style={{ flex: 1, fontSize: 8, color: '#1C2B35', fontWeight: '500', textAlign: 'center', writingDirection: 'rtl' }}>{v}{suffix}</Text>
                         );
                       })}
                     </View>
