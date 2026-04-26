@@ -14,7 +14,8 @@ function stripGoogleDocsCss(h: string): string {
       const keep = (body as string)
         .split(';')
         .map(s => s.trim())
-        .filter(s => /^(text-align|direction|writing-direction|color|background|background-color|font-weight|font-style|text-decoration)\s*:/i.test(s))
+        .filter(s => /^(direction|writing-direction|color|background|background-color|font-weight|font-style|text-decoration)\s*:/i.test(s))
+        .filter(s => !/text-align\s*:\s*(justify|left|center)/i.test(s))
         .join(';');
       return keep ? `style="${keep}"` : '';
     })

@@ -14981,8 +14981,9 @@
           "קומה 5",
           "מיזוג"
         ],
-        "size": "full",
-        "visible": true
+        "size": "banner",
+        "visible": true,
+        "highlightStyle": "yellow-border"
       },
       {
         "id": "rt2",

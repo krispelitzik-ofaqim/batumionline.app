@@ -582,35 +582,7 @@ function TourCard({ t, onRate, nearbyRestaurants }: { t: TourBlock; onRate: (id:
 }
 
 function CategoryNativeMap({ points, focus, setFocus, color, mapSrc }: { points: MapPoint[]; focus: MapPoint | null; setFocus: (p: MapPoint | null) => void; color: string; mapSrc: string }) {
-  if (Platform.OS === 'web') {
-    return <MapEmbed src={mapSrc} style={{ width: '100%', height: 350 }} />;
-  }
-  // @ts-ignore - react-native-maps lazy loaded only on native
-  const RNMaps = require('react-native-maps');
-  const MapView = RNMaps.default;
-  const Marker = RNMaps.Marker;
-  const center = focus
-    ? { latitude: focus.lat, longitude: focus.lng }
-    : { latitude: points.reduce((s, p) => s + p.lat, 0) / points.length, longitude: points.reduce((s, p) => s + p.lng, 0) / points.length };
-  return (
-    <View style={{ width: '100%', height: 350 }}>
-      <MapView
-        style={{ flex: 1 }}
-        region={{ latitude: center.latitude, longitude: center.longitude, latitudeDelta: focus ? 0.01 : 0.05, longitudeDelta: focus ? 0.01 : 0.05 }}
-        showsPointsOfInterest
-      >
-        {points.map((p, i) => (
-          <Marker
-            key={`${p.name}-${i}`}
-            coordinate={{ latitude: p.lat, longitude: p.lng }}
-            title={p.name}
-            pinColor={focus?.name === p.name ? '#dc2626' : color}
-            onPress={() => setFocus(p)}
-          />
-        ))}
-      </MapView>
-    </View>
-  );
+  return <MapEmbed src={mapSrc} style={{ width: '100%', height: 350 }} />;
 }
 
 function CategoryMapModal({ visible, points, focusName, focusCoords, layerColor, onClose }: { visible: boolean; points: MapPoint[]; focusName: string; focusCoords?: { lat: number; lng: number }; layerColor?: string; onClose: () => void }) {

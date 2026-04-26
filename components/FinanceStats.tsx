@@ -5,8 +5,10 @@ import { fetchContent, API_BASE } from '../constants/api';
 
 type Point = { year: string; value: number };
 
-function GdpBars({ ge, il }: { ge: Point[]; il: Point[] }) {
-  if (ge.length === 0 || il.length === 0) return null;
+function GdpBars({ ge: geAll, il: ilAll }: { ge: Point[]; il: Point[] }) {
+  if (geAll.length === 0 || ilAll.length === 0) return null;
+  const ge = geAll.slice(-4);
+  const il = ilAll.slice(-4);
   const W = 300;
   const H = 160;
   const padT = 10;
@@ -25,8 +27,8 @@ function GdpBars({ ge, il }: { ge: Point[]; il: Point[] }) {
     return (
       <View style={{ paddingVertical: 8, paddingHorizontal: 4, backgroundColor: '#f8fafc', borderRadius: 8, borderWidth: 1, borderColor: '#e2e8f0' }}>
         <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 6, justifyContent: 'space-around' }}>
-          {years.slice(-6).map((year, i) => {
-            const idx = years.length - 6 + i;
+          {years.slice(-4).map((year, i) => {
+            const idx = years.length - 4 + i;
             if (idx < 0) return null;
             const vge = ge[idx]?.value || 0;
             const vil = il[idx]?.value || 0;
@@ -39,8 +41,8 @@ function GdpBars({ ge, il }: { ge: Point[]; il: Point[] }) {
                   <View style={{ width: 10, height: hge, backgroundColor: GE, borderRadius: 2 }} />
                 </View>
                 <Text style={{ fontSize: 9, color: '#64748b', marginTop: 4 }}>{year}</Text>
-                <Text style={{ fontSize: 8, color: GE, fontWeight: '700' }}>🇬🇪 {(vge / 1000).toFixed(1)}K</Text>
-                <Text style={{ fontSize: 8, color: IL, fontWeight: '700' }}>🇮🇱 {(vil / 1000).toFixed(1)}K</Text>
+                <Text style={{ fontSize: 6, color: GE, fontWeight: '700' }}>🇬🇪 {(vge / 1000).toFixed(1)}K</Text>
+                <Text style={{ fontSize: 6, color: IL, fontWeight: '700' }}>🇮🇱 {(vil / 1000).toFixed(1)}K</Text>
               </View>
             );
           })}
@@ -69,10 +71,10 @@ function GdpBars({ ge, il }: { ge: Point[]; il: Point[] }) {
         return [
           // Georgia bar (right in RTL display, left in SVG since SVG is LTR)
           React.createElement('rect', { key: `ge-${i}`, x: x0, y: padT + innerH - hge, width: barW, height: hge, fill: GE, rx: 2 }),
-          React.createElement('text', { key: `geL-${i}`, x: x0 + barW / 2, y: padT + innerH - hge - 3, fontSize: 8, fill: GE, fontWeight: '700', textAnchor: 'middle' }, `${(vge / 1000).toFixed(1)}K`),
+          React.createElement('text', { key: `geL-${i}`, x: x0 + barW / 2, y: padT + innerH - hge - 3, fontSize: 6, fill: GE, fontWeight: '700', textAnchor: 'middle' }, `${(vge / 1000).toFixed(1)}K`),
           // Israel bar
           React.createElement('rect', { key: `il-${i}`, x: x0 + barW + 2, y: padT + innerH - hil, width: barW, height: hil, fill: IL, rx: 2 }),
-          React.createElement('text', { key: `ilL-${i}`, x: x0 + barW + 2 + barW / 2, y: padT + innerH - hil - 3, fontSize: 8, fill: IL, fontWeight: '700', textAnchor: 'middle' }, `${(vil / 1000).toFixed(1)}K`),
+          React.createElement('text', { key: `ilL-${i}`, x: x0 + barW + 2 + barW / 2, y: padT + innerH - hil - 3, fontSize: 6, fill: IL, fontWeight: '700', textAnchor: 'middle' }, `${(vil / 1000).toFixed(1)}K`),
           // Year label
           React.createElement('text', { key: `y-${i}`, x: padL + i * groupW + groupW / 2, y: H - padB + 14, fontSize: 9, fill: '#64748b', textAnchor: 'middle' }, year),
         ];
@@ -140,8 +142,8 @@ function Sparkline({ data, color, unit }: { data: Point[]; color: string; unit: 
               <React.Fragment key={`pt-${i}`}>
                 {line}
                 <View style={{ position: 'absolute', left: `${xPct * 100}%`, top: yPx - 4, width: 8, height: 8, borderRadius: 4, backgroundColor: color, marginLeft: -4 }} />
-                <Text style={{ position: 'absolute', left: `${xPct * 100}%`, top: yPx - 22, fontSize: 9, color, fontWeight: '700', marginLeft: -14, width: 28, textAlign: 'center' }}>{p.value.toFixed(1)}</Text>
-                <Text style={{ position: 'absolute', left: `${xPct * 100}%`, top: chartH - 14, fontSize: 9, color: '#64748b', marginLeft: -14, width: 28, textAlign: 'center' }}>{p.year}</Text>
+                <Text style={{ position: 'absolute', left: `${xPct * 100}%`, top: yPx - 16, fontSize: 5, color, fontWeight: '700', marginLeft: -14, width: 28, textAlign: 'center' }}>{p.value.toFixed(1)}</Text>
+                <Text style={{ position: 'absolute', left: `${xPct * 100}%`, top: chartH - 12, fontSize: 5, color: '#64748b', marginLeft: -14, width: 28, textAlign: 'center' }}>{p.year}</Text>
               </React.Fragment>
             );
           })}
@@ -410,7 +412,7 @@ export default function FinanceStats({ cardBg, channel = 'money' }: { cardBg?: s
                 <View style={{ gap: 4, paddingVertical: 4 }}>
                   <View style={{ flexDirection: 'row-reverse', paddingHorizontal: 10, paddingVertical: 4, gap: 8 }}>
                     {cols.map((col: any) => (
-                      <Text key={col.id} numberOfLines={2} style={{ flex: 1, fontSize: 9, fontWeight: '800', color: '#64748b', textAlign: 'center', writingDirection: 'rtl' }}>{col.name}</Text>
+                      <Text key={col.id} numberOfLines={2} adjustsFontSizeToFit style={{ flex: 1, fontSize: 8, fontWeight: '800', color: '#64748b', textAlign: 'center', writingDirection: 'rtl' }}>{col.name}</Text>
                     ))}
                   </View>
                   {filled.map((tr: any) => (
@@ -421,7 +423,7 @@ export default function FinanceStats({ cardBg, channel = 'money' }: { cardBg?: s
                         const unit = (c as any).unit;
                         const suffix = isValue && v && unit ? (unit === '%' ? '%' : ` ${unit}`) : '';
                         return (
-                          <Text key={col.id} numberOfLines={1} adjustsFontSizeToFit style={{ flex: 1, fontSize: 11, color: '#374151', fontWeight: isValue ? '800' : '600', textAlign: 'center', writingDirection: 'rtl' }}>{v}{suffix}</Text>
+                          <Text key={col.id} numberOfLines={1} adjustsFontSizeToFit style={{ flex: 1, fontSize: 6, color: '#374151', fontWeight: isValue ? '800' : '600', textAlign: 'center', writingDirection: 'rtl' }}>{v}{suffix}</Text>
                         );
                       })}
                     </View>
@@ -441,20 +443,22 @@ export default function FinanceStats({ cardBg, channel = 'money' }: { cardBg?: s
               <Text style={s.footerTxt}>{(c as any).tableRows ? `${((c as any).tableRows as any[]).filter((tr:any) => tr.category || tr.value).length} פריטים` : (c.data.length > 0 ? `${c.data[0].year}–${c.data[c.data.length - 1].year}` : 'טוען…')}</Text>
               <Text style={s.footerTxt}>{c.date ? `עודכן ידנית: ${c.date}` : `עודכן: ${updatedAt}`}</Text>
             </View>
+            <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', marginTop: 8, paddingHorizontal: 4 }}>
+              <TouchableOpacity onPress={() => goTo(idx - 1)} disabled={idx === 0} style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: 'rgba(0,0,0,0.6)', alignItems: 'center', justifyContent: 'center' }}>
+                <Text style={[s.arrowTxt, idx === 0 && { opacity: 0.3 }]}>›</Text>
+              </TouchableOpacity>
+              <View style={[s.dots, { marginTop: 0, paddingHorizontal: 0 }]}>
+                {cards.map((_, i) => (
+                  <View key={i} style={[s.dot, i === idx && s.dotActive]} />
+                ))}
+              </View>
+              <TouchableOpacity onPress={() => goTo(idx + 1)} disabled={idx === cards.length - 1} style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: 'rgba(0,0,0,0.6)', alignItems: 'center', justifyContent: 'center' }}>
+                <Text style={[s.arrowTxt, idx === cards.length - 1 && { opacity: 0.3 }]}>‹</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         ))}
       </ScrollView>
-      <TouchableOpacity style={[s.arrow, { right: 8 }]} onPress={() => goTo(idx - 1)} disabled={idx === 0}>
-        <Text style={[s.arrowTxt, idx === 0 && { opacity: 0.3 }]}>›</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={[s.arrow, { left: 8 }]} onPress={() => goTo(idx + 1)} disabled={idx === cards.length - 1}>
-        <Text style={[s.arrowTxt, idx === cards.length - 1 && { opacity: 0.3 }]}>‹</Text>
-      </TouchableOpacity>
-      <View style={s.dots}>
-        {cards.map((_, i) => (
-          <View key={i} style={[s.dot, i === idx && s.dotActive]} />
-        ))}
-      </View>
     </View>
   );
 }
@@ -470,12 +474,12 @@ const s = StyleSheet.create({
   card: { backgroundColor: Colors.WHITE, borderRadius: 12, paddingHorizontal: 14, paddingTop: 14, paddingBottom: 4, borderWidth: 1, borderColor: '#e2e8f0' },
   row: { flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
   label: { fontSize: 13, fontWeight: '700', color: Colors.TEXT, writingDirection: 'rtl' },
-  value: { fontSize: 22, fontWeight: '900', color: Colors.PRIMARY },
+  value: { fontSize: 11, fontWeight: '900', color: Colors.PRIMARY },
   footer: { flexDirection: 'row-reverse', justifyContent: 'space-between', marginTop: 6 },
   footerTxt: { fontSize: 10, color: '#94a3b8', writingDirection: 'rtl' },
-  arrow: { position: 'absolute', top: '40%', marginTop: -18, width: 32, height: 32, borderRadius: 16, backgroundColor: 'rgba(0,0,0,0.4)', alignItems: 'center', justifyContent: 'center', zIndex: 5 },
+  arrow: { position: 'absolute', bottom: 0, width: 28, height: 28, borderRadius: 14, backgroundColor: 'rgba(0,0,0,0.65)', alignItems: 'center', justifyContent: 'center', zIndex: 5 },
   arrowTxt: { fontSize: 22, color: '#fff', fontWeight: '300', lineHeight: 24 },
-  dots: { flexDirection: 'row', justifyContent: 'center', gap: 6, marginTop: 6 },
+  dots: { flexDirection: 'row', justifyContent: 'center', gap: 6, marginTop: 6, paddingHorizontal: 50 },
   dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#cbd5e1' },
   dotActive: { backgroundColor: Colors.PRIMARY, width: 16 },
 });

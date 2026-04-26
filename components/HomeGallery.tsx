@@ -5,21 +5,23 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type GalleryFile = { filename: string; url: string };
 
+const HOME_FALLBACK: GalleryFile[] = [
+  { filename: 'b1', url: '/uploads/1775910069485-6.jpg' },
+  { filename: 'b2', url: '/uploads/1775910069516-30.jpg' },
+  { filename: 'b3', url: '/uploads/1775910069548-933.jpg' },
+  { filename: 'b4', url: '/uploads/1775910069562-341.jpg' },
+  { filename: 'b5', url: '/uploads/1775910069573-698.jpg' },
+  { filename: 'b6', url: '/uploads/1775910069590-365.jpg' },
+];
+
 export default function HomeGallery() {
   const { width } = useWindowDimensions();
-  const [files, setFiles] = useState<GalleryFile[]>([]);
+  const [files, setFiles] = useState<GalleryFile[]>(HOME_FALLBACK);
   const [idx, setIdx] = useState(0);
   const timer = useRef<any>(null);
 
   useEffect(() => {
-    const FALLBACK: GalleryFile[] = [
-      { filename: 'b1', url: '/uploads/1775910069485-6.jpg' },
-      { filename: 'b2', url: '/uploads/1775910069516-30.jpg' },
-      { filename: 'b3', url: '/uploads/1775910069548-933.jpg' },
-      { filename: 'b4', url: '/uploads/1775910069562-341.jpg' },
-      { filename: 'b5', url: '/uploads/1775910069573-698.jpg' },
-      { filename: 'b6', url: '/uploads/1775910069590-365.jpg' },
-    ];
+    const FALLBACK = HOME_FALLBACK;
     AsyncStorage.getItem('@homeBanner').then(cached => {
       if (cached) {
         try { const arr = JSON.parse(cached); if (Array.isArray(arr) && arr.length > 0) setFiles(arr); }

@@ -373,7 +373,7 @@ export default function FlightsModal({ visible, onClose, bgColor }: { visible: b
                         <Text style={{ fontSize: 9, color: 'yellow', textAlign: 'center' }}>{getAirlineIATA(f.flight) || '?'}</Text>
                       )}
                     </View>
-                    <Text style={[s.airline, { textAlign: 'center', marginTop: 2 }]} numberOfLines={1}>{f.airline}</Text>
+                    <Text style={[s.airline, { textAlign: 'center', marginTop: 2 }]} numberOfLines={1}>{cleanAirline(f.airline)}</Text>
                     <Text style={[s.flightNum, { textAlign: 'center', fontSize: 11 }]} numberOfLines={1}>{f.flight}</Text>
                   </View>
                   <View style={{ flex: 1, justifyContent: 'center', gap: 4 }}>
@@ -389,7 +389,7 @@ export default function FlightsModal({ visible, onClose, bgColor }: { visible: b
                     </View>
                   </View>
                   <View style={[s.statusBadge, statusColor(f.status)]}>
-                    <Text style={s.statusTxt}>{f.status}</Text>
+                    <Text style={s.statusTxt} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.6}>{f.status}</Text>
                   </View>
                 </TouchableOpacity>
               ))}
@@ -562,6 +562,14 @@ function formatTime(dateStr: string | undefined): string {
   return d.getHours().toString().padStart(2, '0') + ':' + d.getMinutes().toString().padStart(2, '0');
 }
 
+function cleanAirline(name: string | undefined): string {
+  if (!name) return '';
+  return name
+    .replace(/Arkia\s+Israeli(\s+Airlines)?/i, 'Arkia')
+    .replace(/El\s*Al\s*Israel(\s+Airlines)?/i, 'El Al')
+    .trim();
+}
+
 function formatDateShort(dateStr: string | undefined): string {
   if (!dateStr) return '—';
   const d = new Date(dateStr);
@@ -677,12 +685,12 @@ const s = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 12, padding: 8, marginBottom: 6,
   },
   logo: { width: 30, height: 30, borderRadius: 6, backgroundColor: 'rgba(255,255,255,0.1)' },
-  flightNum: { fontSize: 14, fontWeight: '900', color: Colors.WHITE, textAlign: 'right' },
-  airline: { fontSize: 11, color: Colors.WHITE, opacity: 0.7, textAlign: 'right', fontWeight: '600' },
+  flightNum: { fontSize: 12, fontWeight: '900', color: Colors.WHITE, textAlign: 'right' },
+  airline: { fontSize: 10, color: Colors.WHITE, opacity: 0.7, textAlign: 'right', fontWeight: '600' },
   timeCol: { alignItems: 'center', width: 42 },
   timeVal: { fontSize: 12, fontWeight: '900', color: Colors.WHITE, fontVariant: ['tabular-nums'] },
-  timeDateLabel: { fontSize: 11, color: Colors.WHITE, opacity: 0.7 },
-  timeLabel: { fontSize: 11, color: Colors.WHITE, opacity: 0.6, fontWeight: '700' },
+  timeDateLabel: { fontSize: 10, color: Colors.WHITE, opacity: 0.7 },
+  timeLabel: { fontSize: 10, color: Colors.WHITE, opacity: 0.6, fontWeight: '700' },
   timeArrow: { fontSize: 13, color: Colors.WHITE, opacity: 0.3, marginHorizontal: 1 },
   statusBadge: { paddingVertical: 6, paddingHorizontal: 6, borderRadius: 8, alignItems: 'center', alignSelf: 'center', width: 70 },
   statusTxt: { fontSize: 12, fontWeight: '800', color: Colors.WHITE, writingDirection: 'rtl' },
