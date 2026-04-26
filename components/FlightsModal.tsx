@@ -380,21 +380,15 @@ export default function FlightsModal({ visible, onClose, bgColor }: { visible: b
                     <Text style={[s.flightNum, { textAlign: 'center', fontSize: 11 }]} numberOfLines={1}>{f.flight}</Text>
                   </View>
                   <View style={{ flex: 1, justifyContent: 'center', gap: 4 }}>
-                    <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 4 }}>
-                      <Text style={[s.timeLabel, { fontSize: 9, color: 'rgba(255,255,255,0.6)' }]}>המראה</Text>
-                      <View style={{ flexDirection: 'row-reverse', alignItems: 'baseline', gap: 6 }}>
-                        <Text style={s.timeVal}>{f.depTime}</Text>
-                        <Text style={s.timeLabel}>{tab === 'arrival' ? 'TLV' : 'BUS'}</Text>
-                        <Text style={s.timeDateLabel}>{f.depDate}</Text>
-                      </View>
+                    <View style={{ flexDirection: 'row-reverse', alignItems: 'baseline', justifyContent: 'center', gap: 6 }}>
+                      <Text style={s.timeVal}>{f.depTime}</Text>
+                      <Text style={s.timeLabel}>{tab === 'arrival' ? 'TLV' : 'BUS'}</Text>
+                      <Text style={s.timeDateLabel}>{f.depDate}</Text>
                     </View>
-                    <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 4 }}>
-                      <Text style={[s.timeLabel, { fontSize: 9, color: 'rgba(255,255,255,0.6)' }]}>נחיתה</Text>
-                      <View style={{ flexDirection: 'row-reverse', alignItems: 'baseline', gap: 6 }}>
-                        <Text style={s.timeVal}>{f.arrTime}</Text>
-                        <Text style={s.timeLabel}>{tab === 'arrival' ? 'BUS' : 'TLV'}</Text>
-                        <Text style={s.timeDateLabel}>{f.arrDate}</Text>
-                      </View>
+                    <View style={{ flexDirection: 'row-reverse', alignItems: 'baseline', justifyContent: 'center', gap: 6 }}>
+                      <Text style={s.timeVal}>{f.arrTime}</Text>
+                      <Text style={s.timeLabel}>{tab === 'arrival' ? 'BUS' : 'TLV'}</Text>
+                      <Text style={s.timeDateLabel}>{f.arrDate}</Text>
                     </View>
                   </View>
                   <View style={[s.statusBadge, statusColor(f.status)]}>
@@ -684,15 +678,15 @@ const s = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 12, padding: 8, marginBottom: 6,
   },
   logo: { width: 30, height: 30, borderRadius: 6, backgroundColor: 'rgba(255,255,255,0.1)' },
-  flightNum: { fontSize: 13, fontWeight: '700', color: Colors.WHITE, textAlign: 'right' },
-  airline: { fontSize: 10, color: Colors.WHITE, opacity: 0.5, textAlign: 'right' },
+  flightNum: { fontSize: 14, fontWeight: '900', color: Colors.WHITE, textAlign: 'right' },
+  airline: { fontSize: 11, color: Colors.WHITE, opacity: 0.7, textAlign: 'right', fontWeight: '600' },
   timeCol: { alignItems: 'center', width: 42 },
-  timeVal: { fontSize: 13, fontWeight: '700', color: Colors.WHITE },
-  timeDateLabel: { fontSize: 9, color: Colors.WHITE, opacity: 0.6, marginTop: 1 },
-  timeLabel: { fontSize: 9, color: Colors.WHITE, opacity: 0.4, marginTop: 1 },
-  timeArrow: { fontSize: 11, color: Colors.WHITE, opacity: 0.3, marginHorizontal: 1 },
-  statusBadge: { paddingVertical: 4, paddingHorizontal: 4, borderRadius: 8, alignItems: 'center', alignSelf: 'center', width: 60 },
-  statusTxt: { fontSize: 10, fontWeight: '700', color: Colors.WHITE, writingDirection: 'rtl' },
+  timeVal: { fontSize: 14, fontWeight: '900', color: Colors.WHITE, fontVariant: ['tabular-nums'] },
+  timeDateLabel: { fontSize: 11, color: Colors.WHITE, opacity: 0.7 },
+  timeLabel: { fontSize: 11, color: Colors.WHITE, opacity: 0.6, fontWeight: '700' },
+  timeArrow: { fontSize: 13, color: Colors.WHITE, opacity: 0.3, marginHorizontal: 1 },
+  statusBadge: { paddingVertical: 6, paddingHorizontal: 6, borderRadius: 8, alignItems: 'center', alignSelf: 'center', width: 70 },
+  statusTxt: { fontSize: 12, fontWeight: '800', color: Colors.WHITE, writingDirection: 'rtl' },
 
   detailsOverlay: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(10,20,30,0.96)', zIndex: 100 },
   detailsClose: { position: 'absolute', top: 54, right: 20, zIndex: 110, width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.25)', justifyContent: 'center', alignItems: 'center' },

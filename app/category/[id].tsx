@@ -667,8 +667,27 @@ function CategoryMapModal({ visible, points, focusName, focusCoords, layerColor,
               ])}
             </View>
           )}
-          <MapEmbed src={mapSrc} style={{ width: '100%', height: 350 }} />
-          {focus && (
+          {Platform.OS === 'web' ? (
+            <MapEmbed src={mapSrc} style={{ width: '100%', height: 350 }} />
+          ) : (
+            <ScrollView style={{ maxHeight: 380 }} contentContainerStyle={{ padding: 14, paddingTop: 50 }}>
+              <Text style={{ fontSize: 16, fontWeight: '900', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl', marginBottom: 10 }}>📍 בחר נקודה ({points.length})</Text>
+              {points.map((p, i) => {
+                const on = focus?.name === p.name;
+                const isKosher = p.name.includes('כשר') || p.name.toLowerCase().includes('kosher');
+                const itemColor = isKosher ? '#2E7D32' : color;
+                return (
+                  <TouchableOpacity key={p.name + i} onPress={() => setFocus(p)} style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', padding: 12, borderRadius: 10, backgroundColor: on ? itemColor : isKosher ? '#E8F5E9' : '#f8f9fa', borderWidth: 1.5, borderColor: on ? itemColor : itemColor + '30', marginBottom: 6 }}>
+                    <Text style={{ fontSize: 14, fontWeight: on ? '800' : '600', color: on ? '#fff' : itemColor, writingDirection: 'rtl', textAlign: 'right', flex: 1 }} numberOfLines={1}>{isKosher ? '✡️' : '📍'} {p.name}</Text>
+                    <TouchableOpacity onPress={() => Linking.openURL(`https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}`)} style={{ backgroundColor: on ? '#fff' : itemColor, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8, marginRight: 8 }}>
+                      <Text style={{ color: on ? itemColor : '#fff', fontSize: 12, fontWeight: '900' }}>🧭 נווט</Text>
+                    </TouchableOpacity>
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
+          )}
+          {Platform.OS === 'web' && focus && (
             <View style={{ padding: 14, borderTopWidth: 1, borderTopColor: '#eee' }}>
               <Text style={{ fontSize: 16, fontWeight: '900', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl' }}>📍 {focus.name}</Text>
               <TouchableOpacity
@@ -1173,7 +1192,9 @@ export default function CategoryScreen() {
         ) : cat.hotels && cat.hotels.length > 0 ? (
           <View style={st.hotelList}>
             {cat.longText && cat.hotels.length <= 10 && (
-              <HtmlContent html={cat.longText} style={{ paddingHorizontal: 16, paddingTop: 8 }} baseStyle={{ color: darkCat ? '#e2e8f0' : Colors.TEXT, textAlign: 'right', writingDirection: 'rtl' }} />
+              <View style={{ width: '100%', alignSelf: 'stretch', paddingHorizontal: 16, paddingTop: 8 }}>
+                <HtmlContent html={cat.longText} baseStyle={{ color: darkCat ? '#e2e8f0' : Colors.TEXT, textAlign: 'right', writingDirection: 'rtl' }} />
+              </View>
             )}
             {cat.introAudio && (
               <View style={{ paddingHorizontal: 0, paddingTop: 4, paddingBottom: 8 }}>
@@ -1188,10 +1209,14 @@ export default function CategoryScreen() {
                 : <HotelCard key={h.id} h={h} dark={darkCat} pageBtnLabel={cat.pageBtnLabel || 'לדף המלון'} mapPoints={mapPoints} layerColor={mapLayerColor || (mapPoints.length > 0 ? Colors.PRIMARY : undefined)} placesQuery={`${h.title} Batumi`} isHotel={rootId === '1'} isAttraction={rootId === '2'} isRestaurant={rootId === '6'} />
             ))}
             {cat.longText && cat.hotels.length > 10 && (
-              <HtmlContent html={cat.longText} style={{ paddingBottom: 16, paddingHorizontal: 16 }} baseStyle={{ color: darkCat ? '#e2e8f0' : Colors.TEXT, textAlign: 'right', writingDirection: 'rtl' }} />
+              <View style={{ width: '100%', alignSelf: 'stretch', paddingBottom: 16, paddingHorizontal: 16 }}>
+                <HtmlContent html={cat.longText} baseStyle={{ color: darkCat ? '#e2e8f0' : Colors.TEXT, textAlign: 'right', writingDirection: 'rtl' }} />
+              </View>
             )}
             {(cat as any).longTextBottom && (
-              <HtmlContent html={(cat as any).longTextBottom} style={{ paddingHorizontal: 16, paddingBottom: 16, paddingTop: 8 }} baseStyle={{ color: darkCat ? '#e2e8f0' : Colors.TEXT, textAlign: 'right', writingDirection: 'rtl' }} />
+              <View style={{ width: '100%', alignSelf: 'stretch', paddingHorizontal: 16, paddingBottom: 16, paddingTop: 8 }}>
+                <HtmlContent html={(cat as any).longTextBottom} baseStyle={{ color: darkCat ? '#e2e8f0' : Colors.TEXT, textAlign: 'right', writingDirection: 'rtl' }} />
+              </View>
             )}
             {cat.cardStyle === 'foodie' && (
               <View style={{ backgroundColor: '#1e1e2a', borderRadius: 16, margin: 16, marginTop: 8, padding: 16 }}>

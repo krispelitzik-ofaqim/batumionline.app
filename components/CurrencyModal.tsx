@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Modal, TouchableOpacity, TextInput, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, Modal, TouchableOpacity, TextInput, StyleSheet, ActivityIndicator, ScrollView } from 'react-native';
 import { Colors } from '../constants/colors';
 
 type Rates = { ILS: number; GEL: number; USD: number; EUR: number };
@@ -59,7 +59,7 @@ export default function CurrencyModal({ visible, onClose, bgColor }: { visible: 
           <Text style={s.closeX}>✕</Text>
         </TouchableOpacity>
 
-        <View style={s.content}>
+        <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
           <Text style={s.title}>המרת מטבעות</Text>
           <Text style={s.subtitle}>שערים מתעדכנים בזמן אמת</Text>
           {lastUpdate ? <Text style={s.updatedTxt}>עודכן: {lastUpdate}</Text> : null}
@@ -99,8 +99,8 @@ export default function CurrencyModal({ visible, onClose, bgColor }: { visible: 
                 </View>
               </View>
 
-              {/* In-app numeric keypad */}
-              <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 6, marginBottom: 14 }}>
+              {/* In-app numeric keypad - compact */}
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 4, marginBottom: 10 }}>
                 {[ '7','8','9','4','5','6','1','2','3','.','0','⌫' ].map(k => (
                   <TouchableOpacity
                     key={k}
@@ -109,18 +109,18 @@ export default function CurrencyModal({ visible, onClose, bgColor }: { visible: 
                       else if (k === '.') { if (!amount.includes('.')) setAmount(a => (a || '0') + '.'); }
                       else setAmount(a => (a + k).replace(/^0(\d)/, '$1'));
                     }}
-                    style={{ width: '30%', paddingVertical: 12, backgroundColor: 'rgba(255,255,255,0.18)', borderRadius: 10, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.25)' }}
+                    style={{ width: '23%', paddingVertical: 6, backgroundColor: 'rgba(255,255,255,0.18)', borderRadius: 8, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.25)' }}
                     activeOpacity={0.7}
                   >
-                    <Text style={{ fontSize: 22, fontWeight: '700', color: '#fff' }}>{k}</Text>
+                    <Text style={{ fontSize: 16, fontWeight: '700', color: '#fff' }}>{k}</Text>
                   </TouchableOpacity>
                 ))}
                 <TouchableOpacity
                   onPress={() => setAmount('')}
-                  style={{ width: '94%', paddingVertical: 10, backgroundColor: 'rgba(220,38,38,0.6)', borderRadius: 10, alignItems: 'center', marginTop: 4 }}
+                  style={{ width: '23%', paddingVertical: 6, backgroundColor: 'rgba(220,38,38,0.6)', borderRadius: 8, alignItems: 'center', justifyContent: 'center' }}
                   activeOpacity={0.7}
                 >
-                  <Text style={{ fontSize: 14, fontWeight: '800', color: '#fff' }}>נקה</Text>
+                  <Text style={{ fontSize: 12, fontWeight: '800', color: '#fff' }}>נקה</Text>
                 </TouchableOpacity>
               </View>
 
@@ -142,7 +142,7 @@ export default function CurrencyModal({ visible, onClose, bgColor }: { visible: 
               <Text style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', textAlign: 'center', marginTop: 16, writingDirection: 'rtl' }}>מקור הנתונים: open.er-api.com (שערים גלובליים, מתעדכנים יומית)</Text>
             </>
           )}
-        </View>
+        </ScrollView>
       </View>
     </Modal>
   );
