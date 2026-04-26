@@ -10,7 +10,7 @@ const NAMES: Record<string, string> = { ILS: 'שקל', GEL: 'לארי', USD: 'ד
 export default function CurrencyModal({ visible, onClose, bgColor }: { visible: boolean; onClose: () => void; bgColor: string }) {
   const [rates, setRates] = useState<Rates | null>(null);
   const [loading, setLoading] = useState(true);
-  const [amount, setAmount] = useState('100');
+  const [amount, setAmount] = useState('');
   const [from, setFrom] = useState<keyof Rates>('ILS');
   const [lastUpdate, setLastUpdate] = useState('');
 
@@ -92,9 +92,7 @@ export default function CurrencyModal({ visible, onClose, bgColor }: { visible: 
 
               {/* Amount input */}
               <View style={s.inputCard}>
-                <Text style={s.inputLabel}>סכום ב{NAMES[from]}</Text>
                 <View style={s.inputRow}>
-                  <Text style={s.inputFlag}>{FLAGS[from]}</Text>
                   <TextInput
                     style={s.input}
                     value={amount}
@@ -102,6 +100,8 @@ export default function CurrencyModal({ visible, onClose, bgColor }: { visible: 
                     keyboardType="numeric"
                     textAlign="center"
                     selectTextOnFocus
+                    placeholder={`הקלד סכום ב${NAMES[from]}`}
+                    placeholderTextColor="rgba(255,255,255,0.6)"
                   />
                 </View>
               </View>
@@ -109,18 +109,19 @@ export default function CurrencyModal({ visible, onClose, bgColor }: { visible: 
               {/* Results */}
               {others.map(c => (
                 <View key={c} style={s.resultCard}>
-                  <Text style={s.resultFlag}>{FLAGS[c]}</Text>
-                  <View style={s.resultInfo}>
+                  <View style={{ flexDirection: 'row-reverse', alignItems: 'baseline', justifyContent: 'center', gap: 8 }}>
+                    <Text style={s.resultFlag}>{FLAGS[c]}</Text>
                     <Text style={s.resultAmount}>{convert(c)}</Text>
-                    <Text style={s.resultLabel}>{NAMES[c]}</Text>
+                    <Text style={s.resultName}>{NAMES[c]}</Text>
                   </View>
                   {rates && (
-                    <Text style={s.rateText}>
+                    <Text style={[s.rateText, { textAlign: 'center' }]}>
                       1 {NAMES[from]} = {(rates[c] / rates[from]).toFixed(4)} {NAMES[c]}
                     </Text>
                   )}
                 </View>
               ))}
+              <Text style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', textAlign: 'center', marginTop: 16, writingDirection: 'rtl' }}>מקור הנתונים: open.er-api.com (שערים גלובליים, מתעדכנים יומית)</Text>
             </>
           )}
         </View>
@@ -154,17 +155,15 @@ const s = StyleSheet.create({
 
   inputCard: { backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 16, paddingVertical: 10, paddingHorizontal: 20, alignItems: 'center', marginBottom: 20 },
   inputLabel: { fontSize: 14, color: Colors.WHITE, opacity: 0.7, marginBottom: 12, writingDirection: 'rtl' },
-  inputRow: { alignItems: 'center', justifyContent: 'center', gap: 8 },
+  inputRow: { alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: 'rgba(255,255,255,0.18)', borderRadius: 12, borderWidth: 2, borderColor: 'rgba(255,255,255,0.5)', paddingHorizontal: 12, paddingVertical: 6, alignSelf: 'center' },
   inputFlag: { fontSize: 36, marginBottom: 4 },
-  input: { fontSize: 44, fontWeight: '900', color: Colors.WHITE, minWidth: 180, paddingBottom: 4, textAlign: 'center', outlineStyle: 'none' as any, borderWidth: 0 },
+  input: { fontSize: 24, fontWeight: '900', color: Colors.WHITE, width: 240, paddingVertical: 4, textAlign: 'center', outlineStyle: 'none' as any, borderWidth: 0 },
 
   resultCard: {
-    backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 16, padding: 20, marginBottom: 12,
-    flexDirection: 'row-reverse', alignItems: 'center', gap: 14,
+    backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 12, paddingVertical: 10, paddingHorizontal: 16, marginBottom: 8,
   },
-  resultFlag: { fontSize: 32 },
-  resultInfo: { flex: 1 },
-  resultAmount: { fontSize: 28, fontWeight: '800', color: Colors.WHITE, textAlign: 'right' },
-  resultLabel: { fontSize: 13, color: Colors.WHITE, opacity: 0.7, textAlign: 'right', writingDirection: 'rtl' },
-  rateText: { fontSize: 11, color: Colors.WHITE, opacity: 0.5 },
+  resultFlag: { fontSize: 22 },
+  resultAmount: { fontSize: 24, fontWeight: '900', color: Colors.WHITE },
+  resultName: { fontSize: 14, fontWeight: '700', color: 'rgba(255,255,255,0.85)' },
+  rateText: { fontSize: 11, color: Colors.WHITE, opacity: 0.6, textAlign: 'right', writingDirection: 'rtl', marginTop: 4 },
 });

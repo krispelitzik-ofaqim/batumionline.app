@@ -21,7 +21,33 @@ function GdpBars({ ge, il }: { ge: Point[]; il: Point[] }) {
   const barW = (groupW - 8) / 2;
   const GE = '#8b5cf6', IL = '#0ea5e9';
 
-  if (Platform.OS !== 'web') return <View style={{ height: H, backgroundColor: '#f1f5f9', borderRadius: 6 }} />;
+  if (Platform.OS !== 'web') {
+    return (
+      <View style={{ paddingVertical: 8, paddingHorizontal: 4, backgroundColor: '#f8fafc', borderRadius: 8, borderWidth: 1, borderColor: '#e2e8f0' }}>
+        <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 6, justifyContent: 'space-around' }}>
+          {years.slice(-6).map((year, i) => {
+            const idx = years.length - 6 + i;
+            if (idx < 0) return null;
+            const vge = ge[idx]?.value || 0;
+            const vil = il[idx]?.value || 0;
+            const hge = Math.max(8, (vge / maxVal) * 80);
+            const hil = Math.max(8, (vil / maxVal) * 80);
+            return (
+              <View key={i} style={{ alignItems: 'center', minWidth: 50 }}>
+                <View style={{ flexDirection: 'row', alignItems: 'flex-end', gap: 2, height: 80 }}>
+                  <View style={{ width: 10, height: hil, backgroundColor: IL, borderRadius: 2 }} />
+                  <View style={{ width: 10, height: hge, backgroundColor: GE, borderRadius: 2 }} />
+                </View>
+                <Text style={{ fontSize: 9, color: '#64748b', marginTop: 4 }}>{year}</Text>
+                <Text style={{ fontSize: 8, color: GE, fontWeight: '700' }}>🇬🇪 {(vge / 1000).toFixed(1)}K</Text>
+                <Text style={{ fontSize: 8, color: IL, fontWeight: '700' }}>🇮🇱 {(vil / 1000).toFixed(1)}K</Text>
+              </View>
+            );
+          })}
+        </View>
+      </View>
+    );
+  }
   return React.createElement('div', { style: { width: '100%' } },
     React.createElement('div', { style: { display: 'flex', gap: 10, marginBottom: 6, justifyContent: 'flex-end' } },
       React.createElement('div', { style: { display: 'flex', alignItems: 'center', gap: 4 } },
@@ -80,7 +106,19 @@ function Sparkline({ data, color, unit }: { data: Point[]; color: string; unit: 
   const yTicks = [max, (max + min) / 2, min];
 
   if (Platform.OS !== 'web') {
-    return <View style={{ height: H, backgroundColor: '#f1f5f9', borderRadius: 6 }} />;
+    return (
+      <View style={{ paddingVertical: 8, paddingHorizontal: 4, backgroundColor: '#f8fafc', borderRadius: 8, borderWidth: 1, borderColor: '#e2e8f0' }}>
+        <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 6, justifyContent: 'space-around' }}>
+          {data.slice(-8).map((p, i) => (
+            <View key={i} style={{ alignItems: 'center', minWidth: 56 }}>
+              <View style={{ width: 6, height: Math.max(8, ((p.value - min) / range) * 60), backgroundColor: color, borderRadius: 3, marginBottom: 4 }} />
+              <Text style={{ fontSize: 10, fontWeight: '900', color: '#1C2B35' }}>{p.value.toFixed(1)}{unit}</Text>
+              <Text style={{ fontSize: 9, color: '#64748b' }}>{p.year}</Text>
+            </View>
+          ))}
+        </View>
+      </View>
+    );
   }
   return React.createElement('svg', {
     width: W, height: H, style: { display: 'block' },

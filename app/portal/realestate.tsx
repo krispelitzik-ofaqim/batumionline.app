@@ -680,7 +680,7 @@ function FutureCard({ p, width }: { p: Listing; width: number }) {
 
 function FutureSlider({ projects }: { projects: Listing[] }) {
   const { width } = useWindowDimensions();
-  const SLIDE_W = Math.min(width - 64, 360);
+  const SLIDE_W = width - 32;
   const GAP = 12;
   const scrollRef = useRef<ScrollView>(null);
   const [idx, setIdx] = useState(0);

@@ -306,11 +306,24 @@ export default function FlightsModal({ visible, onClose, bgColor }: { visible: b
         </TouchableOpacity>
 
         <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
-          <Text style={s.title}>נחיתות והמראות משדה התעופה בטומי BUS</Text>
+          <Text style={[s.title, { fontSize: 18 }]} numberOfLines={2}>נחיתות והמראות{'\n'}משדה התעופה בטומי BUS</Text>
 
-          {/* Airport board header */}
-          <View style={s.boardHeader}>
-            {/* Refresh circular button - left */}
+          {/* ONLINE LED - centered */}
+          <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 8 }}>
+            <Animated.View style={[s.led, { opacity: ledAnim }]} />
+            <Text style={s.ledLabel}>ONLINE</Text>
+            <Text style={[s.updatedAt, { marginTop: 0 }]}>· עודכן ב: {lastUpdatedClock}</Text>
+          </View>
+
+          {/* Clock + refresh */}
+          <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'center', gap: 14, marginBottom: 8 }}>
+            <View style={s.clockWrap}>
+              <Text style={s.clockLabelTop}>שעון בטומי</Text>
+              <View style={s.clockBoard}>
+                <Text style={s.clockDigits}>{batumiTime}</Text>
+              </View>
+              <Text style={s.clockLabel}>UTC+4</Text>
+            </View>
             <TouchableOpacity style={s.refreshCircle} onPress={reload} activeOpacity={0.7} disabled={loading}>
               {loading ? (
                 <ActivityIndicator size="small" color={Colors.WHITE} />
@@ -321,22 +334,6 @@ export default function FlightsModal({ visible, onClose, bgColor }: { visible: b
                 </>
               )}
             </TouchableOpacity>
-
-            {/* 7-segment clock - center */}
-            <View style={s.clockWrap}>
-              <Text style={s.clockLabelTop}>שעון בטומי</Text>
-              <View style={s.clockBoard}>
-                <Text style={s.clockDigits}>{batumiTime}</Text>
-              </View>
-              <Text style={s.clockLabel}>UTC+4</Text>
-            </View>
-
-            {/* Green blinking LED + last updated - right */}
-            <View style={s.ledWrap}>
-              <Animated.View style={[s.led, { opacity: ledAnim }]} />
-              <Text style={s.ledLabel}>ONLINE</Text>
-              <Text style={s.updatedAt}>עודכן ב: {lastUpdatedClock}</Text>
-            </View>
           </View>
 
           <Text style={s.code}>TLV — BUS  •  {new Date().toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</Text>
@@ -370,32 +367,30 @@ export default function FlightsModal({ visible, onClose, bgColor }: { visible: b
               )}
 
               {filtered.map((f, i) => (
-                <TouchableOpacity key={i} style={s.flightRow} activeOpacity={0.7} onPress={() => setSelected(f)}>
-                  <View style={s.logo}>
-                    {AIRLINE_LOGOS[getAirlineIATA(f.flight)] ? (
-                      <Image
-                        source={AIRLINE_LOGOS[getAirlineIATA(f.flight)]}
-                        style={{ width: '100%', height: '100%' }}
-                        resizeMode="contain"
-                      />
-                    ) : (
-                      <Text style={{ fontSize: 9, color: 'yellow', textAlign: 'center' }}>{getAirlineIATA(f.flight) || '?'}</Text>
-                    )}
+                <TouchableOpacity key={i} style={[s.flightRow, { justifyContent: 'space-between' }]} activeOpacity={0.7} onPress={() => setSelected(f)}>
+                  <View style={{ alignItems: 'center', width: 60 }}>
+                    <View style={s.logo}>
+                      {AIRLINE_LOGOS[getAirlineIATA(f.flight)] ? (
+                        <Image source={AIRLINE_LOGOS[getAirlineIATA(f.flight)]} style={{ width: '100%', height: '100%' }} resizeMode="contain" />
+                      ) : (
+                        <Text style={{ fontSize: 9, color: 'yellow', textAlign: 'center' }}>{getAirlineIATA(f.flight) || '?'}</Text>
+                      )}
+                    </View>
+                    <Text style={[s.airline, { textAlign: 'center', marginTop: 2 }]} numberOfLines={1}>{f.airline}</Text>
+                    <Text style={[s.flightNum, { textAlign: 'center', fontSize: 11 }]} numberOfLines={1}>{f.flight}</Text>
                   </View>
-                  <View style={{ flex: 1 }}>
-                    <Text style={s.flightNum} numberOfLines={1}>{f.flight}</Text>
-                    <Text style={s.airline} numberOfLines={1}>{f.airline}</Text>
-                  </View>
-                  <View style={s.timeCol}>
-                    <Text style={s.timeVal}>{f.depTime}</Text>
-                    <Text style={s.timeDateLabel}>{f.depDate}</Text>
-                    <Text style={s.timeLabel}>{tab === 'arrival' ? 'TLV' : 'BUS'}</Text>
-                  </View>
-                  <Text style={s.timeArrow}>←</Text>
-                  <View style={s.timeCol}>
-                    <Text style={s.timeVal}>{f.arrTime}</Text>
-                    <Text style={s.timeDateLabel}>{f.arrDate}</Text>
-                    <Text style={s.timeLabel}>{tab === 'arrival' ? 'BUS' : 'TLV'}</Text>
+                  <View style={{ flex: 1, flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
+                    <View style={s.timeCol}>
+                      <Text style={s.timeVal}>{f.depTime}</Text>
+                      <Text style={s.timeDateLabel}>{f.depDate}</Text>
+                      <Text style={s.timeLabel}>{tab === 'arrival' ? 'TLV' : 'BUS'}</Text>
+                    </View>
+                    <Text style={s.timeArrow}>←</Text>
+                    <View style={s.timeCol}>
+                      <Text style={s.timeVal}>{f.arrTime}</Text>
+                      <Text style={s.timeDateLabel}>{f.arrDate}</Text>
+                      <Text style={s.timeLabel}>{tab === 'arrival' ? 'BUS' : 'TLV'}</Text>
+                    </View>
                   </View>
                   <View style={[s.statusBadge, statusColor(f.status)]}>
                     <Text style={s.statusTxt}>{f.status}</Text>

@@ -64,8 +64,6 @@ const BOTTOM_BANNERS = [
   { id: 'currency', title: 'המרת מטבעות', icon: '💰', bg: Colors.SECONDARY },
   { id: 'news', title: 'חדשות בעברית', icon: '🗞️', bg: '#7ECFC0' },
   { id: 'flights', title: 'לוח המראות ונחיתות', icon: '✈️', bg: '#2D4A5E' },
-  { id: 'coupon', title: 'מימוש קוד קופון', icon: '🎟️', bg: '#16a34a' },
-  { id: 'gyg', title: 'סיורים ופעילויות בבטומי', icon: '🎫', bg: '#FF5A5F' },
 ];
 
 const DEV_PALETTE = [

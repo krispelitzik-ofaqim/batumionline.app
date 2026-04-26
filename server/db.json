@@ -15128,5 +15128,6 @@
       "visible": true
     }
   ],
-  "bgColor": "#f0ede5"
+  "bgColor": "#f0ede5",
+  "homeBanner": []
 }

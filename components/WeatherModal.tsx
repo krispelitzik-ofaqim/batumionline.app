@@ -277,14 +277,14 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
         </TouchableOpacity>
 
         <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
-          <View style={s.liveHeader}>
+          <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
             <View style={s.liveBadge}>
               <Animated.View style={[s.liveDot, { opacity: livePulse }]} />
               <Text style={s.liveTxt}>LIVE</Text>
             </View>
-            <Text style={s.title}>מזג האוויר בבטומי</Text>
             <Text style={s.batumiClock}>🕐 {batumiTime}</Text>
           </View>
+          <Text style={[s.title, { fontSize: 16, marginBottom: 4 }]}>מזג האוויר בבטומי</Text>
           {lastUpdated && (
             <Text style={s.updatedTxt}>עודכן: {lastUpdated.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })} · מתרענן כל 10 דק׳</Text>
           )}
@@ -312,11 +312,11 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
               {/* Today's weather — compact display */}
               {current && (
                 <View style={s.currentCard}>
-                  <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 10 }}>
+                  <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 10, justifyContent: 'center' }}>
                     <Text style={s.currentIcon}>{current.icon}</Text>
                     <Text style={s.currentTemp}>{current.temp}°</Text>
-                    <Text style={s.currentDesc}>{current.desc}</Text>
                   </View>
+                  <Text style={[s.currentDesc, { textAlign: 'center', marginTop: 4 }]}>{current.desc}</Text>
                   <View style={s.detailsRow}>
                     <View style={s.detailItem}>
                       <Text style={s.detailIcon}>🌡️</Text>
@@ -383,7 +383,10 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
               {hourly.length > 0 && (
                 <>
                   <Text style={s.weekTitle}>24 השעות הקרובות</Text>
-                  <View style={{ position: 'relative' }}>
+                  <View style={{ position: 'relative', paddingTop: 18 }}>
+                    <View style={{ position: 'absolute', top: 0, right: 22, backgroundColor: '#F4A94E', paddingHorizontal: 10, paddingVertical: 3, borderRadius: 10, zIndex: 5 }}>
+                      <Text style={{ color: '#1C2B35', fontSize: 10, fontWeight: '900' }}>עכשיו</Text>
+                    </View>
                     <Text style={s.hourArrowFloat}>←</Text>
                     <ScrollView
                       ref={hourlyRef}
@@ -404,7 +407,6 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
                             end={{ x: 0, y: 1 }}
                             style={[s.hourCell, isNow && s.hourCellNow]}
                           >
-                            {isNow && <Text style={s.nowBadge}>עכשיו</Text>}
                             <Text style={s.hourTime}>{h.hour}</Text>
                             <Text style={s.hourIcon}>{h.icon}</Text>
                             <Text style={s.hourTemp}>{h.temp}°</Text>
@@ -641,38 +643,38 @@ const s = StyleSheet.create({
   audioWrap: { marginBottom: 12, borderRadius: 18, borderWidth: 1, borderColor: 'rgba(255,255,255,0.35)' },
   hourlyScroll: { flexDirection: 'row-reverse', gap: 10, paddingVertical: 8, paddingHorizontal: 2, marginBottom: 20 },
   hourCell: { backgroundColor: 'rgba(255,255,255,0.12)', borderRadius: 14, paddingVertical: 12, paddingHorizontal: 14, alignItems: 'center', minWidth: 70, borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)' },
-  hourCellNow: { borderWidth: 2, borderColor: '#F4A94E', paddingTop: 8 },
-  nowBadge: { position: 'absolute', top: -9, backgroundColor: '#F4A94E', color: '#1C2B35', fontSize: 10, fontWeight: '900', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 8, overflow: 'hidden' },
-  hourArrowFloat: { position: 'absolute', top: -18, right: 88, color: 'rgba(255,255,255,0.7)', fontSize: 20, fontWeight: '900', zIndex: 2, textShadowColor: 'rgba(0,0,0,0.35)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 2 },
+  hourCellNow: { borderWidth: 2, borderColor: '#F4A94E' },
+  nowBadge: { position: 'absolute', top: -8, alignSelf: 'center', backgroundColor: '#F4A94E', color: '#1C2B35', fontSize: 10, fontWeight: '900', paddingHorizontal: 10, paddingVertical: 3, borderRadius: 10, overflow: 'hidden', zIndex: 5 },
+  hourArrowFloat: { position: 'absolute', top: -2, right: 115, color: 'rgba(255,255,255,0.85)', fontSize: 22, fontWeight: '900', zIndex: 2, textShadowColor: 'rgba(0,0,0,0.35)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 2 },
   hourTime: { fontSize: 12, color: '#fff', fontWeight: '800', marginBottom: 4, textShadowColor: 'rgba(0,0,0,0.35)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 2 },
   hourIcon: { fontSize: 24, marginBottom: 2 },
   hourTemp: { fontSize: 16, color: '#fff', fontWeight: '900', textShadowColor: 'rgba(0,0,0,0.4)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 3 },
   hourPop: { fontSize: 10, color: '#DBEAFE', fontWeight: '800', marginTop: 2, textShadowColor: 'rgba(0,0,0,0.35)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 2 },
 
-  currentCard: { backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 20, padding: 18, marginBottom: 18 },
-  currentIcon: { fontSize: 56 },
-  currentTemp: { fontSize: 52, fontWeight: '900', color: Colors.WHITE, marginLeft: 12, lineHeight: 60, textShadowColor: 'rgba(0,0,0,0.4)', textShadowOffset: { width: 0, height: 3 }, textShadowRadius: 6 },
-  currentDesc: { fontSize: 16, color: Colors.WHITE, textTransform: 'capitalize', flex: 1, textAlign: 'right', writingDirection: 'rtl', fontWeight: '700', textShadowColor: 'rgba(0,0,0,0.35)', textShadowOffset: { width: 0, height: 2 }, textShadowRadius: 4 },
-  detailsRow: { flexDirection: 'row', alignItems: 'center', marginTop: 14, gap: 8, width: '100%', paddingHorizontal: 2 },
+  currentCard: { backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 20, padding: 14, marginBottom: 14 },
+  currentIcon: { fontSize: 44 },
+  currentTemp: { fontSize: 40, fontWeight: '900', color: Colors.WHITE, marginLeft: 8, lineHeight: 46, textShadowColor: 'rgba(0,0,0,0.4)', textShadowOffset: { width: 0, height: 3 }, textShadowRadius: 6 },
+  currentDesc: { fontSize: 13, color: Colors.WHITE, textTransform: 'capitalize', flex: 1, textAlign: 'right', writingDirection: 'rtl', fontWeight: '700', textShadowColor: 'rgba(0,0,0,0.35)', textShadowOffset: { width: 0, height: 2 }, textShadowRadius: 4 },
+  detailsRow: { flexDirection: 'row', alignItems: 'center', marginTop: 10, gap: 6, width: '100%', paddingHorizontal: 2 },
   detailItem: { alignItems: 'center', flex: 1, paddingVertical: 2 },
-  detailIcon: { fontSize: 22, marginBottom: 6 },
-  detailVal: { fontSize: 20, fontWeight: '900', color: Colors.WHITE, marginBottom: 4, textShadowColor: 'rgba(0,0,0,0.35)', textShadowOffset: { width: 0, height: 2 }, textShadowRadius: 3 },
-  detailLabel: { fontSize: 11, color: Colors.WHITE, fontWeight: '700', textAlign: 'center', writingDirection: 'rtl', lineHeight: 14, textShadowColor: 'rgba(0,0,0,0.3)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 2 },
+  detailIcon: { fontSize: 18, marginBottom: 4 },
+  detailVal: { fontSize: 16, fontWeight: '900', color: Colors.WHITE, marginBottom: 2, textShadowColor: 'rgba(0,0,0,0.35)', textShadowOffset: { width: 0, height: 2 }, textShadowRadius: 3 },
+  detailLabel: { fontSize: 10, color: Colors.WHITE, fontWeight: '700', textAlign: 'center', writingDirection: 'rtl', lineHeight: 12, textShadowColor: 'rgba(0,0,0,0.3)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 2 },
   divider: { width: 1, height: 56, backgroundColor: 'rgba(255,255,255,0.35)' },
 
   weekTitle: { fontSize: 20, fontWeight: '900', color: Colors.WHITE, textAlign: 'right', marginBottom: 12, writingDirection: 'rtl', textShadowColor: 'rgba(0,0,0,0.35)', textShadowOffset: { width: 0, height: 2 }, textShadowRadius: 3 },
   dayRow: {
-    flexDirection: 'row-reverse', alignItems: 'center', gap: 10,
-    backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 14, padding: 14, marginBottom: 8,
+    flexDirection: 'row-reverse', alignItems: 'center', gap: 6,
+    backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 12, paddingVertical: 10, paddingHorizontal: 16, marginBottom: 6,
   },
-  dayNameCol: { alignItems: 'flex-end', minWidth: 70 },
-  dayName: { fontSize: 14, fontWeight: '900', color: Colors.WHITE, textAlign: 'right', writingDirection: 'rtl', textShadowColor: 'rgba(0,0,0,0.3)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 2 },
-  dayDate: { fontSize: 11, color: 'rgba(255,255,255,0.85)', textAlign: 'right', fontWeight: '700', marginTop: 2, textShadowColor: 'rgba(0,0,0,0.3)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 2 },
-  dayIcon: { fontSize: 24 },
-  dayDesc: { flex: 1, fontSize: 13, color: Colors.WHITE, textAlign: 'right', writingDirection: 'rtl', flexShrink: 1, minWidth: 80, fontWeight: '600', textShadowColor: 'rgba(0,0,0,0.3)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 2 },
-  dayTemps: { flexDirection: 'row', gap: 6, alignItems: 'center' },
-  dayHigh: { fontSize: 17, fontWeight: '900', color: Colors.WHITE, textShadowColor: 'rgba(0,0,0,0.35)', textShadowOffset: { width: 0, height: 2 }, textShadowRadius: 3 },
-  dayLow: { fontSize: 15, color: 'rgba(255,255,255,0.6)', fontWeight: '700' },
+  dayNameCol: { alignItems: 'flex-end', minWidth: 56 },
+  dayName: { fontSize: 13, fontWeight: '900', color: Colors.WHITE, textAlign: 'right', writingDirection: 'rtl', textShadowColor: 'rgba(0,0,0,0.3)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 2 },
+  dayDate: { fontSize: 10, color: 'rgba(255,255,255,0.85)', textAlign: 'right', fontWeight: '700', marginTop: 1, textShadowColor: 'rgba(0,0,0,0.3)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 2 },
+  dayIcon: { fontSize: 22 },
+  dayDesc: { flex: 1, fontSize: 11, color: Colors.WHITE, textAlign: 'right', writingDirection: 'rtl', flexShrink: 1, minWidth: 0, fontWeight: '600', textShadowColor: 'rgba(0,0,0,0.3)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 2 },
+  dayTemps: { flexDirection: 'row', gap: 4, alignItems: 'center', minWidth: 56, justifyContent: 'flex-end' },
+  dayHigh: { fontSize: 15, fontWeight: '900', color: Colors.WHITE, textShadowColor: 'rgba(0,0,0,0.35)', textShadowOffset: { width: 0, height: 2 }, textShadowRadius: 3 },
+  dayLow: { fontSize: 13, color: 'rgba(255,255,255,0.6)', fontWeight: '700' },
 
   skippersWrap: { marginTop: 24, borderRadius: 14, backgroundColor: 'rgba(0,0,0,0.15)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)', overflow: 'hidden' },
   skippersHeader: { flexDirection: 'row-reverse', alignItems: 'center', gap: 10, paddingHorizontal: 16, paddingVertical: 14 },
