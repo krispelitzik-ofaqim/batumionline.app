@@ -685,7 +685,7 @@ const s = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 12, padding: 8, marginBottom: 6,
   },
   logo: { width: 30, height: 30, borderRadius: 6, backgroundColor: 'rgba(255,255,255,0.1)' },
-  flightNum: { fontSize: 12, fontWeight: '900', color: Colors.WHITE, textAlign: 'right' },
+  flightNum: { fontSize: 10, fontWeight: '900', color: Colors.WHITE, textAlign: 'right' },
   airline: { fontSize: 10, color: Colors.WHITE, opacity: 0.7, textAlign: 'right', fontWeight: '600' },
   timeCol: { alignItems: 'center', width: 42 },
   timeVal: { fontSize: 12, fontWeight: '900', color: Colors.WHITE, fontVariant: ['tabular-nums'] },
