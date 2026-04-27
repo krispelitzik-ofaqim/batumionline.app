@@ -16,7 +16,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.batumionline.app",
-      "buildNumber": "34",
+      "buildNumber": "35",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -27,7 +27,8 @@
         "backgroundColor": "#F7F3ED"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.batumionline.batumi"
+      "package": "com.batumionline.batumi",
+      "versionCode": 2
     },
     "plugins": [
       "expo-router",
@@ -40,6 +41,12 @@
         "projectId": "09ed4232-19dd-41d6-8b2b-4ddb7e25cee5"
       }
     },
-    "owner": "krispel"
+    "owner": "krispel",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/09ed4232-19dd-41d6-8b2b-4ddb7e25cee5"
+    }
   }
 }

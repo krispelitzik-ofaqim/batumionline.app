@@ -275,20 +275,40 @@ function TourStations({ audios, color, onNavigate, onActiveChange, nearbyRestaur
 
   useEffect(() => { setTracks(audios); }, [audios]);
 
-  const toggle = (idx: number) => {
-    if (Platform.OS !== 'web') return;
-    if (playingIdx === idx && audioRef.current) {
-      audioRef.current.pause();
-      setPlayingIdx(-1);
-      return;
-    }
-    if (audioRef.current) { audioRef.current.pause(); audioRef.current = null; }
+  const toggle = async (idx: number) => {
     const track = tracks[idx];
-    const au = new (window as any).Audio(track.url);
-    au.ontimeupdate = () => { setPos(au.currentTime || 0); setDur(au.duration || 0); };
-    au.onended = () => setPlayingIdx(-1);
-    au.play();
-    audioRef.current = au;
+    if (!track) return;
+    if (Platform.OS === 'web') {
+      if (playingIdx === idx && audioRef.current) {
+        audioRef.current.pause();
+        setPlayingIdx(-1);
+        return;
+      }
+      if (audioRef.current) { audioRef.current.pause(); audioRef.current = null; }
+      const au = new (window as any).Audio(resolveUri(track.url));
+      au.ontimeupdate = () => { setPos(au.currentTime || 0); setDur(au.duration || 0); };
+      au.onended = () => setPlayingIdx(-1);
+      au.play();
+      audioRef.current = au;
+    } else {
+      try {
+        const { Audio } = require('expo-av');
+        if (playingIdx === idx && audioRef.current) {
+          await audioRef.current.pauseAsync();
+          setPlayingIdx(-1);
+          return;
+        }
+        if (audioRef.current) { try { await audioRef.current.unloadAsync(); } catch {} audioRef.current = null; }
+        const { sound } = await Audio.Sound.createAsync({ uri: resolveUri(track.url) }, { shouldPlay: true });
+        sound.setOnPlaybackStatusUpdate((st: any) => {
+          if (!st.isLoaded) return;
+          setPos((st.positionMillis || 0) / 1000);
+          setDur((st.durationMillis || 0) / 1000);
+          if (st.didJustFinish) setPlayingIdx(-1);
+        });
+        audioRef.current = sound;
+      } catch {}
+    }
     setPlayingIdx(idx);
     onActiveChange(idx, track);
     if (track.coords) onNavigate(track.coords);
@@ -308,8 +328,8 @@ function TourStations({ audios, color, onNavigate, onActiveChange, nearbyRestaur
           <View style={{ backgroundColor: 'rgba(255,255,255,0.5)', borderRadius: 12, padding: 10, borderWidth: isPlaying ? 2 : 0, borderColor: color, borderTopWidth: 3, borderTopColor: dragIdx === i ? color : 'transparent' }}>
             <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 8 }}>
               <Text style={{ fontSize: 16, color: '#999', fontWeight: '700', paddingHorizontal: 4, ...(Platform.OS === 'web' ? { cursor: 'grab' } as any : {}) }}>≡</Text>
-              <TouchableOpacity onPress={() => toggle(i)} style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: isPlaying ? color : 'rgba(0,0,0,0.15)', alignItems: 'center', justifyContent: 'center' }}>
-                <Text style={{ color: isPlaying ? (isLight(color) ? '#1C2B35' : '#fff') : '#fff', fontSize: 14, fontWeight: '900' }}>{isPlaying ? '❚❚' : '▶'}</Text>
+              <TouchableOpacity onPress={() => toggle(i)} style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: isPlaying ? '#F4A94E' : Colors.PRIMARY, alignItems: 'center', justifyContent: 'center' }}>
+                <Text style={{ color: '#fff', fontSize: 14, fontWeight: '900' }}>{isPlaying ? '❚❚' : '▶'}</Text>
               </TouchableOpacity>
               <View style={{ flex: 1 }}>
                 <Text style={{ fontSize: 14, fontWeight: isPlaying ? '900' : '700', color: '#1C2B35', textAlign: 'right', writingDirection: 'rtl' }} numberOfLines={1}>{au.title || `תחנה ${i + 1}`}</Text>
@@ -451,11 +471,11 @@ function TourAlbumUpload({ tourId, color, onUploaded }: { tourId: string; color:
 
   return (
     <View style={{ margin: 12, backgroundColor: '#fff', borderRadius: 14, padding: 12, borderWidth: 1, borderColor: '#e0e0e0' }}>
-      <TouchableOpacity onPress={() => setOpen(o => !o)} style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginBottom: open ? 10 : 0 }}>
-        <Text style={{ fontSize: 14, fontWeight: '900', color: '#1C2B35', writingDirection: 'rtl' }}>📸 העלאת תמונות לאלבום</Text>
-        <View style={{ flexDirection: 'row', gap: 4, alignItems: 'center' }}>
-          <Text style={{ fontSize: 12, color: open ? '#cbd5e1' : '#1A6B8A', fontWeight: '900' }}>▼</Text>
-          <Text style={{ fontSize: 12, color: open ? '#1A6B8A' : '#cbd5e1', fontWeight: '900' }}>▲</Text>
+      <TouchableOpacity onPress={() => setOpen(o => !o)} style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: open ? 10 : 0, paddingVertical: 4 }}>
+        <Text style={{ fontSize: 11, fontWeight: '900', color: '#1C2B35', writingDirection: 'rtl' }}>העלאת תמונות לאלבום</Text>
+        <View style={{ flexDirection: 'row', gap: 2, alignItems: 'center' }}>
+          <Text style={{ fontSize: 9, color: open ? '#cbd5e1' : '#1A6B8A', fontWeight: '900' }}>▼</Text>
+          <Text style={{ fontSize: 9, color: open ? '#1A6B8A' : '#cbd5e1', fontWeight: '900' }}>▲</Text>
         </View>
       </TouchableOpacity>
       {open && (uploaded ? (
@@ -629,16 +649,14 @@ function TourCard({ t, onRate, nearbyRestaurants }: { t: TourBlock; onRate: (id:
         )}
       </View>
 
-      <View style={[tourSt.ratingRow, { flexDirection: 'column', gap: 8 }]}>
-        <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-          <Text style={tourSt.ratingLabel}>דרג את הסיור</Text>
-          <View style={tourSt.stars}>
-            {[1, 2, 3, 4, 5].map(n => (
-              <TouchableOpacity key={n} onPress={() => !ratingSubmitted && setRating(n)} disabled={ratingSubmitted}>
-                <Text style={[tourSt.star, n <= rating && tourSt.starOn]}>★</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
+      <View style={[tourSt.ratingRow, { flexDirection: 'column', gap: 6, alignItems: 'center' }]}>
+        <Text style={[tourSt.ratingLabel, { fontSize: 10 }]}>דרג את הסיור</Text>
+        <View style={tourSt.stars}>
+          {[1, 2, 3, 4, 5].map(n => (
+            <TouchableOpacity key={n} onPress={() => !ratingSubmitted && setRating(n)} disabled={ratingSubmitted}>
+              <Text style={[tourSt.star, n <= rating && tourSt.starOn]}>★</Text>
+            </TouchableOpacity>
+          ))}
         </View>
         <TouchableOpacity
           style={[tourSt.submitBtn, { alignSelf: 'stretch', alignItems: 'center' }, (rating === 0 || ratingSubmitted) && { opacity: 0.4 }]}
@@ -1509,7 +1527,7 @@ const st = StyleSheet.create({
     padding: 16, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 8, elevation: 3,
   },
   tourGridIcon: { fontSize: 36, marginBottom: 4 },
-  tourGridTitle: { fontSize: 15, fontWeight: '900', color: Colors.TEXT, textAlign: 'center', writingDirection: 'rtl' },
+  tourGridTitle: { fontSize: 12, fontWeight: '900', color: Colors.TEXT, textAlign: 'center', writingDirection: 'rtl' },
   tourGridSub: { fontSize: 11, fontWeight: '600', color: 'rgba(0,0,0,0.6)', textAlign: 'center', writingDirection: 'rtl', marginTop: 4, minHeight: 28, lineHeight: 14 },
   tourBack: {
     alignSelf: 'flex-start', padding: 10, marginBottom: 8,

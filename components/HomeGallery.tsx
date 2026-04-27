@@ -45,6 +45,10 @@ export default function HomeGallery() {
         if (valid.length > 0) {
           setFiles(valid.map((u: string, i: number) => ({ key: `hb${i}`, source: { uri: resolveUri(u) }, url: u })));
           AsyncStorage.setItem('@homeBanner', JSON.stringify(valid)).catch(() => {});
+        } else {
+          // API explicitly says empty - clear cache and hide
+          setFiles([]);
+          AsyncStorage.removeItem('@homeBanner').catch(() => {});
         }
       }
     }).catch(() => {});
