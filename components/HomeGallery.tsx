@@ -16,14 +16,14 @@ const isBadUrl = (u: any): boolean => {
   return false;
 };
 
-export default function HomeGallery() {
+export default function HomeGallery({ field = 'homeBanner' }: { field?: string } = {}) {
   const { width } = useWindowDimensions();
   const [files, setFiles] = useState<GalleryItem[]>([]);
   const [idx, setIdx] = useState(0);
   const [errorKeys, setErrorKeys] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    AsyncStorage.getItem('@homeBanner').then(cached => {
+    AsyncStorage.getItem(`@${field}`).then(cached => {
       if (!cached) return;
       try {
         const arr = JSON.parse(cached);
@@ -32,7 +32,7 @@ export default function HomeGallery() {
         if (valid.length > 0) {
           setFiles(valid.map((u: string, i: number) => ({ key: `hb${i}`, source: { uri: resolveUri(u) }, url: u })));
         } else {
-          AsyncStorage.removeItem('@homeBanner').catch(() => {});
+          AsyncStorage.removeItem(`@${field}`).catch(() => {});
         }
       } catch {}
     });
@@ -40,15 +40,15 @@ export default function HomeGallery() {
     const timeoutId = setTimeout(() => ctrl.abort(), 8000);
     fetchContent().then((d: any) => {
       clearTimeout(timeoutId);
-      if (Array.isArray(d?.homeBanner)) {
-        const valid = d.homeBanner.filter((u: any) => !isBadUrl(u));
+      if (Array.isArray(d?.[field])) {
+        const valid = d[field].filter((u: any) => !isBadUrl(u));
         if (valid.length > 0) {
           setFiles(valid.map((u: string, i: number) => ({ key: `hb${i}`, source: { uri: resolveUri(u) }, url: u })));
-          AsyncStorage.setItem('@homeBanner', JSON.stringify(valid)).catch(() => {});
+          AsyncStorage.setItem(`@${field}`, JSON.stringify(valid)).catch(() => {});
         } else {
           // API explicitly says empty - clear cache and hide
           setFiles([]);
-          AsyncStorage.removeItem('@homeBanner').catch(() => {});
+          AsyncStorage.removeItem(`@${field}`).catch(() => {});
         }
       }
     }).catch(() => {});

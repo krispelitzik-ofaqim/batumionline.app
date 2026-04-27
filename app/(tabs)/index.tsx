@@ -153,7 +153,7 @@ export default function HomeScreen() {
   const { width: screenW } = useWindowDimensions();
   const [showExtra, setShowExtra] = useState(false);
   const [extraGroupVisible, setExtraGroupVisible] = useState(false);
-  const [sideGroupVisible, setSideGroupVisible] = useState(true);
+  const [sideGroupVisible, setSideGroupVisible] = useState(false);
   const [welcomeGroupVisible, setWelcomeGroupVisible] = useState(true);
   const [infoGroupVisible, setInfoGroupVisible] = useState(true);
   const [bottomGroupVisible, setBottomGroupVisible] = useState(true);
@@ -254,6 +254,7 @@ export default function HomeScreen() {
         </View>
 
         <HomeGallery />
+        <HomeGallery field="homeBanner2" />
 
         <ClientBannerDisplay page="home" position="top" />
 

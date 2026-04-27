@@ -812,7 +812,15 @@ function CuratedListingsEditor() {
   );
 }
 
+function HomeBanner2Editor() {
+  return <HomeBannerEditorInner field="homeBanner2" title="🖼️ באנר 2" hint="באנר נוסף שיוצג מתחת לבאנר הראשי" />;
+}
+
 function HomeBannerEditor() {
+  return <HomeBannerEditorInner field="homeBanner" title="🖼️ באנר מתחלף בדף הבית" hint="תמונות שמתחלפות בראש דף הבית (מומלץ 6-10)" />;
+}
+
+function HomeBannerEditorInner({ field, title, hint }: { field: string; title: string; hint: string }) {
   const [imgs, setImgs] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -820,10 +828,10 @@ function HomeBannerEditor() {
 
   useEffect(() => {
     fetchContent().then(d => {
-      setImgs(Array.isArray(d?.homeBanner) ? d.homeBanner : []);
+      setImgs(Array.isArray(d?.[field]) ? d[field] : []);
       setLoading(false);
     }).catch(() => setLoading(false));
-  }, []);
+  }, [field]);
 
   const upload = async (file: File): Promise<string | null> => {
     const fd = new FormData();
@@ -840,7 +848,7 @@ function HomeBannerEditor() {
   const save = async () => {
     setSaving(true);
     try {
-      await fetch(`${API_BASE}/api/content/homeBanner`, {
+      await fetch(`${API_BASE}/api/content/${field}`, {
         method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(imgs),
       });
       setSaved(true); setTimeout(() => setSaved(false), 2000);
@@ -850,8 +858,8 @@ function HomeBannerEditor() {
 
   return (
     <View style={{ padding: 12, marginTop: 12, backgroundColor: '#f8fafc', borderRadius: 10, borderWidth: 1, borderColor: '#e2e8f0' }}>
-      <Text style={{ fontSize: 13, fontWeight: '900', color: '#1C2B35', writingDirection: 'rtl', textAlign: 'right', marginBottom: 4 }}>🖼️ באנר מתחלף בדף הבית</Text>
-      <Text style={{ fontSize: 10, color: '#64748b', writingDirection: 'rtl', textAlign: 'right', marginBottom: 8 }}>תמונות שמתחלפות בראש דף הבית (מומלץ 6-10)</Text>
+      <Text style={{ fontSize: 13, fontWeight: '900', color: '#1C2B35', writingDirection: 'rtl', textAlign: 'right', marginBottom: 4 }}>{title}</Text>
+      <Text style={{ fontSize: 10, color: '#64748b', writingDirection: 'rtl', textAlign: 'right', marginBottom: 8 }}>{hint}</Text>
       <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 4, marginBottom: 8 }}>
         {imgs.map((u, i) => (
           <View key={i} style={{ position: 'relative' }}>
@@ -864,12 +872,12 @@ function HomeBannerEditor() {
       </View>
       {Platform.OS === 'web' && React.createElement('div', { style: { marginBottom: 8 } }, [
         React.createElement('input', {
-          key: 'inp', type: 'file', accept: 'image/*', id: 'home_banner_file', style: { display: 'none' },
+          key: 'inp', type: 'file', accept: 'image/*', id: `home_banner_file_${field}`, style: { display: 'none' },
           onChange: async (e: any) => { const f = e.target.files?.[0]; if (!f) return; const url = await upload(f); if (url) setImgs(p => [...p, url]); e.target.value = ''; },
         }),
         React.createElement('button', {
           key: 'btn', type: 'button',
-          onClick: () => { const el = (document as any).getElementById('home_banner_file'); if (el) el.click(); },
+          onClick: () => { const el = (document as any).getElementById(`home_banner_file_${field}`); if (el) el.click(); },
           style: { width: '100%', backgroundColor: '#fff', border: '2px dashed #cbd5e1', borderRadius: 6, padding: 8, cursor: 'pointer', color: '#1C2B35', fontSize: 12, fontWeight: 800 },
         }, '📤 הוסף תמונה'),
       ])}
@@ -3413,6 +3421,9 @@ export default function AdminDashboard() {
         )}
 
         <HomeBannerEditor />
+        <View style={{ height: 1, backgroundColor: '#e2e8f0', marginVertical: 16 }} />
+        <Text style={{ fontSize: 14, fontWeight: '900', color: '#1A6B8A', writingDirection: 'rtl', textAlign: 'right', marginTop: 4 }}>━━ באנר 2 (נפרד) ━━</Text>
+        <HomeBanner2Editor />
         <BgColorPicker />
         <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 12, padding: 12, marginTop: 12, backgroundColor: '#f8fafc', borderRadius: 10, borderWidth: 1, borderColor: '#e2e8f0' }}>
           <Text style={{ flex: 1, fontSize: 13, fontWeight: '700', color: '#1C2B35', writingDirection: 'rtl', textAlign: 'right' }}>הצג סרגל תצוגה (נייד/אייפד/מחשב)</Text>

@@ -9799,7 +9799,15 @@
     "1777305203719-904.jpg": "batumionline1115.jpg",
     "1777305223335-898.jpg": "batumionline1127.jpg",
     "1777305265998-495.jpg": "batumionline1144.jpg",
-    "1777305328945-569.jpg": "batumionline1149.jpg"
+    "1777305328945-569.jpg": "batumionline1149.jpg",
+    "1777307923835-381.webp": "תיאטרון בטומי.webp",
+    "1777307954826-415.jpg": "batumionline1114.jpg",
+    "1777307996063-878.jpg": "batumionline1142.jpg",
+    "1777308148998-785.jpg": "dreamstime_m_92144630.jpg",
+    "1777308164324-538.jpg": "dreamstime_m_189329406.jpg",
+    "1777308181650-185.jpg": "dreamstime_m_111124089.jpg",
+    "1777308284744-134.jpg": "dreamstime_m_212612454.jpg",
+    "1777308309734-32.jpg": "dreamstime_m_204048861.jpg"
   },
   "mapLayers": [
     {
@@ -10567,7 +10575,7 @@
   "showDevBar": false,
   "groupVisibility": {
     "welcome": true,
-    "side": true,
+    "side": false,
     "bottom": true,
     "info": true,
     "main": true
@@ -15183,5 +15191,15 @@
     "/uploads/1777305265998-495.jpg",
     "/uploads/1777305328945-569.jpg"
   ],
-  "tourAlbums": {}
+  "tourAlbums": {},
+  "homeBanner2": [
+    "/uploads/1777307923835-381.webp",
+    "/uploads/1777307954826-415.jpg",
+    "/uploads/1777307996063-878.jpg",
+    "/uploads/1777308148998-785.jpg",
+    "/uploads/1777308164324-538.jpg",
+    "/uploads/1777308181650-185.jpg",
+    "/uploads/1777308284744-134.jpg",
+    "/uploads/1777308309734-32.jpg"
+  ]
 }
