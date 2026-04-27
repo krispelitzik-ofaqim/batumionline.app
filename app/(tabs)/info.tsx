@@ -68,7 +68,6 @@ export default function InfoScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: bg }]}>
-      <View style={{ height: Platform.OS === 'ios' ? 50 : 24, backgroundColor: bg }} />
       <View style={styles.topRow}>
         {tabs.map((t) => {
           const on = t.id === active;

@@ -1771,7 +1771,8 @@
               },
               "visible": true
             }
-          ]
+          ],
+          "visible": false
         }
       ],
       "heroBg": "#F4A94E"
@@ -3181,7 +3182,8 @@
               },
               "visible": true
             }
-          ]
+          ],
+          "visible": false
         }
       ],
       "heroBg": "#7ECFC0"
@@ -4143,7 +4145,8 @@
           "pageUrl": "https://www.tisolet.co.il",
           "modal": "flights",
           "titleEn": "Flights",
-          "titleGe": "ფრენები"
+          "titleGe": "ფრენები",
+          "visible": false
         }
       ],
       "heroBg": "#F4A94E"
@@ -8150,7 +8153,8 @@
       "image": "/uploads/1777114889454-969.png",
       "kicker": "B A T U M I",
       "bannerTitle": "פורטל  הנדל״ן  והעסקים",
-      "bannerSub": "כל העסקים והנכסים של בטומי במקום אחד"
+      "bannerSub": "כל העסקים והנכסים של בטומי במקום אחד",
+      "visible": false
     }
   ],
   "mediaTags": {

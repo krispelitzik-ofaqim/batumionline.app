@@ -14,8 +14,6 @@ export default function AppHeader({ crumbs = [], dark = false }: { crumbs?: Crum
   const arrowBorder = dark ? 'rgba(255,255,255,0.18)' : '#e2e8f0';
 
   return (
-    <>
-      <View style={{ height: Platform.OS === 'ios' ? 50 : 24, backgroundColor: bg }} />
     <View style={[s.container, { backgroundColor: bg, borderBottomColor: borderColor }]}>
       <TouchableOpacity
         onPress={() => (router.canGoBack() ? router.back() : router.replace("/"))}
@@ -28,7 +26,6 @@ export default function AppHeader({ crumbs = [], dark = false }: { crumbs?: Crum
         <Breadcrumb crumbs={crumbs} dark={dark} />
       </View>
     </View>
-    </>
   );
 }
 

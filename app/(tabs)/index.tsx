@@ -241,7 +241,6 @@ export default function HomeScreen() {
 
   return (
     <View style={[styles.safe, { backgroundColor: bgColor }, dark && { backgroundColor: Colors.TEXT }]}>
-      <View style={{ height: Platform.OS === 'ios' ? 50 : 24, backgroundColor: dark ? Colors.TEXT : bgColor }} />
       {editMode && <EditToolbar onSave={handleSaveEdit} onExit={handleExitEdit} />}
       <PopupDisplay page="home" />
       <ScrollView

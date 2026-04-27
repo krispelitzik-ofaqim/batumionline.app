@@ -18,7 +18,7 @@ const isBadUrl = (u: any): boolean => {
 
 export default function HomeGallery() {
   const { width } = useWindowDimensions();
-  const [files, setFiles] = useState<GalleryItem[]>(LOCAL_FALLBACK);
+  const [files, setFiles] = useState<GalleryItem[]>([]);
   const [idx, setIdx] = useState(0);
   const [errorKeys, setErrorKeys] = useState<Set<string>>(new Set());
 
@@ -53,11 +53,12 @@ export default function HomeGallery() {
 
   // Static gallery - user navigates with arrows (no auto-rotation)
 
-  const visibleFiles = files.length > 0 ? files : LOCAL_FALLBACK;
+  if (files.length === 0) return null;
+  const visibleFiles = files;
   const safeIdx = idx % visibleFiles.length;
   const current = visibleFiles[safeIdx];
   const isErrored = errorKeys.has(current.key);
-  const fallbackSource = LOCAL_FALLBACK[safeIdx % LOCAL_FALLBACK.length].source;
+  const fallbackSource = LOCAL_FALLBACK[safeIdx % LOCAL_FALLBACK.length]?.source;
 
   const goNext = () => setIdx(i => (i + 1) % visibleFiles.length);
   const goPrev = () => setIdx(i => (i - 1 + visibleFiles.length) % visibleFiles.length);

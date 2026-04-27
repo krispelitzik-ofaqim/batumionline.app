@@ -48,7 +48,6 @@ export default function MapScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: bg }]}>
-      <View style={{ height: Platform.OS === 'ios' ? 50 : 24, backgroundColor: bg }} />
       <Modal visible={menuOpen} transparent animationType="slide" onRequestClose={() => setMenuOpen(false)}>
         <TouchableOpacity activeOpacity={1} onPress={() => setMenuOpen(false)} style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' }}>
           <TouchableOpacity activeOpacity={1} style={{ backgroundColor: '#fff', borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: '60%', paddingBottom: 20 }}>

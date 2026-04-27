@@ -16,6 +16,7 @@ import ListingsList from '../../components/ListingsList';
 import DeveloperCard, { Developer } from '../../components/DeveloperCard';
 import DeveloperForm from '../../components/DeveloperForm';
 import { Modal } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import HtmlContent from '../../components/HtmlContent';
 
 const DEMO_DEVELOPERS: Developer[] = [
@@ -163,7 +164,7 @@ export default function RealEstatePortal() {
   const heroUri = realEstateImage || galleryImages[0] || '/uploads/city.jpg';
 
   return (
-    <View style={s.container}>
+    <SafeAreaView edges={['top']} style={s.container}>
       <AppHeader crumbs={[{ title: 'פורטל הנדל״ן' }]} />
       <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
         {/* Hero */}
@@ -485,7 +486,7 @@ export default function RealEstatePortal() {
           </View>
         </View>
       </Modal>
-    </View>
+    </SafeAreaView>
   );
 }
 
