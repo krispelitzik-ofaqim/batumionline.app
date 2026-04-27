@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Modal, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, Modal, ScrollView, StyleSheet, Linking, Platform, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../constants/colors';
 import { useAccessibility } from '../constants/accessibilityContext';
@@ -8,21 +8,11 @@ export default function AccessibilityButton() {
   const [open, setOpen] = useState(false);
   const { settings, update, reset } = useAccessibility();
 
-  const fontOptions = [
-    { key: 'normal' as const, label: 'רגיל', size: 18 },
-    { key: 'large' as const, label: 'גדול', size: 24 },
-    { key: 'xlarge' as const, label: 'ענק', size: 30 },
-  ];
-
   return (
     <>
-      <View style={st.btnWrap} pointerEvents="box-none">
-        <Text style={[st.arrow, { opacity: 0.5 }]}>⌃</Text>
-        <Text style={[st.arrow, { opacity: 0.85, marginTop: -8 }]}>⌃</Text>
-        <TouchableOpacity onPress={() => setOpen(true)} style={st.btn} accessibilityLabel="פתח תפריט נגישות" accessibilityRole="button">
-          <Ionicons name="accessibility" size={16} color="#fff" />
-        </TouchableOpacity>
-      </View>
+      <TouchableOpacity onPress={() => setOpen(true)} style={st.btn} accessibilityLabel="פתח תפריט נגישות" accessibilityRole="button">
+        <Ionicons name="accessibility" size={20} color="#fff" />
+      </TouchableOpacity>
 
       <Modal visible={open} transparent animationType="slide" onRequestClose={() => setOpen(false)}>
         <View style={st.backdrop}>
@@ -38,22 +28,18 @@ export default function AccessibilityButton() {
             <ScrollView contentContainerStyle={{ padding: 16, gap: 18 }}>
               <View>
                 <Text style={st.sectionTitle}>גודל טקסט</Text>
-                <View style={{ flexDirection: 'row-reverse', gap: 8 }}>
-                  {fontOptions.map(opt => {
-                    const on = settings.fontScale === opt.key;
-                    return (
-                      <TouchableOpacity key={opt.key} onPress={() => update({ fontScale: opt.key })} style={[st.chip, on && st.chipOn]}>
-                        <Text style={[{ fontSize: opt.size, fontWeight: '900', color: on ? '#fff' : Colors.PRIMARY }]}>A</Text>
-                        <Text style={[st.chipLabel, on && { color: '#fff' }]}>{opt.label}</Text>
-                      </TouchableOpacity>
-                    );
-                  })}
-                </View>
+                <Text style={{ fontSize: 12, color: '#475569', writingDirection: 'rtl', textAlign: 'right', marginBottom: 8, lineHeight: 18 }}>
+                  גודל הטקסט נקבע לפי הגדרות המכשיר. ניתן להגדיל/להקטין דרך:
+                  {'\n'}הגדרות → תצוגה ובהירות → גודל טקסט
+                </Text>
+                {Platform.OS === 'ios' && (
+                  <TouchableOpacity onPress={() => Linking.openURL('app-settings:').catch(() => Alert.alert('פתח ידנית: הגדרות → תצוגה ובהירות → גודל טקסט'))} style={[st.chip, { paddingVertical: 12 }]}>
+                    <Text style={{ fontSize: 14, fontWeight: '900', color: Colors.PRIMARY }}>⚙️ פתח הגדרות מכשיר</Text>
+                  </TouchableOpacity>
+                )}
               </View>
 
               <Toggle label="🌗 ניגודיות גבוהה" value={settings.highContrast} onChange={v => update({ highContrast: v })} />
-              <Toggle label="🎬 הפחתת אנימציות" value={settings.reduceMotion} onChange={v => update({ reduceMotion: v })} />
-              <Toggle label="🔗 הדגשת קישורים" value={settings.underlineLinks} onChange={v => update({ underlineLinks: v })} />
 
               <TouchableOpacity onPress={reset} style={st.reset}>
                 <Text style={st.resetTxt}>↻ אפס הגדרות</Text>
@@ -80,9 +66,7 @@ function Toggle({ label, value, onChange }: { label: string; value: boolean; onC
 }
 
 const st = StyleSheet.create({
-  btnWrap: { alignItems: 'center', marginTop: 0, marginBottom: 0 },
-  arrow: { fontSize: 16, color: '#0077be', fontWeight: '900', lineHeight: 16 },
-  btn: { width: 28, height: 28, borderRadius: 14, backgroundColor: '#0077be', alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 4, elevation: 4 },
+  btn: { width: 36, height: 36, borderRadius: 18, backgroundColor: '#0077be', alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.2, shadowRadius: 4, elevation: 3 },
   backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'flex-end' },
   sheet: { backgroundColor: '#fff', borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: '80%' },
   header: { flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', padding: 16, borderBottomWidth: 1, borderBottomColor: '#e2e8f0', gap: 8 },

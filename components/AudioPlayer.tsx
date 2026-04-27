@@ -199,7 +199,7 @@ export default function AudioPlayer({ tracks: initialTracks, title, compact, onN
 
           {playOnLeft ? (
             <View style={styles.compactPlayRow}>
-              <TouchableOpacity style={[styles.playBtnSmall, ringPlay && { borderWidth: 2.5, borderColor: '#fff', shadowColor: '#fff', shadowOpacity: 0.6, shadowRadius: 10 }]} onPress={toggle} activeOpacity={0.85}>
+              <TouchableOpacity style={[styles.playBtnSmall, playing && { backgroundColor: Colors.ACCENT }, ringPlay && { borderWidth: 2.5, borderColor: '#fff', shadowColor: '#fff', shadowOpacity: 0.6, shadowRadius: 10 }]} onPress={toggle} activeOpacity={0.85}>
                 <Text style={styles.playIconSmall}>{playing ? '❚❚' : '▶'}</Text>
               </TouchableOpacity>
               <View style={styles.compactProgressWrap}>

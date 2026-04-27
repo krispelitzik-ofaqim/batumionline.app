@@ -109,6 +109,18 @@ function isDark(bg: string) {
   return bg.startsWith('#2') || bg.startsWith('#1');
 }
 
+function BatumiClock({ dark }: { dark: boolean }) {
+  const [time, setTime] = useState('');
+  useEffect(() => {
+    const fmt = new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Tbilisi', hour: '2-digit', minute: '2-digit', hour12: false });
+    const update = () => setTime(fmt.format(new Date()));
+    update();
+    const iv = setInterval(update, 30000);
+    return () => clearInterval(iv);
+  }, []);
+  return <Text style={{ fontSize: 16, fontWeight: '900', color: dark ? '#fff' : Colors.TEXT, fontVariant: ['tabular-nums'] }}>🕐 {time}</Text>;
+}
+
 function CatCard({ item, width }: { item: CatItem; width: number }) {
   const iconIsImage = !!item.icon && (item.icon.startsWith('data:') || item.icon.startsWith('http') || item.icon.startsWith('/'));
   return (
@@ -140,7 +152,7 @@ function CatCard({ item, width }: { item: CatItem; width: number }) {
 export default function HomeScreen() {
   const { width: screenW } = useWindowDimensions();
   const [showExtra, setShowExtra] = useState(false);
-  const [extraGroupVisible, setExtraGroupVisible] = useState(true);
+  const [extraGroupVisible, setExtraGroupVisible] = useState(false);
   const [sideGroupVisible, setSideGroupVisible] = useState(true);
   const [welcomeGroupVisible, setWelcomeGroupVisible] = useState(true);
   const [infoGroupVisible, setInfoGroupVisible] = useState(true);
@@ -162,7 +174,7 @@ export default function HomeScreen() {
   const w = simulatedWidth ? Math.min(simulatedWidth, screenW) : screenW;
   const cardW = (w - 48) / 2;
 
-  const { dark } = useContext(ThemeContext);
+  const { dark, toggle } = useContext(ThemeContext);
   const { isAdmin } = useContext(AdminContext);
 
   // Fetch content from API on mount
@@ -229,6 +241,7 @@ export default function HomeScreen() {
 
   return (
     <View style={[styles.safe, { backgroundColor: bgColor }, dark && { backgroundColor: Colors.TEXT }]}>
+      <View style={{ height: Platform.OS === 'ios' ? 50 : 24, backgroundColor: dark ? Colors.TEXT : bgColor }} />
       {editMode && <EditToolbar onSave={handleSaveEdit} onExit={handleExitEdit} />}
       <PopupDisplay page="home" />
       <ScrollView
@@ -330,8 +343,6 @@ export default function HomeScreen() {
             ))}
           </View>
         )}
-
-        <AccessibilityButton />
 
         <ClientBannerDisplay page="home" position="bottom" />
 

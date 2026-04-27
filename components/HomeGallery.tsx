@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { View, Image, StyleSheet, TouchableOpacity, useWindowDimensions } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Image, StyleSheet, TouchableOpacity, Text, useWindowDimensions } from 'react-native';
 import { resolveUri, fetchContent } from '../constants/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { HOME_IMAGES } from '../assets/images/home';
@@ -21,7 +21,6 @@ export default function HomeGallery() {
   const [files, setFiles] = useState<GalleryItem[]>(LOCAL_FALLBACK);
   const [idx, setIdx] = useState(0);
   const [errorKeys, setErrorKeys] = useState<Set<string>>(new Set());
-  const timer = useRef<any>(null);
 
   useEffect(() => {
     AsyncStorage.getItem('@homeBanner').then(cached => {
@@ -52,19 +51,16 @@ export default function HomeGallery() {
     return () => clearTimeout(timeoutId);
   }, []);
 
-  useEffect(() => {
-    if (files.length < 2) return;
-    timer.current = setInterval(() => {
-      setIdx(i => (i + 1) % files.length);
-    }, 4000);
-    return () => clearInterval(timer.current);
-  }, [files.length]);
+  // Static gallery - user navigates with arrows (no auto-rotation)
 
   const visibleFiles = files.length > 0 ? files : LOCAL_FALLBACK;
   const safeIdx = idx % visibleFiles.length;
   const current = visibleFiles[safeIdx];
   const isErrored = errorKeys.has(current.key);
   const fallbackSource = LOCAL_FALLBACK[safeIdx % LOCAL_FALLBACK.length].source;
+
+  const goNext = () => setIdx(i => (i + 1) % visibleFiles.length);
+  const goPrev = () => setIdx(i => (i - 1 + visibleFiles.length) % visibleFiles.length);
 
   return (
     <View style={[styles.wrap, { width: width - 32 }]}>
@@ -81,13 +77,21 @@ export default function HomeGallery() {
         }}
       />
       {visibleFiles.length > 1 && (
-        <View style={styles.dots}>
-          {visibleFiles.map((_, i) => (
-            <TouchableOpacity key={i} onPress={() => setIdx(i)}>
-              <View style={[styles.dot, i === safeIdx && styles.dotActive]} />
-            </TouchableOpacity>
-          ))}
-        </View>
+        <>
+          <TouchableOpacity onPress={goPrev} style={[styles.arrow, { right: 8 }]} activeOpacity={0.7}>
+            <Text style={styles.arrowTxt}>››</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={goNext} style={[styles.arrow, { left: 8 }]} activeOpacity={0.7}>
+            <Text style={styles.arrowTxt}>‹‹</Text>
+          </TouchableOpacity>
+          <View style={styles.dots}>
+            {visibleFiles.map((_, i) => (
+              <TouchableOpacity key={i} onPress={() => setIdx(i)}>
+                <View style={[styles.dot, i === safeIdx && styles.dotActive]} />
+              </TouchableOpacity>
+            ))}
+          </View>
+        </>
       )}
     </View>
   );
@@ -105,4 +109,6 @@ const styles = StyleSheet.create({
   },
   dot: { width: 7, height: 7, borderRadius: 4, backgroundColor: 'rgba(255,255,255,0.5)' },
   dotActive: { backgroundColor: '#fff', width: 18 },
+  arrow: { position: 'absolute', top: '50%', marginTop: -22, width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
+  arrowTxt: { fontSize: 30, color: '#fff', fontWeight: '300', lineHeight: 32, textShadowColor: 'rgba(0,0,0,0.7)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 4 },
 });

@@ -101,11 +101,6 @@ export default function PlacesInfoModal({ query, title, onClose, hideHours, show
                       <Text style={s.btnTxt}>🌐 אתר רשמי</Text>
                     </TouchableOpacity>
                   )}
-                  {!!data.mapsUri && (
-                    <TouchableOpacity style={[s.btn, { backgroundColor: '#f59e0b' }]} onPress={() => Linking.openURL(data.mapsUri!)}>
-                      <Text style={s.btnTxt}>⭐ דרג בגוגל</Text>
-                    </TouchableOpacity>
-                  )}
                 </View>
               )}
               {showHotelPrices && (

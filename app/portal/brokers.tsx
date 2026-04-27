@@ -54,7 +54,7 @@ export default function BrokersPortal() {
   return (
     <SafeAreaView style={s.safe}>
       <View style={s.header}>
-        <Text style={s.title}>מתווכי נדל"ן מורשים</Text>
+        <Text style={s.title}>סוכני נדל"ן מורשים</Text>
         <TouchableOpacity onPress={() => router.canGoBack() ? router.back() : router.replace('/portal/realestate' as any)} style={s.backBtn}>
           <Text style={s.backTxt}>‹</Text>
         </TouchableOpacity>
@@ -62,17 +62,17 @@ export default function BrokersPortal() {
 
       <View style={{ flexDirection: 'row-reverse', gap: 8, padding: 12, backgroundColor: '#f0fdf4', borderBottomWidth: 1, borderBottomColor: '#bbf7d0' }}>
         <TouchableOpacity onPress={() => setShowCriteria(true)} style={[s.topBtn, { backgroundColor: '#fff', borderWidth: 1, borderColor: '#15803d' }]} activeOpacity={0.85}>
-          <Text style={[s.topBtnTxt, { color: '#15803d' }]}>📋 מה נדרש מהמתווכים?</Text>
+          <Text style={[s.topBtnTxt, { color: '#15803d', textAlign: 'center' }]}>מה נדרש מהסוכן?</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => Linking.openURL('https://wa.me/972502844867?text=' + encodeURIComponent('שלום, אני רוצה להמליץ על מתווך נדל"ן בבטומי. שם המתווך: '))} style={[s.topBtn, { backgroundColor: Colors.PRIMARY }]} activeOpacity={0.85}>
-          <Text style={[s.topBtnTxt, { color: '#fff' }]}>+ המלץ על מתווך</Text>
+        <TouchableOpacity onPress={() => Linking.openURL('https://wa.me/972502844867?text=' + encodeURIComponent('שלום, אני רוצה להמליץ על סוכן נדל"ן בבטומי. שם הסוכן: '))} style={[s.topBtn, { backgroundColor: Colors.PRIMARY }]} activeOpacity={0.85}>
+          <Text style={[s.topBtnTxt, { color: '#fff', textAlign: 'center' }]}>המלצה על סוכן נדל"ן</Text>
         </TouchableOpacity>
       </View>
 
       <Modal visible={showCriteria} transparent animationType="slide" onRequestClose={() => setShowCriteria(false)}>
         <TouchableOpacity activeOpacity={1} onPress={() => setShowCriteria(false)} style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'flex-start' }}>
           <TouchableOpacity activeOpacity={1} style={{ backgroundColor: '#fff', borderBottomLeftRadius: 20, borderBottomRightRadius: 20, padding: 20, paddingTop: 50 }}>
-            <Text style={{ fontSize: 16, fontWeight: '900', color: '#15803d', writingDirection: 'rtl', textAlign: 'right', marginBottom: 12 }}>✓ קריטריוני אימות מתווכים</Text>
+            <Text style={{ fontSize: 16, fontWeight: '900', color: '#15803d', writingDirection: 'rtl', textAlign: 'right', marginBottom: 12 }}>✓ קריטריוני אימות סוכנים</Text>
             <Text style={s.introBullet}>• ניסיון מוכח בנדל"ן בבטומי - מעל שנתיים</Text>
             <Text style={s.introBullet}>• חשבון בנק פעיל בבטומי</Text>
             <Text style={s.introBullet}>• ערוץ תקשורת (אתר, פייסבוק, אחר)</Text>
@@ -131,7 +131,7 @@ export default function BrokersPortal() {
           </View>
           );
         })}
-        {items.length === 0 && <Text style={s.empty}>אין מתווכים זמינים כרגע</Text>}
+        {items.length === 0 && <Text style={s.empty}>אין סוכנים זמינים כרגע</Text>}
       </ScrollView>
       <BottomTabBar />
     </SafeAreaView>
