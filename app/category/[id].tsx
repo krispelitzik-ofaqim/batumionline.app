@@ -1149,12 +1149,17 @@ export default function CategoryScreen() {
           ) : (
             <View>
               <TouchableOpacity
-                style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 12, marginHorizontal: 16, marginTop: 4, borderRadius: 14, backgroundColor: tourMapOpen ? '#e8f4f8' : Colors.PRIMARY }}
+                style={{ marginHorizontal: 0, marginTop: -16, borderBottomLeftRadius: 40, borderBottomRightRadius: 40, backgroundColor: cat.heroBg || cat.bg || (darkCat ? '#1a1a2e' : '#3DA5C4'), shadowColor: '#000', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.25, shadowRadius: 10, elevation: 5, padding: 2 }}
                 onPress={() => setTourMapOpen(!tourMapOpen)}
-                activeOpacity={0.8}
+                activeOpacity={0.85}
               >
-                <Text style={{ fontSize: 15, fontWeight: '800', color: tourMapOpen ? Colors.PRIMARY : '#fff' }}>🗺️ מפת כל המסלולים</Text>
-                <Text style={{ fontSize: 12, color: tourMapOpen ? Colors.PRIMARY : '#fff' }}>{tourMapOpen ? '▲' : '▼'}</Text>
+                <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'center', gap: 10, paddingVertical: 14, paddingTop: 30, borderBottomLeftRadius: 38, borderBottomRightRadius: 38, borderLeftWidth: 0.8, borderRightWidth: 0.8, borderBottomWidth: 0.8, borderColor: 'rgba(255,255,255,0.75)' }}>
+                  <View style={{ position: 'absolute', top: 18, left: 8, right: 8, height: 0.8, backgroundColor: 'rgba(255,255,255,0.75)' }} />
+                  <Text style={{ fontSize: 15, fontWeight: '900', color: '#fff', letterSpacing: 0.5, textShadowColor: 'rgba(0,0,0,0.4)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 2 }}>⌬ מפת כל המסלולים</Text>
+                  <View style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: 'rgba(255,255,255,0.2)', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.4)' }}>
+                    <Text style={{ fontSize: 11, color: '#fff', fontWeight: '900', lineHeight: 14 }}>{tourMapOpen ? '▲' : '▼'}</Text>
+                  </View>
+                </View>
               </TouchableOpacity>
               {tourMapOpen && (
                 <View style={{ marginHorizontal: 8, marginTop: 8, borderRadius: 14, overflow: 'hidden', height: 500, borderWidth: 1, borderColor: '#ddd', position: 'relative' }}>
@@ -1173,13 +1178,13 @@ export default function CategoryScreen() {
                 const avg = r && r.count > 0 ? Math.round(r.sum / r.count) : 0;
                 return (
                   <TouchableOpacity key={t.id} style={[st.tourGridCard, { backgroundColor: t.color }]} onPress={() => setSelectedTour(t)} activeOpacity={0.8}>
+                    <Text style={st.tourGridIcon}>🎧</Text>
                     <View style={st.tourGridStars}>
                       {[1, 2, 3, 4, 5].map(n => (
                         <Text key={n} style={[st.tourGridStar, n <= avg && st.tourGridStarOn]}>★</Text>
                       ))}
                       {r && r.count > 0 && <Text style={{ fontSize: 9, color: 'rgba(0,0,0,0.5)', marginRight: 3 }}>({r.count})</Text>}
                     </View>
-                    <Text style={st.tourGridIcon}>🎧</Text>
                     <Text style={st.tourGridTitle} numberOfLines={3}>{t.title || 'ללא כותרת'}</Text>
                   </TouchableOpacity>
                 );
@@ -1495,15 +1500,15 @@ const st = StyleSheet.create({
 
   tourGrid: { padding: 16, flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 12 },
   tourGridWrap: { width: '47%' },
-  tourGridStars: { flexDirection: 'row-reverse', justifyContent: 'center', alignItems: 'center', gap: 1, marginBottom: 4 },
-  tourGridStar: { fontSize: 12, color: '#d1d5db' },
+  tourGridStars: { flexDirection: 'row-reverse', justifyContent: 'center', alignItems: 'center', gap: 0, marginVertical: 4, paddingHorizontal: 4 },
+  tourGridStar: { fontSize: 11, color: '#d1d5db' },
   tourGridStarOn: { color: '#F4A94E' },
   tourGridPopular: { fontSize: 10, fontWeight: '800', color: '#B45309', textAlign: 'center', writingDirection: 'rtl', marginTop: 2, marginBottom: 4 },
   tourGridCard: {
     width: '47%', aspectRatio: 1, borderRadius: 18, alignItems: 'center', justifyContent: 'center',
     padding: 16, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 8, elevation: 3,
   },
-  tourGridIcon: { fontSize: 44, marginBottom: 10 },
+  tourGridIcon: { fontSize: 36, marginBottom: 4 },
   tourGridTitle: { fontSize: 15, fontWeight: '900', color: Colors.TEXT, textAlign: 'center', writingDirection: 'rtl' },
   tourGridSub: { fontSize: 11, fontWeight: '600', color: 'rgba(0,0,0,0.6)', textAlign: 'center', writingDirection: 'rtl', marginTop: 4, minHeight: 28, lineHeight: 14 },
   tourBack: {

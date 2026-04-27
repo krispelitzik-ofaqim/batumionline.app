@@ -8,32 +8,48 @@ type GalleryItem = { key: string; source: any; url?: string };
 
 const LOCAL_FALLBACK: GalleryItem[] = HOME_IMAGES.map(h => ({ key: h.key, source: h.source }));
 
+const isBadUrl = (u: any): boolean => {
+  if (typeof u !== 'string') return true;
+  if (u.trim().length === 0) return true;
+  if (u.includes('localhost')) return true;
+  if (u.includes('127.0.0.1')) return true;
+  return false;
+};
+
 export default function HomeGallery() {
   const { width } = useWindowDimensions();
   const [files, setFiles] = useState<GalleryItem[]>(LOCAL_FALLBACK);
   const [idx, setIdx] = useState(0);
+  const [errorKeys, setErrorKeys] = useState<Set<string>>(new Set());
   const timer = useRef<any>(null);
 
   useEffect(() => {
     AsyncStorage.getItem('@homeBanner').then(cached => {
-      if (cached) {
-        try {
-          const arr = JSON.parse(cached);
-          if (Array.isArray(arr) && arr.length > 0) {
-            setFiles(arr.map((u: string, i: number) => ({ key: `hb${i}`, source: { uri: resolveUri(u) }, url: u })));
-          }
-        } catch {}
-      }
+      if (!cached) return;
+      try {
+        const arr = JSON.parse(cached);
+        if (!Array.isArray(arr)) return;
+        const valid = arr.filter((u: any) => !isBadUrl(u));
+        if (valid.length > 0) {
+          setFiles(valid.map((u: string, i: number) => ({ key: `hb${i}`, source: { uri: resolveUri(u) }, url: u })));
+        } else {
+          AsyncStorage.removeItem('@homeBanner').catch(() => {});
+        }
+      } catch {}
     });
+    const ctrl = new AbortController();
+    const timeoutId = setTimeout(() => ctrl.abort(), 8000);
     fetchContent().then((d: any) => {
+      clearTimeout(timeoutId);
       if (Array.isArray(d?.homeBanner)) {
-        const valid = d.homeBanner.filter((u: any) => typeof u === 'string' && u.trim().length > 0);
+        const valid = d.homeBanner.filter((u: any) => !isBadUrl(u));
         if (valid.length > 0) {
           setFiles(valid.map((u: string, i: number) => ({ key: `hb${i}`, source: { uri: resolveUri(u) }, url: u })));
           AsyncStorage.setItem('@homeBanner', JSON.stringify(valid)).catch(() => {});
         }
       }
     }).catch(() => {});
+    return () => clearTimeout(timeoutId);
   }, []);
 
   useEffect(() => {
@@ -44,18 +60,31 @@ export default function HomeGallery() {
     return () => clearInterval(timer.current);
   }, [files.length]);
 
-  if (files.length === 0) return null;
-
-  const current = files[idx];
+  const visibleFiles = files.length > 0 ? files : LOCAL_FALLBACK;
+  const safeIdx = idx % visibleFiles.length;
+  const current = visibleFiles[safeIdx];
+  const isErrored = errorKeys.has(current.key);
+  const fallbackSource = LOCAL_FALLBACK[safeIdx % LOCAL_FALLBACK.length].source;
 
   return (
     <View style={[styles.wrap, { width: width - 32 }]}>
-      <Image source={current.source} style={StyleSheet.absoluteFillObject} resizeMode="cover" />
-      {files.length > 1 && (
+      <Image
+        source={isErrored ? fallbackSource : current.source}
+        style={StyleSheet.absoluteFillObject}
+        resizeMode="cover"
+        onError={() => {
+          setErrorKeys(prev => {
+            const next = new Set(prev);
+            next.add(current.key);
+            return next;
+          });
+        }}
+      />
+      {visibleFiles.length > 1 && (
         <View style={styles.dots}>
-          {files.map((_, i) => (
+          {visibleFiles.map((_, i) => (
             <TouchableOpacity key={i} onPress={() => setIdx(i)}>
-              <View style={[styles.dot, i === idx && styles.dotActive]} />
+              <View style={[styles.dot, i === safeIdx && styles.dotActive]} />
             </TouchableOpacity>
           ))}
         </View>

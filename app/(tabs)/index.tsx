@@ -331,6 +331,8 @@ export default function HomeScreen() {
           </View>
         )}
 
+        <AccessibilityButton />
+
         <ClientBannerDisplay page="home" position="bottom" />
 
         <View style={{ height: 24 }} />
@@ -338,7 +340,6 @@ export default function HomeScreen() {
 
       {/* Admin floating button */}
       {!editMode && <AdminFloatingButton onEnterEdit={() => setEditMode(true)} />}
-      <AccessibilityButton />
 
       {/* Bottom banner modals */}
       <WeatherModal visible={activeModal === 'weather'} onClose={() => setActiveModal(null)} bgColor={BOTTOM_BANNERS.find(b => b.id === 'weather')!.bg} />

@@ -1,53 +1,28 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, Modal, ScrollView, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Colors } from '../constants/colors';
-
-const KEY = '@accessibility_settings';
-
-type Settings = {
-  fontScale: 'normal' | 'large' | 'xlarge';
-  highContrast: boolean;
-  reduceMotion: boolean;
-  underlineLinks: boolean;
-};
-
-const DEFAULTS: Settings = {
-  fontScale: 'normal',
-  highContrast: false,
-  reduceMotion: false,
-  underlineLinks: false,
-};
+import { useAccessibility } from '../constants/accessibilityContext';
 
 export default function AccessibilityButton() {
   const [open, setOpen] = useState(false);
-  const [s, setS] = useState<Settings>(DEFAULTS);
-
-  useEffect(() => {
-    AsyncStorage.getItem(KEY).then(raw => {
-      if (raw) try { setS({ ...DEFAULTS, ...JSON.parse(raw) }); } catch {}
-    });
-  }, []);
-
-  const update = (patch: Partial<Settings>) => {
-    const next = { ...s, ...patch };
-    setS(next);
-    AsyncStorage.setItem(KEY, JSON.stringify(next)).catch(() => {});
-  };
+  const { settings, update, reset } = useAccessibility();
 
   const fontOptions = [
-    { key: 'normal' as const, label: 'רגיל', val: 'A' },
-    { key: 'large' as const, label: 'גדול', val: 'A' },
-    { key: 'xlarge' as const, label: 'ענק', val: 'A' },
+    { key: 'normal' as const, label: 'רגיל', size: 18 },
+    { key: 'large' as const, label: 'גדול', size: 24 },
+    { key: 'xlarge' as const, label: 'ענק', size: 30 },
   ];
-  const fontSizes = { normal: 18, large: 24, xlarge: 30 };
 
   return (
     <>
-      <TouchableOpacity onPress={() => setOpen(true)} style={st.btn} accessibilityLabel="פתח תפריט נגישות" accessibilityRole="button">
-        <Ionicons name="accessibility" size={26} color="#fff" />
-      </TouchableOpacity>
+      <View style={st.btnWrap} pointerEvents="box-none">
+        <Text style={[st.arrow, { opacity: 0.5 }]}>⌃</Text>
+        <Text style={[st.arrow, { opacity: 0.85, marginTop: -8 }]}>⌃</Text>
+        <TouchableOpacity onPress={() => setOpen(true)} style={st.btn} accessibilityLabel="פתח תפריט נגישות" accessibilityRole="button">
+          <Ionicons name="accessibility" size={16} color="#fff" />
+        </TouchableOpacity>
+      </View>
 
       <Modal visible={open} transparent animationType="slide" onRequestClose={() => setOpen(false)}>
         <View style={st.backdrop}>
@@ -65,10 +40,10 @@ export default function AccessibilityButton() {
                 <Text style={st.sectionTitle}>גודל טקסט</Text>
                 <View style={{ flexDirection: 'row-reverse', gap: 8 }}>
                   {fontOptions.map(opt => {
-                    const on = s.fontScale === opt.key;
+                    const on = settings.fontScale === opt.key;
                     return (
                       <TouchableOpacity key={opt.key} onPress={() => update({ fontScale: opt.key })} style={[st.chip, on && st.chipOn]}>
-                        <Text style={[{ fontSize: fontSizes[opt.key], fontWeight: '900', color: on ? '#fff' : Colors.PRIMARY }]}>{opt.val}</Text>
+                        <Text style={[{ fontSize: opt.size, fontWeight: '900', color: on ? '#fff' : Colors.PRIMARY }]}>A</Text>
                         <Text style={[st.chipLabel, on && { color: '#fff' }]}>{opt.label}</Text>
                       </TouchableOpacity>
                     );
@@ -76,11 +51,11 @@ export default function AccessibilityButton() {
                 </View>
               </View>
 
-              <Toggle label="🌗 ניגודיות גבוהה" value={s.highContrast} onChange={v => update({ highContrast: v })} />
-              <Toggle label="🎬 הפחתת אנימציות" value={s.reduceMotion} onChange={v => update({ reduceMotion: v })} />
-              <Toggle label="🔗 הדגשת קישורים" value={s.underlineLinks} onChange={v => update({ underlineLinks: v })} />
+              <Toggle label="🌗 ניגודיות גבוהה" value={settings.highContrast} onChange={v => update({ highContrast: v })} />
+              <Toggle label="🎬 הפחתת אנימציות" value={settings.reduceMotion} onChange={v => update({ reduceMotion: v })} />
+              <Toggle label="🔗 הדגשת קישורים" value={settings.underlineLinks} onChange={v => update({ underlineLinks: v })} />
 
-              <TouchableOpacity onPress={() => update(DEFAULTS)} style={st.reset}>
+              <TouchableOpacity onPress={reset} style={st.reset}>
                 <Text style={st.resetTxt}>↻ אפס הגדרות</Text>
               </TouchableOpacity>
 
@@ -105,7 +80,9 @@ function Toggle({ label, value, onChange }: { label: string; value: boolean; onC
 }
 
 const st = StyleSheet.create({
-  btn: { position: 'absolute', left: 16, bottom: 56, width: 44, height: 44, borderRadius: 22, backgroundColor: '#0077be', alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.35, shadowRadius: 8, elevation: 6, zIndex: 100 },
+  btnWrap: { alignItems: 'center', marginTop: 0, marginBottom: 0 },
+  arrow: { fontSize: 16, color: '#0077be', fontWeight: '900', lineHeight: 16 },
+  btn: { width: 28, height: 28, borderRadius: 14, backgroundColor: '#0077be', alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 4, elevation: 4 },
   backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'flex-end' },
   sheet: { backgroundColor: '#fff', borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: '80%' },
   header: { flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', padding: 16, borderBottomWidth: 1, borderBottomColor: '#e2e8f0', gap: 8 },

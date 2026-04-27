@@ -44,6 +44,19 @@ import { Colors } from '../constants/colors';
 import { ThemeContext } from '../constants/theme';
 import { AdminContext } from '../constants/adminContext';
 import { PreviewContext, PreviewMode } from '../constants/previewContext';
+import { AccessibilityProvider, useAccessibility } from '../constants/accessibilityContext';
+
+function AccessibilityToThemeBridge({ dark, setDark, children }: { dark: boolean; setDark: (v: boolean) => void; children: React.ReactNode }) {
+  const { settings } = useAccessibility();
+  useEffect(() => {
+    if (settings.highContrast && !dark) setDark(true);
+  }, [settings.highContrast]);
+  return (
+    <ThemeContext.Provider value={{ dark, toggle: () => setDark(!dark) }}>
+      {children}
+    </ThemeContext.Provider>
+  );
+}
 
 // Note: Previously set Assistant font via Text.defaultProps — removed because
 // defaultProps is deprecated in React 19 and caused iOS crash on launch under
@@ -84,19 +97,21 @@ export default function RootLayout() {
 
   return (
     <ErrorBoundary>
-      <PreviewContext.Provider value={previewCtx}>
-        <AdminContext.Provider value={{ isAdmin, setAdmin }}>
-          <ThemeContext.Provider value={{ dark, toggle: () => setDark(!dark) }}>
-            <StatusBar style={dark ? 'light' : 'dark'} />
-            <Stack
-              screenOptions={{
-                headerShown: false,
-                contentStyle: { backgroundColor: dark ? Colors.TEXT : Colors.BACKGROUND },
-              }}
-            />
-          </ThemeContext.Provider>
-        </AdminContext.Provider>
-      </PreviewContext.Provider>
+      <AccessibilityProvider>
+        <PreviewContext.Provider value={previewCtx}>
+          <AdminContext.Provider value={{ isAdmin, setAdmin }}>
+            <AccessibilityToThemeBridge dark={dark} setDark={setDark}>
+              <StatusBar style={dark ? 'light' : 'dark'} />
+              <Stack
+                screenOptions={{
+                  headerShown: false,
+                  contentStyle: { backgroundColor: dark ? Colors.TEXT : Colors.BACKGROUND },
+                }}
+              />
+            </AccessibilityToThemeBridge>
+          </AdminContext.Provider>
+        </PreviewContext.Provider>
+      </AccessibilityProvider>
     </ErrorBoundary>
   );
 }
