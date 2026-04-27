@@ -545,6 +545,29 @@ function TourAlbumUpload({ tourId, color, onUploaded }: { tourId: string; color:
   );
 }
 
+function TourLegendDropdown({ tours, onSelect }: { tours: TourBlock[]; onSelect: (t: TourBlock) => void }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <View style={{ marginTop: 8, backgroundColor: '#fff', borderRadius: 12, borderWidth: 1, borderColor: '#e2e8f0', overflow: 'hidden' }}>
+      <TouchableOpacity onPress={() => setOpen(o => !o)} style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', padding: 12 }}>
+        <Text style={{ fontSize: 13, fontWeight: '900', color: '#1C2B35', writingDirection: 'rtl' }}>📍 מקרא הסיורים</Text>
+        <Text style={{ fontSize: 14, color: '#1A6B8A', fontWeight: '900' }}>{open ? '▲' : '▼'}</Text>
+      </TouchableOpacity>
+      {open && (
+        <View style={{ padding: 10, gap: 6, borderTopWidth: 1, borderTopColor: '#f1f5f9' }}>
+          {tours.map(t => (
+            <TouchableOpacity key={t.id} onPress={() => { onSelect(t); setOpen(false); }} style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 10, paddingHorizontal: 12, paddingVertical: 10, borderRadius: 8, backgroundColor: t.color }} activeOpacity={0.85}>
+              <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: 'rgba(0,0,0,0.55)' }} />
+              <Text style={{ flex: 1, fontSize: 13, fontWeight: '800', color: isLight(t.color) ? '#1C2B35' : '#fff', writingDirection: 'rtl', textAlign: 'right' }} numberOfLines={1}>{t.title}</Text>
+              <Text style={{ fontSize: 14, color: isLight(t.color) ? '#1C2B35' : '#fff', fontWeight: '900' }}>‹</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      )}
+    </View>
+  );
+}
+
 function TourCard({ t, onRate, nearbyRestaurants }: { t: TourBlock; onRate: (id: string, score: number) => void; nearbyRestaurants?: { name: string; lat: number; lng: number; mapUrl?: string }[] }) {
   const [imgIdx, setImgIdx] = useState(0);
   const [mapBig, setMapBig] = useState(false);

@@ -2354,7 +2354,7 @@ function EditModal({
 
             <View style={ms.fieldGroup}>
               <TouchableOpacity
-                onPress={() => setForm(prev => ({ ...prev, _emojiOpen: !prev._emojiOpen } as any))}
+                onPress={() => setForm(prev => ({ ...prev, _emojiOpen: !(prev as any)._emojiOpen } as any))}
                 style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 6 }}
               >
                 <Text style={ms.label}>או בחר אימוג׳י ({EMOJI_LIBRARY.length})</Text>
@@ -3421,9 +3421,6 @@ export default function AdminDashboard() {
         )}
 
         <HomeBannerEditor />
-        <View style={{ height: 1, backgroundColor: '#e2e8f0', marginVertical: 16 }} />
-        <Text style={{ fontSize: 14, fontWeight: '900', color: '#1A6B8A', writingDirection: 'rtl', textAlign: 'right', marginTop: 4 }}>━━ באנר 2 (נפרד) ━━</Text>
-        <HomeBanner2Editor />
         <BgColorPicker />
         <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 12, padding: 12, marginTop: 12, backgroundColor: '#f8fafc', borderRadius: 10, borderWidth: 1, borderColor: '#e2e8f0' }}>
           <Text style={{ flex: 1, fontSize: 13, fontWeight: '700', color: '#1C2B35', writingDirection: 'rtl', textAlign: 'right' }}>הצג סרגל תצוגה (נייד/אייפד/מחשב)</Text>

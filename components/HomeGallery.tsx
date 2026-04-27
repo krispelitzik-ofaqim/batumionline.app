@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Image, StyleSheet, TouchableOpacity, Text, useWindowDimensions } from 'react-native';
+import { View, Image, StyleSheet, useWindowDimensions } from 'react-native';
 import { resolveUri, fetchContent } from '../constants/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { HOME_IMAGES } from '../assets/images/home';
@@ -19,12 +19,12 @@ const isBadUrl = (u: any): boolean => {
 export default function HomeGallery({ field = 'homeBanner' }: { field?: string } = {}) {
   const { width } = useWindowDimensions();
   const [files, setFiles] = useState<GalleryItem[]>([]);
-  const [idx, setIdx] = useState(0);
   const [errorKeys, setErrorKeys] = useState<Set<string>>(new Set());
 
   useEffect(() => {
+    let active = true;
     AsyncStorage.getItem(`@${field}`).then(cached => {
-      if (!cached) return;
+      if (!active || !cached) return;
       try {
         const arr = JSON.parse(cached);
         if (!Array.isArray(arr)) return;
@@ -36,36 +36,27 @@ export default function HomeGallery({ field = 'homeBanner' }: { field?: string }
         }
       } catch {}
     });
-    const ctrl = new AbortController();
-    const timeoutId = setTimeout(() => ctrl.abort(), 8000);
     fetchContent().then((d: any) => {
-      clearTimeout(timeoutId);
+      if (!active) return;
       if (Array.isArray(d?.[field])) {
         const valid = d[field].filter((u: any) => !isBadUrl(u));
         if (valid.length > 0) {
           setFiles(valid.map((u: string, i: number) => ({ key: `hb${i}`, source: { uri: resolveUri(u) }, url: u })));
           AsyncStorage.setItem(`@${field}`, JSON.stringify(valid)).catch(() => {});
         } else {
-          // API explicitly says empty - clear cache and hide
           setFiles([]);
           AsyncStorage.removeItem(`@${field}`).catch(() => {});
         }
       }
     }).catch(() => {});
-    return () => clearTimeout(timeoutId);
-  }, []);
-
-  // Static gallery - user navigates with arrows (no auto-rotation)
+    return () => { active = false; };
+  }, [field]);
 
   if (files.length === 0) return null;
-  const visibleFiles = files;
-  const safeIdx = idx % visibleFiles.length;
-  const current = visibleFiles[safeIdx];
+  // Show only the first image - no slider, no rotation
+  const current = files[0];
   const isErrored = errorKeys.has(current.key);
-  const fallbackSource = LOCAL_FALLBACK[safeIdx % LOCAL_FALLBACK.length]?.source;
-
-  const goNext = () => setIdx(i => (i + 1) % visibleFiles.length);
-  const goPrev = () => setIdx(i => (i - 1 + visibleFiles.length) % visibleFiles.length);
+  const fallbackSource = LOCAL_FALLBACK[0]?.source;
 
   return (
     <View style={[styles.wrap, { width: width - 32 }]}>
@@ -81,23 +72,6 @@ export default function HomeGallery({ field = 'homeBanner' }: { field?: string }
           });
         }}
       />
-      {visibleFiles.length > 1 && (
-        <>
-          <TouchableOpacity onPress={goPrev} style={[styles.arrow, { right: 8 }]} activeOpacity={0.7}>
-            <Text style={styles.arrowTxt}>››</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={goNext} style={[styles.arrow, { left: 8 }]} activeOpacity={0.7}>
-            <Text style={styles.arrowTxt}>‹‹</Text>
-          </TouchableOpacity>
-          <View style={styles.dots}>
-            {visibleFiles.map((_, i) => (
-              <TouchableOpacity key={i} onPress={() => setIdx(i)}>
-                <View style={[styles.dot, i === safeIdx && styles.dotActive]} />
-              </TouchableOpacity>
-            ))}
-          </View>
-        </>
-      )}
     </View>
   );
 }

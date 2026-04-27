@@ -326,9 +326,9 @@ export default function RealEstatePortal() {
                 <BrokerBannerSmall />
               </View>
             )}
-            {false && (activeTop === 'sale' || activeTop === 'rent') && (
+            {false && activeTop && (activeTop === 'sale' || activeTop === 'rent') && (
               <View style={{ paddingHorizontal: 16, gap: 10, marginTop: 14 }}>
-                {(LISTINGS_BY_TOP[activeTop] || []).filter(lst => !!lst.image).map(lst => (
+                {(LISTINGS_BY_TOP[activeTop as string] || []).filter((lst: any) => !!lst.image).map((lst: any) => (
                   <TouchableOpacity
                     key={`h-${lst.id}`}
                     activeOpacity={0.85}

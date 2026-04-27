@@ -254,7 +254,6 @@ export default function HomeScreen() {
         </View>
 
         <HomeGallery />
-        <HomeGallery field="homeBanner2" />
 
         <ClientBannerDisplay page="home" position="top" />
 
