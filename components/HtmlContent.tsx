@@ -14,7 +14,7 @@ function stripGoogleDocsCss(h: string): string {
       const keep = (body as string)
         .split(';')
         .map(s => s.trim())
-        .filter(s => /^(direction|writing-direction|color|background|background-color|font-weight|font-style|text-decoration)\s*:/i.test(s))
+        .filter(s => /^(direction|writing-direction|color|background|background-color|font-weight|font-style|text-decoration|margin|margin-top|margin-bottom|padding|padding-top|padding-bottom|border-radius|box-shadow|border-right|border-left|border-top|border-bottom|border)\s*:/i.test(s))
         .filter(s => !/text-align\s*:\s*(justify|left|center)/i.test(s))
         .join(';');
       return keep ? `style="${keep}"` : '';
@@ -38,7 +38,8 @@ export default function HtmlContent({ html, style, baseStyle }: Props) {
 .hc-rtl-content { font-size: 15px !important; line-height: 1.7 !important; letter-spacing: 0.1px !important; }
 .hc-rtl-content p { margin: 0 0 14px 0 !important; line-height: 1.7 !important; padding: 0 !important; text-align: right !important; }
 .hc-rtl-content p:last-child { margin-bottom: 0 !important; }
-.hc-rtl-content div { margin: 0 !important; padding: 0 !important; line-height: 1.7 !important; }
+.hc-rtl-content div { line-height: 1.7 !important; margin-top: 0 !important; }
+.hc-rtl-content > div + div, .hc-rtl-content > div > div + div { margin-top: 14px !important; }
 .hc-rtl-content h1 { font-size: 22px !important; font-weight: 800 !important; margin: 24px 0 12px 0 !important; line-height: 1.3 !important; padding: 0 0 8px 0 !important; border-bottom: 2px solid currentColor !important; display: inline-block !important; }
 .hc-rtl-content h1:first-child { margin-top: 0 !important; }
 .hc-rtl-content h2 { font-size: 18px !important; font-weight: 800 !important; margin: 20px 0 10px 0 !important; line-height: 1.3 !important; padding: 0 !important; position: relative !important; padding-right: 14px !important; }

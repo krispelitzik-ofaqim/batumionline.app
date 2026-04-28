@@ -112,7 +112,7 @@ export default function MapScreen() {
                               maxHeight: 150, overflow: 'auto',
                             },
                           })
-                        ) : <Text style={styles.panelDesc}>{p.description.replace(/<[^>]+>/g, '')}</Text>
+                        ) : <Text style={styles.panelDesc}>{(p.description || '').replace(/<[^>]+>/g, '')}</Text>
                       ) : p.description ? <Text style={styles.panelDesc} numberOfLines={1}>{p.description.replace(/<[^>]+>/g, '').substring(0, 40)}</Text> : null}
                     </View>
                     <Text style={styles.panelArrow}>{focusPoint?.name === p.name ? '▼' : '←'}</Text>

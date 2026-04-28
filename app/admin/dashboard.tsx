@@ -3173,7 +3173,7 @@ export default function AdminDashboard() {
         }
         setData(loaded);
         const rawTexts = await AsyncStorage.getItem('@admin_texts');
-        if (rawTexts) setTexts(JSON.parse(rawTexts));
+        if (rawTexts) { try { setTexts(JSON.parse(rawTexts)); } catch {} }
       }
     })();
   }, []);

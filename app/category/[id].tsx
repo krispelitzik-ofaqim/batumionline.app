@@ -314,7 +314,14 @@ function TourStations({ audios, color, onNavigate, onActiveChange, nearbyRestaur
     if (track.coords) onNavigate(track.coords);
   };
 
-  useEffect(() => { return () => { if (audioRef.current) audioRef.current.pause(); }; }, []);
+  useEffect(() => { return () => {
+    const a = audioRef.current;
+    if (!a) return;
+    try {
+      if (Platform.OS === 'web') { a.pause(); }
+      else if (typeof a.unloadAsync === 'function') { a.unloadAsync().catch(() => {}); }
+    } catch {}
+  }; }, []);
 
   const fmt = (s: number) => { const m = Math.floor(s / 60); const r = Math.floor(s % 60); return `${m}:${r.toString().padStart(2, '0')}`; };
 
