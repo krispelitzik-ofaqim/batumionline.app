@@ -61,7 +61,7 @@ const EXTRA_CATEGORIES: CatItem[] = [
 
 // 6. באנרים רוחביים
 const BOTTOM_BANNERS = [
-  { id: 'weather', title: 'מזג אוויר', icon: '🌤️', bg: Colors.PRIMARY },
+  { id: 'weather', title: 'מזג אוויר ומצלמות רשת', icon: '🌤️', bg: Colors.PRIMARY },
   { id: 'currency', title: 'המרת מטבעות', icon: '💰', bg: Colors.SECONDARY },
   { id: 'news', title: 'חדשות בעברית', icon: '🗞️', bg: '#7ECFC0' },
   { id: 'flights', title: 'לוח המראות ונחיתות', icon: '✈️', bg: '#2D4A5E' },

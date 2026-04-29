@@ -82,6 +82,20 @@ export default function RootLayout() {
     return () => clearTimeout(t);
   }, []);
 
+  useEffect(() => {
+    if (Platform.OS === 'web') return;
+    (async () => {
+      try {
+        const { Audio } = require('expo-av');
+        await Audio.setAudioModeAsync({
+          playsInSilentModeIOS: true,
+          staysActiveInBackground: false,
+          shouldDuckAndroid: true,
+        });
+      } catch {}
+    })();
+  }, []);
+
   const fontsReady = fontsLoaded || fontError || fontTimedOut;
 
   const simW = previewMode ? PREVIEW_WIDTHS[previewMode] : null;

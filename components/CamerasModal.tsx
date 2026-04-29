@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Modal, TouchableOpacity, ScrollView, StyleSheet, Platform, Linking, Image } from 'react-native';
+import * as WebBrowser from 'expo-web-browser';
 import { Colors } from '../constants/colors';
 import { fetchContent, resolveUri } from '../constants/api';
 import MapEmbed from './MapEmbed';
@@ -60,8 +61,9 @@ export default function CamerasModal({ visible, onClose, bgColor }: { visible: b
 
   const openCam = (cam: Camera) => {
     if (!cam.url) return;
-    if (cam.external) Linking.openURL(cam.url);
-    else setSelected(cam);
+    if (Platform.OS === 'web' && !cam.external) { setSelected(cam); return; }
+    if (Platform.OS === 'web') Linking.openURL(cam.url);
+    else WebBrowser.openBrowserAsync(cam.url).catch(() => Linking.openURL(cam.url));
   };
 
   const renderTile = (cam: Camera, featured: boolean) => (

@@ -10,6 +10,7 @@ import { PreviewContext } from '../../constants/previewContext';
 import { AdminContext } from '../../constants/adminContext';
 import DevicePreviewBar from '../../components/DevicePreviewBar';
 import { fetchContent, fetchRatings, submitRating, API_BASE, resolveUri } from '../../constants/api';
+import { openLocation, openDirections, openMapUrl } from '../../constants/maps';
 
 type MapPoint = { name: string; lat: number; lng: number; description?: string };
 import AudioPlayer from '../../components/AudioPlayer';
@@ -46,7 +47,7 @@ function FoodieCard({ h, isLast }: { h: Hotel; isLast?: boolean }) {
   const [imgFailed, setImgFailed] = useState(!h.image || h.image.includes('city.jpg'));
   const badge = h.amenities?.[0] || '🔥 חובה לטעום';
   return (
-    <TouchableOpacity activeOpacity={0.85} onPress={() => h.mapUrl && Linking.openURL(h.mapUrl)}
+    <TouchableOpacity activeOpacity={0.85} onPress={() => h.mapUrl && openMapUrl(h.mapUrl, h.title)}
       style={{ paddingVertical: 12, borderBottomWidth: isLast ? 0 : 1, borderBottomColor: '#e0e0e0' }}>
       <View style={{ flexDirection: 'row-reverse', gap: 12 }}>
         <View style={{ width: 80, height: 80, borderRadius: 12, overflow: 'hidden', backgroundColor: '#f0f0f0' }}>
@@ -114,7 +115,7 @@ function PassportCard({ h, pageBtnLabel }: { h: Hotel; pageBtnLabel: string }) {
         ) : null}
         <TouchableOpacity
           style={[passSt.btn, { backgroundColor: '#25D366' }]}
-          onPress={() => h.mapUrl && Linking.openURL(h.mapUrl)}
+          onPress={() => h.mapUrl && openMapUrl(h.mapUrl, h.title)}
           disabled={!h.mapUrl}
         >
           <Text style={passSt.btnTxt}>📱 WhatsApp</Text>
@@ -238,7 +239,7 @@ function FoodRecGps({ restaurants }: { restaurants: { name: string; lat: number;
   return (
     <View style={{ marginTop: 6, gap: 4 }}>
       {nearby.map((r, i) => (
-        <TouchableOpacity key={i} onPress={() => r.mapUrl && Linking.openURL(r.mapUrl)} style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 8, padding: 8, backgroundColor: r.category?.includes('קפה') ? '#efebe9' : r.category?.includes('רחוב') ? '#fff3e0' : r.category?.includes('מקומי') ? '#fce4ec' : '#fff8e1', borderRadius: 8, borderWidth: 1, borderColor: r.category?.includes('קפה') ? '#bcaaa4' : r.category?.includes('רחוב') ? '#ff6b35' : r.category?.includes('מקומי') ? '#f48fb1' : '#f4a94e' }}>
+        <TouchableOpacity key={i} onPress={() => r.mapUrl && openMapUrl(r.mapUrl, r.name)} style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 8, padding: 8, backgroundColor: r.category?.includes('קפה') ? '#efebe9' : r.category?.includes('רחוב') ? '#fff3e0' : r.category?.includes('מקומי') ? '#fce4ec' : '#fff8e1', borderRadius: 8, borderWidth: 1, borderColor: r.category?.includes('קפה') ? '#bcaaa4' : r.category?.includes('רחוב') ? '#ff6b35' : r.category?.includes('מקומי') ? '#f48fb1' : '#f4a94e' }}>
           <Text style={{ fontSize: 14 }}>{r.category?.includes('קפה') ? '☕' : r.category?.includes('רחוב') ? '🔥' : r.category?.includes('מקומי') ? '🥙' : '🍽️'}</Text>
           <View style={{ flex: 1 }}>
             <Text style={{ fontSize: 11, fontWeight: '800', color: '#1C2B35', writingDirection: 'rtl' }}>{r.name}</Text>
@@ -359,7 +360,7 @@ function TourStations({ audios, color, onNavigate, onActiveChange, nearbyRestaur
               return (
                 <View style={{ marginTop: 6, gap: 4 }}>
                   {dists.map((r, ri) => (
-                    <TouchableOpacity key={ri} onPress={() => r.mapUrl && Linking.openURL(r.mapUrl)} style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 8, padding: 8, backgroundColor: r.category?.includes('קפה') ? '#efebe9' : r.category?.includes('רחוב') ? '#fff3e0' : r.category?.includes('מקומי') ? '#fce4ec' : '#fff8e1', borderRadius: 8, borderWidth: 1, borderColor: r.category?.includes('קפה') ? '#bcaaa4' : r.category?.includes('רחוב') ? '#ff6b35' : r.category?.includes('מקומי') ? '#f48fb1' : '#f4a94e' }}>
+                    <TouchableOpacity key={ri} onPress={() => r.mapUrl && openMapUrl(r.mapUrl, r.name)} style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 8, padding: 8, backgroundColor: r.category?.includes('קפה') ? '#efebe9' : r.category?.includes('רחוב') ? '#fff3e0' : r.category?.includes('מקומי') ? '#fce4ec' : '#fff8e1', borderRadius: 8, borderWidth: 1, borderColor: r.category?.includes('קפה') ? '#bcaaa4' : r.category?.includes('רחוב') ? '#ff6b35' : r.category?.includes('מקומי') ? '#f48fb1' : '#f4a94e' }}>
                       <Text style={{ fontSize: 14 }}>{r.category?.includes('קפה') ? '☕' : r.category?.includes('רחוב') ? '🔥' : r.category?.includes('מקומי') ? '🥙' : '🍽️'}</Text>
                       <View style={{ flex: 1 }}>
                         <Text style={{ fontSize: 11, fontWeight: '800', color: '#1C2B35', writingDirection: 'rtl' }}>{r.name}</Text>
@@ -799,7 +800,7 @@ function CategoryMapModal({ visible, points, focusName, focusCoords, layerColor,
               <Text style={{ fontSize: 16, fontWeight: '900', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl' }}>📍 {focus.name}</Text>
               <TouchableOpacity
                 style={{ marginTop: 8, backgroundColor: color, paddingVertical: 10, borderRadius: 10, alignItems: 'center' }}
-                onPress={() => Linking.openURL(`https://www.google.com/maps/dir/?api=1&destination=${focus.lat},${focus.lng}`)}
+                onPress={() => openDirections(focus.lat, focus.lng, focus.name)}
               >
                 <Text style={{ color: '#fff', fontWeight: '800', fontSize: 14 }}>🧭 נווט למקום</Text>
               </TouchableOpacity>
@@ -872,7 +873,7 @@ function HotelCard({ h, dark, pageBtnLabel, mapPoints, layerColor, placesQuery, 
               if (mapPoints && mapPoints.length > 0) setShowCatMapModal(true);
               else if (h.coords) {
                 if (Platform.OS === 'web') setShowMap(v => !v);
-                else Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${h.coords.lat},${h.coords.lng}`).catch(() => {});
+                else openLocation(h.coords.lat, h.coords.lng, h.title);
               }
             }}
             disabled={!h.coords && !(mapPoints && mapPoints.length > 0)}
@@ -895,7 +896,7 @@ function HotelCard({ h, dark, pageBtnLabel, mapPoints, layerColor, placesQuery, 
           <TouchableOpacity
             style={[st.hotelBtn, st.hotelBtnSecondary, !h.mapUrl && st.hotelBtnDisabled]}
             activeOpacity={h.mapUrl ? 0.7 : 1}
-            onPress={() => h.mapUrl && Linking.openURL(h.mapUrl)}
+            onPress={() => h.mapUrl && openMapUrl(h.mapUrl, h.title)}
             disabled={!h.mapUrl}
           >
             <Text style={[st.hotelBtnTxt, !h.mapUrl && st.hotelBtnTxtDisabled]}>{h.mapUrl && h.mapUrl.includes('wa.me') ? 'WhatsApp' : 'נווט למקום'}</Text>
@@ -1771,14 +1772,14 @@ function ArticleView({ cat, darkCat }: { cat: Item; darkCat: boolean }) {
               onPress={() => {
                 if (btn.type === 'link' && btn.url) Linking.openURL(btn.url);
                 else if (btn.type === 'navigate' && btn.coords)
-                  Linking.openURL(`https://www.google.com/maps/dir/?api=1&destination=${btn.coords.lat},${btn.coords.lng}`);
+                  openDirections(btn.coords.lat, btn.coords.lng, btn.label);
                 else if (btn.type === 'map' && btn.coords) {
                   if (Platform.OS === 'web') setShowMap(showMap ? null : btn.coords);
-                  else Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${btn.coords.lat},${btn.coords.lng}`);
+                  else openLocation(btn.coords.lat, btn.coords.lng, btn.label);
                 }
                 else if (btn.type === 'ticket' && btn.coords) {
                   if (Platform.OS === 'web') setShowMap(showMap ? null : btn.coords);
-                  else Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${btn.coords.lat},${btn.coords.lng}`);
+                  else openLocation(btn.coords.lat, btn.coords.lng, btn.label);
                 }
               }}
             >

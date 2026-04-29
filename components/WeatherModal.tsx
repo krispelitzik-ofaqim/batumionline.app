@@ -639,7 +639,7 @@ const s = StyleSheet.create({
   liveTxt: { color: '#fff', fontSize: 11, fontWeight: '900', letterSpacing: 1 },
   batumiClock: { color: '#4ade80', fontSize: 16, fontWeight: '900', fontVariant: ['tabular-nums'], textShadowColor: '#4ade80', textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 8 },
   updatedTxt: { color: 'rgba(255,255,255,0.55)', fontSize: 11, textAlign: 'center', marginBottom: 18, writingDirection: 'rtl' },
-  audioWrap: { marginBottom: 12, borderRadius: 18, borderWidth: 1, borderColor: 'rgba(255,255,255,0.35)' },
+  audioWrap: { marginTop: 16, marginBottom: 16, borderRadius: 18, borderWidth: 1, borderColor: 'rgba(255,255,255,0.35)' },
   hourlyScroll: { flexDirection: 'row-reverse', gap: 10, paddingVertical: 8, paddingHorizontal: 2, marginBottom: 20 },
   hourCell: { backgroundColor: 'rgba(255,255,255,0.12)', borderRadius: 14, paddingVertical: 12, paddingHorizontal: 14, alignItems: 'center', minWidth: 70, borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)' },
   hourCellNow: { borderWidth: 2, borderColor: '#F4A94E' },
@@ -675,7 +675,7 @@ const s = StyleSheet.create({
   dayHigh: { fontSize: 15, fontWeight: '900', color: Colors.WHITE, textShadowColor: 'rgba(0,0,0,0.35)', textShadowOffset: { width: 0, height: 2 }, textShadowRadius: 3 },
   dayLow: { fontSize: 13, color: 'rgba(255,255,255,0.6)', fontWeight: '700' },
 
-  skippersWrap: { marginTop: 24, borderRadius: 14, backgroundColor: 'rgba(0,0,0,0.15)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)', overflow: 'hidden' },
+  skippersWrap: { borderRadius: 14, backgroundColor: 'rgba(0,0,0,0.15)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)', overflow: 'hidden' },
   skippersHeader: { flexDirection: 'row-reverse', alignItems: 'center', gap: 10, paddingHorizontal: 16, paddingVertical: 14 },
   skippersIcon: { fontSize: 24 },
   skippersTitle: { flex: 1, fontSize: 16, fontWeight: '900', color: '#fff', writingDirection: 'rtl', textAlign: 'right', textShadowColor: 'rgba(0,0,0,0.35)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 2 },
