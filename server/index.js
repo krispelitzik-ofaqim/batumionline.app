@@ -27,6 +27,15 @@ if (!fs.existsSync(DB_PATH)) {
 // Middleware
 app.use(cors());
 app.use(express.json({ limit: '50mb', strict: false }));
+
+// Disable CDN caching for all /api/* endpoints (Fastly was serving stale data)
+app.use('/api', (req, res, next) => {
+  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.set('Pragma', 'no-cache');
+  res.set('Expires', '0');
+  res.set('Surrogate-Control', 'no-store');
+  next();
+});
 app.use('/uploads', express.static(UPLOADS_DIR));
 // Fallback: serve git-committed uploads when file not found in persistent volume
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
