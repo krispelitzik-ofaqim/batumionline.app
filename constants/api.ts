@@ -26,15 +26,18 @@ export function resolveUri(u?: string): string {
   return u;
 }
 
+const noCacheHeaders = { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'Pragma': 'no-cache' };
+const bust = () => `_t=${Date.now()}`;
+
 export async function fetchContent() {
-  const res = await fetch(`${API_BASE}/api/content`);
+  const res = await fetch(`${API_BASE}/api/content?${bust()}`, { headers: noCacheHeaders, cache: 'no-store' as any });
   const json = await res.json();
   if (!json.success) throw new Error(json.error);
   return json.data;
 }
 
 export async function fetchRatings() {
-  const res = await fetch(`${API_BASE}/api/ratings`);
+  const res = await fetch(`${API_BASE}/api/ratings?${bust()}`, { headers: noCacheHeaders, cache: 'no-store' as any });
   const json = await res.json();
   if (!json.success) throw new Error(json.error);
   return json.data as Record<string, { sum: number; count: number }>;
