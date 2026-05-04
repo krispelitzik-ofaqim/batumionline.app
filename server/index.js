@@ -1269,9 +1269,21 @@ app.use((req, res, next) => {
 });
 
 if (fs.existsSync(WEB_DIST)) {
-  app.use(express.static(WEB_DIST));
+  app.use(express.static(WEB_DIST, {
+    setHeaders: (res, filePath) => {
+      // HTML never cached. Hashed assets (with hash in filename) cached long; other JS/CSS short
+      if (filePath.endsWith('.html')) {
+        res.set('Cache-Control', 'no-store, no-cache, must-revalidate');
+      } else if (/\.[a-f0-9]{8,}\.(js|css|woff2?|png|jpe?g|webp|svg)$/i.test(filePath)) {
+        res.set('Cache-Control', 'public, max-age=31536000, immutable');
+      } else if (/\.(js|css)$/i.test(filePath)) {
+        res.set('Cache-Control', 'no-cache');
+      }
+    }
+  }));
   app.use((req, res, next) => {
     if (req.method !== 'GET' || req.path.startsWith('/api/') || req.path.startsWith('/uploads/')) return next();
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate');
     res.sendFile(path.join(WEB_DIST, 'index.html'));
   });
 }
