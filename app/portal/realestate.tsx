@@ -13,6 +13,7 @@ import AppHeader from '../../components/AppHeader';
 import FinanceStats from '../../components/FinanceStats';
 import ListingForm from '../../components/ListingForm';
 import MyListingsModal from '../../components/MyListingsModal';
+import { FEATURES } from '../../constants/features';
 import ListingsList from '../../components/ListingsList';
 import DeveloperCard, { Developer } from '../../components/DeveloperCard';
 import DeveloperForm from '../../components/DeveloperForm';
@@ -492,7 +493,7 @@ export default function RealEstatePortal() {
               <Text style={s.choiceBtnIcon}>👤</Text>
               <View style={{ flex: 1 }}>
                 <Text style={s.choiceBtnTitle}>לקוח פרטי</Text>
-                <Text style={s.choiceBtnSub}>מודעה בודדת · קטן חינם / גדול $10/חודש</Text>
+                <Text style={s.choiceBtnSub}>{FEATURES.PAID_LISTING_OPTIONS ? 'מודעה בודדת · קטן חינם / גדול $10/חודש' : 'מודעה בודדת · חינם'}</Text>
               </View>
               <Text style={s.choiceArrow}>‹</Text>
             </TouchableOpacity>
@@ -503,7 +504,7 @@ export default function RealEstatePortal() {
               <Text style={s.choiceBtnIcon}>🏗️</Text>
               <View style={{ flex: 1 }}>
                 <Text style={s.choiceBtnTitle}>יזם / מתווך</Text>
-                <Text style={s.choiceBtnSub}>מיני-פורטל · Basic $100 / Premium $180 לחודש</Text>
+                <Text style={s.choiceBtnSub}>{FEATURES.PAID_LISTING_OPTIONS ? 'מיני-פורטל · Basic $100 / Premium $180 לחודש' : 'מיני-פורטל · חינם'}</Text>
               </View>
               <Text style={s.choiceArrow}>‹</Text>
             </TouchableOpacity>
