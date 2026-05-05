@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform,
   useWindowDimensions,
@@ -14,7 +14,11 @@ export default function AdminLogin() {
   const [error, setError] = useState('');
   const { width } = useWindowDimensions();
   const isWide = width >= 768;
-  const { setAdmin } = useContext(AdminContext);
+  const { isAdmin, setAdmin } = useContext(AdminContext);
+
+  useEffect(() => {
+    if (isAdmin) router.replace('/admin/dashboard');
+  }, [isAdmin]);
 
   const handleLogin = () => {
     if (password === ADMIN_PASSWORD) {
