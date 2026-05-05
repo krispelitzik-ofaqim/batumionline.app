@@ -14,7 +14,9 @@ const DATA_DIR = process.env.DATA_DIR || __dirname;
 const DB_PATH = path.join(DATA_DIR, 'db.json');
 const UPLOADS_DIR = path.join(DATA_DIR, 'uploads');
 const GALLERY_DIR = path.join(UPLOADS_DIR, 'gallery');
+const LISTINGS_DIR = path.join(UPLOADS_DIR, 'listings');
 if (!fs.existsSync(GALLERY_DIR)) fs.mkdirSync(GALLERY_DIR, { recursive: true });
+if (!fs.existsSync(LISTINGS_DIR)) fs.mkdirSync(LISTINGS_DIR, { recursive: true });
 if (!fs.existsSync(DB_PATH)) {
   const seed = path.join(__dirname, 'db.json');
   if (fs.existsSync(seed) && seed !== DB_PATH) {
@@ -106,6 +108,22 @@ const galleryUpload = multer({
   fileFilter: (req, file, cb) => {
     const allowed = /\.(jpg|jpeg|png|gif|webp)$/i;
     cb(allowed.test(path.extname(file.originalname)) ? null : new Error('Image only'), allowed.test(path.extname(file.originalname)));
+  },
+});
+
+const listingsStorage = multer.diskStorage({
+  destination: (_req, _file, cb) => cb(null, LISTINGS_DIR),
+  filename: (_req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase() || '.jpg';
+    cb(null, `${Date.now()}-${Math.round(Math.random() * 10000)}${ext}`);
+  },
+});
+const listingsUpload = multer({
+  storage: listingsStorage,
+  limits: { fileSize: 50 * 1024 * 1024 },
+  fileFilter: (_req, file, cb) => {
+    const allowed = /\.(jpe?g|png|webp|gif|mp4|mov)$/i;
+    cb(null, allowed.test(file.originalname));
   },
 });
 
@@ -1045,6 +1063,32 @@ app.get('/api/og-image', async (req, res) => {
     res.json({ success: true, image });
   } catch {
     res.json({ success: false, error: 'fetch failed' });
+  }
+});
+
+// ─── Listings folder uploads ──────────────────────────────────
+
+// POST /api/upload-listing — saves photo to /uploads/listings/
+app.post('/api/upload-listing', listingsUpload.single('file'), (req, res) => {
+  if (!req.file) return res.status(400).json({ success: false, error: 'no file' });
+  res.json({
+    success: true,
+    filename: req.file.filename,
+    url: `/uploads/listings/${req.file.filename}`,
+  });
+});
+
+// GET /api/listings-images — returns array of public URLs
+app.get('/api/listings-images', (_req, res) => {
+  try {
+    const files = fs.readdirSync(LISTINGS_DIR)
+      .filter(f => /\.(jpe?g|png|webp|gif)$/i.test(f))
+      .sort()
+      .reverse();
+    const images = files.map(f => `/uploads/listings/${f}`);
+    res.json({ success: true, images });
+  } catch (e) {
+    res.json({ success: false, images: [], error: 'failed to read folder' });
   }
 });
 

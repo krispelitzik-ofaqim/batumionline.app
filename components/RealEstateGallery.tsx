@@ -24,20 +24,15 @@ export default function RealEstateGallery() {
   useEffect(() => {
     (async () => {
       try {
-        const r = await fetch(`${API_BASE}/api/listings?_t=${Date.now()}`);
+        const r = await fetch(`${API_BASE}/api/listings-images?_t=${Date.now()}`);
         const j = await r.json();
-        const fromListings: Slide[] = [];
-        for (const l of (j.listings || [])) {
-          for (const img of (l.images || [])) {
-            if (img) fromListings.push({ uri: resolveUri(img), caption: l.title || '' });
-          }
-        }
-        if (fromListings.length > 0) {
-          for (let i = fromListings.length - 1; i > 0; i--) {
+        const arr: Slide[] = (j.images || []).map((u: string) => ({ uri: resolveUri(u), caption: '' }));
+        if (arr.length > 0) {
+          for (let i = arr.length - 1; i > 0; i--) {
             const k = Math.floor(Math.random() * (i + 1));
-            [fromListings[i], fromListings[k]] = [fromListings[k], fromListings[i]];
+            [arr[i], arr[k]] = [arr[k], arr[i]];
           }
-          setSlides(fromListings.slice(0, 30));
+          setSlides(arr.slice(0, 30));
           return;
         }
       } catch {}

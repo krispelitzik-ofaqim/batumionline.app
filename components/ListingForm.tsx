@@ -55,7 +55,7 @@ export default function ListingForm({ visible, onClose, defaultType, onSubmitted
     try {
       const fd = new FormData();
       fd.append('file', { uri, name: fileName, type: mimeType } as any);
-      const r = await fetch(`${API_BASE}/api/upload`, { method: 'POST', body: fd });
+      const r = await fetch(`${API_BASE}/api/upload-listing`, { method: 'POST', body: fd });
       const j = await r.json();
       return j.url || null;
     } catch { return null; }
@@ -77,7 +77,7 @@ export default function ListingForm({ visible, onClose, defaultType, onSubmitted
           const fd = new FormData();
           fd.append('file', file);
           try {
-            const r = await fetch(`${API_BASE}/api/upload`, { method: 'POST', body: fd });
+            const r = await fetch(`${API_BASE}/api/upload-listing`, { method: 'POST', body: fd });
             const j = await r.json();
             if (j.url) setVideo(j.url);
           } catch {}
@@ -120,7 +120,7 @@ export default function ListingForm({ visible, onClose, defaultType, onSubmitted
         const fd = new FormData();
         fd.append('file', f);
         try {
-          const r = await fetch(`${API_BASE}/api/upload`, { method: 'POST', body: fd });
+          const r = await fetch(`${API_BASE}/api/upload-listing`, { method: 'POST', body: fd });
           const j = await r.json();
           if (j.url) urls.push(j.url);
         } catch {}
