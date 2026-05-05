@@ -1670,6 +1670,32 @@ function RealEstateNewsEditor() {
               <TextInput style={{ borderWidth: 1, borderColor: '#dcfce7', borderRadius: 6, padding: 6, fontSize: 11, textAlign: 'right', marginBottom: 4 }} value={it.summary} onChangeText={v => updateItem(c.id, it.id, { summary: v })} placeholder="תקציר" placeholderTextColor="#86efac" />
               <TextInput style={{ borderWidth: 1, borderColor: '#dcfce7', borderRadius: 6, padding: 6, fontSize: 11, textAlign: 'right', marginBottom: 4 }} value={it.date} onChangeText={v => updateItem(c.id, it.id, { date: v })} placeholder="תאריך (היום/השבוע/05.04)" placeholderTextColor="#86efac" />
               <TextInput style={{ borderWidth: 1, borderColor: '#dcfce7', borderRadius: 6, padding: 6, fontSize: 11, textAlign: 'right', marginBottom: 4, minHeight: 60 }} multiline value={it.article || ''} onChangeText={v => updateItem(c.id, it.id, { article: v })} placeholder="כתבה מלאה (אופציונלי)" placeholderTextColor="#86efac" />
+              <View style={{ flexDirection: 'row-reverse', gap: 4, marginBottom: 4 }}>
+                <TextInput
+                  style={{ flex: 1, borderWidth: 1, borderColor: '#bfdbfe', borderRadius: 6, padding: 6, fontSize: 11, textAlign: 'right', backgroundColor: '#eff6ff' }}
+                  value={it.link || ''}
+                  onChangeText={v => updateItem(c.id, it.id, { link: v })}
+                  placeholder="🔗 קישור למקור הכתבה (אופציונלי)"
+                  placeholderTextColor="#93c5fd"
+                  autoCapitalize="none"
+                  keyboardType="url"
+                />
+                {!!it.link && (
+                  <TouchableOpacity
+                    onPress={async () => {
+                      try {
+                        const r = await fetch(`${API_BASE}/api/og-image?url=${encodeURIComponent(it.link)}`);
+                        const j = await r.json();
+                        if (j.success && j.image) updateItem(c.id, it.id, { image: j.image });
+                        else alert('לא נמצאה תמונה בקישור');
+                      } catch { alert('שגיאה במשיכת תמונה'); }
+                    }}
+                    style={{ paddingHorizontal: 10, paddingVertical: 6, backgroundColor: '#3b82f6', borderRadius: 6, justifyContent: 'center' }}
+                  >
+                    <Text style={{ color: '#fff', fontSize: 11, fontWeight: '800' }}>🪄 הבא תמונה</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
               {it.image && <Image source={{ uri: resolveUri(it.image) }} style={{ width: 60, height: 60, borderRadius: 4, marginBottom: 4 }} />}
               {Platform.OS === 'web' && React.createElement('div', null, [
                 React.createElement('input', {
@@ -1680,7 +1706,7 @@ function RealEstateNewsEditor() {
                   key: 'btn', type: 'button',
                   onClick: () => { const el = (document as any).getElementById(`news_file_${it.id}`); if (el) el.click(); },
                   style: { width: '100%', backgroundColor: '#fff', border: '2px dashed #86efac', borderRadius: 4, padding: 6, cursor: 'pointer', color: '#15803d', fontSize: 10, fontWeight: 800 },
-                }, '📤 העלה תמונה'),
+                }, '📤 העלה תמונה ידנית'),
               ])}
             </View>
           ))}
