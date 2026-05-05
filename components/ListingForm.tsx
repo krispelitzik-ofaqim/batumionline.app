@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, Modal, TextInput, TouchableOpacity, ScrollView, StyleSheet, Image, Platform, Linking, KeyboardAvoidingView } from 'react-native';
 import { Colors } from '../constants/colors';
 import { API_BASE } from '../constants/api';
+import { FEATURES } from '../constants/features';
 
 type Props = {
   visible: boolean;
@@ -121,6 +122,7 @@ export default function ListingForm({ visible, onClose, defaultType, onSubmitted
               </View>
               <TextInput style={s.input} placeholder="טלפון ליצירת קשר" value={phone} onChangeText={setPhone} textAlign="right" keyboardType="phone-pad" placeholderTextColor="#94a3b8" />
 
+              {FEATURES.PAID_LISTING_OPTIONS && (
               <View>
                 <Text style={s.sectionLabel}>סוג תצוגה</Text>
                 <View style={{ flexDirection: 'row-reverse', gap: 6 }}>
@@ -135,6 +137,7 @@ export default function ListingForm({ visible, onClose, defaultType, onSubmitted
                   ))}
                 </View>
               </View>
+              )}
 
               <View>
                 <Text style={s.sectionLabel}>תמונות ({images.length}/8)</Text>
