@@ -6104,6 +6104,7 @@ export default function AdminDashboard() {
                 </TouchableOpacity>
               )}
 
+              {activeNav !== 'side' && (
               <TouchableOpacity
                 activeOpacity={0.8}
                 onPress={() => {
@@ -6138,6 +6139,7 @@ export default function AdminDashboard() {
               >
                 <View style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: '#fff', marginLeft: (item as any).visible !== false ? 18 : 0 }} />
               </TouchableOpacity>
+              )}
 
               <TouchableOpacity
                 style={cs.editBtn}
