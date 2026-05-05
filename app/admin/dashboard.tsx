@@ -1074,7 +1074,7 @@ function RealEstateBannerEditor() {
   );
 }
 
-function ListingsFolderViewer() {
+function ListingsFolderViewer({ onBack }: { onBack?: () => void } = {}) {
   const [images, setImages] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [migrating, setMigrating] = useState(false);
@@ -1105,7 +1105,14 @@ function ListingsFolderViewer() {
   return (
     <View style={{ marginBottom: 14, padding: 12, backgroundColor: '#fef3c7', borderRadius: 10, borderWidth: 1, borderColor: '#fde68a' }}>
       <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-        <Text style={{ fontSize: 13, fontWeight: '900', color: '#713f12', writingDirection: 'rtl' }}>📁 תיקיית מודעות נדל"ן ({images.length})</Text>
+        <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 8 }}>
+          {onBack && (
+            <TouchableOpacity onPress={onBack}>
+              <Text style={{ fontSize: 22, color: '#713f12', fontWeight: '700' }}>→</Text>
+            </TouchableOpacity>
+          )}
+          <Text style={{ fontSize: 13, fontWeight: '900', color: '#713f12', writingDirection: 'rtl' }}>🏠 מודעות נדל"ן ({images.length})</Text>
+        </View>
         <View style={{ flexDirection: 'row-reverse', gap: 6 }}>
           <TouchableOpacity onPress={load} style={{ paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8, backgroundColor: '#fde68a' }}>
             <Text style={{ fontSize: 11, fontWeight: '800', color: '#713f12' }}>🔄 רענן</Text>
@@ -1139,7 +1146,6 @@ function BlocksMenu() {
     { id: 'news', icon: '📰', title: 'חדשות נדל"ן', component: <RealEstateNewsEditor /> },
   ];
   const toggleable = [
-    { id: 'listings_folder', icon: '📁', title: 'תיקיית מודעות נדל"ן', component: <ListingsFolderViewer /> },
     { id: 'future', icon: '🔮', title: 'עתיד הנדל"ן', component: <FutureProjectsEditor /> },
     { id: 'business', icon: '💼', title: 'פורטל העסקים', component: <BusinessProjectsEditor /> },
     { id: 'gallery', icon: '🖼️', title: 'באנר מתחלף', component: <RealEstateGalleryEditor /> },
@@ -5297,6 +5303,12 @@ export default function AdminDashboard() {
           <Text style={{ fontSize: 20, fontWeight: '900', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl', marginBottom: 4 }}>📁 תיקיות תמונות</Text>
           <Text style={{ fontSize: 13, color: '#888', textAlign: 'right', writingDirection: 'rtl', marginBottom: 16 }}>{mediaFiles.length} תמונות בסה״כ</Text>
           <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 12 }}>
+            <TouchableOpacity onPress={() => setMediaFolder('__listings')} activeOpacity={0.7}
+              style={{ width: 130, height: 110, borderRadius: 16, backgroundColor: '#fef3c7', borderWidth: 1, borderColor: '#fde68a', alignItems: 'center', justifyContent: 'center' }}>
+              <Text style={{ fontSize: 32 }}>🏠</Text>
+              <Text style={{ fontSize: 12, fontWeight: '800', color: '#713f12', textAlign: 'center', marginTop: 4 }}>מודעות נדל"ן</Text>
+              <Text style={{ fontSize: 10, color: '#888', marginTop: 2 }}>מתוך מודעות גולשים</Text>
+            </TouchableOpacity>
             {FOLDERS.map(g => (
               <TouchableOpacity key={g.group} onPress={() => { setMediaFolder(g.group); setMediaFilter(''); }} activeOpacity={0.7}
                 style={{ width: 130, height: 110, borderRadius: 16, backgroundColor: '#f8fafc', borderWidth: 1, borderColor: '#e2e8f0', alignItems: 'center', justifyContent: 'center' }}>
@@ -5316,6 +5328,9 @@ export default function AdminDashboard() {
       );
     }
 
+    if (mediaFolder === '__listings') {
+      return <ListingsFolderViewer onBack={() => { setMediaFolder(''); setMediaFilter(''); }} />;
+    }
     return (
       <View style={cs.contentCard}>
         <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 10, marginBottom: 12 }}>
