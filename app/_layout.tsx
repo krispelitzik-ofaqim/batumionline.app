@@ -81,7 +81,24 @@ export default function RootLayout() {
       try { if (localStorage.getItem('@bo:isAdmin') === '1') setAdminRaw(true); } catch {}
     }
   }, []);
-  const [previewMode, setPreviewMode] = useState<PreviewMode>(null);
+  const [previewMode, setPreviewModeRaw] = useState<PreviewMode>(null);
+  const setPreviewMode = (v: PreviewMode) => {
+    setPreviewModeRaw(v);
+    if (Platform.OS === 'web') {
+      try {
+        if (v) localStorage.setItem('@bo:previewMode', v);
+        else localStorage.removeItem('@bo:previewMode');
+      } catch {}
+    }
+  };
+  useEffect(() => {
+    if (Platform.OS === 'web') {
+      try {
+        const saved = localStorage.getItem('@bo:previewMode') as PreviewMode | null;
+        if (saved === 'mobile' || saved === 'tablet' || saved === 'desktop') setPreviewModeRaw(saved);
+      } catch {}
+    }
+  }, []);
   const { width: realWidth } = useWindowDimensions();
   const [fontsLoaded, fontError] = useFonts({
     Assistant_400Regular,
