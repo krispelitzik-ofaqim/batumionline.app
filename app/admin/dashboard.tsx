@@ -1019,11 +1019,8 @@ function RealEstateBannerEditor() {
 
   return (
     <View style={{ marginBottom: 14, padding: 12, backgroundColor: '#fff7ed', borderRadius: 10, borderWidth: 1, borderColor: '#fed7aa' }}>
-      <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-        <Text style={{ fontSize: 13, fontWeight: '900', color: '#9a3412', writingDirection: 'rtl' }}>🖼️ תמונת באנר נדל"ן</Text>
-        <TouchableOpacity onPress={toggleVisible} style={{ paddingHorizontal: 10, paddingVertical: 6, borderRadius: 16, backgroundColor: visible ? '#10b981' : '#94a3b8' }}>
-          <Text style={{ color: '#fff', fontSize: 11, fontWeight: '900' }}>{visible ? '👁 גלוי' : '🚫 מוסתר'}</Text>
-        </TouchableOpacity>
+      <View style={{ marginBottom: 4 }}>
+        <Text style={{ fontSize: 13, fontWeight: '900', color: '#9a3412', writingDirection: 'rtl', textAlign: 'right' }}>🖼️ תמונת באנר נדל"ן</Text>
       </View>
       <Text style={{ fontSize: 10, color: '#9a3412', writingDirection: 'rtl', textAlign: 'right', marginBottom: 8, opacity: 0.7 }}>התמונה הזו מופיעה גם בכפתור "פורטל הנדל״ן" בדף הבית, וגם כתמונה עליונה (Hero) בתוך הפורטל עצמו</Text>
       {url ? (
