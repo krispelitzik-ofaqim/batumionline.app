@@ -37,6 +37,23 @@ if (!fs.existsSync(DB_PATH)) {
   }
 }
 
+// Auto-recover listings folder from db on every startup (Railway volume isn't persistent across deploys)
+try {
+  const FALLBACK = path.join(__dirname, 'uploads');
+  const dbRaw = JSON.parse(fs.readFileSync(DB_PATH, 'utf-8'));
+  for (const l of (dbRaw.listings || [])) {
+    for (const img of (l.images || [])) {
+      const filename = path.basename(decodeURIComponent(String(img)));
+      const dst = path.join(LISTINGS_DIR, filename);
+      if (fs.existsSync(dst)) continue;
+      const src1 = path.join(UPLOADS_DIR, filename);
+      const src2 = path.join(FALLBACK, filename);
+      const src = fs.existsSync(src1) ? src1 : (fs.existsSync(src2) ? src2 : null);
+      if (src) fs.copyFileSync(src, dst);
+    }
+  }
+} catch {}
+
 // Middleware
 app.use(cors());
 app.use(express.json({ limit: '50mb', strict: false }));
