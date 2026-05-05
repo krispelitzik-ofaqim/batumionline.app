@@ -313,7 +313,8 @@ export default function HomeScreen() {
                 imageStyle={{ borderRadius: 18 }}
               >
                 <LinearGradient
-                  colors={['rgba(26,107,138,0.25)', 'rgba(10,30,50,0.85)']}
+                  colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0)', 'rgba(10,30,50,0.85)']}
+                  locations={[0, 0.6, 1]}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 0, y: 1 }}
                   style={styles.megaBannerOverlay}
