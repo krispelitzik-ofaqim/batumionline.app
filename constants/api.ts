@@ -1,4 +1,5 @@
 import { Platform } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const DEV_HOST = Platform.OS === 'android' ? '10.0.2.2' : 'localhost';
 
@@ -28,19 +29,63 @@ export function resolveUri(u?: string): string {
 
 const noCacheHeaders = { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'Pragma': 'no-cache' };
 const bust = () => `_t=${Date.now()}`;
+const FETCH_TIMEOUT_MS = 10000;
+const CACHE_CONTENT = '@cache:content/v1';
+const CACHE_RATINGS = '@cache:ratings/v1';
+
+async function fetchWithTimeout(url: string, init?: RequestInit, ms: number = FETCH_TIMEOUT_MS): Promise<Response> {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), ms);
+  try {
+    return await fetch(url, { ...(init || {}), signal: ctrl.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function loadCache<T>(key: string): Promise<T | null> {
+  try {
+    const raw = await AsyncStorage.getItem(key);
+    return raw ? (JSON.parse(raw) as T) : null;
+  } catch { return null; }
+}
+async function saveCache(key: string, value: any) {
+  try { await AsyncStorage.setItem(key, JSON.stringify(value)); } catch {}
+}
 
 export async function fetchContent() {
-  const res = await fetch(`${API_BASE}/api/content?${bust()}`, { headers: noCacheHeaders, cache: 'no-store' as any });
-  const json = await res.json();
-  if (!json.success) throw new Error(json.error);
-  return json.data;
+  try {
+    const res = await fetchWithTimeout(`${API_BASE}/api/content?${bust()}`, { headers: noCacheHeaders, cache: 'no-store' as any });
+    const json = await res.json();
+    if (!json.success) throw new Error(json.error);
+    saveCache(CACHE_CONTENT, json.data);
+    return json.data;
+  } catch (err) {
+    const cached = await loadCache<any>(CACHE_CONTENT);
+    if (cached) return cached;
+    throw err;
+  }
+}
+
+export async function getCachedContent() {
+  return loadCache<any>(CACHE_CONTENT);
+}
+export async function getCachedRatings() {
+  return loadCache<Record<string, { sum: number; count: number }>>(CACHE_RATINGS);
 }
 
 export async function fetchRatings() {
-  const res = await fetch(`${API_BASE}/api/ratings?${bust()}`, { headers: noCacheHeaders, cache: 'no-store' as any });
-  const json = await res.json();
-  if (!json.success) throw new Error(json.error);
-  return json.data as Record<string, { sum: number; count: number }>;
+  try {
+    const res = await fetchWithTimeout(`${API_BASE}/api/ratings?${bust()}`, { headers: noCacheHeaders, cache: 'no-store' as any });
+    const json = await res.json();
+    if (!json.success) throw new Error(json.error);
+    saveCache(CACHE_RATINGS, json.data);
+    return json.data as Record<string, { sum: number; count: number }>;
+  } catch (err) {
+    const cached = await loadCache<Record<string, { sum: number; count: number }>>(CACHE_RATINGS);
+    if (cached) return cached;
+    throw err;
+  }
 }
 
 export async function submitRating(id: string, score: number) {
