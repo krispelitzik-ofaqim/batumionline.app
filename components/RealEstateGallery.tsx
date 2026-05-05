@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Image, StyleSheet, TouchableOpacity, Text, useWindowDimensions } from 'react-native';
+import { View, Image, StyleSheet, TouchableOpacity, Text, useWindowDimensions, Animated, Easing } from 'react-native';
 import { Colors } from '../constants/colors';
 import { fetchContent, resolveUri, API_BASE } from '../constants/api';
 
@@ -46,32 +46,54 @@ export default function RealEstateGallery() {
   }, []);
 
   const validSlides = slides.map((s, i) => ({ ...s, _origIdx: i })).filter((_, i) => !failed.has(i));
+  const fadeIn = useRef(new Animated.Value(1)).current;
+  const fadeOut = useRef(new Animated.Value(0)).current;
+  const [prevIdx, setPrevIdx] = useState(0);
+
+  const advance = () => {
+    setPrevIdx(idx);
+    setIdx(i => (i + 1) % Math.max(1, validSlides.length));
+    fadeIn.setValue(0);
+    fadeOut.setValue(1);
+    Animated.parallel([
+      Animated.timing(fadeIn, { toValue: 1, duration: 800, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
+      Animated.timing(fadeOut, { toValue: 0, duration: 800, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
+    ]).start();
+  };
 
   useEffect(() => {
-    timer.current = setInterval(() => {
-      setIdx(i => (i + 1) % Math.max(1, validSlides.length));
-    }, 4000);
+    timer.current = setInterval(advance, 4000);
     return () => clearInterval(timer.current);
   }, [validSlides.length]);
 
   if (validSlides.length === 0) return null;
   const safeIdx = idx % validSlides.length;
   const current = validSlides[safeIdx];
+  const previous = validSlides[prevIdx % validSlides.length];
 
   return (
     <View style={[s.wrap, { width: width - 32 }]}>
-      <Image
+      {previous && previous._origIdx !== current._origIdx && (
+        <Animated.Image
+          source={{ uri: previous.uri }}
+          style={[StyleSheet.absoluteFillObject, { opacity: fadeOut }]}
+          resizeMode="cover"
+        />
+      )}
+      <Animated.Image
         source={{ uri: current.uri }}
-        style={StyleSheet.absoluteFillObject}
+        style={[StyleSheet.absoluteFillObject, { opacity: fadeIn }]}
         resizeMode="cover"
         onError={() => setFailed(prev => new Set(prev).add(current._origIdx))}
       />
-      <View style={s.captionWrap}>
-        <Text style={s.caption}>{current.caption}</Text>
-      </View>
+      {!!current.caption && (
+        <View style={s.captionWrap}>
+          <Text style={s.caption}>{current.caption}</Text>
+        </View>
+      )}
       <View style={s.dots}>
         {validSlides.map((_, i) => (
-          <TouchableOpacity key={i} onPress={() => setIdx(i)}>
+          <TouchableOpacity key={i} onPress={() => { setPrevIdx(idx); setIdx(i); fadeIn.setValue(0); fadeOut.setValue(1); Animated.parallel([Animated.timing(fadeIn,{toValue:1,duration:600,useNativeDriver:true}),Animated.timing(fadeOut,{toValue:0,duration:600,useNativeDriver:true})]).start(); }}>
             <View style={[s.dot, i === safeIdx && s.dotActive]} />
           </TouchableOpacity>
         ))}
