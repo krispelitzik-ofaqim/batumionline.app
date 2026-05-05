@@ -1074,6 +1074,64 @@ function RealEstateBannerEditor() {
   );
 }
 
+function ListingsFolderViewer() {
+  const [images, setImages] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [migrating, setMigrating] = useState(false);
+  const [msg, setMsg] = useState('');
+
+  const load = async () => {
+    setLoading(true);
+    try {
+      const r = await fetch(`${API_BASE}/api/listings-images?_t=${Date.now()}`);
+      const j = await r.json();
+      setImages(j.images || []);
+    } catch { setImages([]); }
+    setLoading(false);
+  };
+  useEffect(() => { load(); }, []);
+
+  const migrate = async () => {
+    setMigrating(true); setMsg('');
+    try {
+      const r = await fetch(`${API_BASE}/api/migrate-listings-images`, { method: 'POST' });
+      const j = await r.json();
+      setMsg(j.success ? `הועתקו ${j.copied} תמונות, דולגו ${j.skipped}` : 'שגיאה');
+      await load();
+    } catch { setMsg('שגיאה'); }
+    setMigrating(false);
+  };
+
+  return (
+    <View style={{ marginBottom: 14, padding: 12, backgroundColor: '#fef3c7', borderRadius: 10, borderWidth: 1, borderColor: '#fde68a' }}>
+      <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+        <Text style={{ fontSize: 13, fontWeight: '900', color: '#713f12', writingDirection: 'rtl' }}>📁 תיקיית מודעות נדל"ן ({images.length})</Text>
+        <View style={{ flexDirection: 'row-reverse', gap: 6 }}>
+          <TouchableOpacity onPress={load} style={{ paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8, backgroundColor: '#fde68a' }}>
+            <Text style={{ fontSize: 11, fontWeight: '800', color: '#713f12' }}>🔄 רענן</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={migrate} disabled={migrating} style={{ paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8, backgroundColor: '#a16207', opacity: migrating ? 0.5 : 1 }}>
+            <Text style={{ fontSize: 11, fontWeight: '800', color: '#fff' }}>{migrating ? '...' : '🔁 עדכון'}</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+      <Text style={{ fontSize: 10, color: '#713f12', writingDirection: 'rtl', textAlign: 'right', marginBottom: 8, opacity: 0.7 }}>תמונות שגולשים מעלים למודעות נדל"ן. הבאנר המתחלף מציג מתוך תיקייה זו.</Text>
+      {!!msg && <Text style={{ fontSize: 11, color: '#15803d', marginBottom: 6, textAlign: 'right' }}>{msg}</Text>}
+      {loading ? (
+        <Text style={{ color: '#a16207', fontSize: 12, textAlign: 'center', padding: 8 }}>טוען...</Text>
+      ) : images.length === 0 ? (
+        <Text style={{ color: '#a16207', fontSize: 12, textAlign: 'center', padding: 8 }}>התיקייה ריקה — לחץ "עדכון" כדי להעביר תמונות מודעות קיימות</Text>
+      ) : (
+        <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 4 }}>
+          {images.map(u => (
+            <Image key={u} source={{ uri: resolveUri(u) }} style={{ width: 70, height: 70, borderRadius: 6 }} />
+          ))}
+        </View>
+      )}
+    </View>
+  );
+}
+
 function BlocksMenu() {
   const [active, setActive] = useState<string | null>(null);
   const alwaysOpen = [
@@ -1081,6 +1139,7 @@ function BlocksMenu() {
     { id: 'news', icon: '📰', title: 'חדשות נדל"ן', component: <RealEstateNewsEditor /> },
   ];
   const toggleable = [
+    { id: 'listings_folder', icon: '📁', title: 'תיקיית מודעות נדל"ן', component: <ListingsFolderViewer /> },
     { id: 'future', icon: '🔮', title: 'עתיד הנדל"ן', component: <FutureProjectsEditor /> },
     { id: 'business', icon: '💼', title: 'פורטל העסקים', component: <BusinessProjectsEditor /> },
     { id: 'gallery', icon: '🖼️', title: 'באנר מתחלף', component: <RealEstateGalleryEditor /> },
