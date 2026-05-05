@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Image, StyleSheet, TouchableOpacity, Text, useWindowDimensions } from 'react-native';
 import { Colors } from '../constants/colors';
-import { fetchContent, resolveUri } from '../constants/api';
+import { fetchContent, resolveUri, API_BASE } from '../constants/api';
 
 type Slide = { uri: string; caption: string };
 
@@ -22,11 +22,32 @@ export default function RealEstateGallery() {
   const timer = useRef<any>(null);
 
   useEffect(() => {
-    fetchContent().then(d => {
-      if (Array.isArray(d?.realEstateGallery) && d.realEstateGallery.length > 0) {
-        setSlides(d.realEstateGallery.map((s: any) => ({ uri: resolveUri(s.uri || s.image || ''), caption: s.caption || '' })));
-      }
-    }).catch(() => {});
+    (async () => {
+      try {
+        const r = await fetch(`${API_BASE}/api/listings?_t=${Date.now()}`);
+        const j = await r.json();
+        const fromListings: Slide[] = [];
+        for (const l of (j.listings || [])) {
+          for (const img of (l.images || [])) {
+            if (img) fromListings.push({ uri: resolveUri(img), caption: l.title || '' });
+          }
+        }
+        if (fromListings.length > 0) {
+          for (let i = fromListings.length - 1; i > 0; i--) {
+            const k = Math.floor(Math.random() * (i + 1));
+            [fromListings[i], fromListings[k]] = [fromListings[k], fromListings[i]];
+          }
+          setSlides(fromListings.slice(0, 30));
+          return;
+        }
+      } catch {}
+      try {
+        const d = await fetchContent();
+        if (Array.isArray(d?.realEstateGallery) && d.realEstateGallery.length > 0) {
+          setSlides(d.realEstateGallery.map((sl: any) => ({ uri: resolveUri(sl.uri || sl.image || ''), caption: sl.caption || '' })));
+        }
+      } catch {}
+    })();
   }, []);
 
   const validSlides = slides.map((s, i) => ({ ...s, _origIdx: i })).filter((_, i) => !failed.has(i));
