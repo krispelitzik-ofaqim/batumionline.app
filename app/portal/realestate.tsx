@@ -135,6 +135,23 @@ export default function RealEstatePortal() {
   const [realEstateImage, setRealEstateImage] = useState('');
 
   useEffect(() => {
+    (async () => {
+      try {
+        const rssUrl = 'https://news.google.com/rss/search?q=' + encodeURIComponent('בטומי נדלן') + '&hl=he&gl=IL&ceid=IL:he';
+        const apiUrl = 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(rssUrl);
+        const r = await fetch(apiUrl);
+        const j = await r.json();
+        const items: Article[] = (j.items || []).slice(0, 12).map((it: any, i: number) => ({
+          id: 'rss_' + i + '_' + (it.guid || it.link || '').slice(-12),
+          title: it.title || '',
+          summary: (it.description || '').replace(/<[^>]+>/g, '').slice(0, 250),
+          image: it.enclosure?.link || it.thumbnail || '',
+          link: it.link || '',
+          date: it.pubDate ? new Date(it.pubDate).toLocaleDateString('he-IL') : '',
+        }));
+        if (items.length) setNews(items);
+      } catch {}
+    })();
     fetchContent()
       .then(data => {
         if (data?.realEstate?.topButtons?.length) setTopButtons(data.realEstate.topButtons);
