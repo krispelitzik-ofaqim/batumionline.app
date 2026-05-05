@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, Modal, TextInput, TouchableOpacity, ScrollView, StyleSheet, Image, Platform, Linking, KeyboardAvoidingView } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 import { Colors } from '../constants/colors';
 import { API_BASE } from '../constants/api';
 import { FEATURES } from '../constants/features';
@@ -30,9 +31,65 @@ export default function ListingForm({ visible, onClose, defaultType, onSubmitted
   const [done, setDone] = useState(false);
   const [period, setPeriod] = useState<'daily' | 'monthly' | 'yearly' | 'other'>('monthly');
   const [size, setSize] = useState<'banner' | 'full'>('banner');
+  const [video, setVideo] = useState<string>('');
+  const [videoUploading, setVideoUploading] = useState(false);
 
   const reset = () => {
-    setTitle(''); setDescription(''); setPrice(''); setLocation(''); setPhone(''); setImages([]); setDone(false);
+    setTitle(''); setDescription(''); setPrice(''); setLocation(''); setPhone(''); setImages([]); setVideo(''); setDone(false);
+  };
+
+  const uploadFromUri = async (uri: string, fileName: string, mimeType: string): Promise<string | null> => {
+    try {
+      const fd = new FormData();
+      fd.append('file', { uri, name: fileName, type: mimeType } as any);
+      const r = await fetch(`${API_BASE}/api/upload`, { method: 'POST', body: fd });
+      const j = await r.json();
+      return j.url || null;
+    } catch { return null; }
+  };
+
+  const pickVideo = async () => {
+    if (Platform.OS === 'web') {
+      const input = (document as any).createElement('input');
+      input.type = 'file';
+      input.accept = 'video/mp4,video/quicktime,video/*';
+      input.onchange = async (e: any) => {
+        const file: File = e.target.files?.[0];
+        if (!file) return;
+        const v: any = (document as any).createElement('video');
+        v.preload = 'metadata';
+        v.onloadedmetadata = async () => {
+          if (v.duration > 31) { alert('הסרטון מוגבל ל-30 שניות'); return; }
+          setVideoUploading(true);
+          const fd = new FormData();
+          fd.append('file', file);
+          try {
+            const r = await fetch(`${API_BASE}/api/upload`, { method: 'POST', body: fd });
+            const j = await r.json();
+            if (j.url) setVideo(j.url);
+          } catch {}
+          setVideoUploading(false);
+        };
+        v.src = URL.createObjectURL(file);
+      };
+      input.click();
+      return;
+    }
+    const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!perm.granted) return;
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Videos,
+      videoMaxDuration: 30,
+      quality: 0.7,
+    } as any);
+    if (result.canceled) return;
+    const asset: any = result.assets?.[0];
+    if (!asset) return;
+    if (asset.duration && asset.duration > 31000) { alert('הסרטון מוגבל ל-30 שניות'); return; }
+    setVideoUploading(true);
+    const url = await uploadFromUri(asset.uri, `video_${Date.now()}.mp4`, 'video/mp4');
+    if (url) setVideo(url);
+    setVideoUploading(false);
   };
 
   const pickImage = async () => {
@@ -65,7 +122,7 @@ export default function ListingForm({ visible, onClose, defaultType, onSubmitted
     if (!title || !phone) return;
     setSubmitting(true);
     try {
-      const payload: any = { type: defaultType, title, description, price, location, phone, images, size };
+      const payload: any = { type: defaultType, title, description, price, location, phone, images, video, size };
       if (defaultType === 'rent') payload.period = period;
       await fetch(`${API_BASE}/api/listings`, {
         method: 'POST',
@@ -153,6 +210,28 @@ export default function ListingForm({ visible, onClose, defaultType, onSubmitted
                   {images.length < 8 && (
                     <TouchableOpacity onPress={pickImage} disabled={uploading} style={{ width: 70, height: 70, borderRadius: 8, backgroundColor: '#f1f5f9', borderWidth: 1, borderColor: '#cbd5e1', borderStyle: 'dashed', alignItems: 'center', justifyContent: 'center' }}>
                       <Text style={{ fontSize: 22, color: '#94a3b8' }}>{uploading ? '…' : '+'}</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+              </View>
+
+              <View>
+                <Text style={s.sectionLabel}>סרטון (עד 30 שניות) {video ? '✓' : ''}</Text>
+                <View style={{ flexDirection: 'row-reverse', gap: 6, alignItems: 'center' }}>
+                  {video ? (
+                    <View style={{ position: 'relative' }}>
+                      <View style={{ width: 110, height: 70, borderRadius: 8, backgroundColor: '#000', alignItems: 'center', justifyContent: 'center' }}>
+                        <Text style={{ color: '#fff', fontSize: 22 }}>▶</Text>
+                        <Text style={{ color: '#fff', fontSize: 9, marginTop: 2 }}>סרטון</Text>
+                      </View>
+                      <TouchableOpacity onPress={() => setVideo('')} style={{ position: 'absolute', top: -4, right: -4, width: 18, height: 18, borderRadius: 9, backgroundColor: '#dc2626', alignItems: 'center', justifyContent: 'center' }}>
+                        <Text style={{ fontSize: 10, color: '#fff', fontWeight: '900' }}>×</Text>
+                      </TouchableOpacity>
+                    </View>
+                  ) : (
+                    <TouchableOpacity onPress={pickVideo} disabled={videoUploading} style={{ width: 110, height: 70, borderRadius: 8, backgroundColor: '#f1f5f9', borderWidth: 1, borderColor: '#cbd5e1', borderStyle: 'dashed', alignItems: 'center', justifyContent: 'center' }}>
+                      <Text style={{ fontSize: 22, color: '#94a3b8' }}>{videoUploading ? '…' : '+ 🎥'}</Text>
+                      <Text style={{ fontSize: 10, color: '#94a3b8', marginTop: 2 }}>{videoUploading ? 'מעלה' : 'הוסף סרטון'}</Text>
                     </TouchableOpacity>
                   )}
                 </View>
