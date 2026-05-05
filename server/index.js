@@ -1078,6 +1078,30 @@ app.post('/api/upload-listing', listingsUpload.single('file'), (req, res) => {
   });
 });
 
+// POST /api/migrate-listings-images — one-time migration of existing listing images
+app.post('/api/migrate-listings-images', (_req, res) => {
+  try {
+    const db = readDB();
+    const all = db.listings || [];
+    let copied = 0; let skipped = 0;
+    for (const l of all) {
+      for (const img of (l.images || [])) {
+        const filename = path.basename(String(img));
+        const src = path.join(UPLOADS_DIR, filename);
+        const dst = path.join(LISTINGS_DIR, filename);
+        if (fs.existsSync(dst)) { skipped++; continue; }
+        if (fs.existsSync(src)) {
+          fs.copyFileSync(src, dst);
+          copied++;
+        }
+      }
+    }
+    res.json({ success: true, copied, skipped });
+  } catch (e) {
+    res.status(500).json({ success: false, error: String(e) });
+  }
+});
+
 // GET /api/listings-images — returns array of public URLs
 app.get('/api/listings-images', (_req, res) => {
   try {
