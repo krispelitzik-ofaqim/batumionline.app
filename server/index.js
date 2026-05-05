@@ -1084,13 +1084,16 @@ app.post('/api/migrate-listings-images', (_req, res) => {
     const db = readDB();
     const all = db.listings || [];
     let copied = 0; let skipped = 0;
+    const FALLBACK_UPLOADS = path.join(__dirname, 'uploads');
     for (const l of all) {
       for (const img of (l.images || [])) {
         const filename = path.basename(String(img));
-        const src = path.join(UPLOADS_DIR, filename);
         const dst = path.join(LISTINGS_DIR, filename);
         if (fs.existsSync(dst)) { skipped++; continue; }
-        if (fs.existsSync(src)) {
+        const src1 = path.join(UPLOADS_DIR, filename);
+        const src2 = path.join(FALLBACK_UPLOADS, filename);
+        const src = fs.existsSync(src1) ? src1 : (fs.existsSync(src2) ? src2 : null);
+        if (src) {
           fs.copyFileSync(src, dst);
           copied++;
         }
