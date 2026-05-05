@@ -1,9 +1,21 @@
 import React, { useState } from 'react';
 import { View, Text, Modal, TextInput, TouchableOpacity, ScrollView, StyleSheet, Image, Platform, Linking, KeyboardAvoidingView } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Colors } from '../constants/colors';
 import { API_BASE } from '../constants/api';
 import { FEATURES } from '../constants/features';
+
+async function getDeviceId(): Promise<string> {
+  try {
+    let id = await AsyncStorage.getItem('@bo:deviceId');
+    if (!id) {
+      id = 'd_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
+      await AsyncStorage.setItem('@bo:deviceId', id);
+    }
+    return id;
+  } catch { return 'd_anon_' + Date.now(); }
+}
 
 type Props = {
   visible: boolean;
@@ -122,7 +134,8 @@ export default function ListingForm({ visible, onClose, defaultType, onSubmitted
     if (!title || !phone) return;
     setSubmitting(true);
     try {
-      const payload: any = { type: defaultType, title, description, price, location, phone, images, video, size };
+      const deviceId = await getDeviceId();
+      const payload: any = { type: defaultType, title, description, price, location, phone, images, video, size, deviceId };
       if (defaultType === 'rent') payload.period = period;
       await fetch(`${API_BASE}/api/listings`, {
         method: 'POST',

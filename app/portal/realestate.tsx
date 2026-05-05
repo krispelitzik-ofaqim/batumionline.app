@@ -12,6 +12,7 @@ import BottomTabBar from '../../components/BottomTabBar';
 import AppHeader from '../../components/AppHeader';
 import FinanceStats from '../../components/FinanceStats';
 import ListingForm from '../../components/ListingForm';
+import MyListingsModal from '../../components/MyListingsModal';
 import ListingsList from '../../components/ListingsList';
 import DeveloperCard, { Developer } from '../../components/DeveloperCard';
 import DeveloperForm from '../../components/DeveloperForm';
@@ -112,6 +113,7 @@ export default function RealEstatePortal() {
   const [tips] = useState<Article[]>(FALLBACK_TIPS);
   const [galleryImages, setGalleryImages] = useState<string[]>([]);
   const [futureProjects, setFutureProjects] = useState<Listing[]>(LISTINGS_BY_TOP['future'] || []);
+  const [myListingsOpen, setMyListingsOpen] = useState(false);
   const [articles, setArticles] = useState<any[]>([]);
   const [openArticle, setOpenArticle] = useState<any | null>(null);
   const [curated, setCurated] = useState<Record<string, Listing[]>>({});
@@ -216,7 +218,7 @@ export default function RealEstatePortal() {
             )}
 
             {(activeTop === 'sale' || activeTop === 'rent' || activeTop === 'hotels') && (
-              <View style={{ marginBottom: 14, paddingHorizontal: 12 }}>
+              <View style={{ marginBottom: 14, paddingHorizontal: 12, gap: 6 }}>
                 <TouchableOpacity onPress={() => activeTop === 'hotels' ? setChoiceOpen(true) : setFormOpen(true)} activeOpacity={0.85} style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 10, paddingVertical: 10, paddingHorizontal: 14, borderRadius: 10, borderWidth: 1.5, borderColor: Colors.PRIMARY, backgroundColor: '#fff' }}>
                   <View style={{ width: 30, height: 30, borderRadius: 15, backgroundColor: Colors.PRIMARY, alignItems: 'center', justifyContent: 'center' }}>
                     <Text style={{ fontSize: 16, color: '#fff', fontWeight: '900' }}>+</Text>
@@ -226,6 +228,9 @@ export default function RealEstatePortal() {
                     <Text style={{ fontSize: 10, color: '#64748b', textAlign: 'right', writingDirection: 'rtl', marginTop: 1 }}>חינם · חשיפה לישראלים בבטומי</Text>
                   </View>
                   <Text style={{ fontSize: 16, color: Colors.PRIMARY, fontWeight: '300' }}>‹</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => setMyListingsOpen(true)} activeOpacity={0.7} style={{ paddingVertical: 6, alignItems: 'center' }}>
+                  <Text style={{ fontSize: 12, color: Colors.PRIMARY, fontWeight: '700', textDecorationLine: 'underline' }}>המודעות שלי / מחיקה</Text>
                 </TouchableOpacity>
               </View>
             )}
@@ -449,6 +454,7 @@ export default function RealEstatePortal() {
         defaultType={activeTop === 'sale' ? 'sale' : activeTop === 'hotels' ? 'hotels' : 'rent'}
         onSubmitted={() => setListingsKey(k => k + 1)}
       />
+      <MyListingsModal visible={myListingsOpen} onClose={() => setMyListingsOpen(false)} />
       <DeveloperForm
         visible={devFormOpen}
         onClose={() => setDevFormOpen(false)}

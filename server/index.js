@@ -1051,6 +1051,8 @@ app.post('/api/listings', (req, res) => {
     location: body.location || '',
     phone: normalizePhone(body.phone),
     images: Array.isArray(body.images) ? body.images.slice(0, 8) : [],
+    video: body.video || '',
+    deviceId: body.deviceId || '',
     size: body.size || 'half',
     period: body.period || '',
     createdAt: new Date().toISOString(),
@@ -1060,6 +1062,18 @@ app.post('/api/listings', (req, res) => {
   db.listings.push(rec);
   writeDB(db);
   res.json({ success: true, listing: rec });
+});
+
+// GET /api/listings/mine?deviceId=X or ?phone=X — returns user's own listings
+app.get('/api/listings/mine', (req, res) => {
+  const db = readDB();
+  const { deviceId, phone } = req.query;
+  if (!deviceId && !phone) return res.status(400).json({ success: false, error: 'deviceId or phone required' });
+  const normalized = phone ? normalizePhone(String(phone)) : '';
+  const rows = (db.listings || []).filter(l =>
+    (deviceId && l.deviceId === deviceId) || (normalized && l.phone === normalized)
+  ).sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+  res.json({ success: true, listings: rows });
 });
 
 // PUT /api/listings/:id — update (admin approve / edit)
@@ -1072,13 +1086,29 @@ app.put('/api/listings/:id', (req, res) => {
   res.json({ success: true, listing: db.listings[i] });
 });
 
-// DELETE /api/listings/:id
+// DELETE /api/listings/:id — admin (legacy, no body)
 app.delete('/api/listings/:id', (req, res) => {
   const db = readDB();
   const before = (db.listings || []).length;
   db.listings = (db.listings || []).filter(l => l.id !== req.params.id);
   writeDB(db);
   res.json({ success: true, deleted: before - db.listings.length });
+});
+
+// POST /api/listings/:id/owner-delete — owner-side delete (requires deviceId or phone match)
+app.post('/api/listings/:id/owner-delete', (req, res) => {
+  const db = readDB();
+  const item = (db.listings || []).find(l => l.id === req.params.id);
+  if (!item) return res.status(404).json({ success: false, error: 'not found' });
+  const { deviceId, phone } = req.body || {};
+  const ownerByDevice = deviceId && deviceId === item.deviceId;
+  const ownerByPhone = phone && normalizePhone(phone) === item.phone;
+  if (!ownerByDevice && !ownerByPhone) {
+    return res.status(403).json({ success: false, error: 'verification failed' });
+  }
+  db.listings = db.listings.filter(l => l.id !== req.params.id);
+  writeDB(db);
+  res.json({ success: true });
 });
 
 // ─── Developers (mini-portals for real-estate builders) ────────
