@@ -1079,14 +1079,38 @@ app.get('/api/og-image', async (req, res) => {
 
 // ─── Listings folder uploads ──────────────────────────────────
 
+function syncRealEstateGalleryFromFolder() {
+  try {
+    const files = fs.readdirSync(LISTINGS_DIR)
+      .filter(f => /\.(jpe?g|png|webp|gif)$/i.test(f))
+      .sort()
+      .reverse();
+    const slides = files.map((f, i) => ({
+      id: 'gs_listing_' + i,
+      uri: `/uploads/${encodeURIComponent('מודעות-נדלן')}/${encodeURIComponent(f)}`,
+      caption: 'נדל״ן בבטומי',
+    }));
+    const db = readDB();
+    db.realEstateGallery = slides;
+    writeDB(db);
+  } catch {}
+}
+
 // POST /api/upload-listing — saves photo to /uploads/מודעות-נדלן/
 app.post('/api/upload-listing', listingsUpload.single('file'), (req, res) => {
   if (!req.file) return res.status(400).json({ success: false, error: 'no file' });
+  syncRealEstateGalleryFromFolder();
   res.json({
     success: true,
     filename: req.file.filename,
     url: `/uploads/${encodeURIComponent('מודעות-נדלן')}/${encodeURIComponent(req.file.filename)}`,
   });
+});
+
+// POST /api/sync-listings-gallery — manual resync trigger
+app.post('/api/sync-listings-gallery', (_req, res) => {
+  syncRealEstateGalleryFromFolder();
+  res.json({ success: true });
 });
 
 // POST /api/migrate-listings-images — one-time migration of existing listing images
