@@ -1222,12 +1222,33 @@ app.put('/api/listings/:id', (req, res) => {
   res.json({ success: true, listing: db.listings[i] });
 });
 
+function deleteListingFiles(listing) {
+  if (!listing || !listing.images) return;
+  for (const img of listing.images) {
+    try {
+      const filename = path.basename(decodeURIComponent(String(img)));
+      const p = path.join(LISTINGS_DIR, filename);
+      if (fs.existsSync(p)) fs.unlinkSync(p);
+    } catch {}
+  }
+  if (listing.video) {
+    try {
+      const filename = path.basename(decodeURIComponent(String(listing.video)));
+      const p = path.join(LISTINGS_DIR, filename);
+      if (fs.existsSync(p)) fs.unlinkSync(p);
+    } catch {}
+  }
+}
+
 // DELETE /api/listings/:id — admin (legacy, no body)
 app.delete('/api/listings/:id', (req, res) => {
   const db = readDB();
+  const item = (db.listings || []).find(l => l.id === req.params.id);
   const before = (db.listings || []).length;
   db.listings = (db.listings || []).filter(l => l.id !== req.params.id);
   writeDB(db);
+  if (item) deleteListingFiles(item);
+  syncRealEstateGalleryFromFolder();
   res.json({ success: true, deleted: before - db.listings.length });
 });
 
@@ -1244,6 +1265,8 @@ app.post('/api/listings/:id/owner-delete', (req, res) => {
   }
   db.listings = db.listings.filter(l => l.id !== req.params.id);
   writeDB(db);
+  deleteListingFiles(item);
+  syncRealEstateGalleryFromFolder();
   res.json({ success: true });
 });
 
