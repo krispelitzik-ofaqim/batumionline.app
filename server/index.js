@@ -1084,6 +1084,7 @@ app.post('/api/listings', (req, res) => {
     deviceId: body.deviceId || '',
     size: body.size || 'half',
     period: body.period || '',
+    highlightStyle: body.highlightStyle || '',
     createdAt: new Date().toISOString(),
     approved: false,
     visible: true,

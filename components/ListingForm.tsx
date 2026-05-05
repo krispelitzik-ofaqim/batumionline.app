@@ -45,9 +45,10 @@ export default function ListingForm({ visible, onClose, defaultType, onSubmitted
   const [size, setSize] = useState<'banner' | 'full'>('banner');
   const [video, setVideo] = useState<string>('');
   const [videoUploading, setVideoUploading] = useState(false);
+  const [highlightStyle, setHighlightStyle] = useState<'' | 'yellow' | 'yellow-border' | 'blue'>('');
 
   const reset = () => {
-    setTitle(''); setDescription(''); setPrice(''); setLocation(''); setPhone(''); setImages([]); setVideo(''); setDone(false);
+    setTitle(''); setDescription(''); setPrice(''); setLocation(''); setPhone(''); setImages([]); setVideo(''); setHighlightStyle(''); setDone(false);
   };
 
   const uploadFromUri = async (uri: string, fileName: string, mimeType: string): Promise<string | null> => {
@@ -135,7 +136,7 @@ export default function ListingForm({ visible, onClose, defaultType, onSubmitted
     setSubmitting(true);
     try {
       const deviceId = await getDeviceId();
-      const payload: any = { type: defaultType, title, description, price, location, phone, images, video, size, deviceId };
+      const payload: any = { type: defaultType, title, description, price, location, phone, images, video, size, deviceId, highlightStyle };
       if (defaultType === 'rent') payload.period = period;
       await fetch(`${API_BASE}/api/listings`, {
         method: 'POST',
@@ -205,6 +206,25 @@ export default function ListingForm({ visible, onClose, defaultType, onSubmitted
                       <Text style={{ fontSize: 12, fontWeight: '800', color: size === opt.key ? '#fff' : Colors.TEXT }}>{opt.label}</Text>
                       <Text style={{ fontSize: 10, fontWeight: '700', color: size === opt.key ? '#fff' : (priceText === 'חינם' ? '#10b981' : '#f59e0b'), marginTop: 2, opacity: size === opt.key ? 0.9 : 1 }}>{priceText}</Text>
                     </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              </View>
+
+              <View>
+                <Text style={s.sectionLabel}>הדגשה (חינם)</Text>
+                <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 6 }}>
+                  {([
+                    { key: '',              label: 'ללא',           bg: '#fff',    border: '#cbd5e1', txt: Colors.TEXT },
+                    { key: 'yellow',        label: 'צהוב',          bg: '#fffbeb', border: '#fbbf24', txt: '#92400e' },
+                    { key: 'yellow-border', label: 'צהוב + מסגרת',  bg: '#fff',    border: '#f59e0b', txt: '#92400e' },
+                    { key: 'blue',          label: 'נגטיב',         bg: '#0c1e3a', border: '#1e3a8a', txt: '#fff' },
+                  ] as const).map(opt => {
+                    const active = highlightStyle === opt.key;
+                    return (
+                      <TouchableOpacity key={opt.key} onPress={() => setHighlightStyle(opt.key as any)} style={{ flex: 1, minWidth: '47%', paddingVertical: 10, paddingHorizontal: 8, borderRadius: 8, backgroundColor: opt.bg, alignItems: 'center', borderWidth: active ? 2.5 : 1.5, borderColor: active ? Colors.PRIMARY : opt.border }}>
+                        <Text style={{ fontSize: 12, fontWeight: '800', color: opt.txt }}>{active ? '✓ ' : ''}{opt.label}</Text>
+                      </TouchableOpacity>
                     );
                   })}
                 </View>

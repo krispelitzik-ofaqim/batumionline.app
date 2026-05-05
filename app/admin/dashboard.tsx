@@ -772,6 +772,35 @@ function CuratedListingsEditor() {
               style: { width: '100%', backgroundColor: '#fff', border: '2px dashed #fcd34d', borderRadius: 4, padding: 6, cursor: 'pointer', color: '#713f12', fontSize: 11, fontWeight: 800 },
             }, '📤 הוסף תמונה'),
           ])}
+          {it.video ? (
+            <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 6, marginBottom: 4, padding: 6, backgroundColor: '#f0f9ff', borderRadius: 6 }}>
+              <Text style={{ fontSize: 11, fontWeight: '800', color: '#0369a1' }}>🎥 סרטון מצורף</Text>
+              <TouchableOpacity onPress={() => update(it.id, { video: '' })}>
+                <Text style={{ fontSize: 11, color: '#dc2626', fontWeight: '700' }}>✕ הסר</Text>
+              </TouchableOpacity>
+            </View>
+          ) : Platform.OS === 'web' && React.createElement('div', { style: { marginBottom: 4 } }, [
+            React.createElement('input', {
+              key: 'vinp', type: 'file', accept: 'video/mp4,video/quicktime,video/*', id: `cl_video_${it.id}`, style: { display: 'none' },
+              onChange: async (e: any) => {
+                const f = e.target.files?.[0]; if (!f) return;
+                const v: any = (document as any).createElement('video');
+                v.preload = 'metadata';
+                v.onloadedmetadata = async () => {
+                  if (v.duration > 121) { alert('הסרטון מוגבל ל-2 דקות'); e.target.value = ''; return; }
+                  const url = await upload(f);
+                  if (url) update(it.id, { video: url });
+                  e.target.value = '';
+                };
+                v.src = URL.createObjectURL(f);
+              },
+            }),
+            React.createElement('button', {
+              key: 'vbtn', type: 'button',
+              onClick: () => { const el = (document as any).getElementById(`cl_video_${it.id}`); if (el) el.click(); },
+              style: { width: '100%', backgroundColor: '#fff', border: '2px dashed #93c5fd', borderRadius: 4, padding: 6, cursor: 'pointer', color: '#1e3a8a', fontSize: 11, fontWeight: 800 },
+            }, '🎥 הוסף סרטון (עד 2 דקות)'),
+          ])}
           <Text style={{ fontSize: 11, fontWeight: '800', color: '#713f12', marginTop: 6, marginBottom: 4, textAlign: 'right' }}>גודל:</Text>
           <View style={{ flexDirection: 'row-reverse', gap: 6, marginBottom: 4, flexWrap: 'wrap' }}>
             {([{ k: 'full', l: 'גדולה' }, { k: 'half', l: 'בינונית' }, { k: 'banner', l: 'שוכבת' }] as const).map(sz => (
