@@ -14,9 +14,20 @@ const DATA_DIR = process.env.DATA_DIR || __dirname;
 const DB_PATH = path.join(DATA_DIR, 'db.json');
 const UPLOADS_DIR = path.join(DATA_DIR, 'uploads');
 const GALLERY_DIR = path.join(UPLOADS_DIR, 'gallery');
-const LISTINGS_DIR = path.join(UPLOADS_DIR, 'listings');
+const LISTINGS_DIR = path.join(UPLOADS_DIR, 'מודעות-נדלן');
+const LISTINGS_DIR_LEGACY = path.join(UPLOADS_DIR, 'listings');
 if (!fs.existsSync(GALLERY_DIR)) fs.mkdirSync(GALLERY_DIR, { recursive: true });
 if (!fs.existsSync(LISTINGS_DIR)) fs.mkdirSync(LISTINGS_DIR, { recursive: true });
+// Migrate legacy 'listings' folder if exists
+try {
+  if (fs.existsSync(LISTINGS_DIR_LEGACY)) {
+    for (const f of fs.readdirSync(LISTINGS_DIR_LEGACY)) {
+      const src = path.join(LISTINGS_DIR_LEGACY, f);
+      const dst = path.join(LISTINGS_DIR, f);
+      if (!fs.existsSync(dst) && fs.statSync(src).isFile()) fs.copyFileSync(src, dst);
+    }
+  }
+} catch {}
 if (!fs.existsSync(DB_PATH)) {
   const seed = path.join(__dirname, 'db.json');
   if (fs.existsSync(seed) && seed !== DB_PATH) {
@@ -1068,13 +1079,13 @@ app.get('/api/og-image', async (req, res) => {
 
 // ─── Listings folder uploads ──────────────────────────────────
 
-// POST /api/upload-listing — saves photo to /uploads/listings/
+// POST /api/upload-listing — saves photo to /uploads/מודעות-נדלן/
 app.post('/api/upload-listing', listingsUpload.single('file'), (req, res) => {
   if (!req.file) return res.status(400).json({ success: false, error: 'no file' });
   res.json({
     success: true,
     filename: req.file.filename,
-    url: `/uploads/listings/${req.file.filename}`,
+    url: `/uploads/${encodeURIComponent('מודעות-נדלן')}/${encodeURIComponent(req.file.filename)}`,
   });
 });
 
@@ -1112,7 +1123,7 @@ app.get('/api/listings-images', (_req, res) => {
       .filter(f => /\.(jpe?g|png|webp|gif)$/i.test(f))
       .sort()
       .reverse();
-    const images = files.map(f => `/uploads/listings/${f}`);
+    const images = files.map(f => `/uploads/${encodeURIComponent('מודעות-נדלן')}/${encodeURIComponent(f)}`);
     res.json({ success: true, images });
   } catch (e) {
     res.json({ success: false, images: [], error: 'failed to read folder' });
