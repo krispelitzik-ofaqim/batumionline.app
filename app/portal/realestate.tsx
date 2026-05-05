@@ -3,6 +3,7 @@ import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Image, ImageBackg
 import { router } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
+import { Video, ResizeMode } from 'expo-av';
 import { Colors } from '../../constants/colors';
 import { fetchContent, API_BASE, resolveUri } from '../../constants/api';
 import BusinessServicesSlider from '../../components/BusinessServicesSlider';
@@ -196,7 +197,8 @@ export default function RealEstatePortal() {
           imageStyle={{ borderRadius: 0 }}
         >
           <LinearGradient
-            colors={['rgba(10,30,50,0.3)', 'rgba(10,30,50,0.9)']}
+            colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0)', 'rgba(10,30,50,0.85)']}
+            locations={[0, 0.55, 1]}
             start={{ x: 0, y: 0 }}
             end={{ x: 0, y: 1 }}
             style={s.heroOverlay}
@@ -317,6 +319,17 @@ export default function RealEstatePortal() {
                         </TouchableOpacity>
                         <Text style={s.fixedExpandedTitle} numberOfLines={1}>{lst.title}</Text>
                       </View>
+                      {(lst as any).video ? (
+                        <View style={{ width: '100%', aspectRatio: 16/10, backgroundColor: '#000' }}>
+                          <Video
+                            source={{ uri: resolveUri((lst as any).video) }}
+                            style={{ width: '100%', height: '100%' }}
+                            useNativeControls
+                            resizeMode={ResizeMode.COVER}
+                            shouldPlay={false}
+                          />
+                        </View>
+                      ) : null}
                       <ExpandedGallery images={(lst.images && lst.images.length > 0) ? lst.images : (lst.image ? [lst.image] : [])} />
                       <View style={{ padding: 12 }}>
                         {!!lst.location && <Text style={{ fontSize: 13, color: '#cbd5e1', textAlign: 'right', writingDirection: 'rtl', marginBottom: 8 }}>📍 {lst.location}</Text>}
