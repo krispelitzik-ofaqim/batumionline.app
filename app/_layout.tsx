@@ -66,7 +66,21 @@ const PREVIEW_WIDTHS: Record<string, number> = { mobile: 375, tablet: 768, deskt
 
 export default function RootLayout() {
   const [dark, setDark] = useState(false);
-  const [isAdmin, setAdmin] = useState(false);
+  const [isAdmin, setAdminRaw] = useState(false);
+  const setAdmin = (v: boolean) => {
+    setAdminRaw(v);
+    if (Platform.OS === 'web') {
+      try {
+        if (v) localStorage.setItem('@bo:isAdmin', '1');
+        else localStorage.removeItem('@bo:isAdmin');
+      } catch {}
+    }
+  };
+  useEffect(() => {
+    if (Platform.OS === 'web') {
+      try { if (localStorage.getItem('@bo:isAdmin') === '1') setAdminRaw(true); } catch {}
+    }
+  }, []);
   const [previewMode, setPreviewMode] = useState<PreviewMode>(null);
   const { width: realWidth } = useWindowDimensions();
   const [fontsLoaded, fontError] = useFonts({
