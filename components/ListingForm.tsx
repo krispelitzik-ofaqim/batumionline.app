@@ -192,22 +192,23 @@ export default function ListingForm({ visible, onClose, defaultType, onSubmitted
               </View>
               <TextInput style={s.input} placeholder="טלפון ליצירת קשר" value={phone} onChangeText={setPhone} textAlign="right" keyboardType="phone-pad" placeholderTextColor="#94a3b8" />
 
-              {FEATURES.PAID_LISTING_OPTIONS && (
               <View>
                 <Text style={s.sectionLabel}>סוג תצוגה</Text>
                 <View style={{ flexDirection: 'row-reverse', gap: 6 }}>
                   {([
-                    { key: 'banner', label: 'מודעה קטנה', price: 'חינם' },
-                    { key: 'full', label: 'מודעה גדולה', price: '$10/חודש' },
-                  ] as const).map(opt => (
+                    { key: 'banner', label: 'מודעה קטנה', priceFree: 'חינם', pricePaid: 'חינם' },
+                    { key: 'full', label: 'מודעה גדולה', priceFree: 'חינם', pricePaid: '$10/חודש' },
+                  ] as const).map(opt => {
+                    const priceText = FEATURES.PAID_LISTING_OPTIONS ? opt.pricePaid : opt.priceFree;
+                    return (
                     <TouchableOpacity key={opt.key} onPress={() => setSize(opt.key)} style={{ flex: 1, paddingVertical: 10, paddingHorizontal: 8, borderRadius: 8, backgroundColor: size === opt.key ? Colors.PRIMARY : '#f1f5f9', alignItems: 'center', borderWidth: 1, borderColor: size === opt.key ? Colors.PRIMARY : '#cbd5e1' }}>
                       <Text style={{ fontSize: 12, fontWeight: '800', color: size === opt.key ? '#fff' : Colors.TEXT }}>{opt.label}</Text>
-                      <Text style={{ fontSize: 10, fontWeight: '700', color: size === opt.key ? '#fff' : (opt.price === 'חינם' ? '#10b981' : '#f59e0b'), marginTop: 2, opacity: size === opt.key ? 0.9 : 1 }}>{opt.price}</Text>
+                      <Text style={{ fontSize: 10, fontWeight: '700', color: size === opt.key ? '#fff' : (priceText === 'חינם' ? '#10b981' : '#f59e0b'), marginTop: 2, opacity: size === opt.key ? 0.9 : 1 }}>{priceText}</Text>
                     </TouchableOpacity>
-                  ))}
+                    );
+                  })}
                 </View>
               </View>
-              )}
 
               <View>
                 <Text style={s.sectionLabel}>תמונות ({images.length}/8)</Text>
