@@ -349,8 +349,8 @@ export default function HomeScreen() {
         <View style={{ height: 24 }} />
       </ScrollView>
 
-      {/* Admin floating button */}
-      {!editMode && <AdminFloatingButton onEnterEdit={() => setEditMode(true)} />}
+      {/* Admin floating button — disabled per user request */}
+      {/* {!editMode && <AdminFloatingButton onEnterEdit={() => setEditMode(true)} />} */}
 
       {/* Bottom banner modals */}
       <WeatherModal visible={activeModal === 'weather'} onClose={() => setActiveModal(null)} bgColor={BOTTOM_BANNERS.find(b => b.id === 'weather')!.bg} />
