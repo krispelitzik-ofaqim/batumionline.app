@@ -157,11 +157,29 @@ export default function RealEstatePortal() {
         if (j.success && j.files?.length) {
           const urls: string[] = j.files.map((f: any) => f.url);
           setGalleryImages(urls);
-          setNews(prev => prev.map((n, i) => ({ ...n, image: urls[i % urls.length] })));
         }
       })
       .catch(() => {});
   }, []);
+
+  useEffect(() => {
+    const missing = news.filter(n => !n.image && n.link);
+    if (missing.length === 0) return;
+    let cancelled = false;
+    (async () => {
+      for (const n of missing) {
+        try {
+          const r = await fetch(`${API_BASE}/api/og-image?url=${encodeURIComponent(n.link!)}`);
+          const j = await r.json();
+          if (cancelled) return;
+          if (j.success && j.image) {
+            setNews(prev => prev.map(x => x.id === n.id ? { ...x, image: j.image } : x));
+          }
+        } catch {}
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [news]);
 
   const heroUri = realEstateImage || galleryImages[0] || '/uploads/city.jpg';
 

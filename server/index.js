@@ -1019,6 +1019,35 @@ app.delete('/api/map-backups/:layerName/:timestamp', (req, res) => {
   res.json({ success: true, deleted: before - (db.mapLayersBackup[layerName]?.length || 0) });
 });
 
+// ─── OG image scraper (cache 24h) ─────────────────────────────
+const ogCache = new Map();
+app.get('/api/og-image', async (req, res) => {
+  const url = String(req.query.url || '');
+  if (!url || !/^https?:\/\//i.test(url)) return res.status(400).json({ success: false, error: 'invalid url' });
+  const cached = ogCache.get(url);
+  if (cached && Date.now() - cached.fetchedAt < 24 * 60 * 60 * 1000) {
+    return res.json({ success: true, image: cached.image, cached: true });
+  }
+  try {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 8000);
+    const r = await fetch(url, {
+      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; BatumionlineBot/1.0)', 'Accept': 'text/html' },
+      signal: ctrl.signal,
+    });
+    clearTimeout(timer);
+    const html = await r.text();
+    const m1 = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i);
+    const m2 = html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i);
+    const m3 = html.match(/<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)["']/i);
+    const image = (m1 && m1[1]) || (m2 && m2[1]) || (m3 && m3[1]) || '';
+    ogCache.set(url, { image, fetchedAt: Date.now() });
+    res.json({ success: true, image });
+  } catch {
+    res.json({ success: false, error: 'fetch failed' });
+  }
+});
+
 // ─── Listings (user-submitted real-estate ads) ────────────────
 
 // GET /api/listings — public list (approved + visible)
