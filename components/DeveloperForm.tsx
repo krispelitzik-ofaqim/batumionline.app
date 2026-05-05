@@ -18,10 +18,17 @@ type Unit = {
   description: string;
 };
 
-const PACKAGES = [
+import { FEATURES } from '../constants/features';
+
+const PACKAGES_PAID = [
   { key: 'basic', label: 'Basic', units: 5, price: '$100/חודש' },
   { key: 'premium', label: 'Premium', units: 10, price: '$180/חודש' },
 ] as const;
+const PACKAGES_FREE = [
+  { key: 'basic', label: 'Basic', units: 5, price: 'חינם' },
+  { key: 'premium', label: 'Premium', units: 10, price: 'חינם' },
+] as const;
+const PACKAGES = FEATURES.PAID_LISTING_OPTIONS ? PACKAGES_PAID : PACKAGES_FREE;
 
 const BRAND_COLORS = ['#1A6B8A', '#0ea5e9', '#8b5cf6', '#ec4899', '#10b981', '#f59e0b', '#ef4444', '#64748b'];
 
@@ -129,7 +136,7 @@ export default function DeveloperForm({ visible, onClose, onSubmitted }: Props) 
             <View style={{ padding: 40, alignItems: 'center', gap: 10 }}>
               <Text style={{ fontSize: 40 }}>✅</Text>
               <Text style={{ fontSize: 16, fontWeight: '800', color: Colors.TEXT, textAlign: 'center', writingDirection: 'rtl' }}>הפרופיל נשלח לאישור!</Text>
-              <Text style={{ fontSize: 12, color: '#64748b', textAlign: 'center', writingDirection: 'rtl' }}>נחזור אליך לתיאום תשלום ({pkg === 'premium' ? '$180' : '$100'}/חודש)</Text>
+              <Text style={{ fontSize: 12, color: '#64748b', textAlign: 'center', writingDirection: 'rtl' }}>{FEATURES.PAID_LISTING_OPTIONS ? `נחזור אליך לתיאום תשלום (${pkg === 'premium' ? '$180' : '$100'}/חודש)` : 'נחזור אליך עם פרטי הפרסום'}</Text>
               <TouchableOpacity onPress={() => { reset(); onClose(); }} style={s.primaryBtn}>
                 <Text style={s.primaryTxt}>סגור</Text>
               </TouchableOpacity>
@@ -151,8 +158,7 @@ export default function DeveloperForm({ visible, onClose, onSubmitted }: Props) 
                   <View style={s.infoBox}>
                     <Text style={s.infoTxt}>
                       • תקופת פרסום: חודשי{'\n'}
-                      • סדר ברירת מחדל: Premium מעל Basic, ובתוך כל רמה לפי תאריך{'\n'}
-                      • הקפצה: $10/חודש – קפיצה לראש הרמה שלך
+                      • סדר ברירת מחדל: Premium מעל Basic, ובתוך כל רמה לפי תאריך{FEATURES.PAID_LISTING_OPTIONS ? '\n                      • הקפצה: $10/חודש – קפיצה לראש הרמה שלך' : ''}
                     </Text>
                   </View>
                 </View>
