@@ -1278,6 +1278,13 @@ export default function CategoryScreen() {
                         onPress={() => router.push(`/category/${ch.id}` as any)}
                       />
                     ))}
+                    {(cat.id === '2' || (cat.title || '').includes('אטרקציות')) && (
+                      <SubCard
+                        item={{ id: 'my-tours', title: 'הסיורים שלי', icon: '🗺️', bg: '#A8E6CF', subtitle: 'סיורים שאתה מרכיב' } as any}
+                        width={cardW}
+                        onPress={() => router.push('/my-tours' as any)}
+                      />
+                    )}
                     {isAdmin && (
                       <TouchableOpacity
                         style={[st.card, st.addCard, { width: cardW }]}
