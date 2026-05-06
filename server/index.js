@@ -1065,6 +1065,36 @@ app.delete('/api/map-backups/:layerName/:timestamp', (req, res) => {
   res.json({ success: true, deleted: before - (db.mapLayersBackup[layerName]?.length || 0) });
 });
 
+// ─── Resolve URL (follow redirects) — for Google News links ───
+app.get('/api/resolve-url', async (req, res) => {
+  const url = String(req.query.url || '');
+  if (!url || !/^https?:\/\//i.test(url)) return res.status(400).json({ success: false, error: 'invalid url' });
+  try {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 8000);
+    const r = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 14_4) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+      },
+      signal: ctrl.signal,
+      redirect: 'follow',
+    });
+    clearTimeout(timer);
+    let resolved = r.url;
+    // Google News may inject the actual article URL via meta refresh / link tag
+    if (resolved.includes('news.google.com')) {
+      const html = await r.text();
+      const m = html.match(/<a[^>]+href=["']([^"']+)["'][^>]*data-n-au/i)
+            || html.match(/<meta[^>]+http-equiv=["']refresh["'][^>]+content=["'][^;]+;\s*url=([^"']+)["']/i);
+      if (m && m[1]) resolved = m[1];
+    }
+    res.json({ success: true, url: resolved });
+  } catch {
+    res.json({ success: false, url });
+  }
+});
+
 // ─── OG image scraper (cache 24h) ─────────────────────────────
 const ogCache = new Map();
 app.get('/api/og-image', async (req, res) => {
