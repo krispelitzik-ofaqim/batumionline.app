@@ -3,6 +3,7 @@ import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert, TextInput,
 import { useFocusEffect, router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'expo-image-picker';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '../constants/colors';
 import AppHeader from '../components/AppHeader';
 import BottomTabBar from '../components/BottomTabBar';
@@ -118,7 +119,7 @@ export default function MyToursScreen() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: Colors.BACKGROUND }}>
+    <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: Colors.BACKGROUND }}>
       <AppHeader crumbs={[{ title: 'אתרים ואטרקציות', path: '/category/2' }, { title: '❤️ הסיורים שלי' }]} />
       <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 100 }}>
         <Text style={{ fontSize: 18, fontWeight: '900', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl', marginBottom: 6 }}>❤️ הסיורים שלי</Text>
@@ -220,7 +221,7 @@ export default function MyToursScreen() {
         ))}
       </ScrollView>
       <BottomTabBar />
-    </View>
+    </SafeAreaView>
   );
 }
 
