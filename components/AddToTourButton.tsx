@@ -5,7 +5,7 @@ import { Colors } from '../constants/colors';
 
 const STORAGE_KEY = '@bo:myTours';
 
-type TourStop = { id: string; title: string; image?: string; type?: string };
+type TourStop = { id: string; title: string; image?: string; type?: string; sourcePath?: string; day?: number; time?: string };
 type Tour = { id: string; name: string; createdAt: string; stops: TourStop[] };
 
 type Props = {
@@ -13,6 +13,7 @@ type Props = {
   itemTitle: string;
   itemImage?: string;
   itemType?: 'hotel' | 'attraction' | 'restaurant';
+  sourcePath?: string;
 };
 
 async function loadTours(): Promise<Tour[]> {
@@ -25,7 +26,7 @@ async function saveTours(list: Tour[]) {
   try { await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(list)); } catch {}
 }
 
-export default function AddToTourButton({ itemId, itemTitle, itemImage, itemType }: Props) {
+export default function AddToTourButton({ itemId, itemTitle, itemImage, itemType, sourcePath }: Props) {
   const [open, setOpen] = useState(false);
   const [tours, setTours] = useState<Tour[]>([]);
   const [newName, setNewName] = useState('');
@@ -44,7 +45,7 @@ export default function AddToTourButton({ itemId, itemTitle, itemImage, itemType
       Alert.alert('כבר קיים', 'הפריט הזה כבר נמצא בסיור');
       return;
     }
-    list[idx].stops.push({ id: itemId, title: itemTitle, image: itemImage, type: itemType });
+    list[idx].stops.push({ id: itemId, title: itemTitle, image: itemImage, type: itemType, sourcePath });
     await saveTours(list);
     setOpen(false);
     Alert.alert('✓ נוסף', `נוסף ל"${list[idx].name}"`);
@@ -57,7 +58,7 @@ export default function AddToTourButton({ itemId, itemTitle, itemImage, itemType
       id: 't_' + Date.now(),
       name,
       createdAt: new Date().toISOString(),
-      stops: [{ id: itemId, title: itemTitle, image: itemImage, type: itemType }],
+      stops: [{ id: itemId, title: itemTitle, image: itemImage, type: itemType, sourcePath }],
     };
     const list = await loadTours();
     await saveTours([t, ...list]);

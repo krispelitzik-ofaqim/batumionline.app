@@ -1,12 +1,12 @@
 import React, { useState, useCallback } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert, TextInput, Image } from 'react-native';
-import { useFocusEffect } from 'expo-router';
+import { useFocusEffect, router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Colors } from '../constants/colors';
 import AppHeader from '../components/AppHeader';
 import BottomTabBar from '../components/BottomTabBar';
 
-type TourStop = { id: string; title: string; image?: string; type?: string; day?: number; time?: string };
+type TourStop = { id: string; title: string; image?: string; type?: string; day?: number; time?: string; sourcePath?: string };
 type Tour = { id: string; name: string; createdAt: string; stops: TourStop[] };
 
 const STORAGE_KEY = '@bo:myTours';
@@ -154,7 +154,7 @@ export default function MyToursScreen() {
                     {items.map(stop => {
                       const isEditing = editingStop?.tourId === t.id && editingStop?.stopId === stop.id;
                       return (
-                        <View key={stop.id} style={s.stopRow}>
+                        <TouchableOpacity key={stop.id} style={s.stopRow} activeOpacity={stop.sourcePath ? 0.7 : 1} onPress={() => stop.sourcePath && !isEditing && router.push(stop.sourcePath as any)}>
                           {stop.image ? <Image source={{ uri: stop.image }} style={s.thumb} /> : null}
                           <View style={{ flex: 1 }}>
                             <Text style={s.stopTxt} numberOfLines={1}>{stop.title}</Text>
@@ -171,15 +171,15 @@ export default function MyToursScreen() {
                           </View>
                           {!isEditing && (
                             <View style={{ flexDirection: 'row-reverse', gap: 4 }}>
-                              <TouchableOpacity onPress={() => startEdit(t.id, stop)} style={s.smallBtn}>
+                              <TouchableOpacity onPress={(e) => { e.stopPropagation(); startEdit(t.id, stop); }} style={s.smallBtn}>
                                 <Text style={{ fontSize: 14 }}>✏️</Text>
                               </TouchableOpacity>
-                              <TouchableOpacity onPress={() => removeStop(t.id, stop.id)} style={s.smallBtn}>
+                              <TouchableOpacity onPress={(e) => { e.stopPropagation(); removeStop(t.id, stop.id); }} style={s.smallBtn}>
                                 <Text style={{ fontSize: 14, color: '#dc2626' }}>🗑</Text>
                               </TouchableOpacity>
                             </View>
                           )}
-                        </View>
+                        </TouchableOpacity>
                       );
                     })}
                   </View>
