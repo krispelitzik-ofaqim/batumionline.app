@@ -587,10 +587,10 @@ function IndicesTabs() {
                 paddingVertical: 8,
                 paddingHorizontal: 4,
                 borderRadius: 10,
-                borderWidth: 1.5,
+                borderWidth: 2,
                 alignItems: 'center',
                 backgroundColor: isActive ? (t.bg || '#FFFFFF') : 'transparent',
-                borderColor: isActive ? '#1A6B8A' : '#cbd5e1',
+                borderColor: isActive ? '#1A6B8A' : '#94a3b8',
               }}
             >
               <Text style={{
