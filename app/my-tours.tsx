@@ -1,8 +1,7 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert, TextInput } from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../constants/colors';
 import AppHeader from '../components/AppHeader';
 import BottomTabBar from '../components/BottomTabBar';
@@ -51,14 +50,9 @@ export default function MyToursScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.BACKGROUND }}>
-      <AppHeader />
-      <View style={s.header}>
-        <TouchableOpacity onPress={() => router.canGoBack() ? router.back() : router.replace('/')} style={s.backBtn}>
-          <Ionicons name="arrow-back" size={22} color="#fff" />
-        </TouchableOpacity>
-        <Text style={s.title}>🗺️ הסיורים שלי</Text>
-      </View>
+      <AppHeader crumbs={[{ title: 'אתרים ואטרקציות', path: '/category/2' }, { title: '🗺️ הסיורים שלי' }]} />
       <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 100 }}>
+        <Text style={{ fontSize: 18, fontWeight: '900', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl', marginBottom: 6 }}>🗺️ הסיורים שלי</Text>
         <Text style={s.intro}>בנה סיור משלך — בחר אטרקציות ושמור אותן בסיור עם שם משלך.</Text>
 
         {creating ? (
@@ -124,9 +118,6 @@ export default function MyToursScreen() {
 }
 
 const s = StyleSheet.create({
-  header: { flexDirection: 'row-reverse', alignItems: 'center', gap: 10, paddingHorizontal: 16, paddingVertical: 12, backgroundColor: Colors.PRIMARY },
-  backBtn: { padding: 4 },
-  title: { color: '#fff', fontSize: 18, fontWeight: '900', writingDirection: 'rtl' },
   intro: { fontSize: 13, color: '#475569', textAlign: 'right', writingDirection: 'rtl', lineHeight: 19, marginBottom: 14 },
   createBox: { backgroundColor: '#fff', borderRadius: 12, padding: 12, marginBottom: 16, borderWidth: 1, borderColor: '#cbd5e1', gap: 8 },
   createLabel: { fontSize: 13, fontWeight: '700', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl' },
