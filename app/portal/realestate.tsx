@@ -1009,7 +1009,7 @@ const s = StyleSheet.create({
   heroSub: { fontSize: 14, color: Colors.WHITE, opacity: 0.85, textAlign: 'right', writingDirection: 'rtl', marginTop: 4 },
 
   topRow: { flexDirection: 'row-reverse', gap: 6, paddingHorizontal: 8, paddingVertical: 10, justifyContent: 'center' },
-  topBtnRect: { flex: 1, backgroundColor: 'transparent', paddingHorizontal: 4, paddingVertical: 8, borderRadius: 10, borderWidth: 1.5, borderColor: '#cbd5e1', alignItems: 'center', justifyContent: 'center', minHeight: 52 },
+  topBtnRect: { flex: 1, backgroundColor: 'transparent', paddingHorizontal: 4, paddingVertical: 8, borderRadius: 10, borderWidth: 2, borderColor: '#94a3b8', alignItems: 'center', justifyContent: 'center', minHeight: 52 },
   topGrid: { flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 6, paddingHorizontal: 16, paddingVertical: 14, justifyContent: 'center' },
   topBtnGrid: { width: '32%', backgroundColor: Colors.WHITE, paddingHorizontal: 6, paddingVertical: 10, borderRadius: 10, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.08, shadowRadius: 4, elevation: 2, alignItems: 'center', justifyContent: 'center', minHeight: 50 },
   topBtn: { backgroundColor: Colors.WHITE, paddingHorizontal: 14, paddingVertical: 10, borderRadius: 22, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.08, shadowRadius: 4, elevation: 2 },
