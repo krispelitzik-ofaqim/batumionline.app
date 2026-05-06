@@ -4,6 +4,7 @@ import { router } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { Video, ResizeMode } from 'expo-av';
+import { WebView } from 'react-native-webview';
 import { Colors } from '../../constants/colors';
 import { fetchContent, API_BASE, resolveUri } from '../../constants/api';
 import BusinessServicesSlider from '../../components/BusinessServicesSlider';
@@ -152,7 +153,11 @@ export default function RealEstatePortal() {
         const apiUrl = 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(rssUrl);
         const r = await fetch(apiUrl);
         const j = await r.json();
-        const items: Article[] = (j.items || []).slice(0, 12).map((it: any, i: number) => ({
+        const filtered = (j.items || []).filter((it: any) => {
+          const text = ((it.title || '') + ' ' + (it.description || '')).toLowerCase();
+          return text.includes('בטומי') || text.includes('batumi');
+        });
+        const items: Article[] = filtered.slice(0, 12).map((it: any, i: number) => ({
           id: 'rss_' + i + '_' + (it.guid || it.link || '').slice(-12),
           title: it.title || '',
           summary: (it.description || '').replace(/<[^>]+>/g, '').slice(0, 250),
@@ -882,6 +887,7 @@ function NewsSliderArrows({ news }: { news: Article[] }) {
   const scrollRef = useRef<ScrollView>(null);
   const [idx, setIdx] = useState(0);
   const [openNews, setOpenNews] = useState<Article | null>(null);
+  const [webViewUrl, setWebViewUrl] = useState<string | null>(null);
   const scrollTo = (i: number) => {
     const next = Math.max(0, Math.min(news.length - 1, i));
     setIdx(next);
@@ -902,7 +908,7 @@ function NewsSliderArrows({ news }: { news: Article[] }) {
           <TouchableOpacity key={n.id} activeOpacity={0.85} style={[s.newsCardLike, { width: SLIDE_W, height: 200, position: 'relative' }]} onPress={() => {
             const hasArticle = !!(n.body || n.longText || n.article);
             if (hasArticle) setOpenNews(n);
-            else if (n.link) Linking.openURL(n.link);
+            else if (n.link) setWebViewUrl(n.link);
             else setOpenNews(n);
           }}>
             {n.image ? (
@@ -960,12 +966,24 @@ function NewsSliderArrows({ news }: { news: Article[] }) {
                 )
               ) : null}
               {openNews?.link ? (
-                <TouchableOpacity onPress={() => openNews?.link && Linking.openURL(openNews.link)} style={{ marginTop: 14, backgroundColor: Colors.PRIMARY, borderRadius: 10, paddingVertical: 12, alignItems: 'center' }}>
+                <TouchableOpacity onPress={() => { const u = openNews.link; setOpenNews(null); setWebViewUrl(u || null); }} style={{ marginTop: 14, backgroundColor: Colors.PRIMARY, borderRadius: 10, paddingVertical: 12, alignItems: 'center' }}>
                   <Text style={{ color: '#fff', fontWeight: '900', fontSize: 14 }}>↗ למקור המלא</Text>
                 </TouchableOpacity>
               ) : null}
             </ScrollView>
           </View>
+        </View>
+      </Modal>
+
+      <Modal visible={!!webViewUrl} animationType="slide" onRequestClose={() => setWebViewUrl(null)}>
+        <View style={{ flex: 1, backgroundColor: '#fff' }}>
+          <View style={{ flexDirection: 'row-reverse', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 10, backgroundColor: Colors.PRIMARY, borderBottomWidth: 1, borderBottomColor: '#0e4256' }}>
+            <TouchableOpacity onPress={() => setWebViewUrl(null)} style={{ paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8, backgroundColor: 'rgba(255,255,255,0.2)' }}>
+              <Text style={{ color: '#fff', fontWeight: '900', fontSize: 14 }}>✕ סגור</Text>
+            </TouchableOpacity>
+            <Text style={{ flex: 1, color: '#fff', fontWeight: '800', fontSize: 13, textAlign: 'right', writingDirection: 'rtl', marginLeft: 12 }} numberOfLines={1}>{webViewUrl || ''}</Text>
+          </View>
+          {webViewUrl ? <WebView source={{ uri: webViewUrl }} style={{ flex: 1 }} /> : null}
         </View>
       </Modal>
     </View>
