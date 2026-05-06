@@ -2,6 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert, TextInput, Image } from 'react-native';
 import { useFocusEffect, router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as ImagePicker from 'expo-image-picker';
 import { Colors } from '../constants/colors';
 import AppHeader from '../components/AppHeader';
 import BottomTabBar from '../components/BottomTabBar';
@@ -75,6 +76,27 @@ export default function MyToursScreen() {
     saveTours(tours.map(t => t.id === tourId ? { ...t, stops: t.stops.filter(s => s.id !== stopId) } : t));
   };
 
+  const takePhoto = async () => {
+    try {
+      const perm = await ImagePicker.requestCameraPermissionsAsync();
+      if (!perm.granted) { Alert.alert('הרשאה נדרשת', 'יש לאפשר גישה למצלמה'); return; }
+      const r = await ImagePicker.launchCameraAsync({ mediaTypes: ImagePicker.MediaTypeOptions.Images, quality: 0.7 });
+      if (r.canceled) return;
+      const asset = r.assets?.[0];
+      if (!asset) return;
+      if (tours.length === 0) {
+        const t: Tour = { id: 't_' + Date.now(), name: 'הזכרונות שלי', createdAt: new Date().toISOString(), stops: [{ id: 'p_' + Date.now(), title: 'צילום שלי', image: asset.uri }] };
+        saveTours([t, ...tours]);
+        Alert.alert('✓ נשמר', 'נוצר סיור "הזכרונות שלי" עם הצילום');
+      } else {
+        const list = [...tours];
+        list[0].stops.push({ id: 'p_' + Date.now(), title: 'צילום שלי', image: asset.uri });
+        saveTours(list);
+        Alert.alert('✓ נוסף', `הצילום נוסף ל"${list[0].name}"`);
+      }
+    } catch { Alert.alert('שגיאה', 'לא ניתן לצלם'); }
+  };
+
   const startEdit = (tourId: string, stop: TourStop) => {
     setEditingStop({ tourId, stopId: stop.id });
     setEditDay(stop.day != null ? String(stop.day) : '');
@@ -101,6 +123,14 @@ export default function MyToursScreen() {
       <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 100 }}>
         <Text style={{ fontSize: 18, fontWeight: '900', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl', marginBottom: 6 }}>❤️ הסיורים שלי</Text>
         <Text style={s.intro}>בנה סיור משלך לפי ימים ושעות. לחץ על "✏️" ליד עצירה כדי לקבוע יום ושעה.</Text>
+
+        <TouchableOpacity onPress={takePhoto} activeOpacity={0.85} style={s.cameraBlock}>
+          <Text style={{ fontSize: 32 }}>📷</Text>
+          <View style={{ flex: 1 }}>
+            <Text style={{ fontSize: 14, fontWeight: '900', color: '#fff', textAlign: 'right', writingDirection: 'rtl' }}>צלם זיכרון מהמסע</Text>
+            <Text style={{ fontSize: 11, color: 'rgba(255,255,255,0.85)', textAlign: 'right', writingDirection: 'rtl', marginTop: 2 }}>הצילום יישמר בסיור</Text>
+          </View>
+        </TouchableOpacity>
 
         {creating ? (
           <View style={s.createBox}>
@@ -196,6 +226,7 @@ export default function MyToursScreen() {
 
 const s = StyleSheet.create({
   intro: { fontSize: 13, color: '#475569', textAlign: 'right', writingDirection: 'rtl', lineHeight: 19, marginBottom: 14 },
+  cameraBlock: { flexDirection: 'row-reverse', alignItems: 'center', gap: 12, padding: 14, borderRadius: 12, marginBottom: 14, backgroundColor: Colors.PRIMARY, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.15, shadowRadius: 5, elevation: 3 },
   createBox: { backgroundColor: '#fff', borderRadius: 12, padding: 12, marginBottom: 16, borderWidth: 1, borderColor: '#cbd5e1', gap: 8 },
   createLabel: { fontSize: 13, fontWeight: '700', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl' },
   input: { borderWidth: 1, borderColor: '#cbd5e1', borderRadius: 8, padding: 10, fontSize: 13, color: Colors.TEXT },
