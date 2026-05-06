@@ -21,6 +21,7 @@ import AppHeader from '../../components/AppHeader';
 import PlacesInfoModal from '../../components/PlacesInfoModal';
 import HtmlContent from '../../components/HtmlContent';
 import MapEmbed from '../../components/MapEmbed';
+import AddToTourButton from '../../components/AddToTourButton';
 
 type Hotel = { id: string; title: string; titleEn?: string; text: string; image: string; mapUrl?: string; pageUrl?: string; coords?: { lat: number; lng: number }; visible?: boolean; images?: string[]; amenities?: string[]; price?: string; audio?: string };
 type TourBlock = { id: string; title: string; subtitle?: string; text: string; color: string; images: string[]; audios: { title?: string; url: string }[]; visible?: boolean; coords?: { lat: number; lng: number } };
@@ -844,7 +845,15 @@ function HotelCard({ h, dark, pageBtnLabel, mapPoints, layerColor, placesQuery, 
   }
   return (
     <View style={[st.hotelCard, dark && { backgroundColor: '#2a3942' }]}>
-      <HotelImage uri={h.image} titleEn={h.titleEn} placesQuery={placesQuery} />
+      <View style={{ position: 'relative' }}>
+        <HotelImage uri={h.image} titleEn={h.titleEn} placesQuery={placesQuery} />
+        <AddToTourButton
+          itemId={h.id || `${h.title}_${h.titleEn || ''}`}
+          itemTitle={h.title}
+          itemImage={h.image}
+          itemType={isHotel ? 'hotel' : isAttraction ? 'attraction' : isRestaurant ? 'restaurant' : undefined}
+        />
+      </View>
       {h.audio ? (
         <View style={{ paddingHorizontal: 24, paddingTop: 8 }}>
           <AudioPlayer tracks={[{ title: h.title, url: h.audio }]} compact playOnLeft tint={dark ? '#1A6B8A' : undefined} textLight={dark} />
