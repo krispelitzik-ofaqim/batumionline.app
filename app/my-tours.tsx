@@ -97,9 +97,9 @@ export default function MyToursScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.BACKGROUND }}>
-      <AppHeader crumbs={[{ title: 'אתרים ואטרקציות', path: '/category/2' }, { title: '🗺️ הסיורים שלי' }]} />
+      <AppHeader crumbs={[{ title: 'אתרים ואטרקציות', path: '/category/2' }, { title: '❤️ הסיורים שלי' }]} />
       <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 100 }}>
-        <Text style={{ fontSize: 18, fontWeight: '900', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl', marginBottom: 6 }}>🗺️ הסיורים שלי</Text>
+        <Text style={{ fontSize: 18, fontWeight: '900', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl', marginBottom: 6 }}>❤️ הסיורים שלי</Text>
         <Text style={s.intro}>בנה סיור משלך לפי ימים ושעות. לחץ על "✏️" ליד עצירה כדי לקבוע יום ושעה.</Text>
 
         {creating ? (

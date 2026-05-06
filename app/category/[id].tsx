@@ -1289,7 +1289,7 @@ export default function CategoryScreen() {
                     ))}
                     {(cat.id === '2' || (cat.title || '').includes('אטרקציות')) && (
                       <SubCard
-                        item={{ id: 'my-tours', title: 'הסיורים שלי', icon: '🗺️', bg: '#A8E6CF', subtitle: 'סיורים שאתה מרכיב' } as any}
+                        item={{ id: 'my-tours', title: 'הסיורים שלי', icon: '❤️', bg: '#FFD6E0', subtitle: 'סיורים שאתה מרכיב' } as any}
                         width={cardW}
                         onPress={() => router.push('/my-tours' as any)}
                       />
