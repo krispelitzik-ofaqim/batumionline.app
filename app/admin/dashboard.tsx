@@ -1366,37 +1366,33 @@ function BrokersEditor() {
 }
 
 function RealEstateGalleryEditor() {
-  const [slides, setSlides] = useState<any[]>([]);
+  const [images, setImages] = useState<string[]>([]);
+  const [captions, setCaptions] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
-    fetchContent().then(d => {
-      setSlides(Array.isArray(d?.realEstateGallery) ? d.realEstateGallery : []);
+    (async () => {
+      try {
+        const r = await fetch(`${API_BASE}/api/listings-images?_t=${Date.now()}`);
+        const j = await r.json();
+        setImages(j.images || []);
+        const d = await fetchContent();
+        setCaptions(d?.realEstateGalleryCaptions || {});
+      } catch {}
       setLoading(false);
-    }).catch(() => setLoading(false));
+    })();
   }, []);
 
-  const upload = async (file: File): Promise<string | null> => {
-    const fd = new FormData();
-    fd.append('file', file);
-    try {
-      const r = await fetch(`${API_BASE}/api/upload`, { method: 'POST', body: fd });
-      const j = await r.json();
-      return j.success && j.filename ? `/uploads/${j.filename}` : null;
-    } catch { return null; }
-  };
-
-  const addSlide = () => setSlides(p => [...p, { id: 'gs_' + Date.now(), uri: '', caption: '' }]);
-  const updateSlide = (id: string, patch: any) => setSlides(p => p.map(s => s.id === id ? { ...s, ...patch } : s));
-  const removeSlide = (id: string) => setSlides(p => p.filter(s => s.id !== id));
+  const updateCaption = (key: string, value: string) =>
+    setCaptions(p => ({ ...p, [key]: value }));
 
   const save = async () => {
     setSaving(true);
     try {
-      await fetch(`${API_BASE}/api/content/realEstateGallery`, {
-        method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(slides),
+      await fetch(`${API_BASE}/api/content/realEstateGalleryCaptions`, {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(captions),
       });
       setSaved(true); setTimeout(() => setSaved(false), 2000);
     } catch {}
@@ -1405,35 +1401,34 @@ function RealEstateGalleryEditor() {
 
   return (
     <View style={{ marginBottom: 14, padding: 12, backgroundColor: '#fef3c7', borderRadius: 10, borderWidth: 1, borderColor: '#fde68a' }}>
-      <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-        <Text style={{ fontSize: 13, fontWeight: '900', color: '#92400e', writingDirection: 'rtl' }}>🖼️ באנר מתחלף (מתחת לחדשות)</Text>
-        <TouchableOpacity onPress={addSlide} style={{ paddingHorizontal: 10, paddingVertical: 6, borderRadius: 6, backgroundColor: '#d97706' }}>
-          <Text style={{ fontSize: 11, fontWeight: '800', color: '#fff' }}>➕ תמונה</Text>
-        </TouchableOpacity>
+      <View style={{ marginBottom: 8 }}>
+        <Text style={{ fontSize: 13, fontWeight: '900', color: '#92400e', writingDirection: 'rtl', textAlign: 'right' }}>🖼️ באנר מתחלף (מתחת לחדשות)</Text>
+        <Text style={{ fontSize: 10, color: '#92400e', writingDirection: 'rtl', textAlign: 'right', marginTop: 2, opacity: 0.7 }}>תמונות מהתיקייה "מודעות נדל"ן" — הוסף כיתוב מותאם לכל תמונה</Text>
       </View>
-      {loading ? <Text>טוען...</Text> : slides.map(s => (
-        <View key={s.id} style={{ marginBottom: 8, padding: 8, backgroundColor: '#fff', borderRadius: 6 }}>
-          {s.uri && <Image source={{ uri: resolveUri(s.uri) }} style={{ width: '100%', height: 100, borderRadius: 4, marginBottom: 4 }} resizeMode="cover" />}
-          <TextInput style={{ borderWidth: 1, borderColor: '#fde68a', borderRadius: 6, padding: 6, fontSize: 11, textAlign: 'right', marginBottom: 4 }} value={s.caption} onChangeText={v => updateSlide(s.id, { caption: v })} placeholder="כיתוב על התמונה" placeholderTextColor="#fcd34d" />
-          {Platform.OS === 'web' && React.createElement('div', { style: { marginBottom: 4 } }, [
-            React.createElement('input', {
-              key: 'inp', type: 'file', accept: 'image/*', id: `gs_file_${s.id}`, style: { display: 'none' },
-              onChange: async (e: any) => { const f = e.target.files?.[0]; if (!f) return; const url = await upload(f); if (url) updateSlide(s.id, { uri: url }); e.target.value = ''; },
-            }),
-            React.createElement('button', {
-              key: 'btn', type: 'button',
-              onClick: () => { const el = (document as any).getElementById(`gs_file_${s.id}`); if (el) el.click(); },
-              style: { width: '100%', backgroundColor: '#fff', border: '2px dashed #fcd34d', borderRadius: 4, padding: 6, cursor: 'pointer', color: '#92400e', fontSize: 11, fontWeight: 800 },
-            }, '📤 העלה תמונה'),
-          ])}
-          <TouchableOpacity onPress={() => removeSlide(s.id)} style={{ alignSelf: 'flex-end', marginTop: 4 }}>
-            <Text style={{ fontSize: 11, color: '#dc2626' }}>🗑 מחק</Text>
-          </TouchableOpacity>
-        </View>
-      ))}
-      {slides.length > 0 && (
-        <TouchableOpacity onPress={save} disabled={saving} style={{ backgroundColor: '#d97706', borderRadius: 8, paddingVertical: 8, alignItems: 'center', marginTop: 8, opacity: saving ? 0.5 : 1 }}>
-          <Text style={{ color: '#fff', fontWeight: '900', fontSize: 13 }}>{saved ? '✓ נשמר' : saving ? 'שומר...' : '💾 שמור באנר'}</Text>
+      {loading ? <Text style={{ color: '#a16207', textAlign: 'center', padding: 8 }}>טוען...</Text> : images.length === 0 ? (
+        <Text style={{ color: '#a16207', textAlign: 'center', padding: 12, fontSize: 12 }}>אין תמונות בתיקייה. תמונות יופיעו כאן כשגולשים יעלו מודעות.</Text>
+      ) : images.map(uri => {
+        const key = uri.split('/').pop() || uri;
+        return (
+          <View key={uri} style={{ flexDirection: 'row-reverse', gap: 8, marginBottom: 8, padding: 8, backgroundColor: '#fff', borderRadius: 6 }}>
+            <Image source={{ uri: resolveUri(uri) }} style={{ width: 80, height: 80, borderRadius: 4 }} resizeMode="cover" />
+            <View style={{ flex: 1, gap: 4 }}>
+              <TextInput
+                style={{ borderWidth: 1, borderColor: '#fde68a', borderRadius: 6, padding: 8, fontSize: 12, textAlign: 'right' }}
+                value={captions[key] || ''}
+                onChangeText={v => updateCaption(key, v)}
+                placeholder="כיתוב על התמונה (לדוגמה: 'דירת 2 חד׳ בקומה 5')"
+                placeholderTextColor="#fcd34d"
+                multiline
+              />
+              <Text style={{ fontSize: 9, color: '#a16207' }}>{key}</Text>
+            </View>
+          </View>
+        );
+      })}
+      {images.length > 0 && (
+        <TouchableOpacity onPress={save} disabled={saving} style={{ backgroundColor: '#d97706', borderRadius: 8, paddingVertical: 10, alignItems: 'center', marginTop: 8, opacity: saving ? 0.5 : 1 }}>
+          <Text style={{ color: '#fff', fontWeight: '900', fontSize: 13 }}>{saved ? '✓ נשמר' : saving ? 'שומר...' : '💾 שמור כיתובים'}</Text>
         </TouchableOpacity>
       )}
     </View>

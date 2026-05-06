@@ -26,7 +26,15 @@ export default function RealEstateGallery() {
       try {
         const r = await fetch(`${API_BASE}/api/listings-images?_t=${Date.now()}`);
         const j = await r.json();
-        const arr: Slide[] = (j.images || []).map((u: string) => ({ uri: resolveUri(u), caption: '' }));
+        let captions: Record<string, string> = {};
+        try {
+          const d = await fetchContent();
+          captions = d?.realEstateGalleryCaptions || {};
+        } catch {}
+        const arr: Slide[] = (j.images || []).map((u: string) => {
+          const key = u.split('/').pop() || u;
+          return { uri: resolveUri(u), caption: captions[key] || '' };
+        });
         if (arr.length > 0) {
           for (let i = arr.length - 1; i > 0; i--) {
             const k = Math.floor(Math.random() * (i + 1));
