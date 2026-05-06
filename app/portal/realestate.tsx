@@ -136,6 +136,13 @@ export default function RealEstatePortal() {
 
   useEffect(() => {
     (async () => {
+      const RE_FALLBACKS = [
+        'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80',
+        'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80',
+        'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80',
+        'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&q=80',
+        'https://images.unsplash.com/photo-1582407947092-45795aba4166?w=800&q=80',
+      ];
       try {
         const rssUrl = 'https://news.google.com/rss/search?q=' + encodeURIComponent('בטומי נדלן') + '&hl=he&gl=IL&ceid=IL:he';
         const apiUrl = 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(rssUrl);
@@ -145,7 +152,7 @@ export default function RealEstatePortal() {
           id: 'rss_' + i + '_' + (it.guid || it.link || '').slice(-12),
           title: it.title || '',
           summary: (it.description || '').replace(/<[^>]+>/g, '').slice(0, 250),
-          image: it.enclosure?.link || it.thumbnail || '',
+          image: it.enclosure?.link || it.thumbnail || RE_FALLBACKS[i % RE_FALLBACKS.length],
           link: it.link || '',
           date: it.pubDate ? new Date(it.pubDate).toLocaleDateString('he-IL') : '',
         }));
