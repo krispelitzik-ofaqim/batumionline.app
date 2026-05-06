@@ -131,6 +131,8 @@ export default function RealEstatePortal() {
       router.push('/portal/brokers' as any);
     } else if (svc.id === 'bank') {
       Linking.openURL('https://batumionline.biz');
+    } else {
+      router.push('/contact' as any);
     }
   }, []);
 
