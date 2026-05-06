@@ -199,11 +199,12 @@ export default function RealEstatePortal() {
   }, []);
 
   useEffect(() => {
-    const missing = news.filter(n => !n.image && n.link);
-    if (missing.length === 0) return;
+    const fromUnsplash = (img?: string) => !!img && /unsplash\.com/.test(img);
+    const targets = news.filter(n => n.link && (!n.image || fromUnsplash(n.image)));
+    if (targets.length === 0) return;
     let cancelled = false;
     (async () => {
-      for (const n of missing) {
+      for (const n of targets) {
         try {
           const r = await fetch(`${API_BASE}/api/og-image?url=${encodeURIComponent(n.link!)}`);
           const j = await r.json();
@@ -215,7 +216,7 @@ export default function RealEstatePortal() {
       }
     })();
     return () => { cancelled = true; };
-  }, [news]);
+  }, [news.length]);
 
   const heroUri = realEstateImage || galleryImages[0] || '/uploads/city.jpg';
 
