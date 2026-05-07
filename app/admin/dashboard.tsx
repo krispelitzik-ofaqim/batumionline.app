@@ -3615,7 +3615,6 @@ export default function AdminDashboard() {
           </View>
         )}
 
-        <HomeBannerEditor />
         <BgColorPicker />
         <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 12, padding: 12, marginTop: 12, backgroundColor: '#f8fafc', borderRadius: 10, borderWidth: 1, borderColor: '#e2e8f0' }}>
           <Text style={{ flex: 1, fontSize: 13, fontWeight: '700', color: '#1C2B35', writingDirection: 'rtl', textAlign: 'right' }}>הצג סרגל תצוגה (נייד/אייפד/מחשב)</Text>
