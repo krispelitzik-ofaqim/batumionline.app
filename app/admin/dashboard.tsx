@@ -1025,7 +1025,7 @@ function RealEstateBannerEditor() {
           <Text style={{ color: '#fff', fontSize: 11, fontWeight: '900' }}>{visible ? '👁 גלוי' : '🚫 מוסתר'}</Text>
         </TouchableOpacity>
       </View>
-      <Text style={{ fontSize: 10, color: '#9a3412', writingDirection: 'rtl', textAlign: 'right', marginBottom: 8, opacity: 0.7 }}>התמונה הזו מופיעה גם בכפתור "פורטל הנדל״ן" בדף הבית, וגם כתמונה עליונה (Hero) בתוך הפורטל עצמו</Text>
+      <Text style={{ fontSize: 10, color: '#9a3412', writingDirection: 'rtl', textAlign: 'right', marginBottom: 8, opacity: 0.7 }}>התמונה הזו מופיעה בכפתור "פורטל הנדל״ן" בדף הבית בלבד</Text>
       {url ? (
         <Image source={{ uri: resolveUri(url) }} style={{ width: '100%', height: 140, borderRadius: 8, marginBottom: 8 }} resizeMode="cover" />
       ) : null}
@@ -1069,6 +1069,86 @@ function RealEstateBannerEditor() {
       <TextInput style={{ borderWidth: 1, borderColor: '#fed7aa', borderRadius: 6, padding: 6, fontSize: 11, textAlign: 'right', marginBottom: 8, backgroundColor: '#fff', minHeight: 50 }} multiline value={sub} onChangeText={setSub} placeholder="טקסט תחתון" placeholderTextColor="#fdba74" />
       <TouchableOpacity disabled={saving} onPress={save} style={{ backgroundColor: '#ea580c', borderRadius: 8, paddingVertical: 8, alignItems: 'center', opacity: saving ? 0.5 : 1 }}>
         <Text style={{ color: '#fff', fontWeight: '900', fontSize: 13 }}>{saved ? '✓ נשמר' : saving ? 'שומר...' : '💾 שמור באנר'}</Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
+
+function RealEstateHeroEditor() {
+  const [url, setUrl] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    fetchContent().then(d => {
+      const side = d?.sideBanners || [];
+      const re = side.find((b: any) => b.id === 'realestate');
+      if (re?.heroImage) setUrl(re.heroImage);
+      setLoading(false);
+    }).catch(() => setLoading(false));
+  }, []);
+
+  const save = async () => {
+    setSaving(true);
+    try {
+      const d = await fetchContent();
+      const side = (d?.sideBanners || []).map((b: any) => b.id === 'realestate' ? { ...b, heroImage: url } : b);
+      if (!side.find((b: any) => b.id === 'realestate')) {
+        side.push({ id: 'realestate', title: 'פורטל הנדל״ן', icon: '🏠', bg: '#F4A94E', heroImage: url });
+      }
+      await fetch(`${API_BASE}/api/content/sideBanners`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(side),
+      });
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } catch {}
+    setSaving(false);
+  };
+
+  return (
+    <View style={{ marginBottom: 14, padding: 12, backgroundColor: '#ecfeff', borderRadius: 10, borderWidth: 1, borderColor: '#a5f3fc' }}>
+      <Text style={{ fontSize: 13, fontWeight: '900', color: '#155e75', writingDirection: 'rtl', marginBottom: 4 }}>🖼️ תמונת ראש בפורטל הנדל״ן</Text>
+      <Text style={{ fontSize: 10, color: '#155e75', writingDirection: 'rtl', textAlign: 'right', marginBottom: 8, opacity: 0.7 }}>התמונה הגדולה בראש דף הפורטל. ריק = משתמש בתמונת הבאנר של דף הבית</Text>
+      {url ? (
+        <Image source={{ uri: resolveUri(url) }} style={{ width: '100%', height: 140, borderRadius: 8, marginBottom: 8 }} resizeMode="cover" />
+      ) : null}
+      <TextInput
+        style={{ borderWidth: 1, borderColor: '#a5f3fc', borderRadius: 8, padding: 8, fontSize: 12, textAlign: 'right', backgroundColor: '#fff', marginBottom: 8 }}
+        value={url}
+        onChangeText={setUrl}
+        placeholder={loading ? 'טוען...' : 'URL או /uploads/X.jpg'}
+        placeholderTextColor="#67e8f9"
+      />
+      {Platform.OS === 'web' && React.createElement('div', { style: { marginBottom: 8 } }, [
+        React.createElement('input', {
+          key: 'inp', type: 'file', accept: 'image/*', id: 're_hero_file_input', style: { display: 'none' },
+          onChange: async (e: any) => {
+            const file = e.target.files?.[0];
+            if (!file) return;
+            const fd = new FormData();
+            fd.append('file', file);
+            try {
+              const r = await fetch(`${API_BASE}/api/upload`, { method: 'POST', body: fd });
+              const j = await r.json();
+              if (j.success && j.filename) setUrl(`/uploads/${j.filename}`);
+              else alert('שגיאה בהעלאה: ' + (j.error || 'לא ידוע'));
+            } catch (err: any) {
+              alert('שגיאת רשת: ' + err.message);
+            }
+            e.target.value = '';
+          },
+        }),
+        React.createElement('button', {
+          key: 'btn', type: 'button',
+          onClick: () => { const el = (document as any).getElementById('re_hero_file_input'); if (el) el.click(); },
+          style: { width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#fff', border: '2px dashed #67e8f9', borderRadius: 8, padding: 10, cursor: 'pointer', color: '#155e75', fontSize: 12, fontWeight: 800 },
+        }, '📤 העלה תמונה מהמחשב'),
+      ])}
+      <TouchableOpacity disabled={saving} onPress={save} style={{ backgroundColor: '#0891b2', borderRadius: 8, paddingVertical: 8, alignItems: 'center', opacity: saving ? 0.5 : 1 }}>
+        <Text style={{ color: '#fff', fontWeight: '900', fontSize: 13 }}>{saved ? '✓ נשמר' : saving ? 'שומר...' : '💾 שמור תמונת ראש'}</Text>
       </TouchableOpacity>
     </View>
   );
@@ -1142,7 +1222,8 @@ function ListingsFolderViewer({ onBack }: { onBack?: () => void } = {}) {
 function BlocksMenu() {
   const [active, setActive] = useState<string | null>(null);
   const alwaysOpen = [
-    { id: 'home_banner', icon: '🏠', title: 'תמונת באנר נדל"ן (בית + פורטל)', component: <RealEstateBannerEditor /> },
+    { id: 'home_banner', icon: '🏠', title: 'באנר נדל״ן בדף הבית', component: <RealEstateBannerEditor /> },
+    { id: 'hero', icon: '🖼️', title: 'תמונת ראש בפורטל', component: <RealEstateHeroEditor /> },
   ];
   const toggleable = [
     { id: 'news', icon: '📰', title: 'חדשות נדל"ן', component: <RealEstateNewsEditor /> },

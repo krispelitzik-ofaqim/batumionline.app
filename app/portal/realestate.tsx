@@ -178,7 +178,7 @@ export default function RealEstatePortal() {
         }
         const side = data?.sideBanners || [];
         const re = side.find((b: any) => b.id === 'realestate');
-        const heroImg = re?.image || (re?.icon?.startsWith('http') ? re.icon : '');
+        const heroImg = re?.heroImage || re?.image || (re?.icon?.startsWith('http') ? re.icon : '');
         if (heroImg) setRealEstateImage(heroImg);
         if (Array.isArray(data?.futureProjects) && data.futureProjects.length) setFutureProjects(data.futureProjects);
         if (Array.isArray(data?.realEstateArticles)) setArticles(data.realEstateArticles);

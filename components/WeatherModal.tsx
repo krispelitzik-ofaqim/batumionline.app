@@ -169,8 +169,7 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
       // Hourly forecast: next 24 hours (3-hour intervals → 8 points)
       const hours: HourForecast[] = (foreData.list || []).slice(0, 8).map((item: any) => {
         const d = new Date(item.dt * 1000);
-        const tzDate = new Date(d.toLocaleString('en-US', { timeZone: 'Asia/Tbilisi' }));
-        const h = tzDate.getHours().toString().padStart(2, '0');
+        const h = d.toLocaleString('en-GB', { timeZone: 'Asia/Tbilisi', hour: '2-digit', hour12: false });
         return {
           hour: `${h}:00`,
           temp: Math.round(item.main.temp),
@@ -538,12 +537,12 @@ function weatherGradient(iconCode: string | undefined, batumiHourStr: string): [
   if (code.startsWith('13')) return ['#BFDBFE', '#E0F2FE', '#FFFFFF']; // snow
   if (code.startsWith('50')) return ['#94A3B8', '#64748B', '#475569']; // mist
   if (code.startsWith('09') || code.startsWith('10')) return isNight ? ['#0F172A', '#1E3A8A', '#475569'] : ['#475569', '#3B82F6', '#64748B']; // rain
-  if (code.startsWith('03') || code.startsWith('04')) return isNight ? ['#1E293B', '#334155', '#475569'] : ['#475569', '#334155', '#1E293B']; // cloudy — deep slate
+  if (code.startsWith('03') || code.startsWith('04')) return isNight ? ['#312E81', '#1E1B4B', '#0C0A1E'] : ['#475569', '#334155', '#1E293B']; // cloudy — night indigo / day slate
 
   // Clear/few clouds — color by time of day (darker anchors for readability)
   if (isDawn) return ['#D97706', '#BE185D', '#6D28D9'];       // dawn deep orange→pink→purple
   if (isSunset) return ['#C2410C', '#9D174D', '#5B21B6'];     // sunset burnt orange→plum
-  if (isNight) return ['#6B7280', '#374151', '#000000'];      // night gray→black
+  if (isNight) return ['#1E1B4B', '#312E81', '#0C0A1E'];      // night deep indigo→midnight
   return ['#1A6B8A', '#0C4A6E', '#082F49'];                   // day deep teal→navy
 }
 
