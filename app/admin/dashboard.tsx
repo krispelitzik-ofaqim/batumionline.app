@@ -1148,7 +1148,6 @@ function BlocksMenu() {
   const toggleable = [
     { id: 'future', icon: '🔮', title: 'עתיד הנדל"ן', component: <FutureProjectsEditor /> },
     { id: 'business', icon: '💼', title: 'פורטל העסקים', component: <BusinessProjectsEditor /> },
-    { id: 'gallery', icon: '🖼️', title: 'באנר מתחלף', component: <RealEstateGalleryEditor /> },
     { id: 'articles', icon: '📝', title: 'כתבות וטיפים', component: <RealEstateArticlesEditor /> },
     { id: 'brokers', icon: '🤝', title: 'מתווכים מומלצים', component: <BrokersEditor /> },
   ];
