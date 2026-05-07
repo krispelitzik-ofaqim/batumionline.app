@@ -1143,9 +1143,9 @@ function BlocksMenu() {
   const [active, setActive] = useState<string | null>(null);
   const alwaysOpen = [
     { id: 'home_banner', icon: '🏠', title: 'תמונת באנר נדל"ן (בית + פורטל)', component: <RealEstateBannerEditor /> },
-    { id: 'news', icon: '📰', title: 'חדשות נדל"ן', component: <RealEstateNewsEditor /> },
   ];
   const toggleable = [
+    { id: 'news', icon: '📰', title: 'חדשות נדל"ן', component: <RealEstateNewsEditor /> },
     { id: 'future', icon: '🔮', title: 'עתיד הנדל"ן', component: <FutureProjectsEditor /> },
     { id: 'business', icon: '💼', title: 'פורטל העסקים', component: <BusinessProjectsEditor /> },
     { id: 'articles', icon: '📝', title: 'כתבות וטיפים', component: <RealEstateArticlesEditor /> },
