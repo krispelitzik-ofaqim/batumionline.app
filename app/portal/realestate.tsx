@@ -8,7 +8,6 @@ import { WebView } from 'react-native-webview';
 import { Colors } from '../../constants/colors';
 import { fetchContent, API_BASE, resolveUri } from '../../constants/api';
 import BusinessServicesSlider from '../../components/BusinessServicesSlider';
-import RealEstateGallery from '../../components/RealEstateGallery';
 import CurrencyTicker from '../../components/CurrencyTicker';
 import BottomTabBar from '../../components/BottomTabBar';
 import AppHeader from '../../components/AppHeader';
@@ -431,8 +430,6 @@ export default function RealEstatePortal() {
             </Section>
 
             <ArticlesAt loc="after_news" articles={articles} onOpen={setOpenArticle} />
-
-            <RealEstateGallery />
 
             <ArticlesAt loc="after_gallery" articles={articles} onOpen={setOpenArticle} />
 
