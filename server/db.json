@@ -8156,7 +8156,8 @@
       "kicker": "B A T U M I",
       "bannerTitle": "פורטל  הנדל״ן  והעסקים",
       "bannerSub": "כל העסקים והנכסים של בטומי במקום אחד",
-      "visible": true
+      "visible": true,
+      "heroImage": "/uploads/1778164466462-804.jpg"
     }
   ],
   "mediaTags": {
@@ -9819,7 +9820,15 @@
     "1777996646320-663.jpeg": "WhatsApp Image 2026-05-05 at 18.02.13 (3).jpeg",
     "1777996650524-832.jpeg": "WhatsApp Image 2026-05-05 at 18.02.13 (2).jpeg",
     "1777996654035-309.jpeg": "WhatsApp Image 2026-05-05 at 18.02.13 (1).jpeg",
-    "1777999399653-924.mp4": "WhatsApp Video 2026-05-05 at 17.58.52.mp4"
+    "1777999399653-924.mp4": "WhatsApp Video 2026-05-05 at 17.58.52.mp4",
+    "1778164466462-804.jpg": "dreamstime_m_169583898.jpg",
+    "1778165978633-265.jpg": "aerial-view-batumi-georgia-batumi-is-capital-georgia (1).jpg",
+    "1778165987041-628.jpg": "aerial-view-batumi.jpg",
+    "1778165995821-883.jpg": "aerial-drone-view-coastline-batumi-georgia-black-sea-buildings-greenery-mountains.jpg",
+    "1778166056469-489.jpg": "night-city-batumi-night-panorama-view.jpg",
+    "1778166077585-86.webp": "ביטוחים.webp",
+    "1778166101053-98.png": "צילום מסך 2026-02-03 ב-19.24.01.png",
+    "1778166124410-848.png": "צילום מסך 2026-02-03 ב-19.27.22.png"
   },
   "mapLayers": [
     {
@@ -14644,21 +14653,21 @@
             "title": "עיריית בטומי מאשרת 4 פרויקטי מגורים חדשים בטיילת",
             "summary": "תוכנית אב חדשה עם 1,200 יחידות דיור לאורך החוף",
             "date": "היום",
-            "image": "/uploads/city.jpg"
+            "image": "/uploads/1778165978633-265.jpg"
           },
           {
             "id": "n_p2",
             "title": "חברת Orbi מכריזה על מגדל בגובה 45 קומות",
             "summary": "דירות יוקרה, חדרי כושר, ספא ובריכת אינסוף",
             "date": "השבוע",
-            "image": "/uploads/city.jpg"
+            "image": "/uploads/1778165995821-883.jpg"
           },
           {
             "id": "n_p3",
             "title": "פרויקט מגורים חדש בקובולטי",
             "summary": "500 יחידות במחיר ממוצע של 1,200$ למ״ר",
             "date": "השבוע",
-            "image": "/uploads/city.jpg"
+            "image": "/uploads/1778165987041-628.jpg"
           }
         ]
       },
@@ -14672,14 +14681,14 @@
             "title": "תשואות שכירות בבטומי עלו ל-10% בממוצע",
             "summary": "גאורגיה הפכה ליעד השקעה מוביל בקווקז",
             "date": "לפני יומיים",
-            "image": "/uploads/city.jpg"
+            "image": "/uploads/1778166056469-489.jpg"
           },
           {
             "id": "n_pr2",
             "title": "מחירי דירות בטיילת עלו ב-18% השנה",
             "summary": "הביקוש מצד משקיעים זרים ממשיך לדחוף את המחירים",
             "date": "השבוע",
-            "image": "/uploads/city.jpg"
+            "image": "/uploads/1778166077585-86.webp"
           }
         ]
       },
@@ -14700,7 +14709,7 @@
             "title": "שינוי בחוק רישום נכסים",
             "summary": "זמן רישום ירד מ-7 ימים ל-2 ימים בלבד",
             "date": "החודש",
-            "image": "/uploads/city.jpg"
+            "image": "/uploads/1778166101053-98.png"
           }
         ]
       },
@@ -14714,7 +14723,7 @@
             "title": "יזמים ישראלים רכשו מתחם 8 דונם",
             "summary": "קבוצת משקיעים מישראל - הקמת פרויקט יוקרה עם מלון",
             "date": "אתמול",
-            "image": "/uploads/city.jpg"
+            "image": "/uploads/1778166124410-848.png"
           }
         ]
       }

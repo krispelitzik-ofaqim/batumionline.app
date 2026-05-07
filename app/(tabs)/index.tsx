@@ -17,7 +17,6 @@ import { router } from 'expo-router';
 import { fetchContent, resolveUri } from '../../constants/api';
 import { Colors } from '../../constants/colors';
 import WelcomeSlider from '../../components/WelcomeSlider';
-import HomeGallery from '../../components/HomeGallery';
 import AccessibilityButton from '../../components/AccessibilityButton';
 import InfoPortal from '../../components/InfoPortal';
 import { AdminFloatingButton, EditToolbar, EditableText, ReorderControls } from '../../components/AdminEditOverlay';
@@ -252,8 +251,6 @@ export default function HomeScreen() {
           <EditableText value={editHeaderTitle} onChangeText={setEditHeaderTitle} editMode={editMode} textStyle={styles.headerTitle} />
           <EditableText value={editHeaderSub} onChangeText={setEditHeaderSub} editMode={editMode} textStyle={styles.headerSub} />
         </View>
-
-        <HomeGallery />
 
         <ClientBannerDisplay page="home" position="top" />
 
