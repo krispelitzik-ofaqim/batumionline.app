@@ -1242,7 +1242,7 @@ function BlocksMenu() {
         ))}
       </View>
       {active && toggleable.find(b => b.id === active)?.component}
-      {alwaysOpen.map(b => <View key={b.id}>{b.component}</View>)}
+      {!active && alwaysOpen.map(b => <View key={b.id}>{b.component}</View>)}
     </View>
   );
 }
@@ -5827,7 +5827,7 @@ export default function AdminDashboard() {
         {activeNav === 'side' && !childrenOf && (() => {
           const tabLabels: Record<string, string> = {
             dashboard: '📊 דשבורד',
-            blocks: '📦 בלוקים',
+            blocks: '📦 דף הפורטל',
             listings: `🏠 מודעות${pendingCount > 0 ? ' (' + pendingCount + ')' : ''}`,
             finance: '💰 מדד הכסף',
             tourism: '🧳 מדד התיירים',
