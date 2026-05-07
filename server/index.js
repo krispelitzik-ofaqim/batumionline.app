@@ -1097,6 +1097,32 @@ app.get('/api/resolve-url', async (req, res) => {
 
 // ─── OG image scraper (cache 24h) ─────────────────────────────
 const ogCache = new Map();
+async function resolveGoogleNews(url) {
+  if (!/news\.google\.com/i.test(url)) return url;
+  try {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 8000);
+    const r = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 14_4) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+      },
+      signal: ctrl.signal,
+      redirect: 'follow',
+    });
+    clearTimeout(timer);
+    let resolved = r.url;
+    if (resolved.includes('news.google.com')) {
+      const html = await r.text();
+      const m = html.match(/<a[^>]+href=["']([^"']+)["'][^>]*data-n-au/i)
+            || html.match(/<meta[^>]+http-equiv=["']refresh["'][^>]+content=["'][^;]+;\s*url=([^"']+)["']/i)
+            || html.match(/data-url=["'](https?:\/\/[^"']+)["']/i);
+      if (m && m[1]) resolved = m[1].replace(/&amp;/g, '&');
+    }
+    return resolved;
+  } catch { return url; }
+}
+
 app.get('/api/og-image', async (req, res) => {
   const url = String(req.query.url || '');
   if (!url || !/^https?:\/\//i.test(url)) return res.status(400).json({ success: false, error: 'invalid url' });
@@ -1105,9 +1131,10 @@ app.get('/api/og-image', async (req, res) => {
     return res.json({ success: true, image: cached.image, cached: true });
   }
   try {
+    const realUrl = await resolveGoogleNews(url);
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), 8000);
-    const r = await fetch(url, {
+    const r = await fetch(realUrl, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 14_4) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15',
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
@@ -1121,9 +1148,14 @@ app.get('/api/og-image', async (req, res) => {
     const m1 = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i);
     const m2 = html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i);
     const m3 = html.match(/<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)["']/i);
-    const image = (m1 && m1[1]) || (m2 && m2[1]) || (m3 && m3[1]) || '';
+    const m4 = html.match(/<meta[^>]+name=["']twitter:image:src["'][^>]+content=["']([^"']+)["']/i);
+    let image = (m1 && m1[1]) || (m2 && m2[1]) || (m3 && m3[1]) || (m4 && m4[1]) || '';
+    if (!image) {
+      const img = html.match(/<img[^>]+src=["'](https?:\/\/[^"']+\.(?:jpe?g|png|webp))["'][^>]*>/i);
+      if (img && img[1]) image = img[1];
+    }
     ogCache.set(url, { image, fetchedAt: Date.now() });
-    res.json({ success: true, image });
+    res.json({ success: true, image, resolved: realUrl !== url ? realUrl : undefined });
   } catch {
     res.json({ success: false, error: 'fetch failed' });
   }
