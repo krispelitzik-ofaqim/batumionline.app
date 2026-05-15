@@ -1,6 +1,7 @@
 import React from 'react';
 import { Platform, View, StyleProp, ViewStyle, TouchableOpacity } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
+import { API_BASE } from '../constants/api';
 
 type Point = { name: string; lat: number; lng: number };
 type Props = {
@@ -8,9 +9,10 @@ type Props = {
   color?: string;
   style?: StyleProp<ViewStyle>;
   onPress?: () => void;
+  height?: number;
 };
 
-export default function CategoryHeaderMap({ points, color = '#1A6B8A', style, onPress }: Props) {
+export default function CategoryHeaderMap({ points, color = '#1A6B8A', style, onPress, height = 180 }: Props) {
   if (!points || points.length === 0) return null;
 
   const lats = points.map(p => p.lat);
@@ -21,12 +23,17 @@ export default function CategoryHeaderMap({ points, color = '#1A6B8A', style, on
   const dLng = Math.max(0.01, (Math.max(...lngs) - Math.min(...lngs)) * 1.4);
 
   const inner = Platform.OS === 'web'
-    ? React.createElement('iframe', {
-        key: 'frame',
-        src: `https://www.google.com/maps?q=${centerLat},${centerLng}&hl=iw&z=13&output=embed`,
-        style: { width: '100%', height: '100%', border: 0 } as any,
-        title: 'category-map',
-      })
+    ? (() => {
+        const pointsParam = points.map(p => `${p.lat},${p.lng}`).join(';');
+        const colorParam = color.startsWith('#') ? '0x' + color.slice(1) : color;
+        const src = `${API_BASE}/api/static-map?points=${encodeURIComponent(pointsParam)}&w=640&h=${height}&color=${encodeURIComponent(colorParam)}`;
+        return React.createElement('img', {
+          key: 'staticmap',
+          src,
+          alt: 'category-map',
+          style: { width: '100%', height: '100%', objectFit: 'cover', display: 'block' } as any,
+        });
+      })()
     : (
       <MapView
         style={{ flex: 1 }}
