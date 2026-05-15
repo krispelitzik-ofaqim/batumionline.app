@@ -247,7 +247,7 @@ export default function HomeScreen() {
         style={styles.scroll}
         showsVerticalScrollIndicator={false}
       >
-        <HomeGallery />
+        {/* <HomeGallery /> hidden — causes issues */}
 
         {/* Header */}
         <View style={styles.header}>
