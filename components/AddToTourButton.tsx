@@ -65,6 +65,6 @@ const s = StyleSheet.create({
     shadowRadius: 4,
     elevation: 4,
   },
-  heart: { color: '#1C2B35', fontSize: 20, fontWeight: '900', lineHeight: 22 },
+  heart: { color: '#e11d48', fontSize: 20, fontWeight: '900', lineHeight: 22 },
   heartFav: { color: '#e11d48' },
 });

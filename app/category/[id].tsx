@@ -1472,7 +1472,7 @@ export default function CategoryScreen() {
           onPress={() => scrollRef.current?.scrollTo({ y: 0, animated: true })}
           style={{
             position: 'absolute',
-            right: 12,
+            left: 12,
             bottom: 84,
             width: 44,
             height: 44,
