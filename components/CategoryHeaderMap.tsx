@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleProp, ViewStyle, TouchableOpacity } from 'react-native';
+import { View, StyleProp, ViewStyle, TouchableOpacity, Text } from 'react-native';
 import { API_BASE } from '../constants/api';
 
 type Point = { name: string; lat: number; lng: number };
@@ -7,30 +7,35 @@ type Props = {
   points: Point[];
   color?: string;
   style?: StyleProp<ViewStyle>;
-  onPress?: () => void;
-  height?: number;
+  onExpand?: () => void;
 };
 
-export default function CategoryHeaderMap({ points, color = '#1A6B8A', style, onPress, height = 180 }: Props) {
+export default function CategoryHeaderMap({ points, color = '#1A6B8A', style, onExpand }: Props) {
   if (!points || points.length === 0) return null;
 
-  const pointsParam = points.map(p => `${p.lat},${p.lng}`).join(';');
-  const colorParam = color.startsWith('#') ? '0x' + color.slice(1) : color;
-  const src = `${API_BASE}/api/static-map?points=${encodeURIComponent(pointsParam)}&w=640&h=${height}&color=${encodeURIComponent(colorParam)}`;
+  const pointsParam = points.map(p => `${p.lat},${p.lng},${encodeURIComponent(p.name)}`).join(';');
+  const colorParam = color;
+  const src = `${API_BASE}/api/map-html?points=${encodeURIComponent(pointsParam)}&color=${encodeURIComponent(colorParam)}`;
 
-  const inner = React.createElement('img', {
-    key: 'staticmap',
+  const frame = React.createElement('iframe', {
+    key: 'mapframe',
     src,
-    alt: 'category-map',
-    style: { width: '100%', height: '100%', objectFit: 'cover', display: 'block' } as any,
+    title: 'category-map',
+    style: { width: '100%', height: '100%', border: 0, display: 'block' } as any,
   });
 
-  if (onPress) {
-    return (
-      <TouchableOpacity activeOpacity={0.9} onPress={onPress} style={[style, { overflow: 'hidden' }]}>
-        {inner}
-      </TouchableOpacity>
-    );
-  }
-  return <View style={[style, { overflow: 'hidden' }]}>{inner}</View>;
+  return (
+    <View style={[style, { overflow: 'hidden', position: 'relative' }]}>
+      {frame}
+      {onExpand && (
+        <TouchableOpacity
+          onPress={onExpand}
+          style={{ position: 'absolute', left: 8, bottom: 8, width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(28,43,53,0.85)', alignItems: 'center', justifyContent: 'center', zIndex: 5 }}
+          activeOpacity={0.85}
+        >
+          <Text style={{ color: '#fff', fontSize: 18, fontWeight: '900' }}>⤢</Text>
+        </TouchableOpacity>
+      )}
+    </View>
+  );
 }

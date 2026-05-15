@@ -776,6 +776,24 @@ app.get('/api/static-map', async (req, res) => {
   }
 });
 
+// ─── Interactive Map HTML (Google Maps JS API, multi-pin) ────
+app.get('/api/map-html', (req, res) => {
+  const key = process.env.GOOGLE_PLACES_KEY;
+  if (!key) return res.status(503).send('No key');
+  const points = String(req.query.points || '').trim();
+  if (!points) return res.status(400).send('No points');
+  const color = String(req.query.color || '#1A6B8A').replace(/[^a-zA-Z0-9#]/g, '');
+  const pts = points.split(';').filter(Boolean).map(p => {
+    const [lat, lng, ...nameParts] = p.split(',');
+    return { lat: parseFloat(lat), lng: parseFloat(lng), name: decodeURIComponent(nameParts.join(',') || '') };
+  }).filter(p => Number.isFinite(p.lat) && Number.isFinite(p.lng));
+  if (pts.length === 0) return res.status(400).send('Bad points');
+  const html = `<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body,#m{margin:0;padding:0;height:100%;width:100%;}.gm-style-iw{direction:rtl;font-family:-apple-system,sans-serif;}</style></head><body><div id="m"></div><script>const PTS=${JSON.stringify(pts)};const COLOR=${JSON.stringify(color)};function init(){const map=new google.maps.Map(document.getElementById('m'),{center:{lat:PTS[0].lat,lng:PTS[0].lng},zoom:12,mapTypeControl:false,streetViewControl:false,fullscreenControl:false});const bounds=new google.maps.LatLngBounds();PTS.forEach((p,i)=>{const pos={lat:p.lat,lng:p.lng};bounds.extend(pos);const m=new google.maps.Marker({position:pos,map,title:p.name||'',icon:{path:google.maps.SymbolPath.CIRCLE,scale:11,fillColor:COLOR,fillOpacity:1,strokeColor:'#fff',strokeWeight:2}});if(p.name){const iw=new google.maps.InfoWindow({content:'<div style="direction:rtl;"><b>'+p.name+'</b></div>'});m.addListener('click',()=>iw.open({anchor:m,map}));}});if(PTS.length>1)map.fitBounds(bounds,40);}</script><script src="https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(key)}&language=he&callback=init" async defer></script></body></html>`;
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.setHeader('Cache-Control', 'public, max-age=3600');
+  res.send(html);
+});
+
 // ─── Ratings ──────────────────────────────────────────────────
 app.get('/api/ratings', (req, res) => {
   try {
