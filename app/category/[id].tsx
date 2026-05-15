@@ -950,11 +950,13 @@ function SubCard({ item, width, onPress }: { item: Item; width: number; onPress:
         </LinearGradient>
       )}
       <View style={st.cardBottom}>
-        <Text style={st.cardTitle} numberOfLines={2}>
-          {item.title}
-          {count > 0 ? <Text style={{ fontSize: 11, color: 'rgba(28,43,53,0.5)', fontWeight: '600' }}> ({count})</Text> : null}
-        </Text>
-        {item.subtitle ? <Text style={st.cardSub} numberOfLines={1}>{item.subtitle}</Text> : null}
+        <Text style={st.cardTitle} numberOfLines={2}>{item.title}</Text>
+        {item.subtitle || count > 0 ? (
+          <Text style={st.cardSub} numberOfLines={1}>
+            {item.subtitle || ''}
+            {count > 0 ? <Text style={{ color: 'rgba(28,43,53,0.5)', fontWeight: '600' }}>{item.subtitle ? ' ' : ''}({count})</Text> : null}
+          </Text>
+        ) : null}
       </View>
     </TouchableOpacity>
   );
@@ -987,9 +989,10 @@ export default function CategoryScreen() {
   const { dark } = useContext(ThemeContext);
   const { simulatedWidth } = useContext(PreviewContext);
   const { isAdmin } = useContext(AdminContext);
-  const { width: screenW } = useWindowDimensions();
+  const { width: screenW, height: screenH } = useWindowDimensions();
   const w = simulatedWidth ? Math.min(simulatedWidth, screenW) : screenW;
   const cardW = (w - 48) / 2;
+  const [showTopBtn, setShowTopBtn] = useState(false);
 
   const [cat, setCat] = useState<Item | null>(null);
   const [rootId, setRootId] = useState<string | null>(null);
@@ -1177,7 +1180,13 @@ export default function CategoryScreen() {
       <DevicePreviewBar />
       <AppHeader crumbs={crumbs} dark={darkCat} />
       {lockedOverlay}
-      <ScrollView ref={scrollRef} showsVerticalScrollIndicator={false} style={{ maxWidth: w, alignSelf: 'center', width: '100%' }}>
+      <ScrollView
+        ref={scrollRef}
+        showsVerticalScrollIndicator={false}
+        style={{ maxWidth: w, alignSelf: 'center', width: '100%' }}
+        onScroll={(e) => setShowTopBtn(e.nativeEvent.contentOffset.y > screenH)}
+        scrollEventThrottle={64}
+      >
         {cat.heroImage ? (
           <View style={st.heroImgWrap}>
             <Image source={{ uri: resolveUri(cat.heroImage) }} style={st.heroImgBg} resizeMode="cover" />
@@ -1457,15 +1466,32 @@ export default function CategoryScreen() {
             </Text>
           </View>
         )}
-        {((cat.hotels && cat.hotels.filter(h => h.visible !== false).length >= 10) || (cat.children && cat.children.length >= 10) || (cat.tours && cat.tours.filter(t => t.visible !== false).length >= 10)) && (
-          <TouchableOpacity
-            onPress={() => scrollRef.current?.scrollTo({ y: 0, animated: true })}
-            style={{ alignSelf: 'center', marginVertical: 20, paddingVertical: 10, paddingHorizontal: 24, borderRadius: 20, backgroundColor: '#1C2B35' }}
-          >
-            <Text style={{ fontSize: 13, fontWeight: '800', color: '#F4A94E' }}>▲ חזור לראש הדף</Text>
-          </TouchableOpacity>
-        )}
       </ScrollView>
+      {showTopBtn && (
+        <TouchableOpacity
+          onPress={() => scrollRef.current?.scrollTo({ y: 0, animated: true })}
+          style={{
+            position: 'absolute',
+            right: 12,
+            bottom: 84,
+            width: 44,
+            height: 44,
+            borderRadius: 22,
+            backgroundColor: '#1C2B35',
+            alignItems: 'center',
+            justifyContent: 'center',
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.3,
+            shadowRadius: 4,
+            elevation: 6,
+            zIndex: 10,
+          }}
+          activeOpacity={0.85}
+        >
+          <Text style={{ fontSize: 18, color: '#F4A94E', fontWeight: '900' }}>▲</Text>
+        </TouchableOpacity>
+      )}
       <BottomTabBar />
     </SafeAreaView>
   );
