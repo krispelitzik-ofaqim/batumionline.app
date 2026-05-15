@@ -5,6 +5,42 @@ import { Colors } from '../constants/colors';
 import { openInAppBrowser, bookingSearch, agodaSearch, gygSearch } from '../constants/affiliates';
 import MapEmbed from './MapEmbed';
 
+function PhotoGallery({ photos }: { photos: { ref: string; url: string }[] }) {
+  const [idx, setIdx] = useState(0);
+  if (!photos.length) return null;
+  const cur = photos[idx];
+  const prev = () => setIdx(i => (i - 1 + photos.length) % photos.length);
+  const next = () => setIdx(i => (i + 1) % photos.length);
+  return (
+    <View style={{ marginBottom: 12 }}>
+      <View style={{ width: '100%', height: 220, borderRadius: 12, backgroundColor: '#e2e8f0', overflow: 'hidden', position: 'relative' }}>
+        <Image source={{ uri: cur.url }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+        {photos.length > 1 && (
+          <>
+            <TouchableOpacity
+              onPress={prev}
+              style={{ position: 'absolute', left: 8, top: '50%', marginTop: -18, width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(0,0,0,0.55)', alignItems: 'center', justifyContent: 'center' }}
+              activeOpacity={0.85}
+            >
+              <Text style={{ color: '#fff', fontSize: 20, fontWeight: '900' }}>‹</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={next}
+              style={{ position: 'absolute', right: 8, top: '50%', marginTop: -18, width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(0,0,0,0.55)', alignItems: 'center', justifyContent: 'center' }}
+              activeOpacity={0.85}
+            >
+              <Text style={{ color: '#fff', fontSize: 20, fontWeight: '900' }}>›</Text>
+            </TouchableOpacity>
+            <View style={{ position: 'absolute', bottom: 8, alignSelf: 'center', paddingHorizontal: 10, paddingVertical: 3, borderRadius: 12, backgroundColor: 'rgba(0,0,0,0.55)' }}>
+              <Text style={{ color: '#fff', fontSize: 11, fontWeight: '800' }}>{idx + 1} / {photos.length}</Text>
+            </View>
+          </>
+        )}
+      </View>
+    </View>
+  );
+}
+
 type PlaceData = {
   found: boolean;
   name?: string;
@@ -53,16 +89,7 @@ export default function PlacesInfoModal({ query, title, onClose, hideHours, show
           ) : (
             <ScrollView style={{ maxHeight: 520 }} showsVerticalScrollIndicator={false}>
               {!!(data.photos && data.photos.length) && (
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 12 }} contentContainerStyle={{ gap: 6 }}>
-                  {data.photos!.map((ph, i) => (
-                    <Image
-                      key={ph.ref + i}
-                      source={{ uri: ph.url }}
-                      style={{ width: 180, height: 130, borderRadius: 10, backgroundColor: '#e2e8f0' }}
-                      resizeMode="cover"
-                    />
-                  ))}
-                </ScrollView>
+                <PhotoGallery photos={data.photos} />
               )}
               {!!data.mapsUri && (
                 <View style={{ height: 160, borderRadius: 12, overflow: 'hidden', marginBottom: 12, borderWidth: 1, borderColor: '#e2e8f0' }}>
