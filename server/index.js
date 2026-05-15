@@ -753,6 +753,29 @@ app.get('/api/places', async (req, res) => {
   }
 });
 
+// ─── Static Map proxy (multi-pin via Google Static Maps) ─────
+app.get('/api/static-map', async (req, res) => {
+  const key = process.env.GOOGLE_PLACES_KEY;
+  if (!key) return res.status(503).send('No key');
+  const points = String(req.query.points || '').trim();
+  const w = Math.min(640, Math.max(80, Number(req.query.w) || 600));
+  const h = Math.min(640, Math.max(80, Number(req.query.h) || 240));
+  const color = String(req.query.color || 'red').replace(/[^a-zA-Z0-9#]/g, '');
+  if (!points) return res.status(400).send('No points');
+  const markers = points.split(';').filter(Boolean).map(p => p.trim()).join('|');
+  const url = `https://maps.googleapis.com/maps/api/staticmap?size=${w}x${h}&scale=2&markers=color:${encodeURIComponent(color)}|${encodeURIComponent(markers)}&key=${key}`;
+  try {
+    const r = await fetch(url);
+    if (!r.ok) return res.status(r.status).send('Upstream');
+    res.setHeader('Content-Type', r.headers.get('content-type') || 'image/png');
+    res.setHeader('Cache-Control', 'public, max-age=3600');
+    const buf = await r.arrayBuffer();
+    res.send(Buffer.from(buf));
+  } catch (e) {
+    res.status(500).send('Map error');
+  }
+});
+
 // ─── Ratings ──────────────────────────────────────────────────
 app.get('/api/ratings', (req, res) => {
   try {
