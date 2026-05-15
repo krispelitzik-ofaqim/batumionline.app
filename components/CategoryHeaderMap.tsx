@@ -27,19 +27,9 @@ export default function CategoryHeaderMap({ points, color = '#1A6B8A', style, on
   });
 
   return (
-    <View style={[style, { position: 'relative' }]}>
-      <View style={{ position: 'relative', overflow: 'hidden', flex: 1 }}>
+    <View style={style}>
+      <View style={{ position: 'relative', overflow: 'hidden', height: 180, borderTopLeftRadius: 14, borderTopRightRadius: 14 }}>
         {frame}
-        <TouchableOpacity
-          onPress={() => setPickerOpen(!pickerOpen)}
-          style={{ position: 'absolute', top: 8, right: 8, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 18, backgroundColor: 'rgba(28,43,53,0.9)', zIndex: 6, flexDirection: 'row-reverse', alignItems: 'center', gap: 6 }}
-          activeOpacity={0.85}
-        >
-          <Text style={{ color: '#fff', fontSize: 12, fontWeight: '800', writingDirection: 'rtl' }}>
-            📍 {focus ? focus.name : 'בחר מיקום מבוקש'}
-          </Text>
-          <Text style={{ color: '#fff', fontSize: 10 }}>{pickerOpen ? '▲' : '▼'}</Text>
-        </TouchableOpacity>
         {onExpand && (
           <TouchableOpacity
             onPress={onExpand}
@@ -50,9 +40,20 @@ export default function CategoryHeaderMap({ points, color = '#1A6B8A', style, on
           </TouchableOpacity>
         )}
       </View>
-      {pickerOpen && (
-        <View style={{ position: 'absolute', top: 44, right: 8, width: 240, maxHeight: 280, backgroundColor: '#fff', borderRadius: 12, borderWidth: 1, borderColor: '#e2e8f0', zIndex: 10, overflow: 'hidden', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.2, shadowRadius: 8, elevation: 8 }}>
-          <ScrollView>
+
+      <View style={{ backgroundColor: '#fff', borderBottomLeftRadius: 14, borderBottomRightRadius: 14, borderWidth: 1, borderColor: '#e2e8f0', borderTopWidth: 0 }}>
+        <TouchableOpacity
+          onPress={() => setPickerOpen(!pickerOpen)}
+          style={{ paddingHorizontal: 14, paddingVertical: 12, flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between' }}
+          activeOpacity={0.85}
+        >
+          <Text style={{ color: '#1C2B35', fontSize: 13, fontWeight: '800', writingDirection: 'rtl' }}>
+            📍 {focus ? focus.name : 'בחר מיקום מבוקש'}
+          </Text>
+          <Text style={{ color: '#64748b', fontSize: 12 }}>{pickerOpen ? '▲' : '▼'}</Text>
+        </TouchableOpacity>
+        {pickerOpen && (
+          <ScrollView style={{ maxHeight: 260, borderTopWidth: 1, borderTopColor: '#f1f5f9' }}>
             <TouchableOpacity
               onPress={() => { setFocus(null); setPickerOpen(false); }}
               style={{ paddingVertical: 10, paddingHorizontal: 14, borderBottomWidth: 1, borderBottomColor: '#f1f5f9', backgroundColor: !focus ? '#eef6fa' : '#fff' }}
@@ -74,8 +75,8 @@ export default function CategoryHeaderMap({ points, color = '#1A6B8A', style, on
               );
             })}
           </ScrollView>
-        </View>
-      )}
+        )}
+      </View>
     </View>
   );
 }

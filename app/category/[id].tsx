@@ -1235,7 +1235,7 @@ export default function CategoryScreen() {
           const pts = mapPoints.length ? mapPoints : fallback;
           if (pts.length === 0) return null;
           return (
-            <View style={{ marginHorizontal: 12, marginTop: 8, marginBottom: 4, borderRadius: 14, overflow: 'hidden', height: 180, borderWidth: 1, borderColor: '#e2e8f0' }}>
+            <View style={{ marginHorizontal: 12, marginTop: 8, marginBottom: 8 }}>
               <CategoryHeaderMap points={pts} color={mapLayerColor} />
             </View>
           );
