@@ -753,6 +753,62 @@ app.get('/api/places', async (req, res) => {
   }
 });
 
+// ─── Admin: backfill hotel/villa photos from Places API ───────
+app.post('/api/admin/fetch-photos', async (req, res) => {
+  const key = process.env.GOOGLE_PLACES_KEY;
+  if (!key) return res.status(503).json({ error: 'No key' });
+  const { categoryId, placeholder = '/uploads/city.jpg' } = req.body || {};
+  if (!categoryId) return res.status(400).json({ error: 'categoryId required' });
+
+  const db = readDB();
+  const findCategory = (items) => {
+    for (const it of (items || [])) {
+      if (it.id === categoryId) return it;
+      const r = findCategory(it.children);
+      if (r) return r;
+    }
+    return null;
+  };
+  const cat = findCategory(db.mainCategories) || findCategory(db.extraCategories);
+  if (!cat || !Array.isArray(cat.hotels)) return res.status(404).json({ error: 'Category not found or no hotels' });
+
+  const results = [];
+  for (const h of cat.hotels) {
+    if (h.image && h.image !== placeholder && !h.image.includes('city.jpg')) {
+      results.push({ id: h.id, title: h.title, status: 'skip' });
+      continue;
+    }
+    try {
+      const r = await fetch('https://places.googleapis.com/v1/places:searchText', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Goog-Api-Key': key,
+          'X-Goog-FieldMask': 'places.photos,places.displayName',
+        },
+        body: JSON.stringify({ textQuery: `${h.titleEn || h.title} Batumi`, languageCode: 'en' }),
+      });
+      const data = await r.json();
+      const p = (data.places || [])[0];
+      const photoName = p?.photos?.[0]?.name;
+      if (!photoName) { results.push({ id: h.id, title: h.title, status: 'no-photo' }); continue; }
+      const photoUrl = `https://places.googleapis.com/v1/${photoName}/media?maxWidthPx=800&key=${key}`;
+      const imgRes = await fetch(photoUrl);
+      if (!imgRes.ok) { results.push({ id: h.id, title: h.title, status: 'fetch-failed' }); continue; }
+      const buf = Buffer.from(await imgRes.arrayBuffer());
+      const safe = (h.id || `hotel_${Date.now()}`).replace(/[^a-zA-Z0-9_-]/g, '');
+      const filename = `${safe}_${Date.now()}.jpg`;
+      fs.writeFileSync(path.join(UPLOADS_DIR, filename), buf);
+      h.image = `/uploads/${filename}`;
+      results.push({ id: h.id, title: h.title, status: 'updated', image: h.image });
+    } catch (e) {
+      results.push({ id: h.id, title: h.title, status: 'error', error: e.message });
+    }
+  }
+  writeDB(db);
+  res.json({ category: cat.title, count: results.length, results });
+});
+
 // ─── Static Map proxy (multi-pin via Google Static Maps) ─────
 app.get('/api/static-map', async (req, res) => {
   const key = process.env.GOOGLE_PLACES_KEY;
