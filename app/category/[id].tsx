@@ -21,7 +21,6 @@ import AppHeader from '../../components/AppHeader';
 import PlacesInfoModal from '../../components/PlacesInfoModal';
 import HtmlContent from '../../components/HtmlContent';
 import MapEmbed from '../../components/MapEmbed';
-import CategoryHeaderMap from '../../components/CategoryHeaderMap';
 import AddToTourButton from '../../components/AddToTourButton';
 
 type Hotel = { id: string; title: string; titleEn?: string; text: string; image: string; mapUrl?: string; pageUrl?: string; coords?: { lat: number; lng: number }; visible?: boolean; images?: string[]; amenities?: string[]; price?: string; audio?: string };
@@ -1213,19 +1212,6 @@ export default function CategoryScreen() {
             <Text style={{ fontSize: 11, fontWeight: '700', color: '#92400e', writingDirection: 'rtl' }}>תקופת ניסיון חינם - נותרו {trialHoursLeft} שעות</Text>
           </View>
         )}
-
-        {(() => {
-          const fallback = !mapPoints.length
-            ? (cat.hotels || []).filter(h => h.coords && h.visible !== false).map(h => ({ name: h.title, lat: h.coords!.lat, lng: h.coords!.lng }))
-            : [];
-          const pts = mapPoints.length ? mapPoints : fallback;
-          if (pts.length === 0) return null;
-          return (
-            <View style={{ marginHorizontal: 12, marginTop: 8, marginBottom: 4, borderRadius: 14, overflow: 'hidden', height: 180, borderWidth: 1, borderColor: '#e2e8f0' }}>
-              <CategoryHeaderMap points={pts} color={mapLayerColor} />
-            </View>
-          );
-        })()}
 
         {cat.tours && cat.tours.length > 0 ? (
           selectedTour ? (
