@@ -3,6 +3,7 @@ import { Modal, View, Text, TouchableOpacity, ScrollView, ActivityIndicator, Sty
 import { API_BASE } from '../constants/api';
 import { Colors } from '../constants/colors';
 import { openInAppBrowser, bookingSearch, agodaSearch, gygSearch } from '../constants/affiliates';
+import MapEmbed from './MapEmbed';
 
 type PlaceData = {
   found: boolean;
@@ -49,7 +50,12 @@ export default function PlacesInfoModal({ query, title, onClose, hideHours, show
           ) : !data?.found ? (
             <Text style={s.notFound}>לא נמצא מידע נוסף</Text>
           ) : (
-            <ScrollView style={{ maxHeight: 400 }} showsVerticalScrollIndicator={false}>
+            <ScrollView style={{ maxHeight: 500 }} showsVerticalScrollIndicator={false}>
+              {!!data.mapsUri && (
+                <View style={{ height: 160, borderRadius: 12, overflow: 'hidden', marginBottom: 12, borderWidth: 1, borderColor: '#e2e8f0' }}>
+                  <MapEmbed src={`https://www.google.com/maps?q=${encodeURIComponent(`${title} Batumi`)}&output=embed`} style={{ flex: 1 }} />
+                </View>
+              )}
               {typeof data.rating === 'number' && (
                 <View style={s.rowCenter}>
                   <Text style={s.star}>⭐</Text>

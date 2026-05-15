@@ -1228,19 +1228,6 @@ export default function CategoryScreen() {
           </View>
         )}
 
-        {(() => {
-          const fallback = !mapPoints.length
-            ? (cat.hotels || []).filter(h => h.coords && h.visible !== false).map(h => ({ name: h.title, lat: h.coords!.lat, lng: h.coords!.lng }))
-            : [];
-          const pts = mapPoints.length ? mapPoints : fallback;
-          if (pts.length === 0) return null;
-          return (
-            <View style={{ marginHorizontal: 12, marginTop: 8, marginBottom: 8 }}>
-              <CategoryHeaderMap points={pts} color={mapLayerColor} />
-            </View>
-          );
-        })()}
-
         {cat.tours && cat.tours.length > 0 ? (
           selectedTour ? (
             <View style={st.hotelList}>
