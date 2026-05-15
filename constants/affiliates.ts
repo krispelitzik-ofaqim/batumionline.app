@@ -3,6 +3,10 @@ import { Platform } from 'react-native';
 
 export const GYG_PARTNER_ID = 'PE2GLSE3MAO4YDEIXLNOYXMC67BCZ32C';
 
+// Travelpayouts short links (Batumionline campaign)
+export const TIQETS_LINK = 'https://tiqets.tpk.lv/OwII8uTI';
+export const AVIASALES_LINK = 'https://aviasales.tpk.lv/aO3LLEiP';
+
 export async function openInAppBrowser(url: string) {
   if (Platform.OS === 'web') {
     if (typeof window !== 'undefined') window.open(url, '_blank');
