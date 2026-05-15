@@ -936,6 +936,10 @@ function SubCard({ item, width, onPress }: { item: Item; width: number; onPress:
   const iconIsImage = !!item.icon && (item.icon.startsWith('data:') || item.icon.startsWith('http') || item.icon.startsWith('/'));
   const bg = item.bg || '#3DA5C4';
   const bgDark = item.bgDark || '#1A6B8A';
+  const count =
+    (item.hotels?.filter(h => h.visible !== false).length) ||
+    (item.tours?.filter(t => t.visible !== false).length) ||
+    (item.children?.filter(c => c.visible !== false).length) || 0;
   return (
     <TouchableOpacity style={[st.card, { width }]} activeOpacity={0.7} onPress={onPress}>
       {iconIsImage ? (
@@ -946,7 +950,10 @@ function SubCard({ item, width, onPress }: { item: Item; width: number; onPress:
         </LinearGradient>
       )}
       <View style={st.cardBottom}>
-        <Text style={st.cardTitle} numberOfLines={2}>{item.title}</Text>
+        <Text style={st.cardTitle} numberOfLines={2}>
+          {item.title}
+          {count > 0 ? <Text style={{ fontSize: 11, color: 'rgba(28,43,53,0.5)', fontWeight: '600' }}> ({count})</Text> : null}
+        </Text>
         {item.subtitle ? <Text style={st.cardSub} numberOfLines={1}>{item.subtitle}</Text> : null}
       </View>
     </TouchableOpacity>
