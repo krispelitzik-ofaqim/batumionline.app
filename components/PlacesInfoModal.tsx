@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Modal, View, Text, TouchableOpacity, ScrollView, ActivityIndicator, StyleSheet, Linking, Platform } from 'react-native';
+import { Modal, View, Text, TouchableOpacity, ScrollView, ActivityIndicator, StyleSheet, Linking, Platform, Image } from 'react-native';
 import { API_BASE } from '../constants/api';
 import { Colors } from '../constants/colors';
 import { openInAppBrowser, bookingSearch, agodaSearch, gygSearch } from '../constants/affiliates';
@@ -16,6 +16,7 @@ type PlaceData = {
   mapsUri?: string;
   openingHours?: string[];
   openNow?: boolean | null;
+  photos?: { ref: string; url: string }[];
 };
 
 export default function PlacesInfoModal({ query, title, onClose, hideHours, showHotelPrices, showAttractionTickets, isRestaurant }: { query: string; title: string; onClose: () => void; hideHours?: boolean; showHotelPrices?: boolean; showAttractionTickets?: boolean; isRestaurant?: boolean }) {
@@ -50,7 +51,19 @@ export default function PlacesInfoModal({ query, title, onClose, hideHours, show
           ) : !data?.found ? (
             <Text style={s.notFound}>לא נמצא מידע נוסף</Text>
           ) : (
-            <ScrollView style={{ maxHeight: 500 }} showsVerticalScrollIndicator={false}>
+            <ScrollView style={{ maxHeight: 520 }} showsVerticalScrollIndicator={false}>
+              {!!(data.photos && data.photos.length) && (
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 12 }} contentContainerStyle={{ gap: 6 }}>
+                  {data.photos!.map((ph, i) => (
+                    <Image
+                      key={ph.ref + i}
+                      source={{ uri: ph.url }}
+                      style={{ width: 180, height: 130, borderRadius: 10, backgroundColor: '#e2e8f0' }}
+                      resizeMode="cover"
+                    />
+                  ))}
+                </ScrollView>
+              )}
               {!!data.mapsUri && (
                 <View style={{ height: 160, borderRadius: 12, overflow: 'hidden', marginBottom: 12, borderWidth: 1, borderColor: '#e2e8f0' }}>
                   <MapEmbed src={`https://www.google.com/maps?q=${encodeURIComponent(`${title} Batumi`)}&output=embed`} style={{ flex: 1 }} />

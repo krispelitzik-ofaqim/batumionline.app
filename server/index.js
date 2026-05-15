@@ -719,7 +719,7 @@ app.get('/api/places', async (req, res) => {
       headers: {
         'Content-Type': 'application/json',
         'X-Goog-Api-Key': key,
-        'X-Goog-FieldMask': 'places.displayName,places.rating,places.userRatingCount,places.internationalPhoneNumber,places.googleMapsUri,places.websiteUri,places.currentOpeningHours,places.formattedAddress',
+        'X-Goog-FieldMask': 'places.displayName,places.rating,places.userRatingCount,places.internationalPhoneNumber,places.googleMapsUri,places.websiteUri,places.currentOpeningHours,places.formattedAddress,places.photos',
       },
       body: JSON.stringify({ textQuery: query, languageCode: lang }),
     });
@@ -728,7 +728,7 @@ app.get('/api/places', async (req, res) => {
     const p = (data.places || [])[0];
     if (!p) { placesCache[cacheKey] = { data: { found: false }, fetchedAt: Date.now() }; return res.json({ found: false, cached: false }); }
 
-    const photos = (p.photos || []).slice(0, 5).map(ph => ({
+    const photos = (p.photos || []).slice(0, 10).map(ph => ({
       ref: ph.name,
       url: `https://places.googleapis.com/v1/${ph.name}/media?maxWidthPx=800&key=${key}`,
     }));
