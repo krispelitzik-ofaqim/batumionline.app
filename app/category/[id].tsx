@@ -1203,7 +1203,21 @@ export default function CategoryScreen() {
               {cat.icon ? <Text style={{ fontSize: 28 }}>{cat.icon}</Text> : null}
               <Text style={[st.heroTitle, darkCat && { color: '#F4A94E' }]}>{cat.title}</Text>
             </View>
-            {cat.subtitle ? <Text style={[st.heroSub, darkCat && { color: '#d4af37' }]}>{cat.subtitle}</Text> : null}
+            {(() => {
+              const heroCount =
+                (cat.hotels?.filter(h => h.visible !== false).length) ||
+                (cat.tours?.filter(t => t.visible !== false).length) ||
+                (cat.children?.filter((c: any) => c.visible !== false).length) || 0;
+              if (cat.subtitle || heroCount > 0) {
+                return (
+                  <Text style={[st.heroSub, darkCat && { color: '#d4af37' }]}>
+                    {cat.subtitle || ''}
+                    {heroCount > 0 ? <Text style={{ opacity: 0.7 }}>{cat.subtitle ? ' ' : ''}({heroCount})</Text> : null}
+                  </Text>
+                );
+              }
+              return null;
+            })()}
           </View>
         )}
 
