@@ -1228,14 +1228,14 @@ export default function CategoryScreen() {
           </View>
         )}
 
-        {(rootId === '2' || rootId === '6') && (() => {
+        {(rootId === '2' || rootId === '6' || rootId === '7') && (() => {
           const fallback = (cat.hotels || [])
             .filter(h => h.coords && h.visible !== false)
             .map(h => ({ name: h.title, lat: h.coords!.lat, lng: h.coords!.lng }));
           const pts = mapPoints.length ? mapPoints : fallback;
           if (pts.length === 0) return null;
-          const bannerText = rootId === '2' ? 'איזו אטרקציה קרובה אליי עכשיו?' : 'איזו מסעדה מומלצת קרובה אליי עכשיו?';
-          const filterParam = rootId === '2' ? 'אטרקצי' : 'מסעד';
+          const bannerText = rootId === '2' ? 'איזו אטרקציה קרובה אליי עכשיו?' : rootId === '6' ? 'איזו מסעדה מומלצת קרובה אליי עכשיו?' : 'איזו חנות קרובה אליי עכשיו?';
+          const filterParam = rootId === '2' ? 'אטרקצי' : rootId === '6' ? 'מסעד' : 'קני';
           const expandToTab = () => router.push('/(tabs)/map' as any);
           return (
             <View style={{ marginHorizontal: 12, marginTop: 8, marginBottom: 8 }}>
