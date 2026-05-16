@@ -831,6 +831,87 @@ app.post('/api/admin/set-tile-icon', (req, res) => {
   res.json({ category: cat.title, icon: cat.icon });
 });
 
+// ─── Admin: bulk populate category from Places search ─────────
+app.post('/api/admin/populate-category', async (req, res) => {
+  const key = process.env.GOOGLE_PLACES_KEY;
+  if (!key) return res.status(503).json({ error: 'No key' });
+  const { categoryId, query, count = 10 } = req.body || {};
+  if (!categoryId || !query) return res.status(400).json({ error: 'categoryId + query required' });
+
+  const db = readDB();
+  const find = (items) => {
+    for (const it of (items || [])) {
+      if (it.id === categoryId) return it;
+      const r = find(it.children);
+      if (r) return r;
+    }
+    return null;
+  };
+  const cat = find(db.mainCategories) || find(db.extraCategories);
+  if (!cat) return res.status(404).json({ error: 'Category not found' });
+
+  try {
+    const r = await fetch('https://places.googleapis.com/v1/places:searchText', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Goog-Api-Key': key,
+        'X-Goog-FieldMask': 'places.id,places.displayName,places.formattedAddress,places.location,places.googleMapsUri,places.websiteUri,places.rating,places.userRatingCount,places.photos',
+      },
+      body: JSON.stringify({ textQuery: query, languageCode: 'he', maxResultCount: Math.min(20, Number(count) * 2) }),
+    });
+    if (!r.ok) return res.status(r.status).json({ error: `Upstream ${r.status}` });
+    const data = await r.json();
+    const places = (data.places || []).slice(0, Number(count));
+    if (!places.length) return res.json({ added: 0, places: [] });
+
+    const existing = new Set((cat.hotels || []).map(h => (h.titleEn || h.title || '').toLowerCase()));
+    const added = [];
+    let nextNum = (cat.hotels || []).length + 1;
+    for (const p of places) {
+      const name = p.displayName?.text || '';
+      if (!name || existing.has(name.toLowerCase())) continue;
+      // Download photo
+      let imagePath = '';
+      try {
+        const photoName = p.photos?.[0]?.name;
+        if (photoName) {
+          const photoUrl = `https://places.googleapis.com/v1/${photoName}/media?maxWidthPx=800&key=${key}`;
+          const ir = await fetch(photoUrl);
+          if (ir.ok) {
+            const buf = Buffer.from(await ir.arrayBuffer());
+            const filename = `${categoryId}_${nextNum}_${Date.now()}.jpg`;
+            fs.writeFileSync(path.join(UPLOADS_DIR, filename), buf);
+            imagePath = `/uploads/${filename}`;
+          }
+        }
+      } catch {}
+      const lat = p.location?.latitude;
+      const lng = p.location?.longitude;
+      const item = {
+        id: `${categoryId}_${nextNum}`,
+        title: name,
+        titleEn: name,
+        text: p.formattedAddress || '',
+        image: imagePath,
+        pageUrl: p.websiteUri || '',
+        mapUrl: p.googleMapsUri || (lat && lng ? `https://www.google.com/maps?q=${lat},${lng}` : ''),
+        coords: lat && lng ? { lat, lng } : undefined,
+        visible: true,
+      };
+      cat.hotels = cat.hotels || [];
+      cat.hotels.push(item);
+      existing.add(name.toLowerCase());
+      added.push({ id: item.id, title: name, image: imagePath });
+      nextNum++;
+    }
+    writeDB(db);
+    res.json({ category: cat.title, added: added.length, items: added });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 // ─── Diagnostic: check DATA_DIR mount ─────────────────────────
 app.get('/api/admin/diag', (req, res) => {
   try {
