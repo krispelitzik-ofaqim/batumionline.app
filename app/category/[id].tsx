@@ -1670,7 +1670,7 @@ const st = StyleSheet.create({
   },
   cardTop: { height: 80, alignItems: 'center', justifyContent: 'center' },
   cardIcon: { fontSize: 48 },
-  cardBottom: { backgroundColor: Colors.WHITE, paddingVertical: 6, paddingHorizontal: 10, minHeight: 44 },
+  cardBottom: { backgroundColor: Colors.WHITE, paddingVertical: 6, paddingHorizontal: 10, height: 56 },
   cardTitle: { fontSize: 12, fontWeight: 'bold', color: '#1C2B35', textAlign: 'right', writingDirection: 'rtl' },
   cardSub: { fontSize: 10, color: '#666', textAlign: 'right', writingDirection: 'rtl', marginTop: 1 },
 
