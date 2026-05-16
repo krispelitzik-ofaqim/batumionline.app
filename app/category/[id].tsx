@@ -1302,10 +1302,10 @@ export default function CategoryScreen() {
                 ) : (
                   <TouchableOpacity
                     onPress={() => router.push(`/(tabs)/map?near=1&filter=${encodeURIComponent(filterParam)}` as any)}
-                    activeOpacity={0.9}
-                    style={{ marginTop: 8, flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'center', backgroundColor: '#F4A94E', borderRadius: 14, paddingVertical: 14, paddingHorizontal: 14, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.15, shadowRadius: 4, elevation: 3 }}
+                    activeOpacity={0.85}
+                    style={{ marginTop: 8, flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'center', backgroundColor: '#fff', borderRadius: 12, paddingVertical: 10, paddingHorizontal: 14, borderWidth: 1, borderColor: '#e2e8f0' }}
                   >
-                    <Text style={{ fontSize: 14, fontWeight: '900', color: '#1C2B35', writingDirection: 'rtl', textAlign: 'center' }}>{bannerText}</Text>
+                    <Text style={{ fontSize: 13, fontWeight: '800', color: '#1A6B8A', writingDirection: 'rtl', textAlign: 'center' }}>{bannerText}</Text>
                   </TouchableOpacity>
                 )}
               </View>
