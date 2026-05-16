@@ -247,22 +247,6 @@ export default function HomeScreen() {
         style={styles.scroll}
         showsVerticalScrollIndicator={false}
       >
-        {/* Hero demo */}
-        <View style={{ marginHorizontal: 12, marginTop: 8, marginBottom: 4, borderRadius: 18, overflow: 'hidden', height: 220, position: 'relative' }}>
-          <Image source={require('../../assets/welcome/galery1.jpg')} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' } as any} resizeMode="cover" />
-          <View style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.32)' }} />
-          <View style={{ position: 'absolute', left: 18, right: 18, bottom: 16 }}>
-            <View style={{ alignSelf: 'flex-end', backgroundColor: 'rgba(244,169,78,0.95)', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 999, marginBottom: 8 }}>
-              <Text style={{ color: '#1C2B35', fontSize: 11, fontWeight: '900', letterSpacing: 0.5 }}>חדש · קיץ 2026</Text>
-            </View>
-            <Text style={{ color: '#fff', fontSize: 22, fontWeight: '900', writingDirection: 'rtl', textAlign: 'right', textShadowColor: 'rgba(0,0,0,0.5)', textShadowOffset: { width: 0, height: 2 }, textShadowRadius: 6 }}>הטיול שלך בבטומי 🌊</Text>
-            <Text style={{ color: '#fff', fontSize: 12, fontWeight: '600', opacity: 0.95, writingDirection: 'rtl', textAlign: 'right', marginTop: 2, marginBottom: 12, textShadowColor: 'rgba(0,0,0,0.5)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 4 }}>מלונות, אטרקציות ומסעדות — הכל ביד אחת</Text>
-            <TouchableOpacity activeOpacity={0.85} style={{ alignSelf: 'flex-end', backgroundColor: '#F4A94E', paddingHorizontal: 18, paddingVertical: 10, borderRadius: 999, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.25, shadowRadius: 8 }}>
-              <Text style={{ color: '#1C2B35', fontSize: 13, fontWeight: '900' }}>גלה ←</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
         {/* Header */}
         <View style={styles.header}>
           <EditableText value={editHeaderTitle} onChangeText={setEditHeaderTitle} editMode={editMode} textStyle={styles.headerTitle} />
