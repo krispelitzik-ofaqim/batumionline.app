@@ -24,6 +24,7 @@ import MapEmbed from '../../components/MapEmbed';
 import CategoryHeaderMap from '../../components/CategoryHeaderMap';
 import AddToTourButton from '../../components/AddToTourButton';
 import RecommendGuideButton from '../../components/RecommendGuideButton';
+import RecommendDriverButton from '../../components/RecommendDriverButton';
 
 type Hotel = { id: string; title: string; titleEn?: string; text: string; image: string; mapUrl?: string; pageUrl?: string; coords?: { lat: number; lng: number }; visible?: boolean; images?: string[]; amenities?: string[]; price?: string; audio?: string; photoAttribution?: { name: string; uri?: string } };
 type TourBlock = { id: string; title: string; subtitle?: string; text: string; color: string; images: string[]; audios: { title?: string; url: string }[]; visible?: boolean; coords?: { lat: number; lng: number } };
@@ -1426,6 +1427,22 @@ export default function CategoryScreen() {
                   ))}
                 </View>
                 <RecommendGuideButton categoryId="10" mode={guideMode} />
+                <TouchableOpacity
+                  onPress={() => router.push('/category/a8' as any)}
+                  activeOpacity={0.85}
+                  style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#1A6B8A', borderRadius: 14, paddingVertical: 12, paddingHorizontal: 14, marginBottom: 10 }}
+                >
+                  <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 8, flex: 1 }}>
+                    <Text style={{ fontSize: 22 }}>🚖</Text>
+                    <Text style={{ flex: 1, color: '#fff', fontSize: 14, fontWeight: '900', writingDirection: 'rtl' }}>צריך נהג / טרנספר? עבור לנסיעות פרטיות</Text>
+                  </View>
+                  <Text style={{ color: '#F4A94E', fontSize: 16, fontWeight: '900' }}>←</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+            {cat.id === 'a8' && (
+              <View style={{ paddingHorizontal: 12, paddingTop: 4 }}>
+                <RecommendDriverButton categoryId="a8" />
               </View>
             )}
             {cat.longText && cat.hotels.length <= 10 && (
