@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, Modal, TextInput, ScrollView, Alert, Imag
 import * as ImagePicker from 'expo-image-picker';
 import { API_BASE } from '../constants/api';
 import { Colors } from '../constants/colors';
+import { markSubmitted } from './DeleteMySubmission';
 
 type Props = { categoryId: string };
 
@@ -40,6 +41,7 @@ export default function RecommendDriverButton({ categoryId }: Props) {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ categoryId, mode: 'driver', name, phone, languages: `${languages}${carType ? ' · ' + carType : ''}`, whatsapp, facebook: '', website, note, photo }),
       });
+      await markSubmitted(phone);
       Alert.alert('תודה!', 'הפרטים התקבלו. נחזור אליך בקרוב.');
       setOpen(false);
       setName(''); setPhone(''); setLanguages(''); setCarType(''); setWhatsapp(''); setWebsite(''); setNote(''); setPhoto(null);

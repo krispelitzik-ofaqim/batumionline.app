@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, Modal, TextInput, ScrollView, Alert, Imag
 import * as ImagePicker from 'expo-image-picker';
 import { API_BASE } from '../constants/api';
 import { Colors } from '../constants/colors';
+import { markSubmitted } from './DeleteMySubmission';
 
 type Props = { categoryId: string; mode: 'israeli' | 'local' };
 
@@ -40,6 +41,7 @@ export default function RecommendGuideButton({ categoryId, mode }: Props) {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ categoryId, mode, name, phone, languages, whatsapp, facebook, website, note, photo }),
       });
+      await markSubmitted(phone);
       Alert.alert('תודה!', 'הפנייה שלך התקבלה. נחזור אליך בקרוב.');
       setOpen(false);
       setName(''); setPhone(''); setLanguages(''); setWhatsapp(''); setFacebook(''); setWebsite(''); setNote(''); setPhoto(null);
