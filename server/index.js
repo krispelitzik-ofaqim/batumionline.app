@@ -831,6 +831,39 @@ app.post('/api/admin/set-tile-icon', (req, res) => {
   res.json({ category: cat.title, icon: cat.icon });
 });
 
+// ─── Guide recommendation/self-upload ─────────────────────────
+app.post('/api/guide-recommend', (req, res) => {
+  try {
+    const { categoryId, mode, name, phone, languages, whatsapp, facebook, website, note, photo } = req.body || {};
+    if (!name || !phone) return res.status(400).json({ error: 'name+phone required' });
+    const db = readDB();
+    if (!Array.isArray(db.guideRecommendations)) db.guideRecommendations = [];
+    let photoPath = '';
+    if (photo && typeof photo === 'string' && photo.startsWith('data:')) {
+      try {
+        const m = photo.match(/^data:image\/[a-z]+;base64,(.+)$/);
+        if (m) {
+          const buf = Buffer.from(m[1], 'base64');
+          const filename = `guide_${Date.now()}.jpg`;
+          fs.writeFileSync(path.join(UPLOADS_DIR, filename), buf);
+          photoPath = `/uploads/${filename}`;
+        }
+      } catch {}
+    }
+    db.guideRecommendations.push({
+      id: 'gr_' + Date.now(),
+      categoryId, mode, name, phone, languages, whatsapp, facebook, website, note,
+      photo: photoPath,
+      createdAt: new Date().toISOString(),
+      approved: false,
+    });
+    writeDB(db);
+    res.json({ success: true });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 // ─── Admin: bulk populate category from Places search ─────────
 app.post('/api/admin/populate-category', async (req, res) => {
   const key = process.env.GOOGLE_PLACES_KEY;

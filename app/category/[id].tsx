@@ -23,6 +23,7 @@ import HtmlContent from '../../components/HtmlContent';
 import MapEmbed from '../../components/MapEmbed';
 import CategoryHeaderMap from '../../components/CategoryHeaderMap';
 import AddToTourButton from '../../components/AddToTourButton';
+import RecommendGuideButton from '../../components/RecommendGuideButton';
 
 type Hotel = { id: string; title: string; titleEn?: string; text: string; image: string; mapUrl?: string; pageUrl?: string; coords?: { lat: number; lng: number }; visible?: boolean; images?: string[]; amenities?: string[]; price?: string; audio?: string };
 type TourBlock = { id: string; title: string; subtitle?: string; text: string; color: string; images: string[]; audios: { title?: string; url: string }[]; visible?: boolean; coords?: { lat: number; lng: number } };
@@ -940,7 +941,7 @@ function SubCard({ item, width, onPress }: { item: Item; width: number; onPress:
   const count =
     (item.hotels?.filter(h => h.visible !== false).length) ||
     (item.tours?.filter(t => t.visible !== false).length) ||
-    (item.children?.filter(c => c.visible !== false).length) || 0;
+    (item.children?.filter((c: any) => c.visible !== false).length) || 0;
   return (
     <TouchableOpacity style={[st.card, { width }]} activeOpacity={0.7} onPress={onPress}>
       {iconIsImage ? (
@@ -994,6 +995,7 @@ export default function CategoryScreen() {
   const w = simulatedWidth ? Math.min(simulatedWidth, screenW) : screenW;
   const cardW = (w - 48) / 2;
   const [showTopBtn, setShowTopBtn] = useState(false);
+  const [guideMode, setGuideMode] = useState<'israeli' | 'local'>('israeli');
 
   const [cat, setCat] = useState<Item | null>(null);
   const [rootId, setRootId] = useState<string | null>(null);
@@ -1374,6 +1376,25 @@ export default function CategoryScreen() {
           })()
         ) : cat.hotels && cat.hotels.length > 0 ? (
           <View style={st.hotelList}>
+            {cat.id === '10' && (
+              <View style={{ paddingHorizontal: 12, paddingTop: 4 }}>
+                <View style={{ flexDirection: 'row-reverse', backgroundColor: '#f1f5f9', borderRadius: 22, padding: 4, marginBottom: 6 }}>
+                  {(['israeli','local'] as const).map(m => (
+                    <TouchableOpacity
+                      key={m}
+                      onPress={() => setGuideMode(m)}
+                      activeOpacity={0.85}
+                      style={{ flex: 1, paddingVertical: 10, borderRadius: 18, backgroundColor: guideMode === m ? Colors.PRIMARY : 'transparent', alignItems: 'center' }}
+                    >
+                      <Text style={{ fontSize: 13, fontWeight: '900', color: guideMode === m ? '#fff' : '#475569', writingDirection: 'rtl' }}>
+                        {m === 'israeli' ? '🇮🇱 ישראלים' : '🇬🇪 מקומיים'}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+                <RecommendGuideButton categoryId="10" mode={guideMode} />
+              </View>
+            )}
             {cat.longText && cat.hotels.length <= 10 && (
               <View style={{ width: '100%', alignSelf: 'stretch', paddingHorizontal: 16, paddingTop: 8 }}>
                 <HtmlContent html={cat.longText} baseStyle={{ color: darkCat ? '#e2e8f0' : Colors.TEXT, textAlign: 'right', writingDirection: 'rtl' }} />
@@ -1384,7 +1405,7 @@ export default function CategoryScreen() {
                 <AudioPlayer tracks={[{ title: cat.title, url: cat.introAudio }]} compact playOnLeft tint={darkCat ? '#1A6B8A' : undefined} textLight={darkCat} ringPlay={darkCat} />
               </View>
             )}
-            {cat.hotels.filter(h => h.visible !== false).map(h => (
+            {cat.hotels.filter(h => h.visible !== false && (cat.id !== '10' || Boolean((h as any).isLocal) === (guideMode === 'local'))).map(h => (
               cat.cardStyle === 'passport'
                 ? <PassportCard key={h.id} h={h} pageBtnLabel={cat.pageBtnLabel || 'אתר/פייסבוק'} />
                 : cat.cardStyle === 'foodie'
