@@ -338,6 +338,16 @@ export default function FlightsModal({ visible, onClose, bgColor }: { visible: b
 
           <Text style={s.code}>TLV — BUS  •  {new Date().toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</Text>
 
+          {/* Search flights CTA */}
+          <TouchableOpacity
+            onPress={() => Linking.openURL('https://www.aviasales.com/search/TLV01BUS01?marker=X5SEJjUA')}
+            activeOpacity={0.85}
+            style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: '#F4A94E', paddingVertical: 12, paddingHorizontal: 18, borderRadius: 999, marginVertical: 10, alignSelf: 'center' }}
+          >
+            <Text style={{ fontSize: 18 }}>✈️</Text>
+            <Text style={{ color: '#1C2B35', fontSize: 14, fontWeight: '900' }}>חפש טיסה זולה</Text>
+          </TouchableOpacity>
+
           {/* Tabs */}
           <View style={s.tabRow}>
             <TouchableOpacity style={[s.tab, tab === 'departure' && s.tabActive]} onPress={() => setTab('departure')}>
