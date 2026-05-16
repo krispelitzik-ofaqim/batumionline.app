@@ -1239,6 +1239,30 @@ export default function CategoryScreen() {
           </View>
         )}
 
+        {rootId === '5' && (() => {
+          const aviasalesUrl = `https://www.aviasales.com/search/TLV01BUS01?marker=X5SEJjUA`;
+          return (
+            <View style={{ marginHorizontal: 12, marginTop: 8, marginBottom: 8 }}>
+              <TouchableOpacity
+                onPress={() => Linking.openURL(aviasalesUrl)}
+                activeOpacity={0.9}
+                style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#1A6B8A', borderRadius: 14, paddingVertical: 14, paddingHorizontal: 16, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.15, shadowRadius: 4, elevation: 3 }}
+              >
+                <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 10, flex: 1 }}>
+                  <Text style={{ fontSize: 26 }}>✈️</Text>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 15, fontWeight: '900', color: '#fff', writingDirection: 'rtl' }}>חפש טיסה לבטומי</Text>
+                    <Text style={{ fontSize: 12, color: '#fff', writingDirection: 'rtl', opacity: 0.85 }}>טיסות מתל-אביב במחיר הטוב ביותר</Text>
+                  </View>
+                </View>
+                <View style={{ backgroundColor: '#F4A94E', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 18 }}>
+                  <Text style={{ color: '#1C2B35', fontSize: 13, fontWeight: '900' }}>חפש</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+          );
+        })()}
+
         {(rootId === '2' || rootId === '6' || rootId === '7') && (() => {
           const fallback = (cat.hotels || [])
             .filter(h => h.coords && h.visible !== false)
