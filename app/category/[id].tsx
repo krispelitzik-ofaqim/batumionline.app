@@ -1252,7 +1252,7 @@ export default function CategoryScreen() {
           </View>
         )}
 
-        {rootId === '5' && (() => {
+        {id === '5' && (() => {
           const aviasalesUrl = `https://www.aviasales.com/?origin_iata=TLV&destination_iata=BUS&marker=X5SEJjUA`;
           return (
             <View style={{ marginHorizontal: 12, marginTop: 8, marginBottom: 8 }}>
@@ -2053,8 +2053,8 @@ const artSt = StyleSheet.create({
   tabRow: { flexDirection: 'row-reverse', gap: 6, marginBottom: 12, flexWrap: 'wrap' },
   tab: { flex: 1, minWidth: 90, paddingVertical: 10, borderRadius: 10, backgroundColor: '#e2e8f0', alignItems: 'center' },
   tabTxt: { fontSize: 12, fontWeight: '800', color: Colors.TEXT, textAlign: 'center', writingDirection: 'rtl' },
-  btnRow: { flexDirection: 'row-reverse', gap: 8, flexWrap: 'wrap' },
-  actionBtn: { flex: 1, minWidth: 100, paddingVertical: 12, borderRadius: 10, alignItems: 'center' },
+  btnRow: { flexDirection: 'row-reverse', gap: 8, flexWrap: 'wrap', justifyContent: 'center' },
+  actionBtn: { minWidth: 140, paddingHorizontal: 16, paddingVertical: 12, borderRadius: 10, alignItems: 'center' },
   actionBtnTxt: { color: Colors.WHITE, fontWeight: '800', fontSize: 13 },
   tableHeader: { flexDirection: 'row-reverse', borderBottomWidth: 2, borderBottomColor: '#cbd5e1', paddingBottom: 8, marginBottom: 4 },
   tableRow: { flexDirection: 'row-reverse', paddingVertical: 8, borderRadius: 6 },
