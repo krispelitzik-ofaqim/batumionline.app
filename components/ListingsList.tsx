@@ -11,7 +11,7 @@ type Listing = {
 };
 
 const PERIOD_LABEL: Record<string, string> = { daily: 'יומי', monthly: 'חודשי', yearly: 'שנתי', other: 'אחר' };
-const ADMIN_WA = '972XXXXXXXXX'; // TODO: replace with admin's WhatsApp number
+const ADMIN_WA = '972350944067';
 const shortId = (id: string, createdAt?: string) => {
   // 4-digit numeric hash from id + "-" + 2-digit year
   const s = id.replace(/^lst_/, '');
