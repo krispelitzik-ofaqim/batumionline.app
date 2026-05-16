@@ -1236,10 +1236,11 @@ export default function CategoryScreen() {
           if (pts.length === 0) return null;
           const bannerText = rootId === '2' ? 'איזו אטרקציה קרובה אליי עכשיו?' : 'איזו מסעדה מומלצת קרובה אליי עכשיו?';
           const filterParam = rootId === '2' ? 'אטרקצי' : 'מסעד';
+          const expandToTab = () => router.push('/(tabs)/map' as any);
           return (
             <View style={{ marginHorizontal: 12, marginTop: 8, marginBottom: 8 }}>
               <View style={{ borderRadius: 14, overflow: 'hidden' }}>
-                <CategoryHeaderMap points={pts} color={mapLayerColor} />
+                <CategoryHeaderMap points={pts} color={mapLayerColor} onExpand={expandToTab} />
               </View>
               <TouchableOpacity
                 onPress={() => router.push(`/(tabs)/map?near=1&filter=${encodeURIComponent(filterParam)}` as any)}
