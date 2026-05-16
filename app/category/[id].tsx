@@ -944,11 +944,10 @@ function HotelMap({ coords, title, onClose }: { coords: { lat: number; lng: numb
   );
 }
 
-function SubCard({ item, width, onPress, parentBg, parentBgDark }: { item: Item; width: number; onPress: () => void; parentBg?: string; parentBgDark?: string }) {
+function SubCard({ item, width, onPress }: { item: Item; width: number; onPress: () => void }) {
   const iconIsImage = !!item.icon && (item.icon.startsWith('data:') || item.icon.startsWith('http') || item.icon.startsWith('/'));
-  const itemBgIsLight = !!item.bg && isLight(item.bg);
-  const bg = (!item.bg || itemBgIsLight) ? (parentBg || item.bg || '#3DA5C4') : item.bg;
-  const bgDark = item.bgDark || parentBgDark || '#1A6B8A';
+  const bg = item.bg || '#3DA5C4';
+  const bgDark = item.bgDark || '#1A6B8A';
   const count =
     (item.hotels?.filter(h => h.visible !== false).length) ||
     (item.tours?.filter(t => t.visible !== false).length) ||
@@ -1189,7 +1188,7 @@ export default function CategoryScreen() {
   }
 
   return (
-    <SafeAreaView edges={['top','left','right']} style={[st.safe, { backgroundColor: '#fff' }, darkCat && { backgroundColor: cat.heroBg || '#0f1419' }]}>
+    <SafeAreaView edges={['top','left','right']} style={[st.safe, { backgroundColor: '#E8DCC4' }, darkCat && { backgroundColor: cat.heroBg || '#0f1419' }]}>
       <Stack.Screen options={{ headerShown: false }} />
       <DevicePreviewBar />
       <AppHeader crumbs={crumbs} dark={darkCat} />
@@ -1402,8 +1401,6 @@ export default function CategoryScreen() {
                         key={ch.id}
                         item={ch}
                         width={cardW}
-                        parentBg={cat.bg}
-                        parentBgDark={cat.bgDark}
                         onPress={() => router.push(`/category/${ch.id}` as any)}
                       />
                     ))}
@@ -1411,8 +1408,6 @@ export default function CategoryScreen() {
                       <SubCard
                         item={{ id: 'my-tours', title: 'הסיורים שלי', icon: '❤️', bg: '#FFD6E0', subtitle: 'סיורים שאתה מרכיב' } as any}
                         width={cardW}
-                        parentBg={cat.bg}
-                        parentBgDark={cat.bgDark}
                         onPress={() => router.push('/my-tours' as any)}
                       />
                     )}
