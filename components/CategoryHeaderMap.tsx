@@ -29,7 +29,7 @@ export default function CategoryHeaderMap({ points, color = '#1A6B8A', style }: 
 
   return (
     <View style={style}>
-      <View style={{ position: 'relative', overflow: 'hidden', height: expanded ? 360 : 180, borderTopLeftRadius: 14, borderTopRightRadius: 14 }}>
+      <View style={{ position: 'relative', overflow: 'hidden', height: expanded ? 360 : 180 }}>
         {frame}
         <TouchableOpacity
           onPress={() => setExpanded(!expanded)}
