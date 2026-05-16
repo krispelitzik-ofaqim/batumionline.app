@@ -831,6 +831,26 @@ app.post('/api/admin/set-tile-icon', (req, res) => {
   res.json({ category: cat.title, icon: cat.icon });
 });
 
+// ─── Diagnostic: check DATA_DIR mount ─────────────────────────
+app.get('/api/admin/diag', (req, res) => {
+  try {
+    const exists = fs.existsSync(DATA_DIR);
+    const files = exists ? fs.readdirSync(DATA_DIR) : [];
+    const stat = exists ? fs.statSync(DATA_DIR) : null;
+    res.json({
+      DATA_DIR,
+      __dirname,
+      exists,
+      isDirectory: stat?.isDirectory() || false,
+      files,
+      dbPathExists: fs.existsSync(DB_PATH),
+      env_DATA_DIR: process.env.DATA_DIR || null,
+    });
+  } catch (e) {
+    res.json({ error: e.message });
+  }
+});
+
 // ─── Static Map proxy (multi-pin via Google Static Maps) ─────
 app.get('/api/static-map', async (req, res) => {
   const key = process.env.GOOGLE_PLACES_KEY;
