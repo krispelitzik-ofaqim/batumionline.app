@@ -161,7 +161,7 @@ const passSt = StyleSheet.create({
   btnTxt: { color: '#fff', fontWeight: '800', fontSize: 13 },
 });
 
-function HotelImage({ uri, titleEn, placesQuery, hideBadge }: { uri?: string; titleEn?: string; placesQuery?: string; hideBadge?: boolean }) {
+function HotelImage({ uri, titleEn, placesQuery, hideBadge, badgeText }: { uri?: string; titleEn?: string; placesQuery?: string; hideBadge?: boolean; badgeText?: string }) {
   const [failed, setFailed] = useState(!uri);
   const [fetchedName, setFetchedName] = useState<string | null>(null);
   const isSvg = uri && uri.endsWith('.svg');
@@ -174,7 +174,7 @@ function HotelImage({ uri, titleEn, placesQuery, hideBadge }: { uri?: string; ti
       .catch(() => {});
     return () => { cancelled = true; };
   }, [placesQuery, titleEn]);
-  const displayEn = titleEn || fetchedName;
+  const displayEn = badgeText || titleEn || fetchedName;
   if (failed) {
     return (
       <View style={[st.hotelImg, { backgroundColor: '#e5e7eb', alignItems: 'center', justifyContent: 'center' }]}>
@@ -815,7 +815,7 @@ function CategoryMapModal({ visible, points, focusName, focusCoords, layerColor,
   );
 }
 
-function HotelCard({ h, dark, pageBtnLabel, mapPoints, layerColor, placesQuery, isHotel, isAttraction, isRestaurant, sourcePath }: { h: Hotel; dark: boolean; pageBtnLabel: string; mapPoints?: MapPoint[]; layerColor?: string; placesQuery?: string; isHotel?: boolean; isAttraction?: boolean; isRestaurant?: boolean; sourcePath?: string }) {
+function HotelCard({ h, dark, pageBtnLabel, mapPoints, layerColor, placesQuery, isHotel, isAttraction, isRestaurant, isNightlife, sourcePath }: { h: Hotel; dark: boolean; pageBtnLabel: string; mapPoints?: MapPoint[]; layerColor?: string; placesQuery?: string; isHotel?: boolean; isAttraction?: boolean; isRestaurant?: boolean; isNightlife?: boolean; sourcePath?: string }) {
   const [showMap, setShowMap] = useState(false);
   const [showGallery, setShowGallery] = useState(false);
   const [showCatMapModal, setShowCatMapModal] = useState(false);
@@ -848,7 +848,7 @@ function HotelCard({ h, dark, pageBtnLabel, mapPoints, layerColor, placesQuery, 
   return (
     <View style={[st.hotelCard, dark && { backgroundColor: '#2a3942' }]}>
       <View style={{ position: 'relative' }}>
-        <HotelImage uri={h.image} titleEn={h.titleEn} placesQuery={placesQuery} hideBadge={!!h.titleEn && h.title === h.titleEn} />
+        <HotelImage uri={h.image} titleEn={h.titleEn} placesQuery={placesQuery} badgeText={isNightlife ? h.title : undefined} hideBadge={!isNightlife && !!h.titleEn && h.title === h.titleEn} />
         <AddToTourButton
           itemId={h.id || `${h.title}_${h.titleEn || ''}`}
           itemTitle={h.title}
@@ -1419,7 +1419,7 @@ export default function CategoryScreen() {
                 ? <PassportCard key={h.id} h={h} pageBtnLabel={cat.pageBtnLabel || 'אתר/פייסבוק'} />
                 : cat.cardStyle === 'foodie'
                 ? <FoodieCard key={h.id} h={h} isLast={cat.hotels!.filter(x => x.visible !== false).indexOf(h) === cat.hotels!.filter(x => x.visible !== false).length - 1} />
-                : <HotelCard key={h.id} h={h} dark={darkCat} pageBtnLabel={cat.pageBtnLabel || 'לדף המלון'} mapPoints={mapPoints} layerColor={mapLayerColor || (mapPoints.length > 0 ? Colors.PRIMARY : undefined)} placesQuery={`${h.title} Batumi`} isHotel={rootId === '1'} isAttraction={rootId === '2'} isRestaurant={rootId === '6'} sourcePath={`/category/${cat.id}`} />
+                : <HotelCard key={h.id} h={h} dark={darkCat} pageBtnLabel={cat.pageBtnLabel || 'לדף המלון'} mapPoints={mapPoints} layerColor={mapLayerColor || (mapPoints.length > 0 ? Colors.PRIMARY : undefined)} placesQuery={`${h.title} Batumi`} isHotel={rootId === '1'} isAttraction={rootId === '2'} isRestaurant={rootId === '6'} isNightlife={rootId === '4'} sourcePath={`/category/${cat.id}`} />
             ))}
             {cat.longText && cat.hotels.length > 10 && (
               <View style={{ width: '100%', alignSelf: 'stretch', paddingBottom: 16, paddingHorizontal: 16 }}>
