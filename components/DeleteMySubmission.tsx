@@ -91,7 +91,7 @@ export default function DeleteMySubmission({ accentColor = Colors.PRIMARY }: { a
 }
 
 const s = StyleSheet.create({
-  btn: { marginHorizontal: 4, marginTop: 4, marginBottom: 14, paddingVertical: 10, paddingHorizontal: 14, borderRadius: 14, borderWidth: 1, borderStyle: 'dashed', alignItems: 'center', backgroundColor: '#fff' },
+  btn: { marginHorizontal: 4, marginTop: 4, marginBottom: 14, paddingVertical: 16, paddingHorizontal: 14, borderRadius: 14, borderWidth: 1.5, borderStyle: 'dashed', alignItems: 'center', backgroundColor: '#fff', alignSelf: 'stretch' },
   btnTxt: { fontSize: 13, fontWeight: '800', writingDirection: 'rtl' },
   overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.55)', justifyContent: 'flex-end' },
   sheet: { backgroundColor: '#fff', borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: '85%' },
