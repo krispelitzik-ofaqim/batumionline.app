@@ -148,21 +148,11 @@ export default function RealEstatePortal() {
         'https://images.unsplash.com/photo-1582407947092-45795aba4166?w=800&q=80',
       ];
       try {
-        const rssUrl = 'https://news.google.com/rss/search?q=' + encodeURIComponent('בטומי נדלן') + '&hl=he&gl=IL&ceid=IL:he';
-        const apiUrl = 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(rssUrl);
-        const r = await fetch(apiUrl);
+        const r = await fetch(`${API_BASE}/api/realestate-news`);
         const j = await r.json();
-        const filtered = (j.items || []).filter((it: any) => {
-          const text = ((it.title || '') + ' ' + (it.description || '')).toLowerCase();
-          return text.includes('בטומי') || text.includes('batumi');
-        });
-        const items: Article[] = filtered.slice(0, 12).map((it: any, i: number) => ({
-          id: 'rss_' + i + '_' + (it.guid || it.link || '').slice(-12),
-          title: it.title || '',
-          summary: (it.description || '').replace(/<[^>]+>/g, '').slice(0, 250),
-          image: it.enclosure?.link || it.thumbnail || RE_FALLBACKS[i % RE_FALLBACKS.length],
-          link: it.link || '',
-          date: it.pubDate ? new Date(it.pubDate).toLocaleDateString('he-IL') : '',
+        const items: Article[] = (j.items || []).map((it: any, i: number) => ({
+          ...it,
+          image: it.image || RE_FALLBACKS[i % RE_FALLBACKS.length],
         }));
         if (items.length) setNews(items);
       } catch {}

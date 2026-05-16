@@ -1003,6 +1003,44 @@ app.get('/api/admin/diag', (req, res) => {
   }
 });
 
+// ─── Real-estate news proxy (Google News RSS) ─────────────────
+const RE_NEWS_CACHE_MS = 30 * 60 * 1000;
+let reNewsCache = null;
+app.get('/api/realestate-news', async (_req, res) => {
+  try {
+    if (reNewsCache && Date.now() - reNewsCache.at < RE_NEWS_CACHE_MS) {
+      return res.json(reNewsCache.data);
+    }
+    const rssUrl = 'https://news.google.com/rss/search?q=' + encodeURIComponent('בטומי נדלן') + '&hl=he&gl=IL&ceid=IL:he';
+    const apiUrl = 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(rssUrl);
+    const r = await fetch(apiUrl);
+    const j = await r.json();
+    const filtered = (j.items || []).filter((it) => {
+      const text = ((it.title || '') + ' ' + (it.description || '')).toLowerCase();
+      return text.includes('בטומי') || text.includes('batumi');
+    });
+    const FALLBACKS = [
+      'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80',
+      'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80',
+      'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&q=80',
+      'https://images.unsplash.com/photo-1582407947092-45795aba4166?w=800&q=80',
+    ];
+    const items = filtered.slice(0, 12).map((it, i) => ({
+      id: 'rss_' + i + '_' + (it.guid || it.link || '').slice(-12),
+      title: it.title || '',
+      summary: (it.description || '').replace(/<[^>]+>/g, '').slice(0, 250),
+      image: it.enclosure?.link || it.thumbnail || FALLBACKS[i % FALLBACKS.length],
+      link: it.link || '',
+      date: it.pubDate ? new Date(it.pubDate).toLocaleDateString('he-IL') : '',
+    }));
+    const payload = { items };
+    reNewsCache = { at: Date.now(), data: payload };
+    res.json(payload);
+  } catch (e) {
+    res.status(500).json({ error: e.message, items: [] });
+  }
+});
+
 // ─── Static Map proxy (multi-pin via Google Static Maps) ─────
 app.get('/api/static-map', async (req, res) => {
   const key = process.env.GOOGLE_PLACES_KEY;
