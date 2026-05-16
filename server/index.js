@@ -10,7 +10,7 @@ const expoClient = Expo ? new Expo() : null;
 
 const app = express();
 const PORT = process.env.PORT || 3001;
-const DATA_DIR = process.env.DATA_DIR || __dirname;
+const DATA_DIR = (process.env.DATA_DIR || __dirname).trim();
 const DB_PATH = path.join(DATA_DIR, 'db.json');
 const UPLOADS_DIR = path.join(DATA_DIR, 'uploads');
 const GALLERY_DIR = path.join(UPLOADS_DIR, 'gallery');
