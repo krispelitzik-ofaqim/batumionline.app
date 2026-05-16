@@ -824,7 +824,7 @@ app.post('/api/admin/set-tile-icon', (req, res) => {
   };
   const cat = find(db.mainCategories) || find(db.extraCategories);
   if (!cat) return res.status(404).json({ error: 'Category not found' });
-  const first = (cat.hotels || []).find(h => h.visible !== false && h.image && h.image.startsWith('/uploads/'));
+  const first = (cat.hotels || []).find(h => h.visible !== false && h.image && h.image.startsWith('/uploads/') && !h.image.includes('city.jpg'));
   if (!first) return res.status(404).json({ error: 'No suitable hotel image' });
   cat.icon = first.image;
   writeDB(db);
