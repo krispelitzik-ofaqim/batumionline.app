@@ -78,7 +78,7 @@ export default function PlacePage() {
           )}
 
           {!!data.mapsUri && (
-            <View style={{ height: mapBig ? 480 : 240, marginHorizontal: 12, marginTop: 12, borderRadius: 14, overflow: 'hidden', borderWidth: 1, borderColor: '#e2e8f0', position: 'relative' }}>
+            <View style={{ height: mapBig ? 480 : 240, marginTop: 8, position: 'relative' }}>
               <MapEmbed src={`https://www.google.com/maps?q=${encodeURIComponent(`${title || data.name} Batumi`)}&output=embed`} style={{ flex: 1 }} />
               <TouchableOpacity onPress={() => setMapBig(v => !v)} style={s.expand}>
                 <Text style={s.expandTxt}>{mapBig ? '−' : '×2'}</Text>
@@ -136,7 +136,7 @@ export default function PlacePage() {
 }
 
 const s = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: Colors.BACKGROUND },
+  screen: { flex: 1, backgroundColor: '#fff' },
   headerBar: { flexDirection: 'row-reverse', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 12, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#e2e8f0', gap: 10 },
   backBtn: { paddingVertical: 6, paddingHorizontal: 10, borderRadius: 8, backgroundColor: '#f1f5f9' },
   backTxt: { fontSize: 14, fontWeight: '800', color: Colors.PRIMARY },
