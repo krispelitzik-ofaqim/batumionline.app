@@ -1207,7 +1207,11 @@ export default function CategoryScreen() {
         ) : (
           <View style={[st.hero, { backgroundColor: cat.heroBg || cat.bg || (darkCat ? '#1a1a2e' : '#3DA5C4') }]}>
             <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 10, justifyContent: 'center' }}>
-              {cat.icon ? <Text style={{ fontSize: 28 }}>{cat.icon}</Text> : null}
+              {cat.icon ? (
+                (cat.icon.startsWith('/') || cat.icon.startsWith('http') || cat.icon.startsWith('data:'))
+                  ? <Image source={{ uri: resolveUri(cat.icon) }} style={{ width: 40, height: 40, borderRadius: 8 }} resizeMode="cover" />
+                  : <Text style={{ fontSize: 28 }}>{cat.icon}</Text>
+              ) : null}
               <Text style={[st.heroTitle, darkCat && { color: '#F4A94E' }]}>{cat.title}</Text>
             </View>
             {(() => {
