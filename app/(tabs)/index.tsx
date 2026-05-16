@@ -296,6 +296,26 @@ export default function HomeScreen() {
           </View>
         )}
 
+        {/* באנר: קרוב אליי */}
+        <View style={[styles.section, { paddingHorizontal: 16, marginBottom: 12 }]}>
+          <TouchableOpacity
+            onPress={() => router.push('/(tabs)/map?near=1' as any)}
+            activeOpacity={0.9}
+            style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#F4A94E', borderRadius: 14, paddingVertical: 14, paddingHorizontal: 16, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.15, shadowRadius: 4, elevation: 3 }}
+          >
+            <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 10, flex: 1 }}>
+              <Text style={{ fontSize: 26 }}>📍</Text>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: 15, fontWeight: '900', color: '#1C2B35', writingDirection: 'rtl' }}>מה קרוב אליי עכשיו?</Text>
+                <Text style={{ fontSize: 12, color: '#1C2B35', writingDirection: 'rtl', opacity: 0.8 }}>אטרקציות ומסעדות במרחק הליכה</Text>
+              </View>
+            </View>
+            <View style={{ backgroundColor: '#1C2B35', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 18 }}>
+              <Text style={{ color: '#fff', fontSize: 13, fontWeight: '900' }}>מצא</Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+
         {/* 4. פורטל המידע */}
         {infoGroupVisible && (
           <View style={styles.section}>
