@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Modal, View, Text, TouchableOpacity, ScrollView, ActivityIndicator, StyleSheet, Linking, Platform, Image } from 'react-native';
 import { API_BASE } from '../constants/api';
 import { Colors } from '../constants/colors';
-import { openInAppBrowser, bookingSearch, agodaSearch, gygSearch, TIQETS_LINK } from '../constants/affiliates';
+import { openInAppBrowser, bookingSearch, hotellookSearch, tiqetsBatumi } from '../constants/affiliates';
 import MapEmbed from './MapEmbed';
 
 function PhotoGallery({ photos }: { photos: { ref: string; url: string }[] }) {
@@ -151,17 +151,17 @@ export default function PlacesInfoModal({ query, title, onClose, hideHours, show
               )}
               {showHotelPrices && (
                 <View style={[s.btnRow, { marginTop: 10 }]}>
-                  <TouchableOpacity style={[s.btn, { flex: 1, backgroundColor: '#003580' }]} onPress={() => openInAppBrowser(bookingSearch(title))}>
-                    <Text style={s.btnTxt}>💰 Booking</Text>
+                  <TouchableOpacity style={[s.btn, { flex: 1, backgroundColor: '#FF6B00' }]} onPress={() => openInAppBrowser(hotellookSearch(title))}>
+                    <Text style={s.btnTxt}>💰 השווה מחירים</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={[s.btn, { flex: 1, backgroundColor: '#d71b5c' }]} onPress={() => openInAppBrowser(agodaSearch(title))}>
-                    <Text style={s.btnTxt}>💰 Agoda</Text>
+                  <TouchableOpacity style={[s.btn, { flex: 1, backgroundColor: '#003580' }]} onPress={() => openInAppBrowser(bookingSearch(title))}>
+                    <Text style={s.btnTxt}>🛏️ Booking</Text>
                   </TouchableOpacity>
                 </View>
               )}
               {showAttractionTickets && (
                 <View style={[s.btnCol, { marginTop: 10 }]}>
-                  <TouchableOpacity style={[s.btn, { backgroundColor: '#f97316' }]} onPress={() => openInAppBrowser(TIQETS_LINK)}>
+                  <TouchableOpacity style={[s.btn, { backgroundColor: '#f97316' }]} onPress={() => openInAppBrowser(tiqetsBatumi(title))}>
                     <Text style={s.btnTxt}>🎫 כרטיסים ב-Tiqets</Text>
                   </TouchableOpacity>
                 </View>
