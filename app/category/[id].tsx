@@ -1240,7 +1240,7 @@ export default function CategoryScreen() {
         )}
 
         {rootId === '5' && (() => {
-          const aviasalesUrl = `https://www.aviasales.com/search/TLV01BUS01?marker=X5SEJjUA`;
+          const aviasalesUrl = `https://www.aviasales.com/?origin_iata=TLV&destination_iata=BUS&marker=X5SEJjUA`;
           return (
             <View style={{ marginHorizontal: 12, marginTop: 8, marginBottom: 8 }}>
               <TouchableOpacity

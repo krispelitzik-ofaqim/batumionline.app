@@ -54,7 +54,7 @@ export function agodaSearch(hotelName: string): string {
 
 // Aviasales flight search to Batumi from any origin
 export function aviasalesBatumi(): string {
-  return `https://www.aviasales.com/search/TLV01BUS01?marker=${TP_MARKER}`;
+  return `https://www.aviasales.com/?origin_iata=TLV&destination_iata=BUS&marker=${TP_MARKER}`;
 }
 
 // Tiqets — attraction tickets in Batumi

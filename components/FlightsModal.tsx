@@ -340,7 +340,7 @@ export default function FlightsModal({ visible, onClose, bgColor }: { visible: b
 
           {/* Search flights CTA */}
           <TouchableOpacity
-            onPress={() => Linking.openURL('https://www.aviasales.com/search/TLV01BUS01?marker=X5SEJjUA')}
+            onPress={() => Linking.openURL('https://www.aviasales.com/?origin_iata=TLV&destination_iata=BUS&marker=X5SEJjUA')}
             activeOpacity={0.85}
             style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: '#F4A94E', paddingVertical: 12, paddingHorizontal: 18, borderRadius: 999, marginVertical: 10, alignSelf: 'center' }}
           >
