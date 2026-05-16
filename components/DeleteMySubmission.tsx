@@ -115,7 +115,7 @@ export default function DeleteMySubmission({ accentColor = Colors.PRIMARY }: { a
 }
 
 const s = StyleSheet.create({
-  link: { paddingVertical: 8, alignSelf: 'flex-end', marginBottom: 6 },
+  link: { paddingVertical: 6, paddingHorizontal: 4, alignSelf: 'flex-end', marginBottom: 6 },
   linkTxt: { fontSize: 13, fontWeight: '700', writingDirection: 'rtl', textDecorationLine: 'underline' },
   overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.55)', justifyContent: 'flex-end' },
   sheet: { backgroundColor: '#fff', borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: '85%' },

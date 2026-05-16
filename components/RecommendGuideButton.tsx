@@ -100,7 +100,7 @@ export default function RecommendGuideButton({ categoryId, mode }: Props) {
 }
 
 const s = StyleSheet.create({
-  btn: { marginHorizontal: 12, marginTop: 10, marginBottom: 14, paddingVertical: 14, paddingHorizontal: 14, borderRadius: 14, backgroundColor: '#F4A94E', flexDirection: 'row-reverse', alignItems: 'center', gap: 10, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.15, shadowRadius: 4, elevation: 3 },
+  btn: { marginHorizontal: 0, marginTop: 10, marginBottom: 14, paddingVertical: 16, paddingHorizontal: 14, borderRadius: 14, backgroundColor: '#F4A94E', flexDirection: 'row-reverse', alignItems: 'center', gap: 10, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.15, shadowRadius: 4, elevation: 3, alignSelf: 'stretch' },
   btnIcon: { fontSize: 22 },
   btnTitle: { fontSize: 14, fontWeight: '900', color: '#1C2B35', writingDirection: 'rtl', textAlign: 'right' },
   btnSub: { fontSize: 11, color: '#1C2B35', writingDirection: 'rtl', textAlign: 'right', opacity: 0.75, marginTop: 2 },
