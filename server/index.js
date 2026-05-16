@@ -729,7 +729,7 @@ app.get('/api/places', async (req, res) => {
       headers: {
         'Content-Type': 'application/json',
         'X-Goog-Api-Key': key,
-        'X-Goog-FieldMask': 'places.displayName,places.rating,places.userRatingCount,places.internationalPhoneNumber,places.googleMapsUri,places.websiteUri,places.currentOpeningHours,places.formattedAddress,places.photos',
+        'X-Goog-FieldMask': 'places.displayName,places.rating,places.userRatingCount,places.internationalPhoneNumber,places.googleMapsUri,places.websiteUri,places.currentOpeningHours,places.formattedAddress,places.photos,places.photos.authorAttributions',
       },
       body: JSON.stringify({ textQuery: query, languageCode: lang }),
     });
@@ -794,13 +794,14 @@ app.post('/api/admin/fetch-photos', async (req, res) => {
         headers: {
           'Content-Type': 'application/json',
           'X-Goog-Api-Key': key,
-          'X-Goog-FieldMask': 'places.photos,places.displayName',
+          'X-Goog-FieldMask': 'places.photos,places.displayName,places.photos.authorAttributions',
         },
         body: JSON.stringify({ textQuery: `${h.titleEn || h.title} Batumi`, languageCode: 'en' }),
       });
       const data = await r.json();
       const p = (data.places || [])[0];
-      const photoName = p?.photos?.[0]?.name;
+      const photo0 = p?.photos?.[0];
+      const photoName = photo0?.name;
       if (!photoName) { results.push({ id: h.id, title: h.title, status: 'no-photo' }); continue; }
       const photoUrl = `https://places.googleapis.com/v1/${photoName}/media?maxWidthPx=800&key=${key}`;
       const imgRes = await fetch(photoUrl);
@@ -810,6 +811,8 @@ app.post('/api/admin/fetch-photos', async (req, res) => {
       const filename = `${safe}_${Date.now()}.jpg`;
       fs.writeFileSync(path.join(UPLOADS_DIR, filename), buf);
       h.image = `/uploads/${filename}`;
+      const attr = photo0?.authorAttributions?.[0];
+      if (attr?.displayName) h.photoAttribution = { name: attr.displayName, uri: attr.uri || '' };
       results.push({ id: h.id, title: h.title, status: 'updated', image: h.image });
     } catch (e) {
       results.push({ id: h.id, title: h.title, status: 'error', error: e.message });
@@ -899,7 +902,7 @@ app.post('/api/admin/populate-category', async (req, res) => {
       headers: {
         'Content-Type': 'application/json',
         'X-Goog-Api-Key': key,
-        'X-Goog-FieldMask': 'places.id,places.displayName,places.formattedAddress,places.location,places.googleMapsUri,places.websiteUri,places.rating,places.userRatingCount,places.photos',
+        'X-Goog-FieldMask': 'places.id,places.displayName,places.formattedAddress,places.location,places.googleMapsUri,places.websiteUri,places.rating,places.userRatingCount,places.photos,places.photos.authorAttributions',
       },
       body: JSON.stringify({ textQuery: query, languageCode: 'he', maxResultCount: Math.min(20, Number(count) * 2) }),
     });
@@ -931,6 +934,7 @@ app.post('/api/admin/populate-category', async (req, res) => {
       } catch {}
       const lat = p.location?.latitude;
       const lng = p.location?.longitude;
+      const attr = p.photos?.[0]?.authorAttributions?.[0];
       const item = {
         id: `${categoryId}_${nextNum}`,
         title: name,
@@ -940,6 +944,7 @@ app.post('/api/admin/populate-category', async (req, res) => {
         pageUrl: p.websiteUri || '',
         mapUrl: p.googleMapsUri || (lat && lng ? `https://www.google.com/maps?q=${lat},${lng}` : ''),
         coords: lat && lng ? { lat, lng } : undefined,
+        photoAttribution: attr?.displayName ? { name: attr.displayName, uri: attr.uri || '' } : undefined,
         visible: true,
       };
       cat.hotels = cat.hotels || [];

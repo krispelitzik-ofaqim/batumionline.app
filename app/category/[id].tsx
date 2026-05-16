@@ -25,7 +25,7 @@ import CategoryHeaderMap from '../../components/CategoryHeaderMap';
 import AddToTourButton from '../../components/AddToTourButton';
 import RecommendGuideButton from '../../components/RecommendGuideButton';
 
-type Hotel = { id: string; title: string; titleEn?: string; text: string; image: string; mapUrl?: string; pageUrl?: string; coords?: { lat: number; lng: number }; visible?: boolean; images?: string[]; amenities?: string[]; price?: string; audio?: string };
+type Hotel = { id: string; title: string; titleEn?: string; text: string; image: string; mapUrl?: string; pageUrl?: string; coords?: { lat: number; lng: number }; visible?: boolean; images?: string[]; amenities?: string[]; price?: string; audio?: string; photoAttribution?: { name: string; uri?: string } };
 type TourBlock = { id: string; title: string; subtitle?: string; text: string; color: string; images: string[]; audios: { title?: string; url: string }[]; visible?: boolean; coords?: { lat: number; lng: number } };
 type Item = {
   id: string; title: string; subtitle?: string; icon: string; bg?: string;
@@ -161,7 +161,7 @@ const passSt = StyleSheet.create({
   btnTxt: { color: '#fff', fontWeight: '800', fontSize: 13 },
 });
 
-function HotelImage({ uri, titleEn, placesQuery }: { uri?: string; titleEn?: string; placesQuery?: string }) {
+function HotelImage({ uri, titleEn, placesQuery, hideBadge }: { uri?: string; titleEn?: string; placesQuery?: string; hideBadge?: boolean }) {
   const [failed, setFailed] = useState(!uri);
   const [fetchedName, setFetchedName] = useState<string | null>(null);
   const isSvg = uri && uri.endsWith('.svg');
@@ -200,7 +200,7 @@ function HotelImage({ uri, titleEn, placesQuery }: { uri?: string; titleEn?: str
   return (
     <View style={st.hotelImg}>
       <Image source={{ uri: resolveUri(uri) }} style={{ width: '100%', height: '100%' }} resizeMode="cover" onError={() => setFailed(true)} />
-      {displayEn ? (
+      {displayEn && !hideBadge ? (
         <View style={st.enBadge}>
           <Text style={st.enBadgeTxt}>{displayEn}</Text>
         </View>
@@ -848,7 +848,7 @@ function HotelCard({ h, dark, pageBtnLabel, mapPoints, layerColor, placesQuery, 
   return (
     <View style={[st.hotelCard, dark && { backgroundColor: '#2a3942' }]}>
       <View style={{ position: 'relative' }}>
-        <HotelImage uri={h.image} titleEn={h.titleEn} placesQuery={placesQuery} />
+        <HotelImage uri={h.image} titleEn={h.titleEn} placesQuery={placesQuery} hideBadge={!!h.titleEn && h.title === h.titleEn} />
         <AddToTourButton
           itemId={h.id || `${h.title}_${h.titleEn || ''}`}
           itemTitle={h.title}
@@ -856,6 +856,11 @@ function HotelCard({ h, dark, pageBtnLabel, mapPoints, layerColor, placesQuery, 
           itemType={isHotel ? 'hotel' : isAttraction ? 'attraction' : isRestaurant ? 'restaurant' : undefined}
           sourcePath={sourcePath}
         />
+        {h.photoAttribution?.name ? (
+          <View style={{ position: 'absolute', left: 6, bottom: 6, backgroundColor: 'rgba(0,0,0,0.55)', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 10 }}>
+            <Text style={{ color: '#fff', fontSize: 9, fontWeight: '700' }} numberOfLines={1}>📷 {h.photoAttribution.name}</Text>
+          </View>
+        ) : null}
       </View>
       {h.audio ? (
         <View style={{ paddingHorizontal: 24, paddingTop: 8 }}>
