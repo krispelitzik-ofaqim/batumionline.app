@@ -98,13 +98,13 @@ export default function PlacePage() {
               </View>
             )}
             {!!data.address && (
-              data.website ? (
-                <TouchableOpacity onPress={() => Linking.openURL(data.website!)}>
-                  <Text style={[s.addr, { color: Colors.PRIMARY, textDecorationLine: 'underline' }]}>{data.address}</Text>
-                </TouchableOpacity>
-              ) : (
-                <Text style={s.addr}>{data.address}</Text>
-              )
+              <Text style={s.addr}>{data.address}</Text>
+            )}
+            {!!data.website && (
+              <Text style={s.addr}>
+                {isHotel ? 'לאתר המלון - ' : isRestaurant ? 'לאתר המסעדה - ' : 'לאתר הרשמי - '}
+                <Text style={{ color: Colors.PRIMARY, fontWeight: '900', textDecorationLine: 'underline' }} onPress={() => Linking.openURL(data.website!)}>כאן</Text>
+              </Text>
             )}
             {!!(data.openingHours && data.openingHours.length) && (
               <View style={s.hours}>
