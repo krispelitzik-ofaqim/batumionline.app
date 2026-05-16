@@ -1235,13 +1235,14 @@ export default function CategoryScreen() {
           const pts = mapPoints.length ? mapPoints : fallback;
           if (pts.length === 0) return null;
           const bannerText = rootId === '2' ? 'איזו אטרקציה קרובה אליי עכשיו?' : 'איזו מסעדה מומלצת קרובה אליי עכשיו?';
+          const filterParam = rootId === '2' ? 'אטרקצי' : 'מסעד';
           return (
             <View style={{ marginHorizontal: 12, marginTop: 8, marginBottom: 8 }}>
               <View style={{ borderRadius: 14, overflow: 'hidden' }}>
                 <CategoryHeaderMap points={pts} color={mapLayerColor} />
               </View>
               <TouchableOpacity
-                onPress={() => router.push('/(tabs)/map?near=1' as any)}
+                onPress={() => router.push(`/(tabs)/map?near=1&filter=${encodeURIComponent(filterParam)}` as any)}
                 activeOpacity={0.9}
                 style={{ marginTop: 8, flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#F4A94E', borderRadius: 14, paddingVertical: 12, paddingHorizontal: 14, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.15, shadowRadius: 4, elevation: 3 }}
               >

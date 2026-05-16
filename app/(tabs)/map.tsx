@@ -18,8 +18,9 @@ export default function MapScreen() {
   const [userLoc, setUserLoc] = useState<{ lat: number; lng: number } | null>(null);
   const [locError, setLocError] = useState<string | null>(null);
   const bg = dark ? Colors.TEXT : Colors.BACKGROUND;
-  const { lat, lng, name, near } = useLocalSearchParams<{ lat?: string; lng?: string; name?: string; near?: string }>();
+  const { lat, lng, name, near, filter } = useLocalSearchParams<{ lat?: string; lng?: string; name?: string; near?: string; filter?: string }>();
   const nearMode = near === '1';
+  const nearFilter = (filter || '').toString();
 
   useEffect(() => {
     if (!nearMode) return;
@@ -34,7 +35,8 @@ export default function MapScreen() {
     }
   }, [nearMode]);
 
-  const allPoints = layers.flatMap(l => l.points.map(p => ({ ...p, category: l.name })));
+  const filteredLayers = nearFilter ? layers.filter(l => l.name.includes(nearFilter)) : layers;
+  const allPoints = filteredLayers.flatMap(l => l.points.map(p => ({ ...p, category: l.name })));
   const nearby = userLoc ? allPoints
     .map(p => {
       const R = 6371;
