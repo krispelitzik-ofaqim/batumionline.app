@@ -796,7 +796,7 @@ app.post('/api/admin/fetch-photos', async (req, res) => {
           'X-Goog-Api-Key': key,
           'X-Goog-FieldMask': 'places.photos,places.displayName,places.photos.authorAttributions',
         },
-        body: JSON.stringify({ textQuery: `${h.titleEn || h.title} Batumi`, languageCode: 'en' }),
+        body: JSON.stringify({ textQuery: `${h.titleEn || h.title} Batumi`, languageCode: 'he' }),
       });
       const data = await r.json();
       const p = (data.places || [])[0];
