@@ -1264,7 +1264,7 @@ export default function CategoryScreen() {
           );
         })()}
 
-        {(rootId === '2' || rootId === '6' || rootId === '7') && (() => {
+        {(rootId === '2' || rootId === '6' || rootId === '7') && cat.id !== 'a8' && (() => {
           const fallback = (cat.hotels || [])
             .filter(h => h.coords && h.visible !== false)
             .map(h => ({ name: h.title, lat: h.coords!.lat, lng: h.coords!.lng }));
