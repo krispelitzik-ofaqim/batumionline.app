@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, StyleSheet, Linking, Image } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, StyleSheet, Linking, Image, Platform, StatusBar } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { API_BASE } from '../constants/api';
 import { Colors } from '../constants/colors';
 import { openInAppBrowser, bookingSearch, hotellookSearch, tiqetsBatumi } from '../constants/affiliates';
@@ -22,6 +23,7 @@ type PlaceData = {
 
 export default function PlacePage() {
   const { q, title, type } = useLocalSearchParams<{ q?: string; title?: string; type?: string }>();
+  const insets = useSafeAreaInsets();
   const [data, setData] = useState<PlaceData | null>(null);
   const [loading, setLoading] = useState(true);
   const [photoIdx, setPhotoIdx] = useState(0);
@@ -47,12 +49,13 @@ export default function PlacePage() {
 
   return (
     <View style={s.screen}>
-      <View style={s.headerBar}>
-        <TouchableOpacity onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))} style={s.backBtn}>
-          <Text style={s.backTxt}>← חזרה</Text>
-        </TouchableOpacity>
-        <Text style={s.headerTitle} numberOfLines={1}>{title || data?.name || ''}</Text>
-      </View>
+      <View style={{ height: insets.top || (Platform.OS === 'android' ? StatusBar.currentHeight || 24 : 44), backgroundColor: '#fff' }} />
+      <TouchableOpacity
+        onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))}
+        style={{ position: 'absolute', left: 14, top: (insets.top || (Platform.OS === 'android' ? StatusBar.currentHeight || 24 : 44)) + 6, width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(255,255,255,0.95)', alignItems: 'center', justifyContent: 'center', zIndex: 100, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.15, shadowRadius: 4, elevation: 4 }}
+      >
+        <Text style={{ fontSize: 18, color: '#1C2B35', fontWeight: '900' }}>✕</Text>
+      </TouchableOpacity>
 
       {loading ? (
         <ActivityIndicator size="large" color={Colors.PRIMARY} style={{ marginTop: 40 }} />
