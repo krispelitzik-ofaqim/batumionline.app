@@ -322,21 +322,31 @@ app.get('/api/uploads', (req, res) => {
     const data = readDB();
     const tags = data.mediaTags || {};
     const names = data.fileNames || {};
-    const files = fs.readdirSync(UPLOADS_DIR)
-      .filter(f => !f.startsWith('.') && !fs.statSync(path.join(UPLOADS_DIR, f)).isDirectory())
-      .map(f => {
-        const stat = fs.statSync(path.join(UPLOADS_DIR, f));
-        return {
-          filename: f,
-          originalName: names[f] || '',
-          url: `http://localhost:${PORT}/uploads/${f}`,
-          size: stat.size,
-          mtime: stat.mtimeMs,
-          tags: tags[f] || [],
-        };
-      })
-      .sort((a, b) => b.mtime - a.mtime);
-    res.json({ success: true, files });
+    const gitUploads = path.join(__dirname, 'uploads');
+    const collect = (dir) => {
+      try {
+        return fs.readdirSync(dir)
+          .filter(f => !f.startsWith('.') && !fs.statSync(path.join(dir, f)).isDirectory())
+          .map(f => ({ f, dir }));
+      } catch { return []; }
+    };
+    const seen = new Set();
+    const all = [];
+    for (const { f, dir } of [...collect(UPLOADS_DIR), ...(gitUploads !== UPLOADS_DIR ? collect(gitUploads) : [])]) {
+      if (seen.has(f)) continue;
+      seen.add(f);
+      const stat = fs.statSync(path.join(dir, f));
+      all.push({
+        filename: f,
+        originalName: names[f] || '',
+        url: `http://localhost:${PORT}/uploads/${f}`,
+        size: stat.size,
+        mtime: stat.mtimeMs,
+        tags: tags[f] || [],
+      });
+    }
+    all.sort((a, b) => b.mtime - a.mtime);
+    res.json({ success: true, files: all });
   } catch (err) {
     res.status(500).json({ success: false, error: 'Failed to list uploads' });
   }
