@@ -1188,7 +1188,7 @@ export default function CategoryScreen() {
   }
 
   return (
-    <SafeAreaView style={[st.safe, darkCat && { backgroundColor: cat.heroBg || '#0f1419' }]}>
+    <SafeAreaView edges={['top','left','right']} style={[st.safe, { backgroundColor: '#fff' }, darkCat && { backgroundColor: cat.heroBg || '#0f1419' }]}>
       <Stack.Screen options={{ headerShown: false }} />
       <DevicePreviewBar />
       <AppHeader crumbs={crumbs} dark={darkCat} />
@@ -1282,7 +1282,7 @@ export default function CategoryScreen() {
             .map(h => ({ name: h.title, lat: h.coords!.lat, lng: h.coords!.lng }));
           const pts = mapPoints.length ? mapPoints : fallback;
           if (pts.length === 0) return null;
-          const bannerText = rootId === '2' ? 'איזו אטרקציה קרובה אליי עכשיו?' : rootId === '6' ? 'איזו מסעדה מומלצת קרובה אליי עכשיו?' : 'איזו חנות קרובה אליי עכשיו?';
+          const bannerText = rootId === '2' ? 'איזו אטרקציה קרובה למיקום שלי עכשיו?' : rootId === '6' ? 'איזו מסעדה מומלצת קרובה למיקום שלי עכשיו?' : 'איזו חנות קרובה למיקום שלי עכשיו?';
           const filterParam = rootId === '2' ? 'אטרקצי' : rootId === '6' ? 'מסעד' : 'קני';
           const expandToTab = () => router.push('/(tabs)/map' as any);
           return (
