@@ -10,9 +10,10 @@ type Props = {
   onExpand?: () => void;
 };
 
-export default function CategoryHeaderMap({ points, color = '#1A6B8A', style, onExpand }: Props) {
+export default function CategoryHeaderMap({ points, color = '#1A6B8A', style }: Props) {
   const [focus, setFocus] = useState<Point | null>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [expanded, setExpanded] = useState(false);
   if (!points || points.length === 0) return null;
 
   const pointsParam = points.map(p => `${p.lat},${p.lng},${encodeURIComponent(p.name)}`).join(';');
@@ -28,17 +29,15 @@ export default function CategoryHeaderMap({ points, color = '#1A6B8A', style, on
 
   return (
     <View style={style}>
-      <View style={{ position: 'relative', overflow: 'hidden', height: 180, borderTopLeftRadius: 14, borderTopRightRadius: 14 }}>
+      <View style={{ position: 'relative', overflow: 'hidden', height: expanded ? 360 : 180, borderTopLeftRadius: 14, borderTopRightRadius: 14 }}>
         {frame}
-        {onExpand && (
-          <TouchableOpacity
-            onPress={onExpand}
-            style={{ position: 'absolute', left: 8, bottom: 8, width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(28,43,53,0.85)', alignItems: 'center', justifyContent: 'center', zIndex: 5 }}
-            activeOpacity={0.85}
-          >
-            <Text style={{ color: '#fff', fontSize: 18, fontWeight: '900' }}>⤢</Text>
-          </TouchableOpacity>
-        )}
+        <TouchableOpacity
+          onPress={() => setExpanded(!expanded)}
+          style={{ position: 'absolute', left: 8, bottom: 8, paddingHorizontal: 10, height: 36, borderRadius: 18, backgroundColor: 'rgba(28,43,53,0.85)', alignItems: 'center', justifyContent: 'center', zIndex: 5, flexDirection: 'row-reverse', gap: 4 }}
+          activeOpacity={0.85}
+        >
+          <Text style={{ color: '#fff', fontSize: 13, fontWeight: '900' }}>{expanded ? '−' : '×2'}</Text>
+        </TouchableOpacity>
       </View>
 
       <View style={{ backgroundColor: '#fff', borderBottomLeftRadius: 14, borderBottomRightRadius: 14, borderWidth: 1, borderColor: '#e2e8f0', borderTopWidth: 0 }}>

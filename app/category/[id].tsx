@@ -1240,7 +1240,7 @@ export default function CategoryScreen() {
           return (
             <View style={{ marginHorizontal: 12, marginTop: 8, marginBottom: 8 }}>
               <View style={{ borderRadius: 14, overflow: 'hidden' }}>
-                <CategoryHeaderMap points={pts} color={mapLayerColor} onExpand={expandToTab} />
+                <CategoryHeaderMap points={pts} color={mapLayerColor} />
               </View>
               <TouchableOpacity
                 onPress={() => router.push(`/(tabs)/map?near=1&filter=${encodeURIComponent(filterParam)}` as any)}
