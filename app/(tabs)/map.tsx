@@ -15,8 +15,37 @@ export default function MapScreen() {
   const [layers, setLayers] = useState<MapLayer[]>([]);
   const [focusPoint, setFocusPoint] = useState<{ lat: number; lng: number; name: string } | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [userLoc, setUserLoc] = useState<{ lat: number; lng: number } | null>(null);
+  const [locError, setLocError] = useState<string | null>(null);
   const bg = dark ? Colors.TEXT : Colors.BACKGROUND;
-  const { lat, lng, name } = useLocalSearchParams<{ lat?: string; lng?: string; name?: string }>();
+  const { lat, lng, name, near } = useLocalSearchParams<{ lat?: string; lng?: string; name?: string; near?: string }>();
+  const nearMode = near === '1';
+
+  useEffect(() => {
+    if (!nearMode) return;
+    if (Platform.OS === 'web' && typeof navigator !== 'undefined' && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => setUserLoc({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+        (err) => setLocError(err.message || 'לא ניתן לקבל מיקום'),
+        { enableHighAccuracy: true, timeout: 8000 }
+      );
+    } else {
+      setLocError('זמין כרגע רק בגרסת ה-Web');
+    }
+  }, [nearMode]);
+
+  const allPoints = layers.flatMap(l => l.points.map(p => ({ ...p, category: l.name })));
+  const nearby = userLoc ? allPoints
+    .map(p => {
+      const R = 6371;
+      const dLat = (p.lat - userLoc.lat) * Math.PI / 180;
+      const dLng = (p.lng - userLoc.lng) * Math.PI / 180;
+      const a = Math.sin(dLat / 2) ** 2 + Math.cos(userLoc.lat * Math.PI / 180) * Math.cos(p.lat * Math.PI / 180) * Math.sin(dLng / 2) ** 2;
+      const dist = 2 * R * Math.asin(Math.sqrt(a));
+      return { ...p, distKm: dist };
+    })
+    .sort((a, b) => a.distKm - b.distKm)
+    .slice(0, 10) : [];
 
   useEffect(() => {
     const load = () => fetchContent().then(data => {
@@ -30,6 +59,9 @@ export default function MapScreen() {
   const buildMapSrc = () => {
     if (focusPoint) {
       return `https://www.google.com/maps?q=${focusPoint.lat},${focusPoint.lng}(${encodeURIComponent(focusPoint.name)})&hl=iw&z=16&output=embed`;
+    }
+    if (nearMode && userLoc) {
+      return `https://www.google.com/maps?q=${userLoc.lat},${userLoc.lng}&hl=iw&z=15&output=embed`;
     }
     if (lat && lng) {
       return `https://www.google.com/maps?q=${lat},${lng}${name ? `(${encodeURIComponent(name)})` : ''}&hl=iw&z=16&output=embed`;
@@ -82,6 +114,46 @@ export default function MapScreen() {
           <Text style={styles.openMenuTxt}>📍 {active === 'הכל' ? 'בחר קטגוריה' : active}</Text>
           <Text style={styles.openMenuArrow}>▲</Text>
         </TouchableOpacity>
+
+        {nearMode && (
+          <View style={[styles.panel, { backgroundColor: '#F4A94E', maxHeight: '55%' }]}>
+            <View style={styles.panelHandle} />
+            <View style={styles.panelHeader}>
+              <Text style={styles.panelTitle}>📍 קרוב אליי</Text>
+              <Text style={styles.panelCount}>{nearby.length} מיקומים קרובים</Text>
+              <TouchableOpacity onPress={() => { setUserLoc(null); setLocError(null); setActive('הכל'); }} style={styles.panelClose}>
+                <Text style={styles.panelCloseX}>✕</Text>
+              </TouchableOpacity>
+            </View>
+            {locError ? (
+              <View style={{ padding: 16 }}>
+                <Text style={{ color: '#fff', fontSize: 13, fontWeight: '800', writingDirection: 'rtl', textAlign: 'right' }}>{locError}</Text>
+              </View>
+            ) : !userLoc ? (
+              <View style={{ padding: 16 }}>
+                <Text style={{ color: '#fff', fontSize: 13, fontWeight: '800', writingDirection: 'rtl', textAlign: 'right' }}>טוען מיקום...</Text>
+              </View>
+            ) : (
+              <ScrollView style={styles.panelScroll} showsVerticalScrollIndicator={false}>
+                {nearby.map((p, i) => (
+                  <TouchableOpacity
+                    key={i}
+                    style={styles.panelItem}
+                    activeOpacity={0.7}
+                    onPress={() => setFocusPoint(focusPoint?.name === p.name ? null : { lat: p.lat, lng: p.lng, name: p.name })}
+                  >
+                    <Text style={styles.panelIcon}>📍</Text>
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.panelName} numberOfLines={1}>{p.name}</Text>
+                      <Text style={styles.panelDesc}>{(p as any).category} · {(p as any).distKm < 1 ? `${Math.round((p as any).distKm * 1000)} מ׳` : `${(p as any).distKm.toFixed(1)} ק״מ`}</Text>
+                    </View>
+                    <Text style={styles.panelArrow}>←</Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            )}
+          </View>
+        )}
         {active !== 'הכל' && (() => {
           const layer = layers.find(l => l.name === active);
           if (!layer) return null;
