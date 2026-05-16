@@ -904,7 +904,10 @@ function HotelCard({ h, dark, pageBtnLabel, mapPoints, layerColor, placesQuery, 
             style={[st.hotelBtn, st.hotelBtnPrimary, !placesQuery && !btnEnabled && st.hotelBtnDisabled]}
             activeOpacity={0.7}
             onPress={() => {
-              if (placesQuery) setShowInfoModal(true);
+              if (placesQuery) {
+                const t = isHotel ? 'hotel' : isAttraction ? 'attraction' : isRestaurant ? 'restaurant' : '';
+                router.push(`/place?q=${encodeURIComponent(placesQuery)}&title=${encodeURIComponent(h.title)}&type=${t}` as any);
+              }
               else if (hasGallery) setShowGallery(true);
               else if (h.pageUrl) Linking.openURL(h.pageUrl);
             }}
