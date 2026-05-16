@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Modal, View, Text, TouchableOpacity, ScrollView, ActivityIndicator, StyleSheet, Linking, Platform, Image } from 'react-native';
 import { API_BASE } from '../constants/api';
 import { Colors } from '../constants/colors';
-import { openInAppBrowser, bookingSearch, hotellookSearch, tiqetsBatumi } from '../constants/affiliates';
+import { openInAppBrowser, bookingSearch, hotellookSearch, tiqetsBatumi, woltSearch } from '../constants/affiliates';
 import MapEmbed from './MapEmbed';
 
 function PhotoGallery({ photos }: { photos: { ref: string; url: string }[] }) {
@@ -139,12 +139,12 @@ export default function PlacesInfoModal({ query, title, onClose, hideHours, show
                 <View style={s.btnCol}>
                   {!!data.phone && (
                     <TouchableOpacity style={[s.btn, { backgroundColor: '#10b981' }]} onPress={() => Linking.openURL(`tel:${data.phone}`)}>
-                      <Text style={s.btnTxt}>{isRestaurant ? '📞 להזמנת שולחן' : '📞 חייג'} · {data.phone}</Text>
+                      <Text style={s.btnTxt}>{isRestaurant ? 'להזמנת שולחן' : 'חייג'} · {data.phone}</Text>
                     </TouchableOpacity>
                   )}
                   {!!data.website && (
                     <TouchableOpacity style={[s.btn, { backgroundColor: Colors.PRIMARY }]} onPress={() => Linking.openURL(data.website!)}>
-                      <Text style={s.btnTxt}>🌐 אתר רשמי</Text>
+                      <Text style={s.btnTxt}>אתר רשמי</Text>
                     </TouchableOpacity>
                   )}
                 </View>
@@ -152,17 +152,17 @@ export default function PlacesInfoModal({ query, title, onClose, hideHours, show
               {showHotelPrices && (
                 <View style={[s.btnRow, { marginTop: 10 }]}>
                   <TouchableOpacity style={[s.btn, { flex: 1, backgroundColor: '#FF6B00' }]} onPress={() => openInAppBrowser(hotellookSearch(title))}>
-                    <Text style={s.btnTxt}>💰 השווה מחירים</Text>
+                    <Text style={s.btnTxt}>השווה מחירים</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={[s.btn, { flex: 1, backgroundColor: '#003580' }]} onPress={() => openInAppBrowser(bookingSearch(title))}>
-                    <Text style={s.btnTxt}>🛏️ Booking</Text>
+                    <Text style={s.btnTxt}>Booking</Text>
                   </TouchableOpacity>
                 </View>
               )}
               {showAttractionTickets && (
                 <View style={[s.btnCol, { marginTop: 10 }]}>
                   <TouchableOpacity style={[s.btn, { backgroundColor: '#f97316' }]} onPress={() => openInAppBrowser(tiqetsBatumi(title))}>
-                    <Text style={s.btnTxt}>🎫 כרטיסים ב-Tiqets</Text>
+                    <Text style={s.btnTxt}>כרטיסים ב-Tiqets</Text>
                   </TouchableOpacity>
                 </View>
               )}
