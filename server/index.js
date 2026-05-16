@@ -809,6 +809,28 @@ app.post('/api/admin/fetch-photos', async (req, res) => {
   res.json({ category: cat.title, count: results.length, results });
 });
 
+// ─── Admin: set sub-category tile icon from first hotel image ─
+app.post('/api/admin/set-tile-icon', (req, res) => {
+  const { categoryId } = req.body || {};
+  if (!categoryId) return res.status(400).json({ error: 'categoryId required' });
+  const db = readDB();
+  const find = (items) => {
+    for (const it of (items || [])) {
+      if (it.id === categoryId) return it;
+      const r = find(it.children);
+      if (r) return r;
+    }
+    return null;
+  };
+  const cat = find(db.mainCategories) || find(db.extraCategories);
+  if (!cat) return res.status(404).json({ error: 'Category not found' });
+  const first = (cat.hotels || []).find(h => h.visible !== false && h.image && h.image.startsWith('/uploads/'));
+  if (!first) return res.status(404).json({ error: 'No suitable hotel image' });
+  cat.icon = first.image;
+  writeDB(db);
+  res.json({ category: cat.title, icon: cat.icon });
+});
+
 // ─── Static Map proxy (multi-pin via Google Static Maps) ─────
 app.get('/api/static-map', async (req, res) => {
   const key = process.env.GOOGLE_PLACES_KEY;
