@@ -1234,9 +1234,25 @@ export default function CategoryScreen() {
             .map(h => ({ name: h.title, lat: h.coords!.lat, lng: h.coords!.lng }));
           const pts = mapPoints.length ? mapPoints : fallback;
           if (pts.length === 0) return null;
+          const bannerText = rootId === '2' ? 'איזו אטרקציה קרובה אליי עכשיו?' : 'איזו מסעדה מומלצת קרובה אליי עכשיו?';
           return (
-            <View style={{ marginHorizontal: 12, marginTop: 8, marginBottom: 8, borderRadius: 14, overflow: 'hidden' }}>
-              <CategoryHeaderMap points={pts} color={mapLayerColor} />
+            <View style={{ marginHorizontal: 12, marginTop: 8, marginBottom: 8 }}>
+              <View style={{ borderRadius: 14, overflow: 'hidden' }}>
+                <CategoryHeaderMap points={pts} color={mapLayerColor} />
+              </View>
+              <TouchableOpacity
+                onPress={() => router.push('/(tabs)/map?near=1' as any)}
+                activeOpacity={0.9}
+                style={{ marginTop: 8, flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#F4A94E', borderRadius: 14, paddingVertical: 12, paddingHorizontal: 14, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.15, shadowRadius: 4, elevation: 3 }}
+              >
+                <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 8, flex: 1 }}>
+                  <Text style={{ fontSize: 22 }}>📍</Text>
+                  <Text style={{ flex: 1, fontSize: 14, fontWeight: '900', color: '#1C2B35', writingDirection: 'rtl' }}>{bannerText}</Text>
+                </View>
+                <View style={{ backgroundColor: '#1C2B35', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 16 }}>
+                  <Text style={{ color: '#fff', fontSize: 12, fontWeight: '900' }}>מצא</Text>
+                </View>
+              </TouchableOpacity>
             </View>
           );
         })()}
