@@ -1287,17 +1287,28 @@ export default function CategoryScreen() {
               <View style={{ borderRadius: 14, overflow: 'hidden' }}>
                 <CategoryHeaderMap points={pts} color={mapLayerColor} />
               </View>
-              <TouchableOpacity
-                onPress={() => router.push(`/(tabs)/map?near=1&filter=${encodeURIComponent(filterParam)}` as any)}
-                activeOpacity={0.9}
-                style={{ marginTop: 8, flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#F4A94E', borderRadius: 14, paddingVertical: 14, paddingHorizontal: 14, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.15, shadowRadius: 4, elevation: 3 }}
-              >
-                <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 8, flex: 1 }}>
-                  <Text style={{ fontSize: 22 }}>📍</Text>
-                  <Text style={{ flex: 1, fontSize: 14, fontWeight: '900', color: '#1C2B35', writingDirection: 'rtl' }}>{bannerText}</Text>
-                </View>
-                <Text style={{ color: '#1C2B35', fontSize: 14, fontWeight: '900' }}>מצא ←</Text>
-              </TouchableOpacity>
+              {cat.id === 'r6' ? (
+                <TouchableOpacity
+                  onPress={() => router.push(`/(tabs)/map?near=1&filter=${encodeURIComponent(filterParam)}` as any)}
+                  activeOpacity={0.7}
+                  style={{ marginTop: 8, flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 10 }}
+                >
+                  <Text style={{ fontSize: 18 }}>📍</Text>
+                  <Text style={{ fontSize: 14, fontWeight: '900', color: '#1A6B8A', writingDirection: 'rtl', textDecorationLine: 'underline' }}>{bannerText}</Text>
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                  onPress={() => router.push(`/(tabs)/map?near=1&filter=${encodeURIComponent(filterParam)}` as any)}
+                  activeOpacity={0.9}
+                  style={{ marginTop: 8, flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#F4A94E', borderRadius: 14, paddingVertical: 14, paddingHorizontal: 14, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.15, shadowRadius: 4, elevation: 3 }}
+                >
+                  <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 8, flex: 1 }}>
+                    <Text style={{ fontSize: 22 }}>📍</Text>
+                    <Text style={{ flex: 1, fontSize: 14, fontWeight: '900', color: '#1C2B35', writingDirection: 'rtl' }}>{bannerText}</Text>
+                  </View>
+                  <Text style={{ color: '#1C2B35', fontSize: 14, fontWeight: '900' }}>מצא ←</Text>
+                </TouchableOpacity>
+              )}
             </View>
           );
         })()}
