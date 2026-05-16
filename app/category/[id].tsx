@@ -1290,11 +1290,14 @@ export default function CategoryScreen() {
               {cat.id === 'r6' ? (
                 <TouchableOpacity
                   onPress={() => router.push(`/(tabs)/map?near=1&filter=${encodeURIComponent(filterParam)}` as any)}
-                  activeOpacity={0.7}
-                  style={{ marginTop: 8, flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 10 }}
+                  activeOpacity={0.85}
+                  style={{ marginTop: 8, flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', backgroundColor: 'transparent', borderRadius: 14, paddingVertical: 14, paddingHorizontal: 14, borderWidth: 2, borderColor: '#F4A94E' }}
                 >
-                  <Text style={{ fontSize: 18 }}>📍</Text>
-                  <Text style={{ fontSize: 14, fontWeight: '900', color: '#1A6B8A', writingDirection: 'rtl', textDecorationLine: 'underline' }}>{bannerText}</Text>
+                  <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 8, flex: 1 }}>
+                    <Text style={{ fontSize: 22 }}>📍</Text>
+                    <Text style={{ flex: 1, fontSize: 14, fontWeight: '900', color: '#1C2B35', writingDirection: 'rtl' }}>{bannerText}</Text>
+                  </View>
+                  <Text style={{ color: '#F4A94E', fontSize: 14, fontWeight: '900' }}>מצא ←</Text>
                 </TouchableOpacity>
               ) : (
                 <TouchableOpacity
