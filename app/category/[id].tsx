@@ -1286,35 +1286,29 @@ export default function CategoryScreen() {
           const filterParam = rootId === '2' ? 'אטרקצי' : rootId === '6' ? 'מסעד' : 'קני';
           const expandToTab = () => router.push('/(tabs)/map' as any);
           return (
-            <View style={{ marginHorizontal: 12, marginTop: 8, marginBottom: 8 }}>
-              <View style={{ borderRadius: 14, overflow: 'hidden' }}>
+            <View style={{ marginBottom: 8 }}>
+              <View style={{ overflow: 'hidden' }}>
                 <CategoryHeaderMap points={pts} color={mapLayerColor} />
               </View>
-              {cat.id === 'r6' ? (
-                <TouchableOpacity
-                  onPress={() => router.push(`/(tabs)/map?near=1&filter=${encodeURIComponent(filterParam)}` as any)}
-                  activeOpacity={0.85}
-                  style={{ marginTop: 8, flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', backgroundColor: 'transparent', borderRadius: 14, paddingVertical: 14, paddingHorizontal: 14, borderWidth: 2, borderColor: '#F4A94E' }}
-                >
-                  <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 8, flex: 1 }}>
-                    <Text style={{ fontSize: 22 }}>📍</Text>
-                    <Text style={{ flex: 1, fontSize: 14, fontWeight: '900', color: '#1C2B35', writingDirection: 'rtl' }}>{bannerText}</Text>
-                  </View>
-                  <Text style={{ color: '#F4A94E', fontSize: 14, fontWeight: '900' }}>מצא ←</Text>
-                </TouchableOpacity>
-              ) : (
-                <TouchableOpacity
-                  onPress={() => router.push(`/(tabs)/map?near=1&filter=${encodeURIComponent(filterParam)}` as any)}
-                  activeOpacity={0.9}
-                  style={{ marginTop: 8, flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#F4A94E', borderRadius: 14, paddingVertical: 14, paddingHorizontal: 14, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.15, shadowRadius: 4, elevation: 3 }}
-                >
-                  <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 8, flex: 1 }}>
-                    <Text style={{ fontSize: 22 }}>📍</Text>
-                    <Text style={{ flex: 1, fontSize: 14, fontWeight: '900', color: '#1C2B35', writingDirection: 'rtl' }}>{bannerText}</Text>
-                  </View>
-                  <Text style={{ color: '#1C2B35', fontSize: 14, fontWeight: '900' }}>מצא ←</Text>
-                </TouchableOpacity>
-              )}
+              <View style={{ marginHorizontal: 12 }}>
+                {cat.id === 'r6' ? (
+                  <TouchableOpacity
+                    onPress={() => router.push(`/(tabs)/map?near=1&filter=${encodeURIComponent(filterParam)}` as any)}
+                    activeOpacity={0.85}
+                    style={{ marginTop: 8, flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'center', backgroundColor: 'transparent', borderRadius: 14, paddingVertical: 14, paddingHorizontal: 14, borderWidth: 2, borderColor: '#F4A94E' }}
+                  >
+                    <Text style={{ fontSize: 14, fontWeight: '900', color: '#1C2B35', writingDirection: 'rtl', textAlign: 'center' }}>{bannerText}</Text>
+                  </TouchableOpacity>
+                ) : (
+                  <TouchableOpacity
+                    onPress={() => router.push(`/(tabs)/map?near=1&filter=${encodeURIComponent(filterParam)}` as any)}
+                    activeOpacity={0.9}
+                    style={{ marginTop: 8, flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'center', backgroundColor: '#F4A94E', borderRadius: 14, paddingVertical: 14, paddingHorizontal: 14, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.15, shadowRadius: 4, elevation: 3 }}
+                  >
+                    <Text style={{ fontSize: 14, fontWeight: '900', color: '#1C2B35', writingDirection: 'rtl', textAlign: 'center' }}>{bannerText}</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
             </View>
           );
         })()}
