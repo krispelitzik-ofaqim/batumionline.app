@@ -1429,17 +1429,6 @@ export default function CategoryScreen() {
                 </View>
                 <RecommendGuideButton categoryId="10" mode={guideMode} />
                 <DeleteMySubmission accentColor="#F4A94E" />
-                <TouchableOpacity
-                  onPress={() => router.push('/category/a8' as any)}
-                  activeOpacity={0.85}
-                  style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#1A6B8A', borderRadius: 14, paddingVertical: 12, paddingHorizontal: 14, marginBottom: 10 }}
-                >
-                  <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 8, flex: 1 }}>
-                    <Text style={{ fontSize: 22 }}>🚖</Text>
-                    <Text style={{ flex: 1, color: '#fff', fontSize: 14, fontWeight: '900', writingDirection: 'rtl' }}>צריך נהג / טרנספר? עבור לנסיעות פרטיות</Text>
-                  </View>
-                  <Text style={{ color: '#F4A94E', fontSize: 16, fontWeight: '900' }}>←</Text>
-                </TouchableOpacity>
               </View>
             )}
             {cat.id === 'a8' && (
@@ -1474,6 +1463,19 @@ export default function CategoryScreen() {
               <View style={{ width: '100%', alignSelf: 'stretch', paddingHorizontal: 16, paddingBottom: 16, paddingTop: 8 }}>
                 <HtmlContent html={(cat as any).longTextBottom} baseStyle={{ color: darkCat ? '#e2e8f0' : Colors.TEXT, textAlign: 'right', writingDirection: 'rtl' }} />
               </View>
+            )}
+            {cat.id === '10' && (
+              <TouchableOpacity
+                onPress={() => router.push('/category/a8' as any)}
+                activeOpacity={0.85}
+                style={{ marginHorizontal: 16, marginTop: 10, marginBottom: 20, flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#1A6B8A', borderRadius: 14, paddingVertical: 14, paddingHorizontal: 14 }}
+              >
+                <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 8, flex: 1 }}>
+                  <Text style={{ fontSize: 24 }}>🚖</Text>
+                  <Text style={{ flex: 1, color: '#fff', fontSize: 14, fontWeight: '900', writingDirection: 'rtl' }}>צריך נהג / טרנספר? עבור לנסיעות פרטיות</Text>
+                </View>
+                <Text style={{ color: '#F4A94E', fontSize: 18, fontWeight: '900' }}>←</Text>
+              </TouchableOpacity>
             )}
             {cat.cardStyle === 'foodie' && (
               <View style={{ backgroundColor: '#1e1e2a', borderRadius: 16, margin: 16, marginTop: 8, padding: 16 }}>
