@@ -1412,7 +1412,7 @@ export default function CategoryScreen() {
         ) : cat.hotels && cat.hotels.length > 0 ? (
           <View style={st.hotelList}>
             {cat.id === '10' && (
-              <View style={{ paddingHorizontal: 12, paddingTop: 4 }}>
+              <View style={{ paddingTop: 4 }}>
                 <View style={{ flexDirection: 'row-reverse', backgroundColor: '#f1f5f9', borderRadius: 22, padding: 4, marginBottom: 6 }}>
                   {(['israeli','local'] as const).map(m => (
                     <TouchableOpacity
@@ -1432,7 +1432,7 @@ export default function CategoryScreen() {
               </View>
             )}
             {cat.id === 'a8' && (
-              <View style={{ paddingHorizontal: 12, paddingTop: 4 }}>
+              <View style={{ paddingTop: 4 }}>
                 <RecommendDriverButton categoryId="a8" />
                 <DeleteMySubmission accentColor="#F4A94E" />
               </View>
