@@ -338,14 +338,22 @@ export default function FlightsModal({ visible, onClose, bgColor }: { visible: b
 
           <Text style={s.code}>TLV — BUS  •  {new Date().toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</Text>
 
-          {/* Search flights CTA */}
+          {/* Search flights CTA - full banner */}
           <TouchableOpacity
             onPress={() => Linking.openURL('https://www.aviasales.com/?origin_iata=TLV&destination_iata=BUS&marker=X5SEJjUA')}
-            activeOpacity={0.85}
-            style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: '#F4A94E', paddingVertical: 12, paddingHorizontal: 18, borderRadius: 999, marginVertical: 10, alignSelf: 'center' }}
+            activeOpacity={0.9}
+            style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', backgroundColor: 'rgba(0,0,0,0.35)', borderRadius: 14, paddingVertical: 12, paddingHorizontal: 14, marginVertical: 10, borderWidth: 1, borderColor: 'rgba(244,169,78,0.6)' }}
           >
-            <Text style={{ fontSize: 18 }}>✈️</Text>
-            <Text style={{ color: '#1C2B35', fontSize: 14, fontWeight: '900' }}>חפש טיסה זולה</Text>
+            <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 10, flex: 1 }}>
+              <Text style={{ fontSize: 22 }}>✈️</Text>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: 14, fontWeight: '900', color: '#fff', writingDirection: 'rtl' }}>חפש טיסה זולה ל-BUS</Text>
+                <Text style={{ fontSize: 11, color: '#F4A94E', writingDirection: 'rtl', marginTop: 2 }}>השוואת מחירים — TLV → בטומי</Text>
+              </View>
+            </View>
+            <View style={{ backgroundColor: '#F4A94E', paddingHorizontal: 14, paddingVertical: 7, borderRadius: 16 }}>
+              <Text style={{ color: '#1C2B35', fontSize: 12, fontWeight: '900' }}>חפש</Text>
+            </View>
           </TouchableOpacity>
 
           {/* Tabs */}
