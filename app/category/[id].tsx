@@ -1207,14 +1207,20 @@ export default function CategoryScreen() {
             </View>
           </View>
         ) : (
-          <View style={[st.hero, { backgroundColor: cat.heroBg || cat.bg || (darkCat ? '#1a1a2e' : '#3DA5C4') }]}>
+          (() => {
+            const heroBg = cat.heroBg || cat.bg || (darkCat ? '#1a1a2e' : '#3DA5C4');
+            const lightBg = isLight(heroBg);
+            const titleColor = darkCat ? '#F4A94E' : lightBg ? '#1C2B35' : Colors.WHITE;
+            const subColor = darkCat ? '#d4af37' : lightBg ? '#475569' : Colors.WHITE;
+            return (
+          <View style={[st.hero, { backgroundColor: heroBg }]}>
             <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 10, justifyContent: 'center' }}>
               {cat.icon ? (
                 (cat.icon.startsWith('/') || cat.icon.startsWith('http') || cat.icon.startsWith('data:'))
                   ? <Image source={{ uri: resolveUri(cat.icon) }} style={{ width: 40, height: 40, borderRadius: 8 }} resizeMode="cover" />
                   : <Text style={{ fontSize: 28 }}>{cat.icon}</Text>
               ) : null}
-              <Text style={[st.heroTitle, darkCat && { color: '#F4A94E' }]}>{cat.title}</Text>
+              <Text style={[st.heroTitle, { color: titleColor }]}>{cat.title}</Text>
             </View>
             {(() => {
               const heroCount =
@@ -1223,7 +1229,7 @@ export default function CategoryScreen() {
                 (cat.children?.filter((c: any) => c.visible !== false).length) || 0;
               if (cat.subtitle || heroCount > 0) {
                 return (
-                  <Text style={[st.heroSub, darkCat && { color: '#d4af37' }]}>
+                  <Text style={[st.heroSub, { color: subColor }]}>
                     {cat.subtitle || ''}
                     {heroCount > 0 ? <Text style={{ opacity: 0.7 }}>{cat.subtitle ? ' ' : ''}({heroCount})</Text> : null}
                   </Text>
@@ -1232,6 +1238,8 @@ export default function CategoryScreen() {
               return null;
             })()}
           </View>
+            );
+          })()
         )}
 
         {isAdmin && trialHoursLeft !== null && trialHoursLeft > 0 && !isLocked && paywall.mode === 'premium' && paywall.lockedCategories.includes(id as string) && (
@@ -1466,13 +1474,13 @@ export default function CategoryScreen() {
               <TouchableOpacity
                 onPress={() => router.push('/category/a8' as any)}
                 activeOpacity={0.85}
-                style={{ marginHorizontal: 16, marginTop: 10, marginBottom: 20, flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#1A6B8A', borderRadius: 14, paddingVertical: 14, paddingHorizontal: 14 }}
+                style={{ marginHorizontal: 0, marginTop: 10, marginBottom: 20, flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#eef6fa', borderRadius: 14, paddingVertical: 14, paddingHorizontal: 14, borderWidth: 1, borderColor: '#1A6B8A33' }}
               >
                 <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 8, flex: 1 }}>
                   <Text style={{ fontSize: 24 }}>🚖</Text>
-                  <Text style={{ flex: 1, color: '#fff', fontSize: 14, fontWeight: '900', writingDirection: 'rtl' }}>צריך נהג / טרנספר? עבור לנסיעות פרטיות</Text>
+                  <Text style={{ flex: 1, color: '#1C2B35', fontSize: 14, fontWeight: '800', writingDirection: 'rtl' }}>צריך נהג / טרנספר? עבור לנסיעות פרטיות</Text>
                 </View>
-                <Text style={{ color: '#F4A94E', fontSize: 18, fontWeight: '900' }}>←</Text>
+                <Text style={{ color: '#1A6B8A', fontSize: 18, fontWeight: '900' }}>←</Text>
               </TouchableOpacity>
             )}
             {cat.cardStyle === 'foodie' && (
