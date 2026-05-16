@@ -106,12 +106,24 @@ export default function PlacePage() {
                 <Text style={{ color: Colors.PRIMARY, fontWeight: '900', textDecorationLine: 'underline' }} onPress={() => Linking.openURL(data.website!)}>כאן</Text>
               </Text>
             )}
-            {!!(data.openingHours && data.openingHours.length) && (
-              <View style={s.hours}>
-                <Text style={s.hoursTitle}>שעות פתיחה</Text>
-                {data.openingHours.map((l, i) => <Text key={i} style={s.hoursLine}>{l}</Text>)}
-              </View>
-            )}
+            {!!(data.openingHours && data.openingHours.length) && (() => {
+              const hours = data.openingHours!;
+              const timesOnly = hours.map(l => l.replace(/^[^:]+:\s*/, '').trim());
+              const all24 = timesOnly.every(t => /פתוח 24 שעות|Open 24 hours|24 hours/i.test(t));
+              const allSame = timesOnly.every(t => t === timesOnly[0]);
+              return (
+                <View style={s.hours}>
+                  <Text style={s.hoursTitle}>שעות פתיחה</Text>
+                  {all24 ? (
+                    <Text style={s.hoursLine}>פתוח 24 שעות ביממה, 7 ימים בשבוע</Text>
+                  ) : allSame ? (
+                    <Text style={s.hoursLine}>כל ימות השבוע: {timesOnly[0]}</Text>
+                  ) : (
+                    hours.map((l, i) => <Text key={i} style={s.hoursLine}>{l}</Text>)
+                  )}
+                </View>
+              );
+            })()}
 
             <View style={{ gap: 8, marginTop: 6 }}>
               {!!data.phone && (
