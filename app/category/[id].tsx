@@ -25,6 +25,7 @@ import CategoryHeaderMap from '../../components/CategoryHeaderMap';
 import AddToTourButton from '../../components/AddToTourButton';
 import RecommendGuideButton from '../../components/RecommendGuideButton';
 import RecommendDriverButton from '../../components/RecommendDriverButton';
+import DeleteMySubmission from '../../components/DeleteMySubmission';
 
 type Hotel = { id: string; title: string; titleEn?: string; text: string; image: string; mapUrl?: string; pageUrl?: string; coords?: { lat: number; lng: number }; visible?: boolean; images?: string[]; amenities?: string[]; price?: string; audio?: string; photoAttribution?: { name: string; uri?: string } };
 type TourBlock = { id: string; title: string; subtitle?: string; text: string; color: string; images: string[]; audios: { title?: string; url: string }[]; visible?: boolean; coords?: { lat: number; lng: number } };
@@ -1427,6 +1428,7 @@ export default function CategoryScreen() {
                   ))}
                 </View>
                 <RecommendGuideButton categoryId="10" mode={guideMode} />
+                <DeleteMySubmission accentColor="#F4A94E" />
                 <TouchableOpacity
                   onPress={() => router.push('/category/a8' as any)}
                   activeOpacity={0.85}
@@ -1443,6 +1445,7 @@ export default function CategoryScreen() {
             {cat.id === 'a8' && (
               <View style={{ paddingHorizontal: 12, paddingTop: 4 }}>
                 <RecommendDriverButton categoryId="a8" />
+                <DeleteMySubmission accentColor="#F4A94E" />
               </View>
             )}
             {cat.longText && cat.hotels.length <= 10 && (

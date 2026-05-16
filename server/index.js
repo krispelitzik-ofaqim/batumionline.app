@@ -877,6 +877,29 @@ app.post('/api/guide-recommend', (req, res) => {
   }
 });
 
+// ─── Look up & delete user submissions by phone ───────────────
+app.get('/api/guide-recommend/by-phone', (req, res) => {
+  const phone = String(req.query.phone || '').replace(/[^\d+]/g, '');
+  if (!phone) return res.status(400).json({ error: 'phone required' });
+  const db = readDB();
+  const list = (db.guideRecommendations || []).filter(r => (r.phone || '').replace(/[^\d+]/g, '') === phone);
+  res.json({ items: list });
+});
+
+app.delete('/api/guide-recommend/:id', (req, res) => {
+  const id = req.params.id;
+  const phone = String(req.body?.phone || req.query.phone || '').replace(/[^\d+]/g, '');
+  if (!id || !phone) return res.status(400).json({ error: 'id+phone required' });
+  const db = readDB();
+  const list = db.guideRecommendations || [];
+  const idx = list.findIndex(r => r.id === id && (r.phone || '').replace(/[^\d+]/g, '') === phone);
+  if (idx < 0) return res.status(404).json({ error: 'not found or phone mismatch' });
+  list.splice(idx, 1);
+  db.guideRecommendations = list;
+  writeDB(db);
+  res.json({ success: true });
+});
+
 // ─── Admin: bulk populate category from Places search ─────────
 app.post('/api/admin/populate-category', async (req, res) => {
   const key = process.env.GOOGLE_PLACES_KEY;
