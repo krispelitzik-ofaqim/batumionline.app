@@ -247,6 +247,24 @@ export default function HomeScreen() {
         style={styles.scroll}
         showsVerticalScrollIndicator={false}
       >
+        {/* Top gallery image — random per visit */}
+        {(() => {
+          const imgs = [
+            require('../../assets/welcome/galery1.jpg'),
+            require('../../assets/welcome/galery2.jpg'),
+            require('../../assets/welcome/galery3.jpg'),
+            require('../../assets/welcome/galery4.jpg'),
+            require('../../assets/welcome/galery5.jpg'),
+            require('../../assets/welcome/galery6.jpg'),
+          ];
+          const pick = imgs[Math.floor(Math.random() * imgs.length)];
+          return (
+            <View style={{ marginHorizontal: 16, marginTop: 8, marginBottom: 4, height: 180, borderRadius: 18, overflow: 'hidden' }}>
+              <Image source={pick} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+            </View>
+          );
+        })()}
+
         {/* Header */}
         <View style={styles.header}>
           <EditableText value={editHeaderTitle} onChangeText={setEditHeaderTitle} editMode={editMode} textStyle={styles.headerTitle} />
