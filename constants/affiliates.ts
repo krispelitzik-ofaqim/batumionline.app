@@ -34,10 +34,15 @@ export function gygBatumi(): string {
   return `https://www.getyourguide.com/batumi-l2213/?partner_id=${GYG_PARTNER_ID}`;
 }
 
-// Hotellook search via Travelpayouts
+// Hotellook search via Travelpayouts — dates required so it shows real multi-provider comparison
 export function hotellookSearch(hotelName: string): string {
   const q = encodeURIComponent(`${hotelName} Batumi`);
-  return `https://search.hotellook.com/hotels?destination=${q}&adults=2&marker=${TP_MARKER}`;
+  const isoDate = (offsetDays: number) => {
+    const d = new Date();
+    d.setDate(d.getDate() + offsetDays);
+    return d.toISOString().slice(0, 10);
+  };
+  return `https://search.hotellook.com/hotels?destination=${q}&checkIn=${isoDate(30)}&checkOut=${isoDate(32)}&adults=2&marker=${TP_MARKER}`;
 }
 
 // Booking.com via Travelpayouts redirect
@@ -55,6 +60,12 @@ export function agodaSearch(hotelName: string): string {
 // Aviasales flight search to Batumi from any origin
 export function aviasalesBatumi(): string {
   return `https://www.aviasales.com/?origin_iata=TLV&destination_iata=BUS&marker=${TP_MARKER}`;
+}
+
+// Wolt food delivery search in Batumi
+export function woltSearch(restaurantName: string): string {
+  const q = encodeURIComponent(restaurantName);
+  return `https://wolt.com/he/geo/batumi/search?q=${q}`;
 }
 
 // Tiqets — attraction tickets in Batumi
