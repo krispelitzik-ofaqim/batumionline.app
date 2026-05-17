@@ -192,18 +192,16 @@ export default function RealEstatePortal() {
     const targets = news.filter(n => n.link && (!n.image || fromUnsplash(n.image)));
     if (targets.length === 0) return;
     let cancelled = false;
-    (async () => {
-      for (const n of targets) {
-        try {
-          const r = await fetch(`${API_BASE}/api/og-image?url=${encodeURIComponent(n.link!)}`);
-          const j = await r.json();
-          if (cancelled) return;
-          if (j.success && j.image) {
-            setNews(prev => prev.map(x => x.id === n.id ? { ...x, image: j.image } : x));
-          }
-        } catch {}
-      }
-    })();
+    targets.forEach(async (n) => {
+      try {
+        const r = await fetch(`${API_BASE}/api/og-image?url=${encodeURIComponent(n.link!)}`);
+        const j = await r.json();
+        if (cancelled) return;
+        if (j.success && j.image) {
+          setNews(prev => prev.map(x => x.id === n.id ? { ...x, image: j.image } : x));
+        }
+      } catch {}
+    });
     return () => { cancelled = true; };
   }, [news.length]);
 

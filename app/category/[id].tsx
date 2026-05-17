@@ -9,7 +9,7 @@ import { ThemeContext } from '../../constants/theme';
 import { PreviewContext } from '../../constants/previewContext';
 import { AdminContext } from '../../constants/adminContext';
 import DevicePreviewBar from '../../components/DevicePreviewBar';
-import { fetchContent, fetchRatings, submitRating, API_BASE, resolveUri } from '../../constants/api';
+import { fetchContent, getCachedContent, fetchRatings, submitRating, API_BASE, resolveUri } from '../../constants/api';
 import { openLocation, openDirections, openMapUrl } from '../../constants/maps';
 
 type MapPoint = { name: string; lat: number; lng: number; description?: string };
@@ -1072,7 +1072,8 @@ export default function CategoryScreen() {
   };
 
   useEffect(() => {
-    fetchContent().then(data => {
+    const applyContent = (data: any) => {
+      if (!data) return;
       const all = [...(data.mainCategories || []), ...(data.extraCategories || [])];
       const findDeep = (list: Item[]): Item | undefined => {
         for (const c of list) {
@@ -1150,7 +1151,9 @@ export default function CategoryScreen() {
           setAllRestaurants(rests);
         }
       }
-    }).catch(() => {});
+    };
+    getCachedContent().then(applyContent).catch(() => {});
+    fetchContent().then(applyContent).catch(() => {});
   }, [id]);
 
   if (!cat) {
