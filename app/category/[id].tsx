@@ -264,6 +264,17 @@ function isLight(hex: string): boolean {
   return (r * 0.299 + g * 0.587 + b * 0.114) > 170;
 }
 
+function extractEnNameFromMapUrl(url?: string): string {
+  if (!url) return '';
+  const m = url.match(/\/maps\/(?:dir\/\/|place\/|search\/)([^\/,?]+)/i);
+  if (!m) return '';
+  try {
+    const raw = decodeURIComponent(m[1]).replace(/\+/g, ' ').trim();
+    if (!/[A-Za-z]/.test(raw)) return '';
+    return raw;
+  } catch { return ''; }
+}
+
 function TourStations({ audios, color, onNavigate, onActiveChange, nearbyRestaurants, foodRecEnabled }: {
   audios: { title?: string; url: string; coords?: { lat: number; lng: number } }[];
   color: string;
@@ -1469,7 +1480,7 @@ export default function CategoryScreen() {
                 ? <PassportCard key={h.id} h={h} pageBtnLabel={cat.pageBtnLabel || 'אתר/פייסבוק'} />
                 : cat.cardStyle === 'foodie'
                 ? <FoodieCard key={h.id} h={h} isLast={cat.hotels!.filter(x => x.visible !== false).indexOf(h) === cat.hotels!.filter(x => x.visible !== false).length - 1} />
-                : <HotelCard key={h.id} h={h} dark={darkCat} pageBtnLabel={cat.pageBtnLabel || 'לדף המלון'} mapPoints={mapPoints} layerColor={mapLayerColor || (mapPoints.length > 0 ? Colors.PRIMARY : undefined)} placesQuery={`${h.title} Batumi`} isHotel={rootId === '1'} isAttraction={rootId === '2'} isRestaurant={rootId === '6'} isNightlife={rootId === '4'} sourcePath={`/category/${cat.id}`} />
+                : <HotelCard key={h.id} h={h} dark={darkCat} pageBtnLabel={cat.pageBtnLabel || 'לדף המלון'} mapPoints={mapPoints} layerColor={mapLayerColor || (mapPoints.length > 0 ? Colors.PRIMARY : undefined)} placesQuery={extractEnNameFromMapUrl(h.mapUrl) || `${h.title} Batumi`} isHotel={rootId === '1'} isAttraction={rootId === '2'} isRestaurant={rootId === '6'} isNightlife={rootId === '4'} sourcePath={`/category/${cat.id}`} />
             ))}
             {cat.longText && cat.hotels.length > 10 && (
               <View style={{ width: '100%', alignSelf: 'stretch', paddingBottom: 16, paddingHorizontal: 16 }}>
