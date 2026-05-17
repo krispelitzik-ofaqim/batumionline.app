@@ -16,6 +16,7 @@ type PlaceData = {
   phone?: string;
   website?: string;
   mapsUri?: string;
+  location?: { lat: number; lng: number } | null;
   openingHours?: string[];
   openNow?: boolean | null;
   photos?: { ref: string; url: string }[];
@@ -82,7 +83,12 @@ export default function PlacePage() {
 
           {!!data.mapsUri && (
             <View style={{ height: mapBig ? 480 : 240, marginTop: 8, position: 'relative' }}>
-              <MapEmbed src={`https://www.google.com/maps?q=${encodeURIComponent(`${title || data.name} Batumi`)}&output=embed`} style={{ flex: 1 }} />
+              <MapEmbed
+                src={data.location
+                  ? `https://www.google.com/maps?q=${data.location.lat},${data.location.lng}(${encodeURIComponent(title || data.name || '')})&output=embed`
+                  : `https://www.google.com/maps?q=${encodeURIComponent(`${title || data.name} Batumi`)}&output=embed`}
+                style={{ flex: 1 }}
+              />
               <TouchableOpacity onPress={() => setMapBig(v => !v)} style={s.expand}>
                 <Text style={s.expandTxt}>{mapBig ? '−' : '×2'}</Text>
               </TouchableOpacity>

@@ -729,7 +729,7 @@ app.get('/api/places', async (req, res) => {
       headers: {
         'Content-Type': 'application/json',
         'X-Goog-Api-Key': key,
-        'X-Goog-FieldMask': 'places.displayName,places.rating,places.userRatingCount,places.internationalPhoneNumber,places.googleMapsUri,places.websiteUri,places.currentOpeningHours,places.formattedAddress,places.photos,places.photos.authorAttributions',
+        'X-Goog-FieldMask': 'places.displayName,places.rating,places.userRatingCount,places.internationalPhoneNumber,places.googleMapsUri,places.websiteUri,places.currentOpeningHours,places.formattedAddress,places.location,places.photos,places.photos.authorAttributions',
       },
       body: JSON.stringify({ textQuery: query, languageCode: lang }),
     });
@@ -752,6 +752,7 @@ app.get('/api/places', async (req, res) => {
       phone: p.internationalPhoneNumber || '',
       website: p.websiteUri || '',
       mapsUri: p.googleMapsUri || '',
+      location: p.location ? { lat: p.location.latitude, lng: p.location.longitude } : null,
       openingHours: p.currentOpeningHours?.weekdayDescriptions || [],
       openNow: p.currentOpeningHours?.openNow ?? null,
       photos,
