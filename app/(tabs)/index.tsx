@@ -14,7 +14,7 @@ import { ThemeContext } from '../../constants/theme';
 import { AdminContext } from '../../constants/adminContext';
 import { PreviewContext } from '../../constants/previewContext';
 import { router } from 'expo-router';
-import { fetchContent, resolveUri } from '../../constants/api';
+import { fetchContent, getCachedContent, resolveUri } from '../../constants/api';
 import { Colors } from '../../constants/colors';
 import WelcomeSlider from '../../components/WelcomeSlider';
 import HomeGallery from '../../components/HomeGallery';
@@ -179,35 +179,34 @@ export default function HomeScreen() {
 
   // Fetch content from API on mount
   useEffect(() => {
-    fetchContent()
-      .then(data => {
-        if (data.texts) {
-          setEditHeaderTitle(data.texts.headerTitle || 'Batumi Online');
-          setEditHeaderSub(data.texts.headerSub || 'המדריך לתייר הישראלי בבטומי');
-        }
-        if (data.mainCategories) setEditMainCats(data.mainCategories);
-        if (data.extraCategories) setEditExtraCats(data.extraCategories);
-        if (typeof data.extraGroupVisible === 'boolean') setExtraGroupVisible(data.extraGroupVisible);
-        if (data.groupVisibility && typeof data.groupVisibility === 'object') {
-          if (typeof data.groupVisibility.side === 'boolean') setSideGroupVisible(data.groupVisibility.side);
-          if (typeof data.groupVisibility.welcome === 'boolean') setWelcomeGroupVisible(data.groupVisibility.welcome);
-          if (typeof data.groupVisibility.info === 'boolean') setInfoGroupVisible(data.groupVisibility.info);
-          if (typeof data.groupVisibility.bottom === 'boolean') setBottomGroupVisible(data.groupVisibility.bottom);
-          if (typeof data.groupVisibility.main === 'boolean') setMainGroupVisible(data.groupVisibility.main);
-        }
-        if (data.bottomBanners) setEditBottomBanners(data.bottomBanners);
-        const side = data.sideBanners || [];
-        const re = side.find((b: any) => b.id === 'realestate');
-        const img = re?.image || (re?.icon?.startsWith('http') || re?.icon?.startsWith('/') ? re.icon : '');
-        if (img) setRealEstateImg(resolveUri(img));
-        if (re?.kicker !== undefined) setReBannerKicker(re.kicker || '');
-        if (re?.bannerTitle !== undefined) setReBannerTitle(re.bannerTitle || '');
-        if (re?.bannerSub !== undefined) setReBannerSub(re.bannerSub || '');
-        if (data.bgColor) setBgColor(data.bgColor);
-      })
-      .catch(() => {
-        // Fallback to hardcoded data — already set as defaults
-      });
+    const applyData = (data: any) => {
+      if (!data) return;
+      if (data.texts) {
+        setEditHeaderTitle(data.texts.headerTitle || 'Batumi Online');
+        setEditHeaderSub(data.texts.headerSub || 'המדריך לתייר הישראלי בבטומי');
+      }
+      if (data.mainCategories) setEditMainCats(data.mainCategories);
+      if (data.extraCategories) setEditExtraCats(data.extraCategories);
+      if (typeof data.extraGroupVisible === 'boolean') setExtraGroupVisible(data.extraGroupVisible);
+      if (data.groupVisibility && typeof data.groupVisibility === 'object') {
+        if (typeof data.groupVisibility.side === 'boolean') setSideGroupVisible(data.groupVisibility.side);
+        if (typeof data.groupVisibility.welcome === 'boolean') setWelcomeGroupVisible(data.groupVisibility.welcome);
+        if (typeof data.groupVisibility.info === 'boolean') setInfoGroupVisible(data.groupVisibility.info);
+        if (typeof data.groupVisibility.bottom === 'boolean') setBottomGroupVisible(data.groupVisibility.bottom);
+        if (typeof data.groupVisibility.main === 'boolean') setMainGroupVisible(data.groupVisibility.main);
+      }
+      if (data.bottomBanners) setEditBottomBanners(data.bottomBanners);
+      const side = data.sideBanners || [];
+      const re = side.find((b: any) => b.id === 'realestate');
+      const img = re?.image || (re?.icon?.startsWith('http') || re?.icon?.startsWith('/') ? re.icon : '');
+      if (img) setRealEstateImg(resolveUri(img));
+      if (re?.kicker !== undefined) setReBannerKicker(re.kicker || '');
+      if (re?.bannerTitle !== undefined) setReBannerTitle(re.bannerTitle || '');
+      if (re?.bannerSub !== undefined) setReBannerSub(re.bannerSub || '');
+      if (data.bgColor) setBgColor(data.bgColor);
+    };
+    getCachedContent().then(applyData).catch(() => {});
+    fetchContent().then(applyData).catch(() => {});
   }, []);
 
   const handleSaveEdit = () => {
