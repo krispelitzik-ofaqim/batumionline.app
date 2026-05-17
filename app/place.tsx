@@ -140,7 +140,7 @@ export default function PlacePage() {
               {/* website link embedded in address above */}
               {isHotel && (
                 <TouchableOpacity style={[s.btn, { backgroundColor: '#FF6B00' }]} onPress={() => openInAppBrowser(hotellookSearch(title || data.name || ''))}>
-                  <Text style={s.btnTxt}>השווה מחירים</Text>
+                  <Text style={s.btnTxt}>ראה מחיר וזמינות</Text>
                 </TouchableOpacity>
               )}
               {isAttraction && (

@@ -152,7 +152,7 @@ export default function PlacesInfoModal({ query, title, onClose, hideHours, show
               {showHotelPrices && (
                 <View style={[s.btnRow, { marginTop: 10 }]}>
                   <TouchableOpacity style={[s.btn, { flex: 1, backgroundColor: '#FF6B00' }]} onPress={() => openInAppBrowser(hotellookSearch(title))}>
-                    <Text style={s.btnTxt}>השווה מחירים</Text>
+                    <Text style={s.btnTxt}>ראה מחיר וזמינות</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={[s.btn, { flex: 1, backgroundColor: '#003580' }]} onPress={() => openInAppBrowser(bookingSearch(title))}>
                     <Text style={s.btnTxt}>Booking</Text>
