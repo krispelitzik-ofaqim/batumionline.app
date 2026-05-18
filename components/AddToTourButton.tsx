@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const STORAGE_KEY = '@bo:favorites';
+const TOURS_KEY = '@bo:myTours';
+const FAV_TOUR_NAME = '❤️ המועדפים שלי';
 
 type Props = {
   itemId: string;
@@ -12,32 +13,58 @@ type Props = {
   sourcePath?: string;
 };
 
-async function loadFavs(): Promise<Set<string>> {
+type TourStop = { id: string; title: string; image?: string; type?: string; day?: number; time?: string; sourcePath?: string };
+type Tour = { id: string; name: string; createdAt: string; stops: TourStop[] };
+
+async function loadTours(): Promise<Tour[]> {
   try {
-    const raw = await AsyncStorage.getItem(STORAGE_KEY);
-    const arr: string[] = raw ? JSON.parse(raw) : [];
-    return new Set(arr);
-  } catch { return new Set(); }
+    const raw = await AsyncStorage.getItem(TOURS_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch { return []; }
 }
 
-async function saveFavs(set: Set<string>) {
-  try { await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify([...set])); } catch {}
+async function saveTours(list: Tour[]) {
+  try { await AsyncStorage.setItem(TOURS_KEY, JSON.stringify(list)); } catch {}
 }
 
-export default function AddToTourButton({ itemId }: Props) {
+function isHearted(tours: Tour[], itemId: string): boolean {
+  return tours.some(t => t.stops.some(s => s.id === itemId));
+}
+
+export default function AddToTourButton({ itemId, itemTitle, itemImage, itemType, sourcePath }: Props) {
   const [fav, setFav] = useState(false);
 
   useEffect(() => {
     let alive = true;
-    loadFavs().then(s => { if (alive) setFav(s.has(itemId)); });
+    loadTours().then(t => { if (alive) setFav(isHearted(t, itemId)); });
     return () => { alive = false; };
   }, [itemId]);
 
   const toggle = async () => {
-    const s = await loadFavs();
-    if (s.has(itemId)) s.delete(itemId); else s.add(itemId);
-    await saveFavs(s);
-    setFav(s.has(itemId));
+    const tours = await loadTours();
+    const currentlyFav = isHearted(tours, itemId);
+
+    if (currentlyFav) {
+      const next = tours.map(t => ({ ...t, stops: t.stops.filter(s => s.id !== itemId) }));
+      await saveTours(next);
+      setFav(false);
+    } else {
+      const stop: TourStop = {
+        id: itemId,
+        title: itemTitle || 'פריט',
+        image: itemImage,
+        type: itemType,
+        sourcePath,
+      };
+      const favIdx = tours.findIndex(t => t.name === FAV_TOUR_NAME);
+      if (favIdx >= 0) {
+        tours[favIdx] = { ...tours[favIdx], stops: [...tours[favIdx].stops, stop] };
+      } else {
+        tours.unshift({ id: 't_fav_' + Date.now(), name: FAV_TOUR_NAME, createdAt: new Date().toISOString(), stops: [stop] });
+      }
+      await saveTours(tours);
+      setFav(true);
+    }
   };
 
   return (
