@@ -66,9 +66,9 @@ app.use('/api', (req, res, next) => {
   res.set('Surrogate-Control', 'no-store');
   next();
 });
-app.use('/uploads', express.static(UPLOADS_DIR));
-// Fallback: serve git-committed uploads when file not found in persistent volume
+// Serve git-committed (compressed) uploads first; volume serves new uploads only
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads', express.static(UPLOADS_DIR));
 // Serve purchased Batumi photo library (used as news/fallback images)
 const BATUMI_IMAGES_DIR = path.join(__dirname, '..', 'assets', 'images', 'google');
 app.use('/batumi-images', express.static(BATUMI_IMAGES_DIR, { maxAge: '7d' }));
