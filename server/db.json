@@ -988,7 +988,9 @@
                 "lat": 41.6476,
                 "lng": 41.6456
               },
-              "visible": true
+              "visible": true,
+              "ticketType": "online",
+              "ticketUrl": "https://www.getyourguide.com/batumi-l32542/batumi-argo-cable-car-ride-with-panoramic-views-t1161370/?partner_id=PE2GLSE3MAO4YDEIXLNOYXMC67BCZ32C"
             },
             {
               "id": "a1_1",
@@ -1001,7 +1003,8 @@
               "coords": {
                 "lat": 41.654,
                 "lng": 41.635
-              }
+              },
+              "ticketType": "free"
             },
             {
               "id": "a1_2",
@@ -1014,7 +1017,8 @@
               "coords": {
                 "lat": 41.6554,
                 "lng": 41.6426
-              }
+              },
+              "ticketType": "onsite"
             },
             {
               "id": "a1_3",
@@ -1027,7 +1031,8 @@
               "coords": {
                 "lat": 41.6556,
                 "lng": 41.6432
-              }
+              },
+              "ticketType": "free"
             },
             {
               "id": "a1_4",
@@ -1040,7 +1045,9 @@
               "coords": {
                 "lat": 41.656,
                 "lng": 41.6393
-              }
+              },
+              "ticketType": "online",
+              "ticketUrl": "https://www.getyourguide.com/alphabet-tower-l139746/?partner_id=PE2GLSE3MAO4YDEIXLNOYXMC67BCZ32C"
             },
             {
               "id": "a1_5",
@@ -1053,7 +1060,8 @@
               "coords": {
                 "lat": 41.6525,
                 "lng": 41.642
-              }
+              },
+              "ticketType": "free"
             },
             {
               "id": "a1_6",
@@ -1066,7 +1074,8 @@
               "coords": {
                 "lat": 41.655,
                 "lng": 41.644
-              }
+              },
+              "ticketType": "onsite"
             },
             {
               "id": "a1_7",
@@ -1079,7 +1088,8 @@
               "coords": {
                 "lat": 41.6478,
                 "lng": 41.623
-              }
+              },
+              "ticketType": "free"
             },
             {
               "id": "a1_8",
@@ -1092,7 +1102,9 @@
               "coords": {
                 "lat": 41.6478,
                 "lng": 41.6228
-              }
+              },
+              "ticketType": "online",
+              "ticketUrl": "https://tickets.dolphinarium.ge/"
             },
             {
               "id": "a1_10",
@@ -1105,7 +1117,8 @@
               "coords": {
                 "lat": 41.643,
                 "lng": 41.612
-              }
+              },
+              "ticketType": "free"
             },
             {
               "id": "at_13",
@@ -1118,7 +1131,8 @@
                 "lat": 41.653,
                 "lng": 41.637
               },
-              "visible": true
+              "visible": true,
+              "ticketType": "free"
             },
             {
               "id": "at_14",
@@ -1131,7 +1145,8 @@
                 "lat": 41.6478,
                 "lng": 41.623
               },
-              "visible": true
+              "visible": true,
+              "ticketType": "free"
             },
             {
               "id": "at_15",
@@ -1144,7 +1159,8 @@
                 "lat": 41.6505,
                 "lng": 41.6358
               },
-              "visible": true
+              "visible": true,
+              "ticketType": "onsite"
             },
             {
               "id": "at_16",
@@ -1157,7 +1173,8 @@
                 "lat": 41.648,
                 "lng": 41.6225
               },
-              "visible": true
+              "visible": true,
+              "ticketType": "onsite"
             },
             {
               "id": "at_17",
@@ -1170,7 +1187,8 @@
                 "lat": 41.643,
                 "lng": 41.612
               },
-              "visible": true
+              "visible": true,
+              "ticketType": "onsite"
             }
           ],
           "pageBtnLabel": "מידע נוסף"
@@ -1193,7 +1211,8 @@
               "coords": {
                 "lat": 41.6495,
                 "lng": 41.6412
-              }
+              },
+              "ticketType": "free"
             },
             {
               "id": "a2_2",
@@ -1206,7 +1225,8 @@
               "coords": {
                 "lat": 41.651,
                 "lng": 41.6361
-              }
+              },
+              "ticketType": "free"
             },
             {
               "id": "a2_3",
@@ -1219,7 +1239,8 @@
               "coords": {
                 "lat": 41.6494,
                 "lng": 41.6232
-              }
+              },
+              "ticketType": "free"
             },
             {
               "id": "a2_4",
@@ -1232,7 +1253,8 @@
               "coords": {
                 "lat": 41.653,
                 "lng": 41.637
-              }
+              },
+              "ticketType": "free"
             },
             {
               "id": "a2_11",
@@ -1247,7 +1269,8 @@
                 "lat": 41.652,
                 "lng": 41.634
               },
-              "visible": true
+              "visible": true,
+              "ticketType": "free"
             }
           ],
           "pageBtnLabel": "מידע נוסף"
@@ -1272,7 +1295,8 @@
               "coords": {
                 "lat": 41.573,
                 "lng": 41.575
-              }
+              },
+              "ticketType": "onsite"
             },
             {
               "id": "a3_2",
@@ -1287,7 +1311,8 @@
               "coords": {
                 "lat": 41.76,
                 "lng": 41.74
-              }
+              },
+              "ticketType": "onsite"
             },
             {
               "id": "a3_3",
@@ -1302,7 +1327,8 @@
               "coords": {
                 "lat": 41.651,
                 "lng": 41.637
-              }
+              },
+              "ticketType": "free"
             },
             {
               "id": "a3_4",
@@ -1317,7 +1343,8 @@
               "coords": {
                 "lat": 41.75,
                 "lng": 42.78
-              }
+              },
+              "ticketType": "free"
             },
             {
               "id": "a3_5",
@@ -1332,7 +1359,8 @@
               "coords": {
                 "lat": 41.65,
                 "lng": 41.636
-              }
+              },
+              "ticketType": "onsite"
             }
           ],
           "pageBtnLabel": "מידע נוסף",
@@ -1365,7 +1393,9 @@
               "coords": {
                 "lat": 41.6934,
                 "lng": 41.7074
-              }
+              },
+              "ticketType": "online",
+              "ticketUrl": "https://www.getyourguide.com/batumi-botanical-garden-l161322/?partner_id=PE2GLSE3MAO4YDEIXLNOYXMC67BCZ32C"
             },
             {
               "id": "a9_2",
@@ -1380,7 +1410,8 @@
               "coords": {
                 "lat": 41.67,
                 "lng": 41.88
-              }
+              },
+              "ticketType": "onsite"
             },
             {
               "id": "a9_3",
@@ -1395,7 +1426,8 @@
               "coords": {
                 "lat": 41.78,
                 "lng": 41.78
-              }
+              },
+              "ticketType": "onsite"
             },
             {
               "id": "a9_4",
@@ -1410,7 +1442,8 @@
               "coords": {
                 "lat": 41.5736,
                 "lng": 41.5739
-              }
+              },
+              "ticketType": "onsite"
             },
             {
               "id": "a9_5",
@@ -1425,7 +1458,8 @@
               "coords": {
                 "lat": 41.628,
                 "lng": 41.917
-              }
+              },
+              "ticketType": "free"
             },
             {
               "id": "a9_6",
@@ -1440,7 +1474,8 @@
               "coords": {
                 "lat": 41.62,
                 "lng": 42.02
-              }
+              },
+              "ticketType": "free"
             },
             {
               "id": "a9_7",
@@ -1455,7 +1490,8 @@
               "coords": {
                 "lat": 41.65,
                 "lng": 41.64
-              }
+              },
+              "ticketType": "skip"
             },
             {
               "id": "a9_8",
@@ -1470,7 +1506,8 @@
               "coords": {
                 "lat": 41.65,
                 "lng": 41.64
-              }
+              },
+              "ticketType": "skip"
             },
             {
               "id": "a9_9",
@@ -1485,7 +1522,8 @@
               "coords": {
                 "lat": 41.65,
                 "lng": 41.64
-              }
+              },
+              "ticketType": "skip"
             },
             {
               "id": "a9_10",
@@ -1500,7 +1538,8 @@
               "coords": {
                 "lat": 41.65,
                 "lng": 41.64
-              }
+              },
+              "ticketType": "skip"
             },
             {
               "id": "nat_fishing",
@@ -1512,7 +1551,8 @@
                 "lat": 41.65,
                 "lng": 41.635
               },
-              "visible": true
+              "visible": true,
+              "ticketType": "appointment"
             },
             {
               "id": "nat_birdwatch",
@@ -1524,7 +1564,8 @@
                 "lat": 41.75,
                 "lng": 41.78
               },
-              "visible": true
+              "visible": true,
+              "ticketType": "appointment"
             }
           ],
           "pageBtnLabel": "מידע נוסף",
@@ -1551,7 +1592,8 @@
               "coords": {
                 "lat": 41.6508,
                 "lng": 41.6365
-              }
+              },
+              "ticketType": "free"
             },
             {
               "id": "a5_2",
@@ -1567,7 +1609,8 @@
               "coords": {
                 "lat": 41.6505,
                 "lng": 41.636
-              }
+              },
+              "ticketType": "appointment"
             },
             {
               "id": "a5_3",
@@ -1583,7 +1626,8 @@
               "coords": {
                 "lat": 41.6506,
                 "lng": 41.6362
-              }
+              },
+              "ticketType": "free"
             },
             {
               "id": "a5_4",
@@ -1598,7 +1642,8 @@
               "coords": {
                 "lat": 41.655,
                 "lng": 41.64
-              }
+              },
+              "ticketType": "free"
             }
           ],
           "pageBtnLabel": "מידע נוסף",
@@ -1627,7 +1672,8 @@
               "coords": {
                 "lat": 41.6495,
                 "lng": 41.6375
-              }
+              },
+              "ticketType": "free"
             },
             {
               "id": "a6_2",
@@ -1643,7 +1689,8 @@
               "coords": {
                 "lat": 41.651,
                 "lng": 41.637
-              }
+              },
+              "ticketType": "free"
             },
             {
               "id": "a6_3",
@@ -1659,7 +1706,8 @@
               "coords": {
                 "lat": 41.6515,
                 "lng": 41.6368
-              }
+              },
+              "ticketType": "free"
             }
           ],
           "pageBtnLabel": "מידע נוסף"
@@ -1696,7 +1744,8 @@
               "coords": {
                 "lat": 41.65,
                 "lng": 41.6355
-              }
+              },
+              "ticketType": "appointment"
             }
           ],
           "pageBtnLabel": "מידע נוסף",
@@ -1721,7 +1770,8 @@
                 "lat": 41.6399,
                 "lng": 41.6231
               },
-              "visible": true
+              "visible": true,
+              "ticketType": "onsite"
             },
             {
               "id": "cul_2",
@@ -1733,7 +1783,8 @@
                 "lat": 41.6506,
                 "lng": 41.6368
               },
-              "visible": true
+              "visible": true,
+              "ticketType": "free"
             },
             {
               "id": "cul_3",
@@ -1745,7 +1796,9 @@
                 "lat": 41.6453,
                 "lng": 41.6368
               },
-              "visible": true
+              "visible": true,
+              "ticketType": "online",
+              "ticketUrl": "https://biletebi.ge/en/batumis-dramatuli-teatri"
             },
             {
               "id": "cul_4",
@@ -1757,7 +1810,8 @@
                 "lat": 41.66,
                 "lng": 41.64
               },
-              "visible": true
+              "visible": true,
+              "ticketType": "onsite"
             },
             {
               "id": "cul_5",
@@ -1769,7 +1823,8 @@
                 "lat": 41.6469,
                 "lng": 41.6292
               },
-              "visible": true
+              "visible": true,
+              "ticketType": "onsite"
             }
           ],
           "visible": false
