@@ -4,7 +4,7 @@ import { useLocalSearchParams, router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { API_BASE } from '../constants/api';
 import { Colors } from '../constants/colors';
-import { openInAppBrowser, bookingSearch, hotellookSearch, tiqetsBatumi, gygSearch } from '../constants/affiliates';
+import { openInAppBrowser, bookingSearch, hotellookSearch } from '../constants/affiliates';
 import MapEmbed from '../components/MapEmbed';
 
 type PlaceData = {
@@ -23,7 +23,7 @@ type PlaceData = {
 };
 
 export default function PlacePage() {
-  const { q, title, type } = useLocalSearchParams<{ q?: string; title?: string; type?: string }>();
+  const { q, title, type, ticketType, ticketUrl, ticketUrlAlt } = useLocalSearchParams<{ q?: string; title?: string; type?: string; ticketType?: string; ticketUrl?: string; ticketUrlAlt?: string }>();
   const insets = useSafeAreaInsets();
   const [data, setData] = useState<PlaceData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -143,16 +143,34 @@ export default function PlacePage() {
                   <Text style={s.btnTxt}>ראה מחיר וזמינות</Text>
                 </TouchableOpacity>
               )}
-              {isAttraction && (
-                <TouchableOpacity style={[s.btn, { backgroundColor: '#f97316' }]} onPress={() => openInAppBrowser(tiqetsBatumi(title || data.name || ''))}>
-                  <Text style={s.btnTxt}>כרטיסים ב-Tiqets</Text>
-                </TouchableOpacity>
-              )}
-              {isAttraction && (
-                <TouchableOpacity style={[s.btn, { backgroundColor: '#1A6B8A' }]} onPress={() => openInAppBrowser(gygSearch(title || data.name || ''))}>
-                  <Text style={s.btnTxt}>כרטיסים ב-GetYourGuide</Text>
-                </TouchableOpacity>
-              )}
+              {isAttraction && (() => {
+                const config: Record<string, { color: string; label: string; clickable: boolean }> = {
+                  online: { color: '#f97316', label: 'רכישת כרטיס', clickable: true },
+                  onsite: { color: '#64748b', label: 'תשלום בכניסה', clickable: false },
+                  free: { color: '#10b981', label: 'חינם', clickable: false },
+                  appointment: { color: '#3DA5C4', label: 'בתיאום מראש', clickable: false },
+                };
+                const c = ticketType ? config[ticketType] : null;
+                if (!c || ticketType === 'skip') return null;
+                return (
+                  <View>
+                    {c.clickable && ticketUrl ? (
+                      <TouchableOpacity style={[s.btn, { backgroundColor: c.color }]} onPress={() => openInAppBrowser(ticketUrl)}>
+                        <Text style={s.btnTxt}>{c.label}</Text>
+                      </TouchableOpacity>
+                    ) : (
+                      <View style={[s.btn, { backgroundColor: c.color }]}>
+                        <Text style={s.btnTxt}>{c.label}</Text>
+                      </View>
+                    )}
+                    {c.clickable && ticketUrlAlt && (
+                      <TouchableOpacity onPress={() => openInAppBrowser(ticketUrlAlt)} style={{ marginTop: 6, alignSelf: 'center' }}>
+                        <Text style={{ color: '#1A6B8A', fontSize: 13, fontWeight: '700', textDecorationLine: 'underline' }}>לא מצאתם? ראו גם כאן</Text>
+                      </TouchableOpacity>
+                    )}
+                  </View>
+                );
+              })()}
             </View>
           </View>
         </ScrollView>

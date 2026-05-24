@@ -27,7 +27,7 @@ import RecommendGuideButton from '../../components/RecommendGuideButton';
 import RecommendDriverButton from '../../components/RecommendDriverButton';
 import DeleteMySubmission from '../../components/DeleteMySubmission';
 
-type Hotel = { id: string; title: string; titleEn?: string; text: string; image: string; mapUrl?: string; pageUrl?: string; coords?: { lat: number; lng: number }; visible?: boolean; images?: string[]; amenities?: string[]; price?: string; audio?: string; photoAttribution?: { name: string; uri?: string } };
+type Hotel = { id: string; title: string; titleEn?: string; text: string; image: string; mapUrl?: string; pageUrl?: string; coords?: { lat: number; lng: number }; visible?: boolean; images?: string[]; amenities?: string[]; price?: string; audio?: string; photoAttribution?: { name: string; uri?: string }; ticketType?: string; ticketUrl?: string; ticketUrlAlt?: string };
 type TourBlock = { id: string; title: string; subtitle?: string; text: string; color: string; images: string[]; audios: { title?: string; url: string }[]; visible?: boolean; coords?: { lat: number; lng: number } };
 type Item = {
   id: string; title: string; subtitle?: string; icon: string; bg?: string;
@@ -917,7 +917,8 @@ function HotelCard({ h, dark, pageBtnLabel, mapPoints, layerColor, placesQuery, 
             onPress={() => {
               if (placesQuery) {
                 const t = isHotel ? 'hotel' : isAttraction ? 'attraction' : isRestaurant ? 'restaurant' : '';
-                router.push(`/place?q=${encodeURIComponent(placesQuery)}&title=${encodeURIComponent(h.title)}&type=${t}` as any);
+                const ticketParams = isAttraction && h.ticketType ? `&ticketType=${encodeURIComponent(h.ticketType)}${h.ticketUrl ? `&ticketUrl=${encodeURIComponent(h.ticketUrl)}` : ''}${h.ticketUrlAlt ? `&ticketUrlAlt=${encodeURIComponent(h.ticketUrlAlt)}` : ''}` : '';
+                router.push(`/place?q=${encodeURIComponent(placesQuery)}&title=${encodeURIComponent(h.title)}&type=${t}${ticketParams}` as any);
               }
               else if (hasGallery) setShowGallery(true);
               else if (h.pageUrl) Linking.openURL(h.pageUrl);
@@ -937,7 +938,7 @@ function HotelCard({ h, dark, pageBtnLabel, mapPoints, layerColor, placesQuery, 
         </View>
       </View>
       {placesQuery && showInfoModal && (
-        <PlacesInfoModal query={placesQuery} title={h.title} onClose={() => setShowInfoModal(false)} hideHours={isHotel} showHotelPrices={isHotel} showAttractionTickets={isAttraction} isRestaurant={isRestaurant} />
+        <PlacesInfoModal query={placesQuery} title={h.title} onClose={() => setShowInfoModal(false)} hideHours={isHotel} showHotelPrices={isHotel} showAttractionTickets={isAttraction} isRestaurant={isRestaurant} ticketType={h.ticketType} ticketUrl={h.ticketUrl} ticketUrlAlt={h.ticketUrlAlt} />
       )}
     </View>
   );

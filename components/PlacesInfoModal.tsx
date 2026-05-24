@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Modal, View, Text, TouchableOpacity, ScrollView, ActivityIndicator, StyleSheet, Linking, Platform, Image } from 'react-native';
 import { API_BASE } from '../constants/api';
 import { Colors } from '../constants/colors';
-import { openInAppBrowser, bookingSearch, hotellookSearch, tiqetsBatumi, woltSearch, gygSearch } from '../constants/affiliates';
+import { openInAppBrowser, bookingSearch, hotellookSearch, woltSearch } from '../constants/affiliates';
 import MapEmbed from './MapEmbed';
 
 function PhotoGallery({ photos }: { photos: { ref: string; url: string }[] }) {
@@ -55,7 +55,7 @@ type PlaceData = {
   photos?: { ref: string; url: string }[];
 };
 
-export default function PlacesInfoModal({ query, title, onClose, hideHours, showHotelPrices, showAttractionTickets, isRestaurant }: { query: string; title: string; onClose: () => void; hideHours?: boolean; showHotelPrices?: boolean; showAttractionTickets?: boolean; isRestaurant?: boolean }) {
+export default function PlacesInfoModal({ query, title, onClose, hideHours, showHotelPrices, showAttractionTickets, isRestaurant, ticketType, ticketUrl, ticketUrlAlt }: { query: string; title: string; onClose: () => void; hideHours?: boolean; showHotelPrices?: boolean; showAttractionTickets?: boolean; isRestaurant?: boolean; ticketType?: string; ticketUrl?: string; ticketUrlAlt?: string }) {
   const [data, setData] = useState<PlaceData | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -159,16 +159,34 @@ export default function PlacesInfoModal({ query, title, onClose, hideHours, show
                   </TouchableOpacity>
                 </View>
               )}
-              {showAttractionTickets && (
-                <View style={[s.btnCol, { marginTop: 10 }]}>
-                  <TouchableOpacity style={[s.btn, { backgroundColor: '#f97316' }]} onPress={() => openInAppBrowser(tiqetsBatumi(title))}>
-                    <Text style={s.btnTxt}>כרטיסים ב-Tiqets</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={[s.btn, { backgroundColor: '#1A6B8A' }]} onPress={() => openInAppBrowser(gygSearch(title))}>
-                    <Text style={s.btnTxt}>כרטיסים ב-GetYourGuide</Text>
-                  </TouchableOpacity>
-                </View>
-              )}
+              {showAttractionTickets && (() => {
+                const config: Record<string, { color: string; label: string; clickable: boolean }> = {
+                  online: { color: '#f97316', label: 'רכישת כרטיס', clickable: true },
+                  onsite: { color: '#64748b', label: 'תשלום בכניסה', clickable: false },
+                  free: { color: '#10b981', label: 'חינם', clickable: false },
+                  appointment: { color: '#3DA5C4', label: 'בתיאום מראש', clickable: false },
+                };
+                const c = ticketType ? config[ticketType] : null;
+                if (!c || ticketType === 'skip') return null;
+                return (
+                  <View style={[s.btnCol, { marginTop: 10 }]}>
+                    {c.clickable && ticketUrl ? (
+                      <TouchableOpacity style={[s.btn, { backgroundColor: c.color }]} onPress={() => openInAppBrowser(ticketUrl)}>
+                        <Text style={s.btnTxt}>{c.label}</Text>
+                      </TouchableOpacity>
+                    ) : (
+                      <View style={[s.btn, { backgroundColor: c.color }]}>
+                        <Text style={s.btnTxt}>{c.label}</Text>
+                      </View>
+                    )}
+                    {c.clickable && ticketUrlAlt && (
+                      <TouchableOpacity onPress={() => openInAppBrowser(ticketUrlAlt)} style={{ marginTop: 6, alignSelf: 'center' }}>
+                        <Text style={{ color: '#1A6B8A', fontSize: 13, fontWeight: '700', textDecorationLine: 'underline' }}>לא מצאתם? ראו גם כאן</Text>
+                      </TouchableOpacity>
+                    )}
+                  </View>
+                );
+              })()}
             </ScrollView>
           )}
         </View>
