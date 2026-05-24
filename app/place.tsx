@@ -4,7 +4,7 @@ import { useLocalSearchParams, router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { API_BASE } from '../constants/api';
 import { Colors } from '../constants/colors';
-import { openInAppBrowser, bookingSearch, hotellookSearch, tiqetsBatumi } from '../constants/affiliates';
+import { openInAppBrowser, bookingSearch, hotellookSearch, tiqetsBatumi, gygSearch } from '../constants/affiliates';
 import MapEmbed from '../components/MapEmbed';
 
 type PlaceData = {
@@ -146,6 +146,11 @@ export default function PlacePage() {
               {isAttraction && (
                 <TouchableOpacity style={[s.btn, { backgroundColor: '#f97316' }]} onPress={() => openInAppBrowser(tiqetsBatumi(title || data.name || ''))}>
                   <Text style={s.btnTxt}>כרטיסים ב-Tiqets</Text>
+                </TouchableOpacity>
+              )}
+              {isAttraction && (
+                <TouchableOpacity style={[s.btn, { backgroundColor: '#1A6B8A' }]} onPress={() => openInAppBrowser(gygSearch(title || data.name || ''))}>
+                  <Text style={s.btnTxt}>כרטיסים ב-GetYourGuide</Text>
                 </TouchableOpacity>
               )}
             </View>

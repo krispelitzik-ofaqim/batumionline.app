@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Modal, View, Text, TouchableOpacity, ScrollView, ActivityIndicator, StyleSheet, Linking, Platform, Image } from 'react-native';
 import { API_BASE } from '../constants/api';
 import { Colors } from '../constants/colors';
-import { openInAppBrowser, bookingSearch, hotellookSearch, tiqetsBatumi, woltSearch } from '../constants/affiliates';
+import { openInAppBrowser, bookingSearch, hotellookSearch, tiqetsBatumi, woltSearch, gygSearch } from '../constants/affiliates';
 import MapEmbed from './MapEmbed';
 
 function PhotoGallery({ photos }: { photos: { ref: string; url: string }[] }) {
@@ -163,6 +163,9 @@ export default function PlacesInfoModal({ query, title, onClose, hideHours, show
                 <View style={[s.btnCol, { marginTop: 10 }]}>
                   <TouchableOpacity style={[s.btn, { backgroundColor: '#f97316' }]} onPress={() => openInAppBrowser(tiqetsBatumi(title))}>
                     <Text style={s.btnTxt}>כרטיסים ב-Tiqets</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={[s.btn, { backgroundColor: '#1A6B8A' }]} onPress={() => openInAppBrowser(gygSearch(title))}>
+                    <Text style={s.btnTxt}>כרטיסים ב-GetYourGuide</Text>
                   </TouchableOpacity>
                 </View>
               )}
