@@ -2,7 +2,7 @@
   "expo": {
     "name": "Batumionline",
     "slug": "batumionline-app",
-    "version": "2.0.4",
+    "version": "2.0.5",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -28,7 +28,7 @@
       },
       "edgeToEdgeEnabled": true,
       "package": "com.batumionline.batumi",
-      "versionCode": 10002
+      "versionCode": 10003
     },
     "plugins": [
       "expo-router",
