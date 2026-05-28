@@ -1,0 +1,6585 @@
+import React, { useState, useEffect, useCallback } from 'react';
+import {
+  View, Text, ScrollView, TouchableOpacity, TextInput, StyleSheet, Alert, Modal, Image,
+  useWindowDimensions, Platform, Linking,
+} from 'react-native';
+import { router } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Colors } from '../../constants/colors';
+import { fetchContent, updateAllContent, updateSection, fetchRatings, API_BASE, resolveUri } from '../../constants/api';
+
+// ─── Types ─────────────────────────────────────────────────────
+type HotelBlock = {
+  id: string; title: string; titleEn?: string; text: string; image: string;
+  mapUrl?: string; pageUrl?: string;
+  coords?: { lat: number; lng: number };
+  visible?: boolean;
+  images?: string[];
+  amenities?: string[];
+};
+type TourBlock = {
+  id: string; title: string; subtitle?: string; text: string; color: string;
+  images: string[]; audios: Array<{ title?: string; url: string; coords?: { lat: number; lng: number } }>;
+  visible?: boolean;
+  coords?: { lat: number; lng: number };
+};
+type DataItem = {
+  id: string; title: string; subtitle?: string; icon: string; bg: string;
+  image?: string; audio?: string; video?: string; lat?: string; lng?: string; address?: string;
+  summary?: string; longText?: string; heroBg?: string;
+  btnLabel?: string; btnLink?: string;
+  audios?: Array<{ title?: string; url: string }>;
+  children?: DataItem[];
+  hotels?: HotelBlock[];
+  tours?: TourBlock[];
+  pageBtnLabel?: string;
+  cardStyle?: string;
+  article?: any;
+};
+
+const HERO_PALETTE = [
+  '#2D4A5E', '#F7F3ED', '#1A6B8A', '#3DA5C4', '#7ECFC0', '#F4A94E',
+];
+
+const EMOJI_LIBRARY = [
+  // לינה ואירוח
+  '🏨','🏩','🏢','🏖️','🏡','🛏️','🏘️','🛎️','🔑','🧳',
+  // אטרקציות ואתרים
+  '🎡','📸','🏛️','🗿','🏰','⛲','🎭','🖼️','🏺','🗺️',
+  // סיורים ואודיו
+  '🎧','🎶','🎤','🎵','🎙️','📻','🔊','🎼',
+  // דת והיסטוריה
+  '✡️','⛪','🕌','🕍','✝️','☪️','🕎','📜',
+  // מסעדות ואוכל
+  '🍽️','🥂','🍔','🌭','🍕','🍣','🥘','🧀','🍷','☕','🍺','🥐','🍰',
+  // בילוי וחיי לילה
+  '🎰','💃','🎤','🍸','🪩','🎪','🎬','🎯',
+  // תחבורה
+  '🚕','🚌','🚆','🚐','🚍','✈️','🚲','🚗','🛵','⛽','🚢','🚁',
+  // קניות
+  '🛍️','🛒','💳','🏪','🎁','💎',
+  // ספורט ובריאות
+  '🏋️','⛷️','🏊','🧘','🏃','🚣','🤿','🐴','🎾','⚽','🏀','🎿',
+  // ספא ורווחה
+  '💆','🧖','♨️','💅',
+  // טבע ומזג אוויר
+  '🌊','🌳','🌺','🌤️','🌈','🏔️','🌿','🦋',
+  // כללי
+  '📱','💡','💰','📰','🏠','💼','📍','🏙️','⭐','🏥','🛡️','💱','🇮🇱','🇬🇪',
+  // מדריכים ושירותים
+  '🛂','🧭','📞','💬','👤','🤝','📋','🔒',
+];
+
+type Section = {
+  key: string; label: string; icon: string; storageKey: string;
+  hasSubtitle: boolean; hasImage: boolean; hasAudio: boolean; hasLocation: boolean;
+  hasSummary: boolean; hasLongText: boolean;
+  defaults: DataItem[];
+};
+
+// ─── Default Data ──────────────────────────────────────────────
+const DEFAULT_MAIN_CATEGORIES: DataItem[] = [
+  { id: '1', title: 'אירוח ולינה', subtitle: 'מלונות, דירות ואכסניות', icon: '🏨', bg: '#3DA5C430' },
+  { id: '2', title: 'אתרים ואטרקציות', subtitle: 'גלה מקומות וחוויות', icon: '🎡', bg: '#F4A94E30' },
+  { id: '3', title: 'סיורים קוליים', subtitle: 'מסלולים מודרכים', icon: '🎧', bg: '#1A6B8A30' },
+  { id: '4', title: 'בילוי, פנאי וחיי לילה', subtitle: 'בידור והנאה', icon: '🎰', bg: '#1A6B8A' },
+  { id: '5', title: 'תחבורה', subtitle: 'מוניות ותחבורה ציבורית', icon: '🚕', bg: '#F4A94E25' },
+  { id: '6', title: 'מסעדות ואוכל', subtitle: 'מטבח מקומי ואוכל משובח', icon: '🍽️', bg: '#3DA5C425' },
+];
+
+const DEFAULT_EXTRA_CATEGORIES: DataItem[] = [
+  { id: '7', title: 'קניות ומתנות', subtitle: 'שופינג ומזכרות', icon: '🛍️', bg: '#1A6B8A25' },
+  { id: '8', title: 'ספורט ואיכות חיים', subtitle: 'כושר ופעילויות', icon: '🏋️', bg: '#3DA5C425' },
+  { id: '9', title: 'אקסטרים וסקי', subtitle: 'הרפתקאות ואתגרים', icon: '⛷️', bg: '#F4A94E30' },
+  { id: '10', title: 'מדריכים ישראלים וסוכנים', subtitle: 'ליווי אישי בעברית', icon: '🇮🇱', bg: '#1A6B8A30' },
+];
+
+const DEFAULT_WELCOME: DataItem[] = [
+  { id: '1', title: 'ברוכים הבאים', subtitle: 'מדריך מקיף לבטומי', icon: '👋', bg: '#1A6B8A' },
+  { id: '2', title: 'נחיתה רכה', subtitle: 'מה צריך לדעת', icon: '✈️', bg: '#3DA5C4' },
+  { id: '3', title: 'היסטוריה כללית', subtitle: 'סיפור העיר', icon: '🏛️', bg: '#1C2B35' },
+  { id: '4', title: 'היסטוריה יהודית', subtitle: 'קהילה ומורשת', icon: '✡️', bg: '#F4A94E' },
+  { id: '5', title: 'חוזרים הביתה', subtitle: 'טיפים ליום האחרון', icon: '🏠', bg: '#1A6B8A' },
+];
+
+const DEFAULT_INFO_PORTAL: DataItem[] = [
+  { id: 'health', title: 'בריאות', subtitle: 'מידע רפואי חשוב', icon: '🏥', bg: '#3DA5C425', image: '' },
+  { id: 'insurance', title: 'ביטוחים', subtitle: 'ביטוח נסיעות ובריאות', icon: '🛡️', bg: '#F4A94E25', image: '' },
+  { id: 'telecom', title: 'תקשורת וסלולר', subtitle: 'סים מקומי וחבילות', icon: '📱', bg: '#1A6B8A25', image: '' },
+  { id: 'tips', title: 'טיפים', subtitle: 'עצות מנוסים', icon: '💡', bg: '#F4A94E30', image: '' },
+  { id: 'tax', title: 'החזרי מס', subtitle: 'VAT ומכס', icon: '💰', bg: '#3DA5C430', image: '' },
+];
+
+const DEFAULT_LEGAL: DataItem[] = [
+  { id: 'about', title: 'אודותינו', icon: '👥', bg: '#1A6B8A', longText: 'Batumi Online הוא המדריך הישראלי המקיף לטיול בבטומי, גאורגיה. נולדנו מתוך אהבה לעיר היפה הזו ורצון לעזור לכל ישראלי לחוות אותה בצורה הטובה ביותר. האפליקציה מרכזת את כל המידע שתייר ישראלי צריך – מלונות, מסעדות, אטרקציות, תחבורה, פורטל נדל"ן ועסקים, סיורים קוליים בעברית ועוד.' },
+  { id: 'terms', title: 'תקנון', icon: '🪪', bg: '#3DA5C4', longText: 'השימוש באפליקציית Batumi Online כפוף לתנאים הבאים:\n\n1. כל התוכן באפליקציה מיועד למטרות מידע בלבד.\n2. איננו אחראים לדיוק המחירים, זמינות השירותים או פרטי הקשר המוצגים.\n3. המידע מתעדכן מעת לעת אך ייתכנו שינויים שאינם תחת שליטתנו.\n4. השימוש באפליקציה הוא חופשי וללא תשלום.\n5. בעת לחיצה על קישורים חיצוניים המשתמש עובר לאתרי צד שלישי שאין להם קשר אלינו.' },
+  { id: 'privacy', title: 'פרטיות', icon: '⚖️', bg: '#F4A94E', longText: 'אנחנו מכבדים את פרטיות המשתמשים שלנו:\n\n• אין אנו אוספים מידע אישי מזהה ללא הסכמה מפורשת.\n• שימוש באפליקציה אינו דורש הרשמה או יצירת חשבון.\n• נתוני שימוש אנונימיים נאספים לצורך שיפור האפליקציה בלבד.\n• איננו מוכרים או מעבירים מידע לצדדים שלישיים.\n• עוגיות (Cookies) – האפליקציה עלולה להשתמש בטכנולוגיות אחסון מקומיות לשמירת העדפות.' },
+  { id: 'contact', title: 'כתוב לנו', icon: '✉️', bg: '#1C2B35', longText: 'נשמח לשמוע מכם!\n\nאימייל: krispelitzik@gmail.com\nוואטסאפ: זמין דרך כפתור הוואטסאפ בסרגל התחתון\nאתר: www.batumionline.app\n\nיש לכם הצעה לשיפור? מצאתם טעות? רוצים לפרסם עסק באפליקציה? דברו איתנו!' },
+];
+
+const DEFAULT_BOTTOM_BANNERS: DataItem[] = [
+  { id: 'weather', title: 'מזג אוויר', icon: '🌤️', bg: '#1A6B8A' },
+  { id: 'currency', title: 'המרת מטבעות', icon: '💱', bg: '#3DA5C4' },
+  { id: 'news', title: 'חדשות בעברית', icon: '📰', bg: '#7ECFC0' },
+  { id: 'flights', title: 'לוח המראות ונחיתות', icon: '✈️', bg: '#F4A94E' },
+];
+
+const DEFAULT_SIDE_BANNERS: DataItem[] = [
+  { id: 'realestate', title: 'פורטל הנדל״ן', icon: '🏠', bg: '#F4A94E' },
+  { id: 'business', title: 'פורטל העסקים', icon: '💼', bg: '#1A6B8A' },
+];
+
+const DEFAULT_LOCATIONS: DataItem[] = [
+  { id: 'loc1', title: 'כיכר פיאצה', subtitle: 'הכיכר המרכזית של בטומי', icon: '📍', bg: '#1A6B8A', lat: '41.6488', lng: '41.6436', address: 'Piazza Square, Batumi' },
+  { id: 'loc2', title: 'בולבר בטומי', subtitle: 'טיילת החוף', icon: '📍', bg: '#3DA5C4', lat: '41.6453', lng: '41.6378', address: 'Batumi Boulevard' },
+];
+
+const DEFAULT_AUDIO: DataItem[] = [
+  { id: 'audio1', title: 'סיור בעיר העתיקה', subtitle: 'סיור קולי מודרך', icon: '🎧', bg: '#1A6B8A', audio: '' },
+  { id: 'audio2', title: 'היסטוריה יהודית', subtitle: 'סיפור הקהילה', icon: '🎧', bg: '#F4A94E', audio: '' },
+];
+
+const DEFAULT_TEXTS = {
+  headerTitle: 'Batumi Online',
+  headerSub: 'המדריך לתייר הישראלי בבטומי',
+  welcomeTitle: 'ברוכים הבאים',
+  infoTitle: 'פורטל המידע',
+  bottomTitle: 'מידע On Line',
+  dropdownTitle: 'קטגוריות נוספות',
+};
+
+const SECTIONS: Section[] = [
+  { key: 'main', label: 'קטגוריות ראשיות', icon: '📂', storageKey: '@admin_main_categories', hasSubtitle: true, hasImage: true, hasAudio: false, hasLocation: false, hasSummary: true, hasLongText: true, defaults: DEFAULT_MAIN_CATEGORIES },
+  { key: 'extra', label: 'קטגוריות נוספות', icon: '📁', storageKey: '@admin_extra_categories', hasSubtitle: true, hasImage: true, hasAudio: false, hasLocation: false, hasSummary: true, hasLongText: true, defaults: DEFAULT_EXTRA_CATEGORIES },
+  { key: 'welcome', label: 'סליידר ברוכים הבאים', icon: '👋', storageKey: '@admin_welcome', hasSubtitle: true, hasImage: true, hasAudio: false, hasLocation: false, hasSummary: false, hasLongText: false, defaults: DEFAULT_WELCOME },
+  { key: 'info', label: 'פורטל המידע', icon: '📋', storageKey: '@admin_info_portal', hasSubtitle: true, hasImage: true, hasAudio: false, hasLocation: false, hasSummary: false, hasLongText: false, defaults: DEFAULT_INFO_PORTAL },
+  { key: 'bottom', label: 'מידע Online', icon: '🏷️', storageKey: '@admin_bottom_banners', hasSubtitle: false, hasImage: false, hasAudio: false, hasLocation: false, hasSummary: false, hasLongText: false, defaults: DEFAULT_BOTTOM_BANNERS },
+  { key: 'side', label: 'פורטל הנדל״ן', icon: '📌', storageKey: '@admin_side_banners', hasSubtitle: false, hasImage: false, hasAudio: false, hasLocation: false, hasSummary: false, hasLongText: false, defaults: DEFAULT_SIDE_BANNERS },
+  { key: 'locations', label: 'מיקומים ומפה', icon: '📍', storageKey: '@admin_locations', hasSubtitle: true, hasImage: false, hasAudio: false, hasLocation: true, hasSummary: false, hasLongText: false, defaults: DEFAULT_LOCATIONS },
+  // audio section removed - files managed via media folders
+  { key: 'legal', label: 'מידע חובה', icon: '📜', storageKey: '@admin_legal', hasSubtitle: false, hasImage: false, hasAudio: false, hasLocation: false, hasSummary: false, hasLongText: true, defaults: DEFAULT_LEGAL },
+];
+
+const TAG_GROUPS: { group: string; icon: string; tags: { key: string; label: string }[]; subgroups?: { label: string; tags: { key: string; label: string }[] }[] }[] = [
+  { group: 'קטגוריות', icon: '📂', subgroups: [
+    { label: '🏨 אירוח ולינה', tags: [{ key: 'h1', label: 'מלונות יוקרה' },{ key: 'h2', label: 'מלונות 3-4' },{ key: 'h3', label: 'דירות נופש' },{ key: 'h4', label: 'כפרי נופש' },{ key: 'h5', label: 'ווילות' },{ key: 'h6', label: 'אכסניות' }] },
+    { label: '🎡 אטרקציות ואתרים', tags: [{ key: 'a1', label: 'אטרקציות' },{ key: 'a2', label: 'אתרים פופולריים' },{ key: 'a3', label: 'היסטוריים' },{ key: 'a5', label: 'יהדות' },{ key: 'a6', label: 'נצרות' },{ key: 'a7', label: 'אוטובוס' },{ key: 'a8', label: 'נסיעות פרטיות' }] },
+    { label: '🎧 סיורים קוליים', tags: [{ key: 'tours', label: 'סיורים קוליים' }] },
+    { label: '🍽️ מסעדות ואוכל', tags: [{ key: 'r1', label: 'פופולריות' },{ key: 'r2', label: 'יוקרה' },{ key: 'r4', label: 'כשרות' },{ key: 'r3', label: 'רשתות' },{ key: 'r5', label: 'מהיר' },{ key: 'r6', label: 'שווה להכיר' }] },
+    { label: '🍻 בילוי וחיי לילה', tags: [{ key: 'n1', label: 'מועדונים' },{ key: 'n2', label: 'פאבים' },{ key: 'n3', label: 'הופעות' },{ key: 'n4', label: 'חשפנות' }] },
+    { label: '🚕 תחבורה', tags: [{ key: 't1', label: 'מוניות' },{ key: 't2', label: 'ציבורית' },{ key: 't3', label: 'רכבות' },{ key: 't4', label: 'רכב' },{ key: 't5', label: 'אופניים' },{ key: 't6', label: 'טיסות' }] },
+    { label: '🎰 קזינו', tags: [{ key: 'casino', label: 'קזינו' }] },
+    { label: '🛍️ קניות ומתנות', tags: [{ key: 'sh1', label: 'שופינג' },{ key: 'sh2', label: 'סופרמרקטים' },{ key: 'sh3', label: 'החזרי מס' }] },
+    { label: '🏋️ ספורט', tags: [{ key: 'sp1', label: 'כושר' },{ key: 'sp2', label: 'ספא' },{ key: 'sp3', label: 'בריכות' },{ key: 'sp4', label: 'חוף' },{ key: 'sp5', label: 'ריצה' },{ key: 'sp6', label: 'יוגה' },{ key: 'sp7', label: 'ריקוד' },{ key: 'sp8', label: 'מגרשים' }] },
+    { label: '⛷️ אקסטרים', tags: [{ key: 'ex1', label: 'סקי' },{ key: 'ex2', label: 'ג׳יפים' },{ key: 'ex3', label: 'טרקטורונים' },{ key: 'ex4', label: 'פרגליידינג' },{ key: 'ex5', label: 'רפטינג' },{ key: 'ex6', label: 'קניונינג' },{ key: 'ex7', label: 'סוסים' },{ key: 'ex8', label: 'צלילה' }] },
+    { label: '🛂 מדריכים', tags: [{ key: 'guides', label: 'מדריכים' }] },
+  ], tags: [
+    { key: 'main_unsorted', label: '📥 לא ממויין' },
+    { key: 'h1', label: 'מלונות יוקרה' },{ key: 'h2', label: 'מלונות 3-4' },{ key: 'h3', label: 'דירות נופש' },{ key: 'h4', label: 'כפרי נופש' },{ key: 'h5', label: 'ווילות' },{ key: 'h6', label: 'אכסניות' },
+    { key: 'a1', label: 'אטרקציות' },{ key: 'a2', label: 'אתרים פופולריים' },{ key: 'a3', label: 'היסטוריים' },{ key: 'a5', label: 'יהדות' },{ key: 'a6', label: 'נצרות' },{ key: 'a7', label: 'אוטובוס' },{ key: 'a8', label: 'נסיעות פרטיות' },
+    { key: 'tours', label: 'סיורים קוליים' },
+    { key: 'r1', label: 'פופולריות' },{ key: 'r2', label: 'יוקרה' },{ key: 'r4', label: 'כשרות' },{ key: 'r3', label: 'רשתות' },{ key: 'r5', label: 'מהיר' },{ key: 'r6', label: 'שווה להכיר' },
+    { key: 'n1', label: 'מועדונים' },{ key: 'n2', label: 'פאבים' },{ key: 'n3', label: 'הופעות' },{ key: 'n4', label: 'חשפנות' },
+    { key: 't1', label: 'מוניות' },{ key: 't2', label: 'ציבורית' },{ key: 't3', label: 'רכבות' },{ key: 't4', label: 'רכב' },{ key: 't5', label: 'אופניים' },{ key: 't6', label: 'טיסות' },
+    { key: 'casino', label: 'קזינו' },
+    { key: 'sh1', label: 'שופינג' },{ key: 'sh2', label: 'סופרמרקטים' },{ key: 'sh3', label: 'החזרי מס' },
+    { key: 'sp1', label: 'כושר' },{ key: 'sp2', label: 'ספא' },{ key: 'sp3', label: 'בריכות' },{ key: 'sp4', label: 'חוף' },{ key: 'sp5', label: 'ריצה' },{ key: 'sp6', label: 'יוגה' },{ key: 'sp7', label: 'ריקוד' },{ key: 'sp8', label: 'מגרשים' },
+    { key: 'ex1', label: 'סקי' },{ key: 'ex2', label: 'ג׳יפים' },{ key: 'ex3', label: 'טרקטורונים' },{ key: 'ex4', label: 'פרגליידינג' },{ key: 'ex5', label: 'רפטינג' },{ key: 'ex6', label: 'קניונינג' },{ key: 'ex7', label: 'סוסים' },{ key: 'ex8', label: 'צלילה' },
+    { key: 'guides', label: 'מדריכים' },
+  ]},
+  { group: 'סליידר ברוכים הבאים', icon: '👋', tags: [{ key: 'welcome', label: 'ברוכים הבאים' }] },
+  { group: 'פורטל המידע', icon: '📋', tags: [{ key: 'info', label: 'פורטל מידע' }] },
+  { group: 'מידע Online', icon: '🏷️', tags: [{ key: 'bottom', label: 'מידע Online' }] },
+  { group: 'פורטל הנדל״ן', icon: '📌', tags: [{ key: 'realestate', label: 'נדל״ן' },{ key: 'business', label: 'עסקים' }] },
+  { group: 'מיקומים ומפה', icon: '📍', tags: [{ key: 'locations', label: 'מיקומים' }] },
+  { group: 'קבצי אודיו', icon: '🎧', tags: [{ key: 'player', label: 'נגן' }] },
+  { group: 'מידע חובה', icon: '📜', tags: [{ key: 'legal', label: 'מידע חובה' }] },
+  { group: 'תמונות', icon: '🖼️', tags: [{ key: 'icon', label: 'אייקון' },{ key: 'gallery', label: 'גלריה' },{ key: 'home', label: 'גלריית בית' }] },
+  { group: 'גלריה', icon: '🎞️', tags: [{ key: 'gallery_main', label: 'גלריה ראשית' }] },
+  { group: 'טיסות', icon: '✈️', tags: [
+    { key: 'airline_LY', label: 'אל על (LY)' },
+    { key: 'airline_UP', label: 'סאן דור (UP)' },
+    { key: 'airline_6H', label: 'ישראייר (6H)' },
+    { key: 'airline_W6', label: 'וויז אייר (W6)' },
+    { key: 'airline_U2', label: 'איזיג׳ט (U2)' },
+    { key: 'airline_IZ', label: 'ארקיע (IZ)' },
+  ]},
+];
+const TAG_OPTIONS = TAG_GROUPS.flatMap(g => g.tags);
+
+const NAV_ITEMS = [
+  { key: 'texts', label: 'דף הבית', icon: '✏️' },
+  ...SECTIONS.map(s => ({ key: s.key, label: s.label, icon: s.icon })),
+  { key: 'subscription', label: 'ניהול מנויים', icon: '💳' },
+  { key: 'media', label: 'תמונות', icon: '🖼️' },
+];
+
+// ─── Rich Text Editor (web) ────────────────────────────────────
+const FONTS = ['Assistant', 'Arial', 'David', 'Tahoma', 'Verdana', 'Georgia', 'Courier New'];
+const FONT_SIZES = [
+  { label: '10', val: '1' }, { label: '12', val: '2' }, { label: '14', val: '3' },
+  { label: '18', val: '4' }, { label: '24', val: '5' }, { label: '32', val: '6' }, { label: '48', val: '7' },
+];
+const COLORS_PALETTE = ['#000000','#333333','#666666','#999999','#ffffff','#004a99','#1A6B8A','#3DA5C4','#F4A94E','#c0392b','#27ae60','#8e44ad','#e67e22','#2c3e50'];
+
+function RichEditor({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const ref = React.useRef<any>(null);
+  const savedRange = React.useRef<Range | null>(null);
+  const [showCode, setShowCode] = React.useState(false);
+
+  React.useEffect(() => {
+    if (ref.current && !showCode && ref.current.innerHTML !== value) {
+      ref.current.innerHTML = value || '';
+    }
+  }, [value, showCode]);
+
+  const saveSelection = () => {
+    const sel = (window as any).getSelection();
+    if (sel && sel.rangeCount > 0) savedRange.current = sel.getRangeAt(0).cloneRange();
+  };
+  const restoreSelection = () => {
+    const sel = (window as any).getSelection();
+    if (savedRange.current && sel) {
+      sel.removeAllRanges();
+      sel.addRange(savedRange.current);
+    }
+  };
+
+  const exec = (cmd: string, arg?: string) => {
+    if (ref.current) ref.current.focus();
+    restoreSelection();
+    (window as any).document.execCommand(cmd, false, arg);
+    if (ref.current) onChange(ref.current.innerHTML);
+    saveSelection();
+  };
+
+  const btnStyle: any = {
+    padding: '6px 10px', border: '1px solid #e0e0e0', borderRadius: 6,
+    background: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 600, color: '#1A6B8A',
+  };
+
+  const preventBlur = (e: any) => e.preventDefault();
+
+  const btn = (label: string, cmd: string, arg?: string) =>
+    React.createElement('button', {
+      type: 'button', key: label + cmd,
+      onMouseDown: preventBlur,
+      onClick: () => exec(cmd, arg), style: btnStyle,
+    }, label);
+
+  const selectEl = (key: string, options: { label: string; val: string }[], cmd: string, placeholder: string) =>
+    React.createElement('select', {
+      key,
+      onFocus: saveSelection,
+      onChange: (e: any) => { if (e.target.value) exec(cmd, e.target.value); e.target.value = ''; },
+      defaultValue: '',
+      style: { ...btnStyle, paddingRight: 4 },
+    }, [
+      React.createElement('option', { key: 'ph', value: '', disabled: true }, placeholder),
+      ...options.map(o => React.createElement('option', { key: o.val, value: o.val }, o.label)),
+    ]);
+
+  const fontSelect = React.createElement('select', {
+    key: 'fontFamily',
+    onFocus: saveSelection,
+    onChange: (e: any) => { if (e.target.value) exec('fontName', e.target.value); e.target.value = ''; },
+    defaultValue: '',
+    style: { ...btnStyle, paddingRight: 4 },
+  }, [
+    React.createElement('option', { key: 'ph', value: '', disabled: true }, 'גופן'),
+    ...FONTS.map(f => React.createElement('option', { key: f, value: f, style: { fontFamily: f } }, f)),
+  ]);
+
+  const colorPicker = (key: string, cmd: string, label: string) =>
+    React.createElement('label', { key, onMouseDown: preventBlur, style: { ...btnStyle, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 4 } }, [
+      label,
+      React.createElement('input', {
+        key: 'inp', type: 'color', defaultValue: '#000000', style: { width: 0, height: 0, opacity: 0, position: 'absolute' },
+        onChange: (e: any) => exec(cmd, e.target.value),
+      }),
+    ]);
+
+  const promptLink = () => {
+    const url = (window as any).prompt('הכנס קישור:');
+    if (url) exec('createLink', url);
+  };
+
+  const toggleCode = () => {
+    if (showCode && ref.current) {
+      ref.current.innerHTML = value || '';
+    }
+    setShowCode(!showCode);
+  };
+
+  return React.createElement('div', { style: { direction: 'rtl' } }, [
+    React.createElement('div', {
+      key: 'toolbar',
+      style: { display: 'flex', flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 5, marginBottom: 8 },
+    }, [
+      btn('B', 'bold'), btn('I', 'italic'), btn('U', 'underline'),
+      btn('S', 'strikeThrough'),
+      fontSelect,
+      selectEl('fontSize', FONT_SIZES, 'fontSize', 'גודל'),
+      colorPicker('fgColor', 'foreColor', '🎨 צבע'),
+      colorPicker('bgColor', 'hiliteColor', '🖌️ רקע'),
+      btn('• רשימה', 'insertUnorderedList'),
+      btn('1. רשימה', 'insertOrderedList'),
+      btn('H1', 'formatBlock', 'H1'),
+      btn('H2', 'formatBlock', 'H2'),
+      btn('H3', 'formatBlock', 'H3'),
+      btn('פסקה', 'formatBlock', 'P'),
+      btn('ימין', 'justifyRight'),
+      btn('מרכז', 'justifyCenter'),
+      btn('שמאל', 'justifyLeft'),
+      React.createElement('button', {
+        type: 'button', key: 'linkbtn', onMouseDown: preventBlur, onClick: promptLink, style: btnStyle,
+      }, '🔗 קישור'),
+      btn('הסר קישור', 'unlink'),
+      btn('קו אופקי', 'insertHorizontalRule'),
+      React.createElement('button', {
+        type: 'button', key: 'codebtn', onMouseDown: preventBlur, onClick: toggleCode,
+        style: { ...btnStyle, background: showCode ? '#1A6B8A' : '#fff', color: showCode ? '#fff' : '#1A6B8A' },
+      }, showCode ? 'תצוגה' : '</> קוד'),
+      btn('ניקוי', 'removeFormat'),
+    ]),
+    showCode
+      ? React.createElement('textarea', {
+          key: 'codeEditor',
+          value: value || '',
+          onChange: (e: any) => onChange(e.target.value),
+          style: {
+            width: '100%', minHeight: 200, maxHeight: 400, border: '1px solid #e0e0e0',
+            borderRadius: 10, padding: 12, fontSize: 13, fontFamily: 'monospace',
+            lineHeight: '20px', outline: 'none', background: '#1e1e1e', color: '#d4d4d4',
+            direction: 'ltr', textAlign: 'left', resize: 'vertical',
+          },
+        })
+      : React.createElement('div', {
+          key: 'editor',
+          ref,
+          contentEditable: true,
+          suppressContentEditableWarning: true,
+          onInput: (e: any) => onChange(e.currentTarget.innerHTML),
+          onMouseUp: saveSelection,
+          onKeyUp: saveSelection,
+          onBlur: saveSelection,
+          style: {
+            minHeight: 200, maxHeight: 400, overflowY: 'auto',
+            border: '1px solid #e0e0e0', borderRadius: 10, padding: 12,
+            fontSize: 14, lineHeight: '22px', outline: 'none', background: '#fafafa',
+            direction: 'rtl', textAlign: 'right',
+          },
+        }),
+  ]);
+}
+
+// ─── Finance World Bank Table ──────────────────────────────────
+function FinanceWorldBankTable() {
+  const INDICATORS = [
+    { key: 'inflation', label: 'אינפלציה', code: 'FP.CPI.TOTL.ZG', country: 'GE', unit: '%' },
+    { key: 'lending', label: 'ריבית הלוואות', code: 'FR.INR.LEND', country: 'GE', unit: '%' },
+    { key: 'gdp', label: 'צמיחת תמ״ג', code: 'NY.GDP.MKTP.KD.ZG', country: 'GE', unit: '%' },
+    { key: 'unemp', label: 'אבטלה', code: 'SL.UEM.TOTL.ZS', country: 'GE', unit: '%' },
+    { key: 'gdpPcGE', label: 'תמ״ג לנפש (GE)', code: 'NY.GDP.PCAP.CD', country: 'GE', unit: '$' },
+    { key: 'gdpPcIL', label: 'תמ״ג לנפש (IL)', code: 'NY.GDP.PCAP.CD', country: 'IL', unit: '$' },
+  ] as const;
+  type Row = { key: string; label: string; unit: string; series: { year: number; value: number | null }[] };
+  const [rows, setRows] = useState<Row[]>([]);
+  const [years, setYears] = useState<number[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
+      try {
+        const fetched: Row[] = await Promise.all(INDICATORS.map(async (ind) => {
+          const r = await fetch(`https://api.worldbank.org/v2/country/${ind.country}/indicator/${ind.code}?format=json&per_page=12`);
+          const j = await r.json();
+          const arr = Array.isArray(j) && j[1] ? j[1] : [];
+          const series = arr
+            .filter((x: any) => x.value != null)
+            .map((x: any) => ({ year: parseInt(x.date, 10), value: Number(x.value) }))
+            .sort((a: any, b: any) => b.year - a.year)
+            .slice(0, 4)
+            .sort((a: any, b: any) => a.year - b.year);
+          return { key: ind.key, label: ind.label, unit: ind.unit, series };
+        }));
+        setRows(fetched);
+        const allYears = new Set<number>();
+        fetched.forEach(r => r.series.forEach(s => allYears.add(s.year)));
+        setYears(Array.from(allYears).sort((a, b) => a - b).slice(-4));
+      } catch {}
+      setLoading(false);
+    })();
+  }, []);
+
+  const formatVal = (v: number | null | undefined, unit: string) => {
+    if (v == null) return '—';
+    if (unit === '$') return v >= 1000 ? `$${Math.round(v).toLocaleString()}` : `$${v.toFixed(0)}`;
+    return `${v.toFixed(1)}${unit}`;
+  };
+
+  const sparkline = (series: { year: number; value: number | null }[], color: string) => {
+    if (Platform.OS !== 'web' || series.length < 2) return null;
+    const vals = series.map(s => s.value ?? 0);
+    const min = Math.min(...vals);
+    const max = Math.max(...vals);
+    const range = max - min || 1;
+    const w = 80;
+    const h = 24;
+    const pts = vals.map((v, i) => {
+      const x = (i / (vals.length - 1)) * w;
+      const y = h - ((v - min) / range) * h;
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    }).join(' ');
+    return React.createElement('svg', { width: w, height: h },
+      React.createElement('polyline', { points: pts, fill: 'none', stroke: color, strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' }),
+      ...vals.map((v, i) => {
+        const x = (i / (vals.length - 1)) * w;
+        const y = h - ((v - min) / range) * h;
+        return React.createElement('circle', { key: i, cx: x, cy: y, r: 2, fill: color });
+      })
+    );
+  };
+
+  return (
+    <View style={{ marginBottom: 14, backgroundColor: '#fff', borderRadius: 10, borderWidth: 1, borderColor: '#e2e8f0', overflow: 'hidden' }}>
+      <View style={{ padding: 12, borderBottomWidth: 1, borderBottomColor: '#e2e8f0', backgroundColor: '#f8fafc' }}>
+        <Text style={{ fontSize: 13, fontWeight: '900', color: '#1C2B35', writingDirection: 'rtl', textAlign: 'right' }}>📊 טבלת נתונים אוטומטיים (World Bank)</Text>
+        <Text style={{ fontSize: 10, color: '#64748b', writingDirection: 'rtl', textAlign: 'right', marginTop: 2 }}>🔒 כל הערכים מסונכרנים אוטומטית ונעולים לעריכה</Text>
+      </View>
+      {loading ? (
+        <Text style={{ textAlign: 'center', color: '#94a3b8', padding: 20 }}>טוען נתונים...</Text>
+      ) : (
+        <>
+          <View style={{ flexDirection: 'row-reverse', paddingVertical: 8, paddingHorizontal: 10, backgroundColor: '#f1f5f9', gap: 6 }}>
+            <Text style={{ flex: 1.8, fontSize: 11, fontWeight: '800', color: '#475569', textAlign: 'right', writingDirection: 'rtl' }}>מדד</Text>
+            {years.map(y => (
+              <Text key={y} style={{ flex: 1, fontSize: 11, fontWeight: '800', color: '#475569', textAlign: 'center' }}>{y}</Text>
+            ))}
+            <Text style={{ width: 90, fontSize: 11, fontWeight: '800', color: '#475569', textAlign: 'center' }}>מגמה</Text>
+          </View>
+          {rows.map((row, idx) => (
+            <View key={row.key} style={{ flexDirection: 'row-reverse', paddingVertical: 10, paddingHorizontal: 10, gap: 6, backgroundColor: idx % 2 === 0 ? '#fff' : '#fafafa', borderTopWidth: 1, borderTopColor: '#f1f5f9', alignItems: 'center' }}>
+              <Text style={{ flex: 1.8, fontSize: 12, color: '#1C2B35', textAlign: 'right', writingDirection: 'rtl', fontWeight: '700' }}>🔒 {row.label}</Text>
+              {years.map(y => {
+                const p = row.series.find(s => s.year === y);
+                return (
+                  <Text key={y} style={{ flex: 1, fontSize: 11, color: '#64748b', textAlign: 'center' }}>{formatVal(p?.value, row.unit)}</Text>
+                );
+              })}
+              <View style={{ width: 90, alignItems: 'center' }}>
+                {sparkline(row.series, '#1A6B8A')}
+              </View>
+            </View>
+          ))}
+        </>
+      )}
+    </View>
+  );
+}
+
+// ─── Source Links Bar ──────────────────────────────────────────
+function SourceLinksBar({ links, accentColor }: { links: Array<{ label: string; url: string; icon: string }>; accentColor: string }) {
+  const open = (url: string) => {
+    if (Platform.OS === 'web') (window as any).open(url, '_blank');
+    else Linking.openURL(url);
+  };
+  return (
+    <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 6, marginBottom: 10 }}>
+      <Text style={{ fontSize: 11, color: '#64748b', writingDirection: 'rtl', alignSelf: 'center' }}>📎 מקורות:</Text>
+      {links.map((l, i) => (
+        <TouchableOpacity key={i} onPress={() => open(l.url)} style={{ paddingHorizontal: 10, paddingVertical: 6, borderRadius: 6, backgroundColor: accentColor + '15', borderWidth: 1, borderColor: accentColor + '40' }}>
+          <Text style={{ fontSize: 11, fontWeight: '700', color: accentColor }}>{l.icon} {l.label}</Text>
+        </TouchableOpacity>
+      ))}
+    </View>
+  );
+}
+
+// ─── Tourism World Bank Table ──────────────────────────────────
+function TourismWorldBankTable() {
+  const INDICATORS = [
+    { key: 'arrivals', label: 'כניסות תיירים לגאורגיה', code: 'ST.INT.ARVL', country: 'GE', unit: '' },
+    { key: 'receipts', label: 'הכנסות מתיירות ($)', code: 'ST.INT.RCPT.CD', country: 'GE', unit: '$' },
+    { key: 'departures', label: 'יציאות תיירים', code: 'ST.INT.DPRT', country: 'GE', unit: '' },
+  ] as const;
+  type Row = { key: string; label: string; unit: string; series: { year: number; value: number | null }[] };
+  const [rows, setRows] = useState<Row[]>([]);
+  const [years, setYears] = useState<number[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
+      try {
+        const fetched: Row[] = await Promise.all(INDICATORS.map(async (ind) => {
+          const r = await fetch(`https://api.worldbank.org/v2/country/${ind.country}/indicator/${ind.code}?format=json&per_page=12`);
+          const j = await r.json();
+          const arr = Array.isArray(j) && j[1] ? j[1] : [];
+          const series = arr.filter((x: any) => x.value != null).map((x: any) => ({ year: parseInt(x.date, 10), value: Number(x.value) })).sort((a: any, b: any) => b.year - a.year).slice(0, 4).sort((a: any, b: any) => a.year - b.year);
+          return { key: ind.key, label: ind.label, unit: ind.unit, series };
+        }));
+        setRows(fetched);
+        const allYears = new Set<number>();
+        fetched.forEach(r => r.series.forEach(s => allYears.add(s.year)));
+        setYears(Array.from(allYears).sort((a, b) => a - b).slice(-4));
+      } catch {}
+      setLoading(false);
+    })();
+  }, []);
+
+  const formatVal = (v: number | null | undefined, unit: string) => {
+    if (v == null) return '—';
+    if (unit === '$') return `$${Math.round(v / 1e6)}M`;
+    return Math.round(v).toLocaleString();
+  };
+
+  const sparkline = (series: { year: number; value: number | null }[]) => {
+    if (Platform.OS !== 'web' || series.length < 2) return null;
+    const vals = series.map(s => s.value ?? 0);
+    const min = Math.min(...vals);
+    const max = Math.max(...vals);
+    const range = max - min || 1;
+    const w = 80;
+    const h = 24;
+    const pts = vals.map((v, i) => {
+      const x = (i / (vals.length - 1)) * w;
+      const y = h - ((v - min) / range) * h;
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    }).join(' ');
+    return React.createElement('svg', { width: w, height: h },
+      React.createElement('polyline', { points: pts, fill: 'none', stroke: '#22c55e', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' }),
+      ...vals.map((v, i) => {
+        const x = (i / (vals.length - 1)) * w;
+        const y = h - ((v - min) / range) * h;
+        return React.createElement('circle', { key: i, cx: x, cy: y, r: 2, fill: '#22c55e' });
+      })
+    );
+  };
+
+  return (
+    <View style={{ marginBottom: 14, backgroundColor: '#fff', borderRadius: 10, borderWidth: 1, borderColor: '#e2e8f0', overflow: 'hidden' }}>
+      <View style={{ padding: 12, borderBottomWidth: 1, borderBottomColor: '#e2e8f0', backgroundColor: '#f0fdf4' }}>
+        <Text style={{ fontSize: 13, fontWeight: '900', color: '#15803d', writingDirection: 'rtl', textAlign: 'right' }}>📊 נתוני תיירות אוטומטיים (World Bank)</Text>
+        <Text style={{ fontSize: 10, color: '#16a34a', writingDirection: 'rtl', textAlign: 'right', marginTop: 2 }}>🔒 מסונכרן אוטומטית</Text>
+      </View>
+      {loading ? (
+        <Text style={{ textAlign: 'center', color: '#94a3b8', padding: 20 }}>טוען...</Text>
+      ) : (
+        <>
+          <View style={{ flexDirection: 'row-reverse', paddingVertical: 8, paddingHorizontal: 10, backgroundColor: '#f1f5f9', gap: 6 }}>
+            <Text style={{ flex: 1.8, fontSize: 11, fontWeight: '800', color: '#475569', textAlign: 'right', writingDirection: 'rtl' }}>מדד</Text>
+            {years.map(y => (<Text key={y} style={{ flex: 1, fontSize: 11, fontWeight: '800', color: '#475569', textAlign: 'center' }}>{y}</Text>))}
+            <Text style={{ width: 90, fontSize: 11, fontWeight: '800', color: '#475569', textAlign: 'center' }}>מגמה</Text>
+          </View>
+          {rows.map((row, idx) => (
+            <View key={row.key} style={{ flexDirection: 'row-reverse', paddingVertical: 10, paddingHorizontal: 10, gap: 6, backgroundColor: idx % 2 === 0 ? '#fff' : '#fafafa', borderTopWidth: 1, borderTopColor: '#f1f5f9', alignItems: 'center' }}>
+              <Text style={{ flex: 1.8, fontSize: 12, color: '#1C2B35', textAlign: 'right', writingDirection: 'rtl', fontWeight: '700' }}>🔒 {row.label}</Text>
+              {years.map(y => {
+                const p = row.series.find(s => s.year === y);
+                return (<Text key={y} style={{ flex: 1, fontSize: 11, color: '#64748b', textAlign: 'center' }}>{formatVal(p?.value, row.unit)}</Text>);
+              })}
+              <View style={{ width: 90, alignItems: 'center' }}>{sparkline(row.series)}</View>
+            </View>
+          ))}
+        </>
+      )}
+    </View>
+  );
+}
+
+// ─── Manual Indicators Table (generic) ─────────────────────────
+type ManualRow = {
+  id: string;
+  label: string;
+  unit: string;
+  values: Record<string, string>;
+  channel?: 'money' | 'realEstate' | 'tourism';
+  extraYears?: number[];
+  displayType?: 'line' | 'table';
+  tableRows?: Array<{ id: string; category: string; value: string; year?: string; cells?: Record<string, string> }>;
+  columns?: Array<{ id: string; name: string }>;
+  sources?: string;
+  notes?: string;
+};
+
+function RecommendationsList() {
+  const [items, setItems] = React.useState<any[]>([]);
+  const [loading, setLoading] = React.useState(false);
+
+  const load = React.useCallback(async () => {
+    setLoading(true);
+    try {
+      const r = await fetch(`${API_BASE}/api/recommendations/all`);
+      const j = await r.json();
+      if (j.success || Array.isArray(j.data)) setItems(j.data || []);
+    } catch {}
+    setLoading(false);
+  }, []);
+
+  React.useEffect(() => { load(); }, [load]);
+
+  const setApproved = async (id: string, approved: boolean) => {
+    try {
+      await fetch(`${API_BASE}/api/recommendations/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ approved }),
+      });
+      load();
+    } catch {}
+  };
+
+  const remove = async (id: string) => {
+    if (typeof window !== 'undefined' && !(window as any).confirm('למחוק המלצה?')) return;
+    try {
+      await fetch(`${API_BASE}/api/recommendations/${id}`, { method: 'DELETE' });
+      load();
+    } catch {}
+  };
+
+  if (loading) return <Text style={{ color: '#92400e', writingDirection: 'rtl' }}>טוען…</Text>;
+  if (items.length === 0) return <Text style={{ color: '#94a3b8', writingDirection: 'rtl', textAlign: 'right' }}>אין המלצות כרגע</Text>;
+
+  return (
+    <View style={{ gap: 8, marginTop: 4 }}>
+      {items.map((r: any) => {
+        const approved = r.approved === true;
+        const pending = r.approved == null;
+        return (
+          <View key={r.id} style={{ backgroundColor: pending ? '#fff' : approved ? '#dcfce7' : '#fee2e2', borderRadius: 10, padding: 12, borderWidth: 1, borderColor: pending ? '#fde68a' : approved ? '#86efac' : '#fca5a5' }}>
+            <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+              <Text style={{ fontSize: 14, fontWeight: '900', color: '#1C2B35', writingDirection: 'rtl', textAlign: 'right' }}>{r.name || 'אנונימי'}</Text>
+              <Text style={{ fontSize: 11, color: '#64748b' }}>{pending ? '🔵 ממתין' : approved ? '✅ אושר' : '❌ נדחה'}</Text>
+            </View>
+            <Text style={{ fontSize: 13, color: '#475569', writingDirection: 'rtl', textAlign: 'right', marginBottom: 6 }}>{r.text}</Text>
+            <View style={{ flexDirection: 'row-reverse', gap: 6 }}>
+              {!approved && (
+                <TouchableOpacity onPress={() => setApproved(r.id, true)} style={{ backgroundColor: '#16a34a', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 6 }}>
+                  <Text style={{ color: '#fff', fontSize: 12, fontWeight: '900' }}>✓ אשר</Text>
+                </TouchableOpacity>
+              )}
+              {approved && (
+                <TouchableOpacity onPress={() => setApproved(r.id, false)} style={{ backgroundColor: '#f59e0b', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 6 }}>
+                  <Text style={{ color: '#fff', fontSize: 12, fontWeight: '900' }}>↩️ בטל אישור</Text>
+                </TouchableOpacity>
+              )}
+              <TouchableOpacity onPress={() => remove(r.id)} style={{ backgroundColor: '#dc2626', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 6 }}>
+                <Text style={{ color: '#fff', fontSize: 12, fontWeight: '900' }}>🗑️ מחק</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        );
+      })}
+    </View>
+  );
+}
+
+function CuratedListingsEditor() {
+  const [tab, setTab] = useState<'sale' | 'rent' | 'hotels'>('sale');
+  const [items, setItems] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    fetchContent().then(d => {
+      const all = d?.curatedListings || {};
+      setItems(Array.isArray(all[tab]) ? all[tab] : []);
+      setLoading(false);
+    }).catch(() => setLoading(false));
+  }, [tab]);
+
+  const upload = async (file: File): Promise<string | null> => {
+    const fd = new FormData();
+    fd.append('file', file);
+    try {
+      const r = await fetch(`${API_BASE}/api/upload`, { method: 'POST', body: fd });
+      const j = await r.json();
+      return j.success && j.filename ? `/uploads/${j.filename}` : null;
+    } catch { return null; }
+  };
+
+  const add = () => setItems(p => [...p, { id: 'cl_' + Date.now(), title: '', price: '', features: [], image: '', size: 'half', visible: true }]);
+  const update = (id: string, patch: any) => setItems(p => p.map(i => i.id === id ? { ...i, ...patch } : i));
+  const remove = (id: string) => setItems(p => p.filter(i => i.id !== id));
+
+  const save = async () => {
+    setSaving(true);
+    try {
+      const d = await fetchContent();
+      const all = d?.curatedListings || {};
+      all[tab] = items;
+      await fetch(`${API_BASE}/api/content/curatedListings`, {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(all),
+      });
+      setSaved(true); setTimeout(() => setSaved(false), 2000);
+    } catch {}
+    setSaving(false);
+  };
+
+  return (
+    <View style={{ marginBottom: 14, padding: 12, backgroundColor: '#fef9c3', borderRadius: 10, borderWidth: 1, borderColor: '#fde047' }}>
+      <TouchableOpacity onPress={() => setOpen(!open)} style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginBottom: open ? 8 : 0 }}>
+        <Text style={{ fontSize: 13, fontWeight: '900', color: '#713f12', writingDirection: 'rtl' }}>🏆 מודעות מומלצות</Text>
+        <Text style={{ fontSize: 14, color: '#a16207', fontWeight: '900' }}>{open ? '▼' : '◀'}</Text>
+      </TouchableOpacity>
+      {open && (
+      <>
+      <View style={{ flexDirection: 'row-reverse', gap: 6, marginBottom: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+        {([{ k: 'sale', l: 'למכירה' }, { k: 'rent', l: 'להשכרה' }, { k: 'hotels', l: 'מלונאיים' }] as const).map(t => (
+          <TouchableOpacity key={t.k} onPress={() => setTab(t.k as any)} style={{ paddingHorizontal: 14, paddingVertical: 8, borderRadius: 6, backgroundColor: tab === t.k ? '#a16207' : '#fef3c7' }}>
+            <Text style={{ fontSize: 12, fontWeight: '800', color: tab === t.k ? '#fff' : '#713f12' }}>{t.l}</Text>
+          </TouchableOpacity>
+        ))}
+        <TouchableOpacity onPress={add} style={{ marginRight: 'auto', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 6, backgroundColor: '#15803d' }}>
+          <Text style={{ fontSize: 12, fontWeight: '800', color: '#fff' }}>➕ הוסף מודעה</Text>
+        </TouchableOpacity>
+      </View>
+      {loading ? <Text>טוען...</Text> : items.length === 0 ? (
+        <Text style={{ fontSize: 11, color: '#a16207', textAlign: 'center', padding: 12 }}>אין מודעות מומלצות בערוץ זה</Text>
+      ) : items.map(it => (
+        <View key={it.id} style={{ marginBottom: 8, padding: 8, backgroundColor: '#fff', borderRadius: 6 }}>
+          <TextInput style={{ borderWidth: 1, borderColor: '#fde047', borderRadius: 6, padding: 6, fontSize: 12, textAlign: 'right', fontWeight: '700', marginBottom: 4 }} value={it.title} onChangeText={v => update(it.id, { title: v })} placeholder="כותרת" placeholderTextColor="#fcd34d" />
+          <TextInput style={{ borderWidth: 1, borderColor: '#fde047', borderRadius: 6, padding: 6, fontSize: 11, textAlign: 'right', marginBottom: 4 }} value={it.price} onChangeText={v => update(it.id, { price: v })} placeholder="מחיר" placeholderTextColor="#fcd34d" />
+          <TextInput style={{ borderWidth: 1, borderColor: '#fde047', borderRadius: 6, padding: 6, fontSize: 11, textAlign: 'right', marginBottom: 4 }} value={it.location || ''} onChangeText={v => update(it.id, { location: v })} placeholder="מיקום (שכונה / רחוב)" placeholderTextColor="#fcd34d" />
+          <TextInput style={{ borderWidth: 1, borderColor: '#fde047', borderRadius: 6, padding: 6, fontSize: 11, textAlign: 'right', marginBottom: 4 }} value={it.phone || ''} onChangeText={v => update(it.id, { phone: v })} placeholder="טלפון WhatsApp (לקשר במודעה הפתוחה)" placeholderTextColor="#fcd34d" keyboardType="phone-pad" />
+          <TextInput style={{ borderWidth: 1, borderColor: '#fde047', borderRadius: 6, padding: 6, fontSize: 11, textAlign: 'right', marginBottom: 4, minHeight: 50 }} multiline value={(it.features || []).join('\n')} onChangeText={v => update(it.id, { features: v.split('\n') })} placeholder="פרטים (שורה לכל אחד)" placeholderTextColor="#fcd34d" />
+          <Text style={{ fontSize: 11, fontWeight: '800', color: '#713f12', marginTop: 6, marginBottom: 4, textAlign: 'right' }}>תמונות (הראשונה ראשית, השאר בגלריה הפתוחה):</Text>
+          <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 4, marginBottom: 4 }}>
+            {[it.image, ...((it.images || []) as string[])].filter(Boolean).map((u: string, idx: number) => (
+              <View key={idx} style={{ position: 'relative' }}>
+                <Image source={{ uri: resolveUri(u) }} style={{ width: 70, height: 70, borderRadius: 6 }} />
+                <TouchableOpacity onPress={() => {
+                  if (idx === 0) update(it.id, { image: (it.images && it.images[0]) || '', images: (it.images || []).slice(1) });
+                  else update(it.id, { images: (it.images || []).filter((_: any, i: number) => i !== idx - 1) });
+                }} style={{ position: 'absolute', top: -6, left: -6, width: 18, height: 18, borderRadius: 9, backgroundColor: '#dc2626', alignItems: 'center', justifyContent: 'center' }}>
+                  <Text style={{ color: '#fff', fontSize: 10, fontWeight: '900' }}>✕</Text>
+                </TouchableOpacity>
+              </View>
+            ))}
+          </View>
+          {Platform.OS === 'web' && React.createElement('div', { style: { marginBottom: 4 } }, [
+            React.createElement('input', {
+              key: 'inp', type: 'file', accept: 'image/*', id: `cl_file_${it.id}`, style: { display: 'none' },
+              onChange: async (e: any) => { const f = e.target.files?.[0]; if (!f) return; const url = await upload(f); if (url) { if (!it.image) update(it.id, { image: url }); else update(it.id, { images: [...(it.images || []), url] }); } e.target.value = ''; },
+            }),
+            React.createElement('button', {
+              key: 'btn', type: 'button',
+              onClick: () => { const el = (document as any).getElementById(`cl_file_${it.id}`); if (el) el.click(); },
+              style: { width: '100%', backgroundColor: '#fff', border: '2px dashed #fcd34d', borderRadius: 4, padding: 6, cursor: 'pointer', color: '#713f12', fontSize: 11, fontWeight: 800 },
+            }, '📤 הוסף תמונה'),
+          ])}
+          {it.video ? (
+            <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 6, marginBottom: 4, padding: 6, backgroundColor: '#f0f9ff', borderRadius: 6 }}>
+              <Text style={{ fontSize: 11, fontWeight: '800', color: '#0369a1' }}>🎥 סרטון מצורף</Text>
+              <TouchableOpacity onPress={() => update(it.id, { video: '' })}>
+                <Text style={{ fontSize: 11, color: '#dc2626', fontWeight: '700' }}>✕ הסר</Text>
+              </TouchableOpacity>
+            </View>
+          ) : Platform.OS === 'web' && React.createElement('div', { style: { marginBottom: 4 } }, [
+            React.createElement('input', {
+              key: 'vinp', type: 'file', accept: 'video/mp4,video/quicktime,video/*', id: `cl_video_${it.id}`, style: { display: 'none' },
+              onChange: async (e: any) => {
+                const f = e.target.files?.[0]; if (!f) return;
+                const v: any = (document as any).createElement('video');
+                v.preload = 'metadata';
+                v.onloadedmetadata = async () => {
+                  if (v.duration > 121) { alert('הסרטון מוגבל ל-2 דקות'); e.target.value = ''; return; }
+                  const url = await upload(f);
+                  if (url) update(it.id, { video: url });
+                  e.target.value = '';
+                };
+                v.src = URL.createObjectURL(f);
+              },
+            }),
+            React.createElement('button', {
+              key: 'vbtn', type: 'button',
+              onClick: () => { const el = (document as any).getElementById(`cl_video_${it.id}`); if (el) el.click(); },
+              style: { width: '100%', backgroundColor: '#fff', border: '2px dashed #93c5fd', borderRadius: 4, padding: 6, cursor: 'pointer', color: '#1e3a8a', fontSize: 11, fontWeight: 800 },
+            }, '🎥 הוסף סרטון (עד 2 דקות)'),
+          ])}
+          <Text style={{ fontSize: 11, fontWeight: '800', color: '#713f12', marginTop: 6, marginBottom: 4, textAlign: 'right' }}>גודל:</Text>
+          <View style={{ flexDirection: 'row-reverse', gap: 6, marginBottom: 4, flexWrap: 'wrap' }}>
+            {([{ k: 'full', l: 'גדולה' }, { k: 'half', l: 'בינונית' }, { k: 'banner', l: 'שוכבת' }] as const).map(sz => (
+              <TouchableOpacity key={sz.k} onPress={() => update(it.id, { size: sz.k })} style={{ paddingHorizontal: 14, paddingVertical: 8, borderRadius: 6, backgroundColor: it.size === sz.k ? '#a16207' : '#fef3c7' }}>
+                <Text style={{ fontSize: 12, color: it.size === sz.k ? '#fff' : '#713f12', fontWeight: '800' }}>{sz.l}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+          <Text style={{ fontSize: 11, fontWeight: '800', color: '#713f12', marginTop: 6, marginBottom: 4, textAlign: 'right' }}>הדגשה:</Text>
+          <View style={{ flexDirection: 'row-reverse', gap: 6, marginBottom: 4, flexWrap: 'wrap' }}>
+            {([{ k: '', l: 'ללא' }, { k: 'yellow', l: 'צהוב' }, { k: 'yellow-border', l: 'צהוב + מסגרת' }, { k: 'blue', l: 'כחול נגטיב' }] as const).map(hs => (
+              <TouchableOpacity key={hs.k} onPress={() => update(it.id, { highlightStyle: hs.k })} style={{ paddingHorizontal: 14, paddingVertical: 8, borderRadius: 6, backgroundColor: (it.highlightStyle || '') === hs.k ? '#a16207' : '#fef3c7' }}>
+                <Text style={{ fontSize: 12, color: (it.highlightStyle || '') === hs.k ? '#fff' : '#713f12', fontWeight: '800' }}>{hs.l}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+          <View style={{ flexDirection: 'row-reverse', gap: 10, marginTop: 4 }}>
+            <TouchableOpacity onPress={() => update(it.id, { visible: !it.visible })} style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 4 }}>
+              <View style={{ width: 16, height: 16, borderWidth: 2, borderColor: '#a16207', backgroundColor: it.visible !== false ? '#a16207' : '#fff', borderRadius: 3, alignItems: 'center', justifyContent: 'center' }}>
+                {it.visible !== false && <Text style={{ color: '#fff', fontSize: 10, fontWeight: '900' }}>✓</Text>}
+              </View>
+              <Text style={{ fontSize: 11, color: '#713f12', fontWeight: '700' }}>הצג</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => remove(it.id)} style={{ marginRight: 'auto' }}>
+              <Text style={{ fontSize: 11, color: '#dc2626' }}>🗑 מחק</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      ))}
+      {items.length > 0 && (
+        <TouchableOpacity onPress={save} disabled={saving} style={{ backgroundColor: '#a16207', borderRadius: 8, paddingVertical: 8, alignItems: 'center', marginTop: 8, opacity: saving ? 0.5 : 1 }}>
+          <Text style={{ color: '#fff', fontWeight: '900', fontSize: 13 }}>{saved ? '✓ נשמר' : saving ? 'שומר...' : '💾 שמור'}</Text>
+        </TouchableOpacity>
+      )}
+      </>
+      )}
+    </View>
+  );
+}
+
+function HomeBanner2Editor() {
+  return <HomeBannerEditorInner field="homeBanner2" title="🖼️ באנר 2" hint="באנר נוסף שיוצג מתחת לבאנר הראשי" />;
+}
+
+function HomeBannerEditor() {
+  return <HomeBannerEditorInner field="homeBanner" title="🖼️ באנר מתחלף בדף הבית" hint="תמונות שמתחלפות בראש דף הבית (מומלץ 6-10)" />;
+}
+
+function HomeBannerEditorInner({ field, title, hint }: { field: string; title: string; hint: string }) {
+  const [imgs, setImgs] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    fetchContent().then(d => {
+      setImgs(Array.isArray(d?.[field]) ? d[field] : []);
+      setLoading(false);
+    }).catch(() => setLoading(false));
+  }, [field]);
+
+  const upload = async (file: File): Promise<string | null> => {
+    const fd = new FormData();
+    fd.append('file', file);
+    try {
+      const r = await fetch(`${API_BASE}/api/upload`, { method: 'POST', body: fd });
+      const j = await r.json();
+      return j.success && j.filename ? `/uploads/${j.filename}` : null;
+    } catch { return null; }
+  };
+
+  const remove = (idx: number) => setImgs(p => p.filter((_, i) => i !== idx));
+
+  const save = async () => {
+    setSaving(true);
+    try {
+      await fetch(`${API_BASE}/api/content/${field}`, {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(imgs),
+      });
+      setSaved(true); setTimeout(() => setSaved(false), 2000);
+    } catch {}
+    setSaving(false);
+  };
+
+  return (
+    <View style={{ padding: 12, marginTop: 12, backgroundColor: '#f8fafc', borderRadius: 10, borderWidth: 1, borderColor: '#e2e8f0' }}>
+      <Text style={{ fontSize: 13, fontWeight: '900', color: '#1C2B35', writingDirection: 'rtl', textAlign: 'right', marginBottom: 4 }}>{title}</Text>
+      <Text style={{ fontSize: 10, color: '#64748b', writingDirection: 'rtl', textAlign: 'right', marginBottom: 8 }}>{hint}</Text>
+      <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 4, marginBottom: 8 }}>
+        {imgs.map((u, i) => (
+          <View key={i} style={{ position: 'relative' }}>
+            <Image source={{ uri: resolveUri(u) }} style={{ width: 50, height: 50, borderRadius: 4 }} />
+            <TouchableOpacity onPress={() => remove(i)} style={{ position: 'absolute', top: -4, left: -4, width: 16, height: 16, borderRadius: 8, backgroundColor: '#dc2626', alignItems: 'center', justifyContent: 'center' }}>
+              <Text style={{ color: '#fff', fontSize: 10, fontWeight: '900' }}>✕</Text>
+            </TouchableOpacity>
+          </View>
+        ))}
+      </View>
+      {Platform.OS === 'web' && React.createElement('div', { style: { marginBottom: 8 } }, [
+        React.createElement('input', {
+          key: 'inp', type: 'file', accept: 'image/*', id: `home_banner_file_${field}`, style: { display: 'none' },
+          onChange: async (e: any) => { const f = e.target.files?.[0]; if (!f) return; const url = await upload(f); if (url) setImgs(p => [...p, url]); e.target.value = ''; },
+        }),
+        React.createElement('button', {
+          key: 'btn', type: 'button',
+          onClick: () => { const el = (document as any).getElementById(`home_banner_file_${field}`); if (el) el.click(); },
+          style: { width: '100%', backgroundColor: '#fff', border: '2px dashed #cbd5e1', borderRadius: 6, padding: 8, cursor: 'pointer', color: '#1C2B35', fontSize: 12, fontWeight: 800 },
+        }, '📤 הוסף תמונה'),
+      ])}
+      <TouchableOpacity onPress={save} disabled={saving} style={{ backgroundColor: Colors.PRIMARY, borderRadius: 8, paddingVertical: 8, alignItems: 'center', opacity: saving ? 0.5 : 1 }}>
+        <Text style={{ color: '#fff', fontWeight: '900', fontSize: 13 }}>{saved ? '✓ נשמר' : saving ? 'שומר...' : '💾 שמור באנר'}</Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
+
+function BgColorPicker() {
+  const [color, setColor] = useState('#F7F3ED');
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    fetchContent().then(d => {
+      if (d?.bgColor) setColor(d.bgColor);
+    }).catch(() => {});
+  }, []);
+
+  const presets = ['#F7F3ED', '#FFFFFF', '#F5F5F5', '#E8DCC4', '#FFF8E7', '#F0EDE5', '#1C2B35', '#0F172A'];
+
+  const save = async () => {
+    setSaving(true);
+    try {
+      await fetch(`${API_BASE}/api/content/bgColor`, {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(color),
+      });
+      setSaved(true); setTimeout(() => setSaved(false), 2000);
+    } catch {}
+    setSaving(false);
+  };
+
+  return (
+    <View style={{ padding: 12, marginTop: 12, backgroundColor: '#f8fafc', borderRadius: 10, borderWidth: 1, borderColor: '#e2e8f0' }}>
+      <Text style={{ fontSize: 13, fontWeight: '800', color: '#1C2B35', writingDirection: 'rtl', textAlign: 'right', marginBottom: 8 }}>🎨 צבע רקע האתר</Text>
+      <View style={{ flexDirection: 'row-reverse', gap: 8, alignItems: 'center', marginBottom: 8, flexWrap: 'wrap' }}>
+        {presets.map(c => (
+          <TouchableOpacity key={c} onPress={() => setColor(c)} style={{ width: 36, height: 36, borderRadius: 8, backgroundColor: c, borderWidth: color === c ? 3 : 1, borderColor: color === c ? Colors.PRIMARY : '#cbd5e1' }} />
+        ))}
+      </View>
+      <View style={{ flexDirection: 'row-reverse', gap: 8, alignItems: 'center' }}>
+        <Text style={{ fontSize: 11, color: '#475569' }}>HEX:</Text>
+        <TextInput style={{ flex: 1, borderWidth: 1, borderColor: '#cbd5e1', borderRadius: 6, padding: 6, fontSize: 12 }} value={color} onChangeText={setColor} placeholder="#F7F3ED" />
+        <View style={{ width: 36, height: 36, borderRadius: 8, backgroundColor: color, borderWidth: 1, borderColor: '#cbd5e1' }} />
+        <TouchableOpacity onPress={save} disabled={saving} style={{ paddingHorizontal: 14, paddingVertical: 8, borderRadius: 6, backgroundColor: Colors.PRIMARY, opacity: saving ? 0.5 : 1 }}>
+          <Text style={{ color: '#fff', fontSize: 12, fontWeight: '800' }}>{saved ? '✓' : 'שמור'}</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+}
+
+function RealEstateBannerEditor() {
+  const [url, setUrl] = useState('');
+  const [kicker, setKicker] = useState('BATUMI');
+  const [title, setTitle] = useState('פורטל הנדל״ן והעסקים');
+  const [sub, setSub] = useState('כל העסקים והנכסים של בטומי במקום אחד');
+  const [visible, setVisible] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    fetchContent().then(d => {
+      const side = d?.sideBanners || [];
+      const re = side.find((b: any) => b.id === 'realestate');
+      if (re?.image) setUrl(re.image);
+      if (re?.kicker !== undefined) setKicker(re.kicker || '');
+      if (re?.bannerTitle !== undefined) setTitle(re.bannerTitle || '');
+      if (re?.bannerSub !== undefined) setSub(re.bannerSub || '');
+      const gv = d?.groupVisibility || {};
+      setVisible(gv.side !== false);
+      setLoading(false);
+    }).catch(() => setLoading(false));
+  }, []);
+
+  const toggleVisible = async () => {
+    const next = !visible;
+    setVisible(next);
+    try {
+      const d = await fetchContent();
+      const gv = { ...(d?.groupVisibility || {}), side: next };
+      await fetch(`${API_BASE}/api/content/groupVisibility`, {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(gv),
+      });
+    } catch {}
+  };
+
+  const save = async () => {
+    setSaving(true);
+    try {
+      const d = await fetchContent();
+      const patch = { image: url, kicker, bannerTitle: title, bannerSub: sub };
+      const side = (d?.sideBanners || []).map((b: any) => b.id === 'realestate' ? { ...b, ...patch } : b);
+      if (!side.find((b: any) => b.id === 'realestate')) {
+        side.push({ id: 'realestate', title: 'פורטל הנדל״ן', icon: '🏠', bg: '#F4A94E', ...patch });
+      }
+      await fetch(`${API_BASE}/api/content/sideBanners`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(side),
+      });
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } catch {}
+    setSaving(false);
+  };
+
+  return (
+    <View style={{ marginBottom: 14, padding: 12, backgroundColor: '#fff7ed', borderRadius: 10, borderWidth: 1, borderColor: '#fed7aa' }}>
+      <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+        <Text style={{ fontSize: 13, fontWeight: '900', color: '#9a3412', writingDirection: 'rtl' }}>🖼️ תמונת באנר נדל"ן</Text>
+        <TouchableOpacity onPress={toggleVisible} style={{ paddingHorizontal: 10, paddingVertical: 6, borderRadius: 16, backgroundColor: visible ? '#10b981' : '#94a3b8' }}>
+          <Text style={{ color: '#fff', fontSize: 11, fontWeight: '900' }}>{visible ? '👁 גלוי' : '🚫 מוסתר'}</Text>
+        </TouchableOpacity>
+      </View>
+      <Text style={{ fontSize: 10, color: '#9a3412', writingDirection: 'rtl', textAlign: 'right', marginBottom: 8, opacity: 0.7 }}>התמונה הזו מופיעה בכפתור "פורטל הנדל״ן" בדף הבית בלבד</Text>
+      {url ? (
+        <Image source={{ uri: resolveUri(url) }} style={{ width: '100%', height: 140, borderRadius: 8, marginBottom: 8 }} resizeMode="cover" />
+      ) : null}
+      <View style={{ flexDirection: 'row-reverse', gap: 6, marginBottom: 8 }}>
+        <TextInput
+          style={{ flex: 1, borderWidth: 1, borderColor: '#fed7aa', borderRadius: 8, padding: 8, fontSize: 12, textAlign: 'right', backgroundColor: '#fff' }}
+          value={url}
+          onChangeText={setUrl}
+          placeholder={loading ? 'טוען...' : 'URL או /uploads/X.jpg'}
+          placeholderTextColor="#fdba74"
+        />
+      </View>
+      {Platform.OS === 'web' && React.createElement('div', { style: { marginBottom: 8 } }, [
+        React.createElement('input', {
+          key: 'inp', type: 'file', accept: 'image/*', id: 're_banner_file_input', style: { display: 'none' },
+          onChange: async (e: any) => {
+            const file = e.target.files?.[0];
+            if (!file) return;
+            const fd = new FormData();
+            fd.append('file', file);
+            try {
+              const r = await fetch(`${API_BASE}/api/upload`, { method: 'POST', body: fd });
+              const j = await r.json();
+              if (j.success && j.filename) setUrl(`/uploads/${j.filename}`);
+              else alert('שגיאה בהעלאה: ' + (j.error || 'לא ידוע'));
+            } catch (err: any) {
+              alert('שגיאת רשת: ' + err.message);
+            }
+            e.target.value = '';
+          },
+        }),
+        React.createElement('button', {
+          key: 'btn', type: 'button',
+          onClick: () => { const el = (document as any).getElementById('re_banner_file_input'); if (el) el.click(); },
+          style: { width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#fff', border: '2px dashed #fdba74', borderRadius: 8, padding: 10, cursor: 'pointer', color: '#9a3412', fontSize: 12, fontWeight: 800 },
+        }, '📤 העלה תמונה מהמחשב'),
+      ])}
+      <Text style={{ fontSize: 11, fontWeight: '800', color: '#9a3412', marginTop: 8, marginBottom: 4, textAlign: 'right' }}>טקסטים על התמונה:</Text>
+      <TextInput style={{ borderWidth: 1, borderColor: '#fed7aa', borderRadius: 6, padding: 6, fontSize: 11, textAlign: 'right', marginBottom: 4, backgroundColor: '#fff' }} value={kicker} onChangeText={setKicker} placeholder="כותרת עליונה (BATUMI)" placeholderTextColor="#fdba74" />
+      <TextInput style={{ borderWidth: 1, borderColor: '#fed7aa', borderRadius: 6, padding: 6, fontSize: 12, textAlign: 'right', marginBottom: 4, backgroundColor: '#fff', fontWeight: '800' }} value={title} onChangeText={setTitle} placeholder="כותרת גדולה" placeholderTextColor="#fdba74" />
+      <TextInput style={{ borderWidth: 1, borderColor: '#fed7aa', borderRadius: 6, padding: 6, fontSize: 11, textAlign: 'right', marginBottom: 8, backgroundColor: '#fff', minHeight: 50 }} multiline value={sub} onChangeText={setSub} placeholder="טקסט תחתון" placeholderTextColor="#fdba74" />
+      <TouchableOpacity disabled={saving} onPress={save} style={{ backgroundColor: '#ea580c', borderRadius: 8, paddingVertical: 8, alignItems: 'center', opacity: saving ? 0.5 : 1 }}>
+        <Text style={{ color: '#fff', fontWeight: '900', fontSize: 13 }}>{saved ? '✓ נשמר' : saving ? 'שומר...' : '💾 שמור באנר'}</Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
+
+function RealEstateHeroEditor() {
+  const [url, setUrl] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    fetchContent().then(d => {
+      const side = d?.sideBanners || [];
+      const re = side.find((b: any) => b.id === 'realestate');
+      if (re?.heroImage) setUrl(re.heroImage);
+      setLoading(false);
+    }).catch(() => setLoading(false));
+  }, []);
+
+  const save = async () => {
+    setSaving(true);
+    try {
+      const d = await fetchContent();
+      const side = (d?.sideBanners || []).map((b: any) => b.id === 'realestate' ? { ...b, heroImage: url } : b);
+      if (!side.find((b: any) => b.id === 'realestate')) {
+        side.push({ id: 'realestate', title: 'פורטל הנדל״ן', icon: '🏠', bg: '#F4A94E', heroImage: url });
+      }
+      await fetch(`${API_BASE}/api/content/sideBanners`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(side),
+      });
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } catch {}
+    setSaving(false);
+  };
+
+  return (
+    <View style={{ marginBottom: 14, padding: 12, backgroundColor: '#ecfeff', borderRadius: 10, borderWidth: 1, borderColor: '#a5f3fc' }}>
+      <Text style={{ fontSize: 13, fontWeight: '900', color: '#155e75', writingDirection: 'rtl', marginBottom: 4 }}>🖼️ תמונת ראש בפורטל הנדל״ן</Text>
+      <Text style={{ fontSize: 10, color: '#155e75', writingDirection: 'rtl', textAlign: 'right', marginBottom: 8, opacity: 0.7 }}>התמונה הגדולה בראש דף הפורטל. ריק = משתמש בתמונת הבאנר של דף הבית</Text>
+      {url ? (
+        <Image source={{ uri: resolveUri(url) }} style={{ width: '100%', height: 140, borderRadius: 8, marginBottom: 8 }} resizeMode="cover" />
+      ) : null}
+      <TextInput
+        style={{ borderWidth: 1, borderColor: '#a5f3fc', borderRadius: 8, padding: 8, fontSize: 12, textAlign: 'right', backgroundColor: '#fff', marginBottom: 8 }}
+        value={url}
+        onChangeText={setUrl}
+        placeholder={loading ? 'טוען...' : 'URL או /uploads/X.jpg'}
+        placeholderTextColor="#67e8f9"
+      />
+      {Platform.OS === 'web' && React.createElement('div', { style: { marginBottom: 8 } }, [
+        React.createElement('input', {
+          key: 'inp', type: 'file', accept: 'image/*', id: 're_hero_file_input', style: { display: 'none' },
+          onChange: async (e: any) => {
+            const file = e.target.files?.[0];
+            if (!file) return;
+            const fd = new FormData();
+            fd.append('file', file);
+            try {
+              const r = await fetch(`${API_BASE}/api/upload`, { method: 'POST', body: fd });
+              const j = await r.json();
+              if (j.success && j.filename) setUrl(`/uploads/${j.filename}`);
+              else alert('שגיאה בהעלאה: ' + (j.error || 'לא ידוע'));
+            } catch (err: any) {
+              alert('שגיאת רשת: ' + err.message);
+            }
+            e.target.value = '';
+          },
+        }),
+        React.createElement('button', {
+          key: 'btn', type: 'button',
+          onClick: () => { const el = (document as any).getElementById('re_hero_file_input'); if (el) el.click(); },
+          style: { width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#fff', border: '2px dashed #67e8f9', borderRadius: 8, padding: 10, cursor: 'pointer', color: '#155e75', fontSize: 12, fontWeight: 800 },
+        }, '📤 העלה תמונה מהמחשב'),
+      ])}
+      <TouchableOpacity disabled={saving} onPress={save} style={{ backgroundColor: '#0891b2', borderRadius: 8, paddingVertical: 8, alignItems: 'center', opacity: saving ? 0.5 : 1 }}>
+        <Text style={{ color: '#fff', fontWeight: '900', fontSize: 13 }}>{saved ? '✓ נשמר' : saving ? 'שומר...' : '💾 שמור תמונת ראש'}</Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
+
+function ListingsFolderViewer({ onBack }: { onBack?: () => void } = {}) {
+  const [images, setImages] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [migrating, setMigrating] = useState(false);
+  const [msg, setMsg] = useState('');
+
+  const load = async () => {
+    setLoading(true);
+    try {
+      const r = await fetch(`${API_BASE}/api/listings-images?_t=${Date.now()}`);
+      const j = await r.json();
+      setImages(j.images || []);
+    } catch { setImages([]); }
+    setLoading(false);
+  };
+  useEffect(() => { load(); }, []);
+
+  const migrate = async () => {
+    setMigrating(true); setMsg('');
+    try {
+      const r = await fetch(`${API_BASE}/api/migrate-listings-images`, { method: 'POST' });
+      const j = await r.json();
+      setMsg(j.success ? `הועתקו ${j.copied} תמונות, דולגו ${j.skipped}` : 'שגיאה');
+      await load();
+    } catch { setMsg('שגיאה'); }
+    setMigrating(false);
+  };
+
+  return (
+    <View style={{ marginBottom: 14, padding: 12, backgroundColor: '#fef3c7', borderRadius: 10, borderWidth: 1, borderColor: '#fde68a' }}>
+      <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+        <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 8 }}>
+          {onBack && (
+            <TouchableOpacity onPress={onBack}>
+              <Text style={{ fontSize: 22, color: '#713f12', fontWeight: '700' }}>→</Text>
+            </TouchableOpacity>
+          )}
+          <Text style={{ fontSize: 13, fontWeight: '900', color: '#713f12', writingDirection: 'rtl' }}>🏠 מודעות נדל"ן ({images.length})</Text>
+        </View>
+        <View style={{ flexDirection: 'row-reverse', gap: 6 }}>
+          <TouchableOpacity onPress={load} style={{ paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8, backgroundColor: '#fde68a' }}>
+            <Text style={{ fontSize: 11, fontWeight: '800', color: '#713f12' }}>🔄 רענן</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={migrate} disabled={migrating} style={{ paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8, backgroundColor: '#a16207', opacity: migrating ? 0.5 : 1 }}>
+            <Text style={{ fontSize: 11, fontWeight: '800', color: '#fff' }}>{migrating ? '...' : '🔁 עדכון'}</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+      <Text style={{ fontSize: 10, color: '#713f12', writingDirection: 'rtl', textAlign: 'right', marginBottom: 8, opacity: 0.7 }}>תמונות שגולשים מעלים למודעות נדל"ן. הבאנר המתחלף מציג מתוך תיקייה זו.</Text>
+      {!!msg && <Text style={{ fontSize: 11, color: '#15803d', marginBottom: 6, textAlign: 'right' }}>{msg}</Text>}
+      {loading ? (
+        <Text style={{ color: '#a16207', fontSize: 12, textAlign: 'center', padding: 8 }}>טוען...</Text>
+      ) : images.length === 0 ? (
+        <Text style={{ color: '#a16207', fontSize: 12, textAlign: 'center', padding: 8 }}>התיקייה ריקה — לחץ "עדכון" כדי להעביר תמונות מודעות קיימות</Text>
+      ) : (
+        <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 4 }}>
+          {images.map(u => (
+            <Image key={u} source={{ uri: resolveUri(u) }} style={{ width: 70, height: 70, borderRadius: 6 }} />
+          ))}
+        </View>
+      )}
+    </View>
+  );
+}
+
+function BlocksMenu() {
+  const [active, setActive] = useState<string | null>(null);
+  const alwaysOpen = [
+    { id: 'home_banner', icon: '🏠', title: 'באנר נדל״ן בדף הבית', component: <RealEstateBannerEditor /> },
+    { id: 'hero', icon: '🖼️', title: 'תמונת ראש בפורטל', component: <RealEstateHeroEditor /> },
+  ];
+  const toggleable = [
+    { id: 'news', icon: '📰', title: 'חדשות נדל"ן', component: <RealEstateNewsEditor /> },
+    { id: 'future', icon: '🔮', title: 'עתיד הנדל"ן', component: <FutureProjectsEditor /> },
+    { id: 'business', icon: '💼', title: 'פורטל העסקים', component: <BusinessProjectsEditor /> },
+    { id: 'articles', icon: '📝', title: 'כתבות וטיפים', component: <RealEstateArticlesEditor /> },
+    { id: 'brokers', icon: '🤝', title: 'מתווכים מומלצים', component: <BrokersEditor /> },
+  ];
+  return (
+    <View>
+      <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 8, marginBottom: 12 }}>
+        {toggleable.map(b => (
+          <TouchableOpacity key={b.id} onPress={() => setActive(active === b.id ? null : b.id)} style={{ paddingHorizontal: 14, paddingVertical: 10, borderRadius: 10, backgroundColor: active === b.id ? Colors.PRIMARY : '#fff', borderWidth: 1, borderColor: active === b.id ? Colors.PRIMARY : '#e2e8f0' }}>
+            <Text style={{ fontSize: 13, fontWeight: '800', color: active === b.id ? '#fff' : '#1C2B35', writingDirection: 'rtl' }}>{b.icon} {b.title}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+      {active && toggleable.find(b => b.id === active)?.component}
+      {!active && alwaysOpen.map(b => <View key={b.id}>{b.component}</View>)}
+    </View>
+  );
+}
+
+const RE_LOCATIONS = [
+  { id: 'after_news', label: 'אחרי חדשות' },
+  { id: 'after_gallery', label: 'אחרי גלריה' },
+  { id: 'after_indices', label: 'אחרי מדדים' },
+  { id: 'after_tips', label: 'אחרי טיפים' },
+  { id: 'after_business_services', label: 'אחרי שירותי עסקים' },
+  { id: 'after_future', label: 'אחרי עתיד הנדל"ן' },
+  { id: 'before_currency', label: 'לפני שערי מטבעות' },
+];
+
+function RealEstateArticlesEditor() {
+  const [items, setItems] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    fetchContent().then(d => {
+      setItems(Array.isArray(d?.realEstateArticles) ? d.realEstateArticles : []);
+      setLoading(false);
+    }).catch(() => setLoading(false));
+  }, []);
+
+  const upload = async (file: File): Promise<string | null> => {
+    const fd = new FormData();
+    fd.append('file', file);
+    try {
+      const r = await fetch(`${API_BASE}/api/upload`, { method: 'POST', body: fd });
+      const j = await r.json();
+      return j.success && j.filename ? `/uploads/${j.filename}` : null;
+    } catch { return null; }
+  };
+
+  const add = () => setItems(p => [...p, { id: 'art_' + Date.now(), title: '', summary: '', article: '', image: '', location: 'after_tips', visible: true, showImage: true }]);
+  const update = (id: string, patch: any) => setItems(p => p.map(i => i.id === id ? { ...i, ...patch } : i));
+  const remove = (id: string) => setItems(p => p.filter(i => i.id !== id));
+
+  const save = async () => {
+    setSaving(true);
+    try {
+      await fetch(`${API_BASE}/api/content/realEstateArticles`, {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(items),
+      });
+      setSaved(true); setTimeout(() => setSaved(false), 2000);
+    } catch {}
+    setSaving(false);
+  };
+
+  return (
+    <View style={{ marginBottom: 14, padding: 12, backgroundColor: '#fdf4ff', borderRadius: 10, borderWidth: 1, borderColor: '#f0abfc' }}>
+      <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+        <Text style={{ fontSize: 13, fontWeight: '900', color: '#86198f', writingDirection: 'rtl' }}>📝 כתבות וטיפים</Text>
+        <TouchableOpacity onPress={add} style={{ paddingHorizontal: 10, paddingVertical: 6, borderRadius: 6, backgroundColor: '#a21caf' }}>
+          <Text style={{ fontSize: 11, fontWeight: '800', color: '#fff' }}>➕ פריט</Text>
+        </TouchableOpacity>
+      </View>
+      {loading ? <Text>טוען...</Text> : items.map(it => (
+        <View key={it.id} style={{ marginBottom: 8, padding: 8, backgroundColor: '#fff', borderRadius: 6 }}>
+          <TextInput style={{ borderWidth: 1, borderColor: '#f5d0fe', borderRadius: 6, padding: 6, fontSize: 12, textAlign: 'right', fontWeight: '700', marginBottom: 4 }} value={it.title} onChangeText={v => update(it.id, { title: v })} placeholder="כותרת" placeholderTextColor="#c084fc" />
+          <TextInput style={{ borderWidth: 1, borderColor: '#f5d0fe', borderRadius: 6, padding: 6, fontSize: 11, textAlign: 'right', marginBottom: 4 }} value={it.summary} onChangeText={v => update(it.id, { summary: v })} placeholder="תקציר" placeholderTextColor="#c084fc" />
+          <TextInput style={{ borderWidth: 1, borderColor: '#f5d0fe', borderRadius: 6, padding: 6, fontSize: 11, textAlign: 'right', marginBottom: 4, minHeight: 60 }} multiline value={it.article} onChangeText={v => update(it.id, { article: v })} placeholder="כתבה מלאה (אופציונלי)" placeholderTextColor="#c084fc" />
+          {it.image && <Image source={{ uri: resolveUri(it.image) }} style={{ width: 80, height: 80, borderRadius: 6, marginBottom: 4 }} />}
+          {Platform.OS === 'web' && React.createElement('div', { style: { marginBottom: 4 } }, [
+            React.createElement('input', {
+              key: 'inp', type: 'file', accept: 'image/*', id: `art_file_${it.id}`, style: { display: 'none' },
+              onChange: async (e: any) => { const f = e.target.files?.[0]; if (!f) return; const url = await upload(f); if (url) update(it.id, { image: url }); e.target.value = ''; },
+            }),
+            React.createElement('button', {
+              key: 'btn', type: 'button',
+              onClick: () => { const el = (document as any).getElementById(`art_file_${it.id}`); if (el) el.click(); },
+              style: { width: '100%', backgroundColor: '#fff', border: '2px dashed #c084fc', borderRadius: 4, padding: 6, cursor: 'pointer', color: '#86198f', fontSize: 11, fontWeight: 800 },
+            }, '📤 העלה תמונה'),
+          ])}
+          <Text style={{ fontSize: 11, fontWeight: '800', color: '#86198f', marginTop: 6, marginBottom: 4, textAlign: 'right' }}>מיקום:</Text>
+          <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 4, marginBottom: 6 }}>
+            {RE_LOCATIONS.map(loc => (
+              <TouchableOpacity key={loc.id} onPress={() => update(it.id, { location: loc.id })} style={{ paddingHorizontal: 8, paddingVertical: 4, borderRadius: 4, backgroundColor: it.location === loc.id ? '#a21caf' : '#f5d0fe' }}>
+                <Text style={{ fontSize: 10, color: it.location === loc.id ? '#fff' : '#86198f', fontWeight: '700' }}>{loc.label}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+          <View style={{ flexDirection: 'row-reverse', gap: 10, marginTop: 6 }}>
+            <TouchableOpacity onPress={() => update(it.id, { visible: !it.visible })} style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 4 }}>
+              <View style={{ width: 16, height: 16, borderWidth: 2, borderColor: '#a21caf', backgroundColor: it.visible ? '#a21caf' : '#fff', borderRadius: 3, alignItems: 'center', justifyContent: 'center' }}>
+                {it.visible && <Text style={{ color: '#fff', fontSize: 10, fontWeight: '900' }}>✓</Text>}
+              </View>
+              <Text style={{ fontSize: 11, color: '#86198f', fontWeight: '700' }}>הצג</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => update(it.id, { showImage: !it.showImage })} style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 4 }}>
+              <View style={{ width: 16, height: 16, borderWidth: 2, borderColor: '#a21caf', backgroundColor: it.showImage ? '#a21caf' : '#fff', borderRadius: 3, alignItems: 'center', justifyContent: 'center' }}>
+                {it.showImage && <Text style={{ color: '#fff', fontSize: 10, fontWeight: '900' }}>✓</Text>}
+              </View>
+              <Text style={{ fontSize: 11, color: '#86198f', fontWeight: '700' }}>הצג תמונה</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => remove(it.id)} style={{ marginRight: 'auto' }}>
+              <Text style={{ fontSize: 11, color: '#dc2626' }}>🗑 מחק</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      ))}
+      {items.length > 0 && (
+        <TouchableOpacity onPress={save} disabled={saving} style={{ backgroundColor: '#a21caf', borderRadius: 8, paddingVertical: 8, alignItems: 'center', marginTop: 8, opacity: saving ? 0.5 : 1 }}>
+          <Text style={{ color: '#fff', fontWeight: '900', fontSize: 13 }}>{saved ? '✓ נשמר' : saving ? 'שומר...' : '💾 שמור כתבות'}</Text>
+        </TouchableOpacity>
+      )}
+    </View>
+  );
+}
+
+function BrokersEditor() {
+  const [items, setItems] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    fetchContent().then(d => {
+      setItems(Array.isArray(d?.brokers) ? d.brokers : []);
+      setLoading(false);
+    }).catch(() => setLoading(false));
+  }, []);
+
+  const upload = async (file: File): Promise<string | null> => {
+    const fd = new FormData();
+    fd.append('file', file);
+    try {
+      const r = await fetch(`${API_BASE}/api/upload`, { method: 'POST', body: fd });
+      const j = await r.json();
+      return j.success && j.filename ? `/uploads/${j.filename}` : null;
+    } catch { return null; }
+  };
+
+  const add = () => setItems(p => [...p, { id: 'br_' + Date.now(), name: '', title: '', phone: '', whatsapp: '', image: '', description: '', city: 'בטומי', yearsActive: '', visible: true }]);
+  const update = (id: string, patch: any) => setItems(p => p.map(i => i.id === id ? { ...i, ...patch } : i));
+  const remove = (id: string) => setItems(p => p.filter(i => i.id !== id));
+
+  const save = async () => {
+    setSaving(true);
+    try {
+      await fetch(`${API_BASE}/api/content/brokers`, {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(items),
+      });
+      setSaved(true); setTimeout(() => setSaved(false), 2000);
+    } catch {}
+    setSaving(false);
+  };
+
+  return (
+    <View style={{ marginBottom: 14, padding: 12, backgroundColor: '#ecfdf5', borderRadius: 10, borderWidth: 1, borderColor: '#a7f3d0' }}>
+      <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+        <Text style={{ fontSize: 13, fontWeight: '900', color: '#065f46', writingDirection: 'rtl' }}>🤝 מתווכים מומלצים</Text>
+        <TouchableOpacity onPress={add} style={{ paddingHorizontal: 10, paddingVertical: 6, borderRadius: 6, backgroundColor: '#059669' }}>
+          <Text style={{ fontSize: 11, fontWeight: '800', color: '#fff' }}>➕ מתווך</Text>
+        </TouchableOpacity>
+      </View>
+      {loading ? <Text>טוען...</Text> : items.map(it => (
+        <View key={it.id} style={{ marginBottom: 8, padding: 8, backgroundColor: '#fff', borderRadius: 6 }}>
+          <TextInput style={{ borderWidth: 1, borderColor: '#a7f3d0', borderRadius: 6, padding: 6, fontSize: 12, textAlign: 'right', fontWeight: '700', marginBottom: 4 }} value={it.name} onChangeText={v => update(it.id, { name: v })} placeholder="שם" placeholderTextColor="#6ee7b7" />
+          <TextInput style={{ borderWidth: 1, borderColor: '#a7f3d0', borderRadius: 6, padding: 6, fontSize: 11, textAlign: 'right', marginBottom: 4 }} value={it.title} onChangeText={v => update(it.id, { title: v })} placeholder="כותרת (מתווך נדל״ן מומלץ בבטומי)" placeholderTextColor="#6ee7b7" />
+          <TextInput style={{ borderWidth: 1, borderColor: '#a7f3d0', borderRadius: 6, padding: 6, fontSize: 11, textAlign: 'right', marginBottom: 4 }} value={it.phone} onChangeText={v => update(it.id, { phone: v })} placeholder="טלפון" placeholderTextColor="#6ee7b7" keyboardType="phone-pad" />
+          <TextInput style={{ borderWidth: 1, borderColor: '#a7f3d0', borderRadius: 6, padding: 6, fontSize: 11, textAlign: 'right', marginBottom: 4 }} value={it.whatsapp} onChangeText={v => update(it.id, { whatsapp: v })} placeholder="WhatsApp (קוד מדינה+מספר)" placeholderTextColor="#6ee7b7" />
+          <TextInput style={{ borderWidth: 1, borderColor: '#a7f3d0', borderRadius: 6, padding: 6, fontSize: 11, textAlign: 'right', marginBottom: 4 }} value={it.city} onChangeText={v => update(it.id, { city: v })} placeholder="עיר" placeholderTextColor="#6ee7b7" />
+          <TextInput style={{ borderWidth: 1, borderColor: '#a7f3d0', borderRadius: 6, padding: 6, fontSize: 11, textAlign: 'right', marginBottom: 4 }} value={it.yearsActive} onChangeText={v => update(it.id, { yearsActive: v })} placeholder="ניסיון (8 שנים)" placeholderTextColor="#6ee7b7" />
+          <TextInput style={{ borderWidth: 1, borderColor: '#a7f3d0', borderRadius: 6, padding: 6, fontSize: 11, textAlign: 'right', marginBottom: 4, minHeight: 60 }} multiline value={it.description} onChangeText={v => update(it.id, { description: v })} placeholder="תיאור" placeholderTextColor="#6ee7b7" />
+          {it.image && <Image source={{ uri: resolveUri(it.image) }} style={{ width: 80, height: 80, borderRadius: 6, marginBottom: 4 }} />}
+          {Platform.OS === 'web' && React.createElement('div', { style: { marginBottom: 4 } }, [
+            React.createElement('input', {
+              key: 'inp', type: 'file', accept: 'image/*', id: `br_file_${it.id}`, style: { display: 'none' },
+              onChange: async (e: any) => { const f = e.target.files?.[0]; if (!f) return; const url = await upload(f); if (url) update(it.id, { image: url }); e.target.value = ''; },
+            }),
+            React.createElement('button', {
+              key: 'btn', type: 'button',
+              onClick: () => { const el = (document as any).getElementById(`br_file_${it.id}`); if (el) el.click(); },
+              style: { width: '100%', backgroundColor: '#fff', border: '2px dashed #6ee7b7', borderRadius: 4, padding: 6, cursor: 'pointer', color: '#065f46', fontSize: 11, fontWeight: 800 },
+            }, '📤 העלה תמונה'),
+          ])}
+          <View style={{ flexDirection: 'row-reverse', gap: 10, marginTop: 6 }}>
+            <TouchableOpacity onPress={() => update(it.id, { visible: !it.visible })} style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 4 }}>
+              <View style={{ width: 16, height: 16, borderWidth: 2, borderColor: '#059669', backgroundColor: it.visible !== false ? '#059669' : '#fff', borderRadius: 3, alignItems: 'center', justifyContent: 'center' }}>
+                {it.visible !== false && <Text style={{ color: '#fff', fontSize: 10, fontWeight: '900' }}>✓</Text>}
+              </View>
+              <Text style={{ fontSize: 11, color: '#065f46', fontWeight: '700' }}>הצג</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => remove(it.id)} style={{ marginRight: 'auto' }}>
+              <Text style={{ fontSize: 11, color: '#dc2626' }}>🗑 מחק</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      ))}
+      {items.length > 0 && (
+        <TouchableOpacity onPress={save} disabled={saving} style={{ backgroundColor: '#059669', borderRadius: 8, paddingVertical: 8, alignItems: 'center', marginTop: 8, opacity: saving ? 0.5 : 1 }}>
+          <Text style={{ color: '#fff', fontWeight: '900', fontSize: 13 }}>{saved ? '✓ נשמר' : saving ? 'שומר...' : '💾 שמור מתווכים'}</Text>
+        </TouchableOpacity>
+      )}
+    </View>
+  );
+}
+
+function RealEstateGalleryEditor() {
+  const [images, setImages] = useState<string[]>([]);
+  const [captions, setCaptions] = useState<Record<string, string>>({});
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const r = await fetch(`${API_BASE}/api/listings-images?_t=${Date.now()}`);
+        const j = await r.json();
+        setImages(j.images || []);
+        const d = await fetchContent();
+        setCaptions(d?.realEstateGalleryCaptions || {});
+      } catch {}
+      setLoading(false);
+    })();
+  }, []);
+
+  const updateCaption = (key: string, value: string) =>
+    setCaptions(p => ({ ...p, [key]: value }));
+
+  const save = async () => {
+    setSaving(true);
+    try {
+      await fetch(`${API_BASE}/api/content/realEstateGalleryCaptions`, {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(captions),
+      });
+      setSaved(true); setTimeout(() => setSaved(false), 2000);
+    } catch {}
+    setSaving(false);
+  };
+
+  return (
+    <View style={{ marginBottom: 14, padding: 12, backgroundColor: '#fef3c7', borderRadius: 10, borderWidth: 1, borderColor: '#fde68a' }}>
+      <View style={{ marginBottom: 8 }}>
+        <Text style={{ fontSize: 13, fontWeight: '900', color: '#92400e', writingDirection: 'rtl', textAlign: 'right' }}>🖼️ באנר מתחלף (מתחת לחדשות)</Text>
+        <Text style={{ fontSize: 10, color: '#92400e', writingDirection: 'rtl', textAlign: 'right', marginTop: 2, opacity: 0.7 }}>תמונות מהתיקייה "מודעות נדל"ן" — הוסף כיתוב מותאם לכל תמונה</Text>
+      </View>
+      {loading ? <Text style={{ color: '#a16207', textAlign: 'center', padding: 8 }}>טוען...</Text> : images.length === 0 ? (
+        <Text style={{ color: '#a16207', textAlign: 'center', padding: 12, fontSize: 12 }}>אין תמונות בתיקייה. תמונות יופיעו כאן כשגולשים יעלו מודעות.</Text>
+      ) : images.map(uri => {
+        const key = uri.split('/').pop() || uri;
+        return (
+          <View key={uri} style={{ flexDirection: 'row-reverse', gap: 8, marginBottom: 8, padding: 8, backgroundColor: '#fff', borderRadius: 6 }}>
+            <Image source={{ uri: resolveUri(uri) }} style={{ width: 80, height: 80, borderRadius: 4 }} resizeMode="cover" />
+            <View style={{ flex: 1, gap: 4 }}>
+              <TextInput
+                style={{ borderWidth: 1, borderColor: '#fde68a', borderRadius: 6, padding: 8, fontSize: 12, textAlign: 'right' }}
+                value={captions[key] || ''}
+                onChangeText={v => updateCaption(key, v)}
+                placeholder="כיתוב על התמונה (לדוגמה: 'דירת 2 חד׳ בקומה 5')"
+                placeholderTextColor="#fcd34d"
+                multiline
+              />
+              <Text style={{ fontSize: 9, color: '#a16207' }}>{key}</Text>
+            </View>
+          </View>
+        );
+      })}
+      {images.length > 0 && (
+        <TouchableOpacity onPress={save} disabled={saving} style={{ backgroundColor: '#d97706', borderRadius: 8, paddingVertical: 10, alignItems: 'center', marginTop: 8, opacity: saving ? 0.5 : 1 }}>
+          <Text style={{ color: '#fff', fontWeight: '900', fontSize: 13 }}>{saved ? '✓ נשמר' : saving ? 'שומר...' : '💾 שמור כיתובים'}</Text>
+        </TouchableOpacity>
+      )}
+    </View>
+  );
+}
+
+function BusinessProjectsEditor() {
+  const [items, setItems] = useState<any[]>([]);
+  const [cats, setCats] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    fetchContent().then(d => {
+      setItems(Array.isArray(d?.businessProjects) ? d.businessProjects : []);
+      setCats(Array.isArray(d?.businessCategories) ? d.businessCategories : []);
+      setLoading(false);
+    }).catch(() => setLoading(false));
+  }, []);
+
+  const upload = async (file: File): Promise<string | null> => {
+    const fd = new FormData();
+    fd.append('file', file);
+    try {
+      const r = await fetch(`${API_BASE}/api/upload`, { method: 'POST', body: fd });
+      const j = await r.json();
+      return j.success && j.filename ? `/uploads/${j.filename}` : null;
+    } catch { return null; }
+  };
+
+  const addCat = () => setCats(p => [...p, { id: 'bc_' + Date.now(), title: '', icon: '💼' }]);
+  const updateCat = (id: string, patch: any) => setCats(p => p.map(c => c.id === id ? { ...c, ...patch } : c));
+  const removeCat = (id: string) => { setCats(p => p.filter(c => c.id !== id)); setItems(p => p.filter(i => i.category !== id)); };
+
+  const addItem = () => setItems(p => [...p, { id: 'bp_' + Date.now(), title: '', caption: '', image: '', category: cats[0]?.id || '', article: '' }]);
+  const updateItem = (id: string, patch: any) => setItems(p => p.map(i => i.id === id ? { ...i, ...patch } : i));
+  const removeItem = (id: string) => setItems(p => p.filter(i => i.id !== id));
+
+  const save = async () => {
+    setSaving(true);
+    try {
+      await fetch(`${API_BASE}/api/content/businessCategories`, {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(cats),
+      });
+      await fetch(`${API_BASE}/api/content/businessProjects`, {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(items),
+      });
+      setSaved(true); setTimeout(() => setSaved(false), 2000);
+    } catch {}
+    setSaving(false);
+  };
+
+  return (
+    <View style={{ marginBottom: 14, padding: 12, backgroundColor: '#eff6ff', borderRadius: 10, borderWidth: 1, borderColor: '#bfdbfe' }}>
+      <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+        <Text style={{ fontSize: 13, fontWeight: '900', color: '#1e3a8a', writingDirection: 'rtl' }}>💼 פורטל העסקים</Text>
+        <View style={{ flexDirection: 'row-reverse', gap: 6 }}>
+          <TouchableOpacity onPress={addCat} style={{ paddingHorizontal: 10, paddingVertical: 6, borderRadius: 6, backgroundColor: '#1e40af' }}>
+            <Text style={{ fontSize: 11, fontWeight: '800', color: '#fff' }}>➕ קטגוריה</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={addItem} style={{ paddingHorizontal: 10, paddingVertical: 6, borderRadius: 6, backgroundColor: '#1e40af' }}>
+            <Text style={{ fontSize: 11, fontWeight: '800', color: '#fff' }}>➕ פריט</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+      {loading ? <Text>טוען...</Text> : (
+        <>
+          {cats.length > 0 && (
+            <View style={{ marginBottom: 10, padding: 8, backgroundColor: '#fff', borderRadius: 6 }}>
+              <Text style={{ fontSize: 11, fontWeight: '800', color: '#1e40af', marginBottom: 4, textAlign: 'right' }}>קטגוריות</Text>
+              {cats.map(c => (
+                <View key={c.id} style={{ flexDirection: 'row-reverse', gap: 6, marginBottom: 4, alignItems: 'center' }}>
+                  <TextInput style={{ width: 50, borderWidth: 1, borderColor: '#dbeafe', borderRadius: 6, padding: 4, fontSize: 14, textAlign: 'center' }} value={c.icon} onChangeText={v => updateCat(c.id, { icon: v })} />
+                  <TextInput style={{ flex: 1, borderWidth: 1, borderColor: '#dbeafe', borderRadius: 6, padding: 4, fontSize: 12, textAlign: 'right' }} value={c.title} onChangeText={v => updateCat(c.id, { title: v })} placeholder="שם קטגוריה" placeholderTextColor="#93c5fd" />
+                  <TouchableOpacity onPress={() => removeCat(c.id)}><Text style={{ color: '#dc2626' }}>🗑</Text></TouchableOpacity>
+                </View>
+              ))}
+            </View>
+          )}
+          {items.map(it => (
+            <View key={it.id} style={{ marginBottom: 8, padding: 8, backgroundColor: '#fff', borderRadius: 6 }}>
+              <TextInput style={{ borderWidth: 1, borderColor: '#dbeafe', borderRadius: 6, padding: 6, fontSize: 12, textAlign: 'right', fontWeight: '700', marginBottom: 4 }} value={it.title} onChangeText={v => updateItem(it.id, { title: v })} placeholder="כותרת" placeholderTextColor="#93c5fd" />
+              <TextInput style={{ borderWidth: 1, borderColor: '#dbeafe', borderRadius: 6, padding: 6, fontSize: 11, textAlign: 'right', marginBottom: 4 }} value={it.caption} onChangeText={v => updateItem(it.id, { caption: v })} placeholder="כיתוב על התמונה" placeholderTextColor="#93c5fd" />
+              <View style={{ flexDirection: 'row-reverse', gap: 6, marginBottom: 4 }}>
+                {cats.map(c => (
+                  <TouchableOpacity key={c.id} onPress={() => updateItem(it.id, { category: c.id })} style={{ paddingHorizontal: 8, paddingVertical: 4, borderRadius: 4, backgroundColor: it.category === c.id ? '#1e40af' : '#dbeafe' }}>
+                    <Text style={{ fontSize: 10, color: it.category === c.id ? '#fff' : '#1e40af', fontWeight: '700' }}>{c.icon} {c.title}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+              <TextInput style={{ borderWidth: 1, borderColor: '#dbeafe', borderRadius: 6, padding: 6, fontSize: 11, textAlign: 'right', marginBottom: 4, minHeight: 50 }} multiline value={it.article || ''} onChangeText={v => updateItem(it.id, { article: v })} placeholder="כתבה" placeholderTextColor="#93c5fd" />
+              {it.image && <Image source={{ uri: resolveUri(it.image) }} style={{ width: 80, height: 80, borderRadius: 6, marginBottom: 4 }} />}
+              {Platform.OS === 'web' && React.createElement('div', null, [
+                React.createElement('input', {
+                  key: 'inp', type: 'file', accept: 'image/*', id: `bp_file_${it.id}`, style: { display: 'none' },
+                  onChange: async (e: any) => { const f = e.target.files?.[0]; if (!f) return; const url = await upload(f); if (url) updateItem(it.id, { image: url }); e.target.value = ''; },
+                }),
+                React.createElement('button', {
+                  key: 'btn', type: 'button',
+                  onClick: () => { const el = (document as any).getElementById(`bp_file_${it.id}`); if (el) el.click(); },
+                  style: { width: '100%', backgroundColor: '#fff', border: '2px dashed #93c5fd', borderRadius: 4, padding: 6, cursor: 'pointer', color: '#1e40af', fontSize: 10, fontWeight: 800 },
+                }, '📤 העלה תמונה'),
+              ])}
+              <TouchableOpacity onPress={() => removeItem(it.id)} style={{ marginTop: 4, alignSelf: 'flex-end' }}>
+                <Text style={{ fontSize: 11, color: '#dc2626' }}>🗑 מחק</Text>
+              </TouchableOpacity>
+            </View>
+          ))}
+          {(items.length > 0 || cats.length > 0) && (
+            <TouchableOpacity onPress={save} disabled={saving} style={{ backgroundColor: '#1e40af', borderRadius: 8, paddingVertical: 8, alignItems: 'center', marginTop: 8, opacity: saving ? 0.5 : 1 }}>
+              <Text style={{ color: '#fff', fontWeight: '900', fontSize: 13 }}>{saved ? '✓ נשמר' : saving ? 'שומר...' : '💾 שמור'}</Text>
+            </TouchableOpacity>
+          )}
+        </>
+      )}
+    </View>
+  );
+}
+
+function FutureProjectsEditor() {
+  const [items, setItems] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    fetchContent().then(d => {
+      setItems(Array.isArray(d?.futureProjects) ? d.futureProjects : []);
+      setLoading(false);
+    }).catch(() => setLoading(false));
+  }, []);
+
+  const upload = async (file: File): Promise<string | null> => {
+    const fd = new FormData();
+    fd.append('file', file);
+    try {
+      const r = await fetch(`${API_BASE}/api/upload`, { method: 'POST', body: fd });
+      const j = await r.json();
+      return j.success && j.filename ? `/uploads/${j.filename}` : null;
+    } catch { return null; }
+  };
+
+  const addItem = () => setItems(p => [...p, { id: 'fp_' + Date.now(), title: '', price: '', features: [], images: [] }]);
+  const removeItem = (id: string) => setItems(p => p.filter(i => i.id !== id));
+  const update = (id: string, patch: any) => setItems(p => p.map(i => i.id === id ? { ...i, ...patch } : i));
+  const addImage = async (id: string, file: File) => {
+    const url = await upload(file);
+    if (url) setItems(p => p.map(i => i.id === id ? { ...i, images: [...(i.images || []), url] } : i));
+  };
+  const removeImage = (id: string, imgIdx: number) => setItems(p => p.map(i => i.id === id ? { ...i, images: (i.images || []).filter((_: any, idx: number) => idx !== imgIdx) } : i));
+
+  const save = async () => {
+    setSaving(true);
+    try {
+      await fetch(`${API_BASE}/api/content/futureProjects`, {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(items),
+      });
+      setSaved(true); setTimeout(() => setSaved(false), 2000);
+    } catch {}
+    setSaving(false);
+  };
+
+  return (
+    <View style={{ marginBottom: 14, padding: 12, backgroundColor: '#eff6ff', borderRadius: 10, borderWidth: 1, borderColor: '#bfdbfe' }}>
+      <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+        <Text style={{ fontSize: 13, fontWeight: '900', color: '#1e3a8a', writingDirection: 'rtl', textAlign: 'right' }}>🔮 עתיד הנדל"ן (פרויקטים עתידיים)</Text>
+        <TouchableOpacity onPress={addItem} style={{ paddingHorizontal: 10, paddingVertical: 6, borderRadius: 6, backgroundColor: '#1e40af' }}>
+          <Text style={{ fontSize: 11, fontWeight: '800', color: '#fff' }}>➕ הוסף פריט</Text>
+        </TouchableOpacity>
+      </View>
+      {loading ? <Text>טוען...</Text> : items.length === 0 ? (
+        <Text style={{ fontSize: 11, color: '#64748b', textAlign: 'center', padding: 12 }}>אין פריטים. לחץ "הוסף פריט"</Text>
+      ) : items.map(it => (
+        <View key={it.id} style={{ marginBottom: 10, padding: 10, backgroundColor: '#fff', borderRadius: 8, borderWidth: 1, borderColor: '#dbeafe' }}>
+          <TextInput style={{ borderWidth: 1, borderColor: '#dbeafe', borderRadius: 6, padding: 6, fontSize: 12, textAlign: 'right', marginBottom: 6 }} value={it.title} onChangeText={v => update(it.id, { title: v })} placeholder="כותרת" placeholderTextColor="#93c5fd" />
+          <TextInput style={{ borderWidth: 1, borderColor: '#dbeafe', borderRadius: 6, padding: 6, fontSize: 12, textAlign: 'right', marginBottom: 6 }} value={it.price} onChangeText={v => update(it.id, { price: v })} placeholder="מחיר/השקעה" placeholderTextColor="#93c5fd" />
+          <TextInput style={{ borderWidth: 1, borderColor: '#dbeafe', borderRadius: 6, padding: 6, fontSize: 12, textAlign: 'right', marginBottom: 6, minHeight: 50 }} multiline value={(it.features || []).join('\n')} onChangeText={v => update(it.id, { features: v.split('\n') })} placeholder="פרטים (שורה לכל אחד)" placeholderTextColor="#93c5fd" />
+          <Text style={{ fontSize: 11, fontWeight: '800', color: '#1e40af', textAlign: 'right', marginBottom: 4 }}>תמונות ({(it.images || []).length})</Text>
+          <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 6, marginBottom: 6 }}>
+            {(it.images || []).map((u: string, idx: number) => (
+              <View key={idx} style={{ position: 'relative' }}>
+                <Image source={{ uri: resolveUri(u) }} style={{ width: 70, height: 70, borderRadius: 6 }} />
+                <TouchableOpacity onPress={() => removeImage(it.id, idx)} style={{ position: 'absolute', top: -6, left: -6, width: 20, height: 20, borderRadius: 10, backgroundColor: '#dc2626', alignItems: 'center', justifyContent: 'center' }}>
+                  <Text style={{ color: '#fff', fontSize: 11, fontWeight: '900' }}>✕</Text>
+                </TouchableOpacity>
+              </View>
+            ))}
+          </View>
+          {Platform.OS === 'web' && React.createElement('div', null, [
+            React.createElement('input', {
+              key: 'inp', type: 'file', accept: 'image/*', id: `fp_file_${it.id}`, style: { display: 'none' },
+              onChange: async (e: any) => { const f = e.target.files?.[0]; if (f) await addImage(it.id, f); e.target.value = ''; },
+            }),
+            React.createElement('button', {
+              key: 'btn', type: 'button',
+              onClick: () => { const el = (document as any).getElementById(`fp_file_${it.id}`); if (el) el.click(); },
+              style: { width: '100%', backgroundColor: '#fff', border: '2px dashed #93c5fd', borderRadius: 6, padding: 8, cursor: 'pointer', color: '#1e40af', fontSize: 11, fontWeight: 800 },
+            }, '📤 הוסף תמונה'),
+          ])}
+          <TouchableOpacity onPress={() => removeItem(it.id)} style={{ marginTop: 6, alignSelf: 'flex-end' }}>
+            <Text style={{ fontSize: 11, color: '#dc2626', fontWeight: '700' }}>🗑 מחק פריט</Text>
+          </TouchableOpacity>
+        </View>
+      ))}
+      {items.length > 0 && (
+        <TouchableOpacity onPress={save} disabled={saving} style={{ backgroundColor: '#1e40af', borderRadius: 8, paddingVertical: 8, alignItems: 'center', marginTop: 8, opacity: saving ? 0.5 : 1 }}>
+          <Text style={{ color: '#fff', fontWeight: '900', fontSize: 13 }}>{saved ? '✓ נשמר' : saving ? 'שומר...' : '💾 שמור פרויקטים עתידיים'}</Text>
+        </TouchableOpacity>
+      )}
+    </View>
+  );
+}
+
+function RealEstateNewsEditor() {
+  const [cats, setCats] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [expandedCat, setExpandedCat] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchContent().then(d => {
+      const re = d?.realEstate || {};
+      setCats(Array.isArray(re.newsCategories) ? re.newsCategories : []);
+      setLoading(false);
+    }).catch(() => setLoading(false));
+  }, []);
+
+  const upload = async (file: File): Promise<string | null> => {
+    const fd = new FormData();
+    fd.append('file', file);
+    try {
+      const r = await fetch(`${API_BASE}/api/upload`, { method: 'POST', body: fd });
+      const j = await r.json();
+      return j.success && j.filename ? `/uploads/${j.filename}` : null;
+    } catch { return null; }
+  };
+
+  const addCat = () => setCats(p => [...p, { id: 'nc_' + Date.now(), title: '', icon: '📰', items: [] }]);
+  const removeCat = (id: string) => setCats(p => p.filter(c => c.id !== id));
+  const updateCat = (id: string, patch: any) => setCats(p => p.map(c => c.id === id ? { ...c, ...patch } : c));
+
+  const addItem = (catId: string) => updateCat(catId, { items: [...(cats.find(c => c.id === catId)?.items || []), { id: 'n_' + Date.now(), title: '', summary: '', date: '', image: '', article: '' }] });
+  const removeItem = (catId: string, itemId: string) => {
+    const c = cats.find(x => x.id === catId);
+    if (c) updateCat(catId, { items: (c.items || []).filter((i: any) => i.id !== itemId) });
+  };
+  const updateItem = (catId: string, itemId: string, patch: any) => {
+    const c = cats.find(x => x.id === catId);
+    if (c) updateCat(catId, { items: (c.items || []).map((i: any) => i.id === itemId ? { ...i, ...patch } : i) });
+  };
+
+  const save = async () => {
+    setSaving(true);
+    try {
+      const d = await fetchContent();
+      const re = d?.realEstate || {};
+      re.newsCategories = cats;
+      await fetch(`${API_BASE}/api/content/realEstate`, {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(re),
+      });
+      setSaved(true); setTimeout(() => setSaved(false), 2000);
+    } catch {}
+    setSaving(false);
+  };
+
+  return (
+    <View style={{ marginBottom: 14, padding: 12, backgroundColor: '#f0fdf4', borderRadius: 10, borderWidth: 1, borderColor: '#bbf7d0' }}>
+      <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+        <Text style={{ fontSize: 13, fontWeight: '900', color: '#14532d', writingDirection: 'rtl', textAlign: 'right' }}>📰 חדשות נדל"ן</Text>
+        <TouchableOpacity onPress={addCat} style={{ paddingHorizontal: 10, paddingVertical: 6, borderRadius: 6, backgroundColor: '#15803d' }}>
+          <Text style={{ fontSize: 11, fontWeight: '800', color: '#fff' }}>➕ קטגוריה</Text>
+        </TouchableOpacity>
+      </View>
+      {loading ? <Text>טוען...</Text> : cats.map(c => (
+        <View key={c.id} style={{ marginBottom: 10, padding: 10, backgroundColor: '#fff', borderRadius: 8, borderWidth: 1, borderColor: '#bbf7d0' }}>
+          <View style={{ flexDirection: 'row-reverse', gap: 6, marginBottom: 6, alignItems: 'center' }}>
+            <TouchableOpacity onPress={() => setExpandedCat(expandedCat === c.id ? null : c.id)} style={{ width: 28, height: 28, alignItems: 'center', justifyContent: 'center' }}>
+              <Text style={{ fontSize: 14, color: '#15803d' }}>{expandedCat === c.id ? '▼' : '◀'}</Text>
+            </TouchableOpacity>
+            <TextInput style={{ width: 50, borderWidth: 1, borderColor: '#bbf7d0', borderRadius: 6, padding: 6, fontSize: 14, textAlign: 'center' }} value={c.icon} onChangeText={v => updateCat(c.id, { icon: v })} placeholder="🔥" />
+            <TextInput style={{ flex: 1, borderWidth: 1, borderColor: '#bbf7d0', borderRadius: 6, padding: 6, fontSize: 12, textAlign: 'right', fontWeight: '800' }} value={c.title} onChangeText={v => updateCat(c.id, { title: v })} placeholder="שם הקטגוריה" placeholderTextColor="#86efac" />
+            <Text style={{ fontSize: 11, color: '#15803d', fontWeight: '700' }}>{(c.items || []).length}</Text>
+            <TouchableOpacity onPress={() => removeCat(c.id)}>
+              <Text style={{ color: '#dc2626', fontSize: 14 }}>🗑</Text>
+            </TouchableOpacity>
+          </View>
+          {expandedCat === c.id && (c.items || []).map((it: any) => (
+            <View key={it.id} style={{ marginTop: 6, padding: 8, backgroundColor: '#f0fdf4', borderRadius: 6 }}>
+              <View style={{ flexDirection: 'row-reverse', gap: 6, alignItems: 'center', marginBottom: 4 }}>
+                <TextInput style={{ flex: 1, borderWidth: 1, borderColor: '#dcfce7', borderRadius: 6, padding: 6, fontSize: 11, textAlign: 'right', fontWeight: '700' }} value={it.title} onChangeText={v => updateItem(c.id, it.id, { title: v })} placeholder="כותרת" placeholderTextColor="#86efac" />
+                <TouchableOpacity onPress={() => removeItem(c.id, it.id)}>
+                  <Text style={{ color: '#dc2626', fontSize: 12 }}>✕</Text>
+                </TouchableOpacity>
+              </View>
+              <TextInput style={{ borderWidth: 1, borderColor: '#dcfce7', borderRadius: 6, padding: 6, fontSize: 11, textAlign: 'right', marginBottom: 4 }} value={it.summary} onChangeText={v => updateItem(c.id, it.id, { summary: v })} placeholder="תקציר" placeholderTextColor="#86efac" />
+              <TextInput style={{ borderWidth: 1, borderColor: '#dcfce7', borderRadius: 6, padding: 6, fontSize: 11, textAlign: 'right', marginBottom: 4 }} value={it.date} onChangeText={v => updateItem(c.id, it.id, { date: v })} placeholder="תאריך (היום/השבוע/05.04)" placeholderTextColor="#86efac" />
+              <TextInput style={{ borderWidth: 1, borderColor: '#dcfce7', borderRadius: 6, padding: 6, fontSize: 11, textAlign: 'right', marginBottom: 4, minHeight: 60 }} multiline value={it.article || ''} onChangeText={v => updateItem(c.id, it.id, { article: v })} placeholder="כתבה מלאה (אופציונלי)" placeholderTextColor="#86efac" />
+              <View style={{ flexDirection: 'row-reverse', gap: 4, marginBottom: 4 }}>
+                <TextInput
+                  style={{ flex: 1, borderWidth: 1, borderColor: '#bfdbfe', borderRadius: 6, padding: 6, fontSize: 11, textAlign: 'right', backgroundColor: '#eff6ff' }}
+                  value={it.link || ''}
+                  onChangeText={v => updateItem(c.id, it.id, { link: v })}
+                  placeholder="🔗 קישור למקור הכתבה (אופציונלי)"
+                  placeholderTextColor="#93c5fd"
+                  autoCapitalize="none"
+                  keyboardType="url"
+                />
+                {!!it.link && (
+                  <TouchableOpacity
+                    onPress={async () => {
+                      try {
+                        const r = await fetch(`${API_BASE}/api/og-image?url=${encodeURIComponent(it.link)}`);
+                        const j = await r.json();
+                        if (j.success && j.image) updateItem(c.id, it.id, { image: j.image });
+                        else alert('לא נמצאה תמונה בקישור');
+                      } catch { alert('שגיאה במשיכת תמונה'); }
+                    }}
+                    style={{ paddingHorizontal: 10, paddingVertical: 6, backgroundColor: '#3b82f6', borderRadius: 6, justifyContent: 'center' }}
+                  >
+                    <Text style={{ color: '#fff', fontSize: 11, fontWeight: '800' }}>🪄 הבא תמונה</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+              {it.image && <Image source={{ uri: resolveUri(it.image) }} style={{ width: 60, height: 60, borderRadius: 4, marginBottom: 4 }} />}
+              {Platform.OS === 'web' && React.createElement('div', null, [
+                React.createElement('input', {
+                  key: 'inp', type: 'file', accept: 'image/*', id: `news_file_${it.id}`, style: { display: 'none' },
+                  onChange: async (e: any) => { const f = e.target.files?.[0]; if (!f) return; const url = await upload(f); if (url) updateItem(c.id, it.id, { image: url }); e.target.value = ''; },
+                }),
+                React.createElement('button', {
+                  key: 'btn', type: 'button',
+                  onClick: () => { const el = (document as any).getElementById(`news_file_${it.id}`); if (el) el.click(); },
+                  style: { width: '100%', backgroundColor: '#fff', border: '2px dashed #86efac', borderRadius: 4, padding: 6, cursor: 'pointer', color: '#15803d', fontSize: 10, fontWeight: 800 },
+                }, '📤 העלה תמונה ידנית'),
+              ])}
+            </View>
+          ))}
+          {expandedCat === c.id && (
+            <TouchableOpacity onPress={() => addItem(c.id)} style={{ marginTop: 6, alignSelf: 'flex-end', paddingHorizontal: 10, paddingVertical: 4, borderWidth: 1, borderColor: '#15803d', borderStyle: 'dashed', borderRadius: 6 }}>
+              <Text style={{ fontSize: 11, color: '#15803d', fontWeight: '800' }}>+ כתבה</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+      ))}
+      {cats.length > 0 && (
+        <TouchableOpacity onPress={save} disabled={saving} style={{ backgroundColor: '#15803d', borderRadius: 8, paddingVertical: 8, alignItems: 'center', marginTop: 8, opacity: saving ? 0.5 : 1 }}>
+          <Text style={{ color: '#fff', fontWeight: '900', fontSize: 13 }}>{saved ? '✓ נשמר' : saving ? 'שומר...' : '💾 שמור חדשות'}</Text>
+        </TouchableOpacity>
+      )}
+    </View>
+  );
+}
+
+function ManualIndicatorsTable({ title, subtitle, storageField, accentColor, headerBg, lineColor, cellBg }: { title: string; subtitle: string; storageField: string; accentColor: string; headerBg: string; lineColor: string; cellBg: string }) {
+  const [rows, setRows] = useState<ManualRow[]>([]);
+  const [years, setYears] = useState<number[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
+      setYears([]);
+      try {
+        const r = await fetch(`${API_BASE}/api/content`);
+        const resp = await r.json();
+        const d = resp && resp.success && resp.data ? resp.data : resp;
+        if (Array.isArray(d[storageField])) {
+          // Migrate legacy `values` (year->value map) into tableRows so they don't disappear
+          const migrated = d[storageField].map((row: any) => {
+            const existing = Array.isArray(row.tableRows) ? row.tableRows : [];
+            if (existing.length === 0 && row.values && typeof row.values === 'object') {
+              const fromValues = Object.entries(row.values)
+                .filter(([_, v]) => v !== '')
+                .map(([y, v]) => ({ id: 't_' + Math.random().toString(36).slice(2, 6), year: String(y), category: '', value: String(v) }));
+              if (fromValues.length > 0) {
+                return { ...row, tableRows: fromValues };
+              }
+            }
+            return row;
+          });
+          setRows(migrated);
+        }
+      } catch {}
+      setLoading(false);
+    })();
+  }, [storageField]);
+
+  const addRow = () => setRows(prev => [...prev, {
+    id: 'm_' + Math.random().toString(36).slice(2, 8),
+    label: '', unit: '', values: {}, extraYears: [], displayType: 'line',
+    tableRows: [],
+    columns: [
+      { id: 'c_year', name: 'שנה' },
+      { id: 'c_type', name: 'סוג' },
+      { id: 'c_val', name: 'ערך' },
+    ],
+  }]);
+  const addColumn = (rowId: string) => {
+    let name = 'עמודה חדשה';
+    if (typeof window !== 'undefined' && typeof (window as any).prompt === 'function') {
+      const n = (window as any).prompt('שם העמודה החדשה:', name);
+      if (!n) return;
+      name = n;
+    }
+    setRows(prev => prev.map(r => r.id === rowId ? { ...r, columns: [...(r.columns || []), { id: 'c_' + Math.random().toString(36).slice(2, 6), name }] } : r));
+  };
+  const DEFAULT_COLS = [
+    { id: 'c_year', name: 'שנה' },
+    { id: 'c_type', name: 'סוג' },
+    { id: 'c_val', name: 'ערך' },
+  ];
+  const ensureColumns = (r: ManualRow) => (r.columns && r.columns.length > 0) ? r.columns : DEFAULT_COLS;
+  const updateColumn = (rowId: string, colId: string, name: string) =>
+    setRows(prev => prev.map(r => {
+      if (r.id !== rowId) return r;
+      const cols = ensureColumns(r);
+      return { ...r, columns: cols.map(c => c.id === colId ? { ...c, name } : c) };
+    }));
+  const deleteColumn = (rowId: string, colId: string) =>
+    setRows(prev => prev.map(r => {
+      if (r.id !== rowId) return r;
+      const cols = ensureColumns(r);
+      return {
+        ...r,
+        columns: cols.filter(c => c.id !== colId),
+        tableRows: (r.tableRows || []).map(tr => {
+          const cells = { ...(tr.cells || {}) }; delete cells[colId];
+          return { ...tr, cells };
+        }),
+      };
+    }));
+  const updateCell2 = (rowId: string, trId: string, colId: string, val: string) =>
+    setRows(prev => prev.map(r => r.id === rowId ? {
+      ...r,
+      tableRows: (r.tableRows || []).map(tr => tr.id === trId ? { ...tr, cells: { ...(tr.cells || {}), [colId]: val } } : tr),
+    } : r));
+  const deleteRow = (id: string) => setRows(prev => prev.filter(r => r.id !== id));
+  const updateRow = (id: string, patch: Partial<ManualRow>) => setRows(prev => prev.map(r => r.id === id ? { ...r, ...patch } : r));
+  const updateCell = (id: string, year: number, val: string) => setRows(prev => prev.map(r => r.id === id ? { ...r, values: { ...r.values, [year]: val } } : r));
+  const addTableRow = (id: string) => setRows(prev => prev.map(r => r.id === id ? { ...r, tableRows: [...(r.tableRows || []), { id: 't_' + Math.random().toString(36).slice(2, 6), category: '', value: '' }] } : r));
+  const updateTableRow = (rowId: string, trId: string, patch: Partial<{ category: string; value: string; year: string }>) =>
+    setRows(prev => prev.map(r => r.id === rowId ? { ...r, tableRows: (r.tableRows || []).map(tr => tr.id === trId ? { ...tr, ...patch } : tr) } : r));
+  const deleteTableRow = (rowId: string, trId: string) =>
+    setRows(prev => prev.map(r => r.id === rowId ? { ...r, tableRows: (r.tableRows || []).filter(tr => tr.id !== trId) } : r));
+  const addYear = (id: string) => {
+    const row = rows.find(r => r.id === id);
+    if (!row) return;
+    const known = new Set([...years, ...(row.extraYears || [])]);
+    const defaultNext = known.size ? Math.max(...known) + 1 : new Date().getFullYear();
+    let input: string | null = String(defaultNext);
+    if (typeof window !== 'undefined' && typeof (window as any).prompt === 'function') {
+      input = (window as any).prompt('הכנס שנה להוספה:', String(defaultNext));
+    }
+    if (!input) return;
+    const year = parseInt(input, 10);
+    if (isNaN(year) || year < 1900 || year > 2100) return;
+    if (known.has(year)) return;
+    setRows(prev => prev.map(r => r.id === id ? { ...r, extraYears: [...(r.extraYears || []), year] } : r));
+  };
+  const removeYear = (id: string, year: number) => setRows(prev => prev.map(r => {
+    if (r.id !== id) return r;
+    const { [year]: _, ...rest } = r.values;
+    return { ...r, values: rest, extraYears: (r.extraYears || []).filter(y => y !== year) };
+  }));
+
+  const save = async () => {
+    setSaving(true);
+    try {
+      await fetch(`${API_BASE}/api/content/${storageField}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(rows),
+      });
+    } catch {}
+    setSaving(false);
+  };
+
+  const sparkline = (row: ManualRow) => {
+    if (Platform.OS !== 'web') return null;
+    const vals = years.map(y => parseFloat(row.values[y] || '')).filter(v => !isNaN(v));
+    if (vals.length < 2) return null;
+    const min = Math.min(...vals);
+    const max = Math.max(...vals);
+    const range = max - min || 1;
+    const w = 80;
+    const h = 24;
+    const pts = vals.map((v, i) => {
+      const x = (i / (vals.length - 1)) * w;
+      const y = h - ((v - min) / range) * h;
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    }).join(' ');
+    return React.createElement('svg', { width: w, height: h },
+      React.createElement('polyline', { points: pts, fill: 'none', stroke: lineColor, strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' }),
+      ...vals.map((v, i) => {
+        const x = (i / (vals.length - 1)) * w;
+        const y = h - ((v - min) / range) * h;
+        return React.createElement('circle', { key: i, cx: x, cy: y, r: 2, fill: lineColor });
+      })
+    );
+  };
+
+  return (
+    <View style={{ marginBottom: 14, backgroundColor: '#fff', borderRadius: 10, borderWidth: 1, borderColor: '#e2e8f0', overflow: 'hidden' }}>
+      <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', padding: 12, borderBottomWidth: 1, borderBottomColor: '#e2e8f0', backgroundColor: headerBg }}>
+        <View>
+          <Text style={{ fontSize: 13, fontWeight: '900', color: accentColor, writingDirection: 'rtl', textAlign: 'right' }}>{title}</Text>
+          <Text style={{ fontSize: 10, color: accentColor, writingDirection: 'rtl', textAlign: 'right', marginTop: 2, opacity: 0.8 }}>{subtitle}</Text>
+        </View>
+        <TouchableOpacity onPress={addRow} style={{ paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8, backgroundColor: accentColor }}>
+          <Text style={{ fontSize: 11, fontWeight: '800', color: '#fff' }}>➕ הוסף מדד</Text>
+        </TouchableOpacity>
+      </View>
+      {loading ? (
+        <Text style={{ textAlign: 'center', color: '#94a3b8', padding: 20 }}>טוען...</Text>
+      ) : (
+        <>
+          {rows.length === 0 ? (
+            <Text style={{ textAlign: 'center', color: '#94a3b8', padding: 20, writingDirection: 'rtl' }}>אין מדדים. לחץ "➕ הוסף מדד"</Text>
+          ) : rows.map((row, idx) => {
+            const rowYears = [...years, ...(row.extraYears || [])].sort((a, b) => a - b);
+            const pct = (y: number, i: number) => {
+              if (i === 0) return '';
+              const curr = parseFloat(row.values[y] || '');
+              const prev = parseFloat(row.values[rowYears[i - 1]] || '');
+              if (isNaN(curr) || isNaN(prev) || prev === 0) return '';
+              const d = ((curr - prev) / Math.abs(prev)) * 100;
+              return (d >= 0 ? '+' : '') + d.toFixed(1) + '%';
+            };
+            const cols = row.columns && row.columns.length > 0 ? row.columns : [
+              { id: 'c_year', name: 'שנה' },
+              { id: 'c_type', name: 'סוג' },
+              { id: 'c_val', name: 'ערך' },
+            ];
+            const cellFor = (tr: any, colId: string): string => {
+              if (tr.cells && tr.cells[colId] !== undefined) return tr.cells[colId];
+              if (colId === 'c_year') return tr.year || '';
+              if (colId === 'c_type') return tr.category || '';
+              if (colId === 'c_val') return tr.value || '';
+              return '';
+            };
+            const setCell = (tr: any, colId: string, v: string) => {
+              if (colId === 'c_year') updateTableRow(row.id, tr.id, { year: v });
+              else if (colId === 'c_type') updateTableRow(row.id, tr.id, { category: v });
+              else if (colId === 'c_val') updateTableRow(row.id, tr.id, { value: v });
+              else updateCell2(row.id, tr.id, colId, v);
+            };
+            return (
+              <View key={row.id} style={{ paddingVertical: 10, paddingHorizontal: 10, backgroundColor: idx % 2 === 0 ? '#fff' : '#fafafa', borderTopWidth: 1, borderTopColor: '#f1f5f9' }}>
+                <View style={{ flexDirection: 'row-reverse', gap: 6, alignItems: 'center', marginBottom: 8 }}>
+                  <TextInput style={{ flex: 1.8, fontSize: 12, color: accentColor, textAlign: 'right', writingDirection: 'rtl', fontWeight: '700', borderWidth: 1, borderColor: cellBg, borderRadius: 6, padding: 6 }} value={row.label} onChangeText={v => updateRow(row.id, { label: v })} placeholder="שם המדד" placeholderTextColor="#93c5fd" />
+                  <TextInput style={{ width: 60, fontSize: 11, textAlign: 'center', borderWidth: 1, borderColor: cellBg, borderRadius: 6, padding: 6 }} value={row.unit} onChangeText={v => updateRow(row.id, { unit: v })} placeholder="יחידה" placeholderTextColor="#93c5fd" />
+                  <TouchableOpacity onPress={() => deleteRow(row.id)} style={{ width: 30, alignItems: 'center' }}>
+                    <Text style={{ fontSize: 14, color: '#dc2626' }}>🗑</Text>
+                  </TouchableOpacity>
+                </View>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  <View>
+                    <View style={{ flexDirection: 'row-reverse', paddingVertical: 4, gap: 6, alignItems: 'center' }}>
+                      {cols.map(col => (
+                        <View key={col.id} style={{ width: 130, alignItems: 'center' }}>
+                          <TextInput style={{ width: '100%', fontSize: 10, fontWeight: '800', color: '#1e40af', textAlign: 'center', borderWidth: 1, borderColor: cellBg, borderRadius: 4, padding: 4, backgroundColor: headerBg }} value={col.name} onChangeText={v => updateColumn(row.id, col.id, v)} placeholder="עמודה" />
+                          {cols.length > 1 && (
+                            <TouchableOpacity onPress={() => deleteColumn(row.id, col.id)} style={{ paddingVertical: 4, paddingHorizontal: 10, marginTop: 2, borderRadius: 4, backgroundColor: '#fee2e2' }}>
+                              <Text style={{ fontSize: 11, color: '#dc2626', fontWeight: '800' }}>✕ מחק</Text>
+                            </TouchableOpacity>
+                          )}
+                        </View>
+                      ))}
+                      <TouchableOpacity onPress={() => addColumn(row.id)} style={{ paddingHorizontal: 8, paddingVertical: 4, borderRadius: 4, borderWidth: 1, borderColor: accentColor, borderStyle: 'dashed' }}>
+                        <Text style={{ fontSize: 10, color: accentColor, fontWeight: '800' }}>+ עמודה</Text>
+                      </TouchableOpacity>
+                      <View style={{ width: 28 }} />
+                    </View>
+                    {(row.tableRows || []).map(tr => (
+                      <View key={tr.id} style={{ flexDirection: 'row-reverse', gap: 6, alignItems: 'center', paddingVertical: 3 }}>
+                        {cols.map(col => (
+                          <TextInput key={col.id} style={{ width: 120, fontSize: 12, textAlign: 'center', borderWidth: 1, borderColor: cellBg, borderRadius: 6, padding: 6, backgroundColor: cellBg + '40' }} value={cellFor(tr, col.id)} onChangeText={v => setCell(tr, col.id, v)} placeholder="—" placeholderTextColor="#93c5fd" />
+                        ))}
+                        <TouchableOpacity onPress={() => deleteTableRow(row.id, tr.id)} style={{ width: 28, alignItems: 'center' }}>
+                          <Text style={{ fontSize: 14, color: '#dc2626' }}>✕</Text>
+                        </TouchableOpacity>
+                      </View>
+                    ))}
+                  </View>
+                </ScrollView>
+                <TouchableOpacity onPress={() => addTableRow(row.id)} style={{ alignSelf: 'flex-end', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 6, borderWidth: 1, borderColor: accentColor, borderStyle: 'dashed', marginTop: 6 }}>
+                  <Text style={{ fontSize: 12, color: accentColor, fontWeight: '800' }}>+ שורה</Text>
+                </TouchableOpacity>
+                <View style={{ marginTop: 10, gap: 6 }}>
+                  <TextInput style={{ fontSize: 11, borderWidth: 1, borderColor: cellBg, borderRadius: 6, padding: 6, textAlign: 'right', writingDirection: 'rtl' }} value={row.sources || ''} onChangeText={v => updateRow(row.id, { sources: v })} placeholder="מקורות (למשל: Geostat, NBG, Galt & Taggart)" placeholderTextColor="#94a3b8" />
+                  <TextInput style={{ fontSize: 11, borderWidth: 1, borderColor: cellBg, borderRadius: 6, padding: 6, textAlign: 'right', writingDirection: 'rtl' }} value={row.notes || ''} onChangeText={v => updateRow(row.id, { notes: v })} placeholder="הערות (אופציונלי)" placeholderTextColor="#94a3b8" />
+                </View>
+              </View>
+            );
+          })}
+          {rows.length > 0 && (
+            <TouchableOpacity onPress={save} disabled={saving} style={{ margin: 10, paddingVertical: 10, borderRadius: 8, backgroundColor: '#10b981', alignItems: 'center', opacity: saving ? 0.5 : 1 }}>
+              <Text style={{ color: '#fff', fontWeight: '900', fontSize: 13 }}>{saving ? 'שומר...' : '💾 שמור מדדים'}</Text>
+            </TouchableOpacity>
+          )}
+        </>
+      )}
+    </View>
+  );
+}
+
+function FinanceManualTable() {
+  const [rows, setRows] = useState<ManualRow[]>([]);
+  const [years, setYears] = useState<number[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
+      try {
+        const r = await fetch('https://api.worldbank.org/v2/country/GE/indicator/FP.CPI.TOTL.ZG?format=json&per_page=12');
+        const j = await r.json();
+        const arr = Array.isArray(j) && j[1] ? j[1] : [];
+        const ys = arr
+          .filter((x: any) => x.value != null)
+          .map((x: any) => parseInt(x.date, 10))
+          .sort((a: number, b: number) => b - a)
+          .slice(0, 4)
+          .sort((a: number, b: number) => a - b);
+        setYears(ys);
+      } catch {
+        const now = new Date().getFullYear();
+        setYears([now - 3, now - 2, now - 1, now]);
+      }
+      try {
+        const r = await fetch(`${API_BASE}/api/content`);
+        const resp = await r.json();
+        const d = resp && resp.success && resp.data ? resp.data : resp;
+        if (Array.isArray(d.financeStatsCustom)) setRows(d.financeStatsCustom);
+      } catch {}
+      setLoading(false);
+    })();
+  }, []);
+
+  const addRow = () => {
+    setRows(prev => [...prev, { id: 'm_' + Math.random().toString(36).slice(2, 8), label: '', unit: '%', values: {}, channel: 'money', extraYears: [] }]);
+  };
+  const addYear = (id: string) => {
+    const row = rows.find(r => r.id === id);
+    if (!row) return;
+    const known = new Set([...years, ...(row.extraYears || [])]);
+    const defaultNext = known.size ? Math.max(...known) + 1 : new Date().getFullYear();
+    let input: string | null = String(defaultNext);
+    if (typeof window !== 'undefined' && typeof (window as any).prompt === 'function') {
+      input = (window as any).prompt('הכנס שנה להוספה:', String(defaultNext));
+    }
+    if (!input) return;
+    const year = parseInt(input, 10);
+    if (isNaN(year) || year < 1900 || year > 2100) return;
+    if (known.has(year)) return;
+    setRows(prev => prev.map(r => r.id === id ? { ...r, extraYears: [...(r.extraYears || []), year] } : r));
+  };
+  const removeYear = (id: string, year: number) => setRows(prev => prev.map(r => {
+    if (r.id !== id) return r;
+    const { [year]: _, ...rest } = r.values;
+    return { ...r, values: rest, extraYears: (r.extraYears || []).filter(y => y !== year) };
+  }));
+  const deleteRow = (id: string) => setRows(prev => prev.filter(r => r.id !== id));
+  const updateRow = (id: string, patch: Partial<ManualRow>) => setRows(prev => prev.map(r => r.id === id ? { ...r, ...patch } : r));
+  const updateCell = (id: string, year: number, val: string) => setRows(prev => prev.map(r => r.id === id ? { ...r, values: { ...r.values, [year]: val } } : r));
+
+  const save = async () => {
+    setSaving(true);
+    try {
+      await fetch(`${API_BASE}/api/content/financeStatsCustom`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(rows),
+      });
+    } catch {}
+    setSaving(false);
+  };
+
+  const sparkline = (row: ManualRow) => {
+    if (Platform.OS !== 'web') return null;
+    const vals = years.map(y => parseFloat(row.values[y] || '')).filter(v => !isNaN(v));
+    if (vals.length < 2) return null;
+    const min = Math.min(...vals);
+    const max = Math.max(...vals);
+    const range = max - min || 1;
+    const w = 80;
+    const h = 24;
+    const pts = vals.map((v, i) => {
+      const x = (i / (vals.length - 1)) * w;
+      const y = h - ((v - min) / range) * h;
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    }).join(' ');
+    return React.createElement('svg', { width: w, height: h },
+      React.createElement('polyline', { points: pts, fill: 'none', stroke: '#3b82f6', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' }),
+      ...vals.map((v, i) => {
+        const x = (i / (vals.length - 1)) * w;
+        const y = h - ((v - min) / range) * h;
+        return React.createElement('circle', { key: i, cx: x, cy: y, r: 2, fill: '#3b82f6' });
+      })
+    );
+  };
+
+  return (
+    <View style={{ marginBottom: 14, backgroundColor: '#fff', borderRadius: 10, borderWidth: 1, borderColor: '#e2e8f0', overflow: 'hidden' }}>
+      <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', padding: 12, borderBottomWidth: 1, borderBottomColor: '#e2e8f0', backgroundColor: '#eff6ff' }}>
+        <View>
+          <Text style={{ fontSize: 13, fontWeight: '900', color: '#1e40af', writingDirection: 'rtl', textAlign: 'right' }}>✏️ מדדים ידניים</Text>
+          <Text style={{ fontSize: 10, color: '#3b82f6', writingDirection: 'rtl', textAlign: 'right', marginTop: 2 }}>מדדים שאינם זמינים ב-World Bank או שבתשלום</Text>
+        </View>
+        <TouchableOpacity onPress={addRow} style={{ paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8, backgroundColor: '#3b82f6' }}>
+          <Text style={{ fontSize: 11, fontWeight: '800', color: '#fff' }}>➕ הוסף מדד</Text>
+        </TouchableOpacity>
+      </View>
+      {loading ? (
+        <Text style={{ textAlign: 'center', color: '#94a3b8', padding: 20 }}>טוען...</Text>
+      ) : (
+        <>
+          {rows.length === 0 ? (
+            <Text style={{ textAlign: 'center', color: '#94a3b8', padding: 20, writingDirection: 'rtl' }}>אין מדדים ידניים. לחץ "➕ הוסף מדד"</Text>
+          ) : rows.map((row, idx) => {
+            const rowYears = [...years, ...(row.extraYears || [])].sort((a, b) => a - b);
+            const channelLabel = row.channel === 'realEstate' ? '🏠 נדל"ן' : row.channel === 'tourism' ? '🧳 תיירות' : '💰 כסף';
+            const channelNext = row.channel === 'money' ? 'realEstate' : row.channel === 'realEstate' ? 'tourism' : 'money';
+            const pct = (y: number, i: number) => {
+              if (i === 0) return '';
+              const curr = parseFloat(row.values[y] || '');
+              const prev = parseFloat(row.values[rowYears[i - 1]] || '');
+              if (isNaN(curr) || isNaN(prev) || prev === 0) return '';
+              const d = ((curr - prev) / Math.abs(prev)) * 100;
+              return (d >= 0 ? '+' : '') + d.toFixed(1) + '%';
+            };
+            return (
+              <View key={row.id} style={{ paddingVertical: 10, paddingHorizontal: 10, backgroundColor: idx % 2 === 0 ? '#fff' : '#fafafa', borderTopWidth: 1, borderTopColor: '#f1f5f9' }}>
+                <View style={{ flexDirection: 'row-reverse', gap: 6, alignItems: 'center', marginBottom: 8 }}>
+                  <TextInput
+                    style={{ flex: 1.8, fontSize: 12, color: '#1e40af', textAlign: 'right', writingDirection: 'rtl', fontWeight: '700', borderWidth: 1, borderColor: '#bfdbfe', borderRadius: 6, padding: 6 }}
+                    value={row.label}
+                    onChangeText={v => updateRow(row.id, { label: v })}
+                    placeholder="שם המדד"
+                    placeholderTextColor="#93c5fd"
+                  />
+                  <TextInput
+                    style={{ width: 50, fontSize: 11, textAlign: 'center', borderWidth: 1, borderColor: '#bfdbfe', borderRadius: 6, padding: 6 }}
+                    value={row.unit}
+                    onChangeText={v => updateRow(row.id, { unit: v })}
+                    placeholder="%"
+                    placeholderTextColor="#93c5fd"
+                  />
+                  <TouchableOpacity onPress={() => updateRow(row.id, { channel: channelNext })} style={{ paddingHorizontal: 8, paddingVertical: 6, borderRadius: 6, backgroundColor: '#dbeafe' }}>
+                    <Text style={{ fontSize: 11, fontWeight: '800', color: '#1e40af', writingDirection: 'rtl' }}>{channelLabel}</Text>
+                  </TouchableOpacity>
+                  <View style={{ width: 90, alignItems: 'center' }}>{sparkline(row)}</View>
+                  <TouchableOpacity onPress={() => deleteRow(row.id)} style={{ width: 30, alignItems: 'center' }}>
+                    <Text style={{ fontSize: 14, color: '#dc2626' }}>🗑</Text>
+                  </TouchableOpacity>
+                </View>
+                <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 6 }}>
+                  {rowYears.map((y, i) => {
+                    const isExtra = (row.extraYears || []).includes(y);
+                    return (
+                      <View key={y} style={{ width: 80, alignItems: 'center', padding: 6, borderWidth: 1, borderColor: '#bfdbfe', borderRadius: 8, backgroundColor: '#fff' }}>
+                        <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 2, marginBottom: 4 }}>
+                          <Text style={{ fontSize: 11, fontWeight: '800', color: '#1e40af' }}>{y}</Text>
+                          {isExtra && (
+                            <TouchableOpacity onPress={() => removeYear(row.id, y)}>
+                              <Text style={{ fontSize: 10, color: '#dc2626' }}>✕</Text>
+                            </TouchableOpacity>
+                          )}
+                        </View>
+                        <TextInput
+                          style={{ width: '100%', fontSize: 12, textAlign: 'center', borderWidth: 1, borderColor: '#bfdbfe', borderRadius: 6, padding: 5, backgroundColor: '#eff6ff', fontWeight: '700' }}
+                          value={row.values[y] || ''}
+                          onChangeText={v => updateCell(row.id, y, v)}
+                          placeholder="—"
+                          placeholderTextColor="#93c5fd"
+                          keyboardType="numeric"
+                        />
+                        <Text style={{ fontSize: 9, color: pct(y, i).startsWith('-') ? '#dc2626' : '#16a34a', marginTop: 3, minHeight: 10, fontWeight: '700' }}>{pct(y, i)}</Text>
+                      </View>
+                    );
+                  })}
+                  <TouchableOpacity onPress={() => addYear(row.id)} style={{ width: 80, padding: 6, borderRadius: 8, borderWidth: 1, borderColor: '#93c5fd', borderStyle: 'dashed', alignItems: 'center', justifyContent: 'center', minHeight: 72 }}>
+                    <Text style={{ fontSize: 12, color: '#3b82f6', fontWeight: '800' }}>+ שנה</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            );
+          })}
+          {rows.length > 0 && (
+            <TouchableOpacity onPress={save} disabled={saving} style={{ margin: 10, paddingVertical: 10, borderRadius: 8, backgroundColor: '#10b981', alignItems: 'center', opacity: saving ? 0.5 : 1 }}>
+              <Text style={{ color: '#fff', fontWeight: '900', fontSize: 13 }}>{saving ? 'שומר...' : '💾 שמור מדדים ידניים'}</Text>
+            </TouchableOpacity>
+          )}
+        </>
+      )}
+    </View>
+  );
+}
+
+// ─── Edit Modal ────────────────────────────────────────────────
+function EditModal({
+  visible, item, section, onSave, onDelete, onClose, isWide, onMoveSection, allMedia, ratings,
+}: {
+  visible: boolean; item: DataItem | null; section: Section | null;
+  onSave: (item: DataItem) => void; onDelete: () => void; onClose: () => void;
+  isWide: boolean;
+  onMoveSection?: (target: 'main' | 'extra') => void;
+  allMedia?: { filename: string; url: string; tags?: string[] }[];
+  ratings?: Record<string, { sum: number; count: number }>;
+}) {
+  const [form, setForm] = useState<DataItem>({ id: '', title: '', icon: '', bg: '' });
+  const [showGalleryPicker, setShowGalleryPicker] = useState(false);
+  const [galleryPickerFilter, setGalleryPickerFilter] = useState('');
+
+  useEffect(() => {
+    if (item) setForm({ ...item });
+  }, [item]);
+
+  if (!item || !section) return null;
+
+  const set = (key: string, val: string) => setForm(prev => ({ ...prev, [key]: val }));
+
+  return (
+    <Modal visible={visible} transparent animationType="fade">
+      <View style={ms.overlay}>
+        <ScrollView contentContainerStyle={ms.scrollWrap} showsVerticalScrollIndicator={false}>
+          <View style={[ms.modal, isWide && { maxWidth: 520 }]}>
+            <View style={ms.modalHeader}>
+              <Text style={ms.modalTitle}>עריכת פריט</Text>
+              <TouchableOpacity onPress={onClose}>
+                <Text style={ms.closeX}>✕</Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={ms.fieldGroup}>
+              <Text style={ms.label}>כותרת</Text>
+              <TextInput style={ms.input} value={form.title} onChangeText={v => set('title', v)} textAlign="right" />
+            </View>
+
+            {onMoveSection && (section.key === 'main' || section.key === 'extra') && (
+              <View style={ms.fieldGroup}>
+                <Text style={ms.label}>קבוצה</Text>
+                <View style={{ flexDirection: 'row-reverse', gap: 8 }}>
+                  {(['main', 'extra'] as const).map(k => {
+                    const selected = section.key === k;
+                    return (
+                      <TouchableOpacity
+                        key={k}
+                        onPress={() => { if (!selected) onMoveSection(k); }}
+                        style={{
+                          flex: 1, paddingVertical: 10, borderRadius: 10,
+                          backgroundColor: selected ? Colors.PRIMARY : '#f0f2f5',
+                          alignItems: 'center',
+                        }}
+                      >
+                        <Text style={{
+                          fontSize: 13, fontWeight: '700',
+                          color: selected ? Colors.WHITE : '#666',
+                        }}>
+                          {k === 'main' ? 'קטגוריות ראשיות' : 'קטגוריות נוספות'}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              </View>
+            )}
+
+            <View style={ms.fieldGroup}>
+              <Text style={ms.label}>רקע הכותרת</Text>
+              <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 8 }}>
+                {HERO_PALETTE.map(c => {
+                  const selected = (form.heroBg || '') === c;
+                  return (
+                    <TouchableOpacity
+                      key={c}
+                      onPress={() => set('heroBg', c)}
+                      style={{
+                        width: 32, height: 32, borderRadius: 16, backgroundColor: c,
+                        borderWidth: selected ? 3 : 1,
+                        borderColor: selected ? Colors.TEXT : '#e8e8e8',
+                      }}
+                    />
+                  );
+                })}
+              </View>
+            </View>
+
+            {section.hasSubtitle && (
+              <View style={ms.fieldGroup}>
+                <Text style={ms.label}>כותרת משנה</Text>
+                <TextInput style={ms.input} value={form.subtitle || ''} onChangeText={v => set('subtitle', v)} textAlign="right" />
+              </View>
+            )}
+
+            {section.hasSummary && (
+              <View style={ms.fieldGroup}>
+                <Text style={ms.label}>תקציר קצר</Text>
+                <TextInput style={[ms.input, ms.textArea]} value={form.summary || ''} onChangeText={v => set('summary', v)} textAlign="right" multiline numberOfLines={3} placeholder="תקציר קצר שיופיע בכרטיס הקטגוריה..." placeholderTextColor="#bbb" />
+              </View>
+            )}
+
+            <View style={ms.fieldGroup}>
+              <Text style={ms.label}>טקסט מפורט</Text>
+              {Platform.OS === 'web' ? (
+                <RichEditor value={form.longText || ''} onChange={(v) => set('longText', v)} />
+              ) : (
+                <TextInput style={[ms.input, ms.textAreaLong]} value={form.longText || ''} onChangeText={v => set('longText', v)} textAlign="right" multiline numberOfLines={8} placeholder="תוכן מלא..." placeholderTextColor="#bbb" />
+              )}
+            </View>
+
+            <View style={ms.fieldGroup}>
+              <Text style={ms.label}>אייקון (תמונה)</Text>
+              <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 12 }}>
+                {form.icon && (form.icon.startsWith('data:') || form.icon.startsWith('http') || form.icon.startsWith('/')) ? (
+                  React.createElement('img', {
+                    src: form.icon,
+                    style: {
+                      width: 170, height: 100, objectFit: 'cover',
+                      borderTopLeftRadius: 16, borderTopRightRadius: 16,
+                      borderBottomLeftRadius: 0, borderBottomRightRadius: 0,
+                      border: '1px solid #e8e8e8',
+                    },
+                    alt: 'icon',
+                  })
+                ) : (
+                  <View style={{
+                    width: 170, height: 100, backgroundColor: '#fafafa',
+                    borderWidth: 1, borderColor: '#e8e8e8',
+                    borderTopLeftRadius: 16, borderTopRightRadius: 16,
+                    alignItems: 'center', justifyContent: 'center',
+                  }}>
+                    <Text style={{ fontSize: 11, color: '#bbb' }}>אין תמונה</Text>
+                  </View>
+                )}
+                {Platform.OS === 'web' && React.createElement('label', {
+                  style: {
+                    backgroundColor: Colors.PRIMARY, color: '#fff', padding: '10px 16px',
+                    borderRadius: 10, fontSize: 14, fontWeight: 600, cursor: 'pointer',
+                  },
+                }, [
+                  'הוסף תמונה',
+                  React.createElement('input', {
+                    key: 'file',
+                    type: 'file',
+                    accept: 'image/*',
+                    style: { display: 'none' },
+                    onChange: (e: any) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      const reader = new FileReader();
+                      reader.onload = () => {
+                        const src = String(reader.result);
+                        const img = new (window as any).Image();
+                        img.onload = () => {
+                          const TW = 680, TH = 400; // 170:100 @ x4
+                          const canvas = (window as any).document.createElement('canvas');
+                          canvas.width = TW; canvas.height = TH;
+                          const ctx = canvas.getContext('2d');
+                          const srcRatio = img.width / img.height;
+                          const dstRatio = TW / TH;
+                          let sx = 0, sy = 0, sw = img.width, sh = img.height;
+                          if (srcRatio > dstRatio) {
+                            sw = img.height * dstRatio;
+                            sx = (img.width - sw) / 2;
+                          } else {
+                            sh = img.width / dstRatio;
+                            sy = (img.height - sh) / 2;
+                          }
+                          ctx.drawImage(img, sx, sy, sw, sh, 0, 0, TW, TH);
+                          set('icon', canvas.toDataURL('image/jpeg', 0.9));
+                        };
+                        img.src = src;
+                      };
+                      reader.readAsDataURL(file);
+                    },
+                  }),
+                ])}
+              </View>
+              <TouchableOpacity
+                style={{ backgroundColor: '#10b981', paddingVertical: 10, paddingHorizontal: 16, borderRadius: 10, marginTop: 8 }}
+                onPress={() => {
+                  setShowGalleryPicker(true);
+                  const sKey = section?.key || '';
+                  const matchTag = TAG_OPTIONS.find(t => t.key === sKey || t.key === form.id);
+                  const matchGroup = TAG_GROUPS.find((g: any) => g.group === section?.label || g.tags.some((t: any) => t.key === sKey));
+                  setGalleryPickerFilter(matchTag?.key || (matchGroup?.tags[0]?.key) || '');
+                }}
+              >
+                <Text style={{ color: '#fff', fontWeight: '700', fontSize: 14, textAlign: 'center' }}>📁 בחר מהגלריה</Text>
+              </TouchableOpacity>
+              {showGalleryPicker && allMedia && (
+                <View style={{ marginTop: 10, borderWidth: 1, borderColor: '#e2e8f0', borderRadius: 12, padding: 10, backgroundColor: '#f8fafc', maxHeight: 350 }}>
+                  <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                    <Text style={{ fontSize: 14, fontWeight: '800', color: Colors.TEXT }}>בחר תמונה</Text>
+                    <TouchableOpacity onPress={() => setShowGalleryPicker(false)}>
+                      <Text style={{ fontSize: 18, color: '#999' }}>✕</Text>
+                    </TouchableOpacity>
+                  </View>
+                  {Platform.OS === 'web' && React.createElement('select', {
+                    value: galleryPickerFilter,
+                    onChange: (e: any) => setGalleryPickerFilter(e.target.value),
+                    style: { width: '100%', padding: '6px 10px', borderRadius: 8, border: '1px solid #d1d5db', fontSize: 12, fontWeight: 700, direction: 'rtl', cursor: 'pointer', marginBottom: 8 },
+                  }, [
+                    React.createElement('option', { key: '', value: '' }, 'הכל'),
+                    ...TAG_GROUPS.map((g: any) => g.subgroups
+                      ? g.subgroups.map((sg: any) => React.createElement('optgroup', { key: sg.label, label: sg.label }, sg.tags.map((t: any) => React.createElement('option', { key: t.key, value: t.key }, t.label))))
+                      : React.createElement('optgroup', { key: g.group, label: g.group }, g.tags.map((t: any) => React.createElement('option', { key: t.key, value: t.key }, t.label)))
+                    ).flat(),
+                  ])}
+                  <ScrollView style={{ maxHeight: 260 }} contentContainerStyle={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 6 }}>
+                    {allMedia.filter(f => {
+                      if (/\.(mp3|wav|m4a|aac)$/i.test(f.filename)) return false;
+                      if (!galleryPickerFilter) return true;
+                      return (f.tags || []).includes(galleryPickerFilter);
+                    }).map(f => (
+                      <TouchableOpacity key={f.filename} onPress={() => { set('icon', f.url); setShowGalleryPicker(false); }} activeOpacity={0.7}>
+                        {Platform.OS === 'web' && React.createElement('img', {
+                          src: f.url,
+                          style: { width: 70, height: 50, objectFit: 'cover', borderRadius: 6, border: '2px solid transparent', cursor: 'pointer' },
+                          alt: f.filename,
+                        })}
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+                </View>
+              )}
+              <Text style={{ fontSize: 11, color: '#999', marginTop: 6, textAlign: 'right' }}>
+                התמונה תיחתך אוטומטית ליחס 170×100 עם פינות עליונות מעוגלות
+              </Text>
+            </View>
+
+            <View style={ms.fieldGroup}>
+              <TouchableOpacity
+                onPress={() => setForm(prev => ({ ...prev, _emojiOpen: !(prev as any)._emojiOpen } as any))}
+                style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 6 }}
+              >
+                <Text style={ms.label}>או בחר אימוג׳י ({EMOJI_LIBRARY.length})</Text>
+                <Text style={{ fontSize: 14, color: Colors.PRIMARY }}>{(form as any)._emojiOpen ? '▲' : '▼'}</Text>
+              </TouchableOpacity>
+              {(form as any)._emojiOpen && (
+                  <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 6, marginTop: 8 }}>
+                    {EMOJI_LIBRARY.map((e, i) => {
+                      const selected = form.icon === e;
+                      const used = false;
+                      return (
+                        <TouchableOpacity
+                          key={`${e}-${i}`}
+                          onPress={() => set('icon', e)}
+                          style={{
+                            width: 40, height: 40, borderRadius: 8,
+                            backgroundColor: selected ? Colors.PRIMARY + '20' : used ? '#2a2a2a' : '#fafafa',
+                            borderWidth: selected ? 2 : 1,
+                            borderColor: selected ? Colors.PRIMARY : used ? '#555' : '#e8e8e8',
+                            alignItems: 'center', justifyContent: 'center',
+                            opacity: used ? 0.4 : 1,
+                          }}
+                        >
+                          <Text style={{ fontSize: 22 }}>{e}</Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
+              )}
+            </View>
+
+            {['main','extra','welcome','info','bottom'].includes(section.key) && (
+              <View style={ms.fieldGroup}>
+                <Text style={ms.label}>🎨 צבעי רקע הקארד</Text>
+                <View style={{ flexDirection: 'row-reverse', gap: 8 }}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 11, color: '#64748b', marginBottom: 4, textAlign: 'right' }}>צבע 1 (התחלה)</Text>
+                    <TextInput style={ms.input} value={form.bg || ''} onChangeText={v => set('bg', v)} textAlign="left" placeholder="#1C2B35" placeholderTextColor="#bbb" />
+                    <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 3, marginTop: 6, padding: 4, backgroundColor: '#1C2B35', borderRadius: 6 }}>
+                      {['#1C2B35','#2D4A5E','#1A6B8A','#3DA5C4','#7ECFC0','#5BC0DE','#0ea5e9','#3b82f6','#6366f1','#8b5cf6','#a855f7','#ec4899','#ef4444','#f97316','#F4A94E','#eab308','#84cc16','#22c55e','#10b981','#14b8a6','#06b6d4','#0f172a','#1e293b','#334155','#475569','#64748b','#94a3b8','#cbd5e1','#e2e8f0','#ffffff','#fef3c7','#fdba74'].map(c => (
+                        <TouchableOpacity key={c} onPress={() => set('bg', c)} style={{ width: 14, height: 14, backgroundColor: c, borderRadius: 2, borderWidth: form.bg === c ? 2 : 0, borderColor: '#fff' }} />
+                      ))}
+                    </View>
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 11, color: '#64748b', marginBottom: 4, textAlign: 'right' }}>צבע 2 (סיום)</Text>
+                    <TextInput style={ms.input} value={(form as any).bgDark || ''} onChangeText={v => set('bgDark', v)} textAlign="left" placeholder="#2D4A5E" placeholderTextColor="#bbb" />
+                    <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 3, marginTop: 6, padding: 4, backgroundColor: '#1C2B35', borderRadius: 6 }}>
+                      {['#1C2B35','#2D4A5E','#1A6B8A','#3DA5C4','#7ECFC0','#5BC0DE','#0ea5e9','#3b82f6','#6366f1','#8b5cf6','#a855f7','#ec4899','#ef4444','#f97316','#F4A94E','#eab308','#84cc16','#22c55e','#10b981','#14b8a6','#06b6d4','#0f172a','#1e293b','#334155','#475569','#64748b','#94a3b8','#cbd5e1','#e2e8f0','#ffffff','#fef3c7','#fdba74'].map(c => (
+                        <TouchableOpacity key={c} onPress={() => set('bgDark', c)} style={{ width: 14, height: 14, backgroundColor: c, borderRadius: 2, borderWidth: (form as any).bgDark === c ? 2 : 0, borderColor: '#fff' }} />
+                      ))}
+                    </View>
+                  </View>
+                </View>
+                {Platform.OS === 'web' && React.createElement('div', {
+                  style: {
+                    marginTop: 10,
+                    height: 100,
+                    borderRadius: 10,
+                    background: `linear-gradient(135deg, ${form.bg || '#1C2B35'} 0%, ${(form as any).bgDark || form.bg || '#1C2B35'} 100%)`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: 48,
+                  },
+                }, form.icon && !form.icon.startsWith('http') && !form.icon.startsWith('data:') ? form.icon : '🎨')}
+                <Text style={{ fontSize: 10, color: '#94a3b8', marginTop: 4, textAlign: 'center' }}>תצוגה מקדימה של הקארד</Text>
+              </View>
+            )}
+
+            {section.hasImage && (
+              <View style={ms.fieldGroup}>
+                <Text style={ms.label}>כתובת תמונה (URL / נתיב)</Text>
+                <TextInput style={ms.input} value={form.image || ''} onChangeText={v => set('image', v)} textAlign="left" placeholder="https://... או assets/images/..." placeholderTextColor="#bbb" />
+              </View>
+            )}
+
+            <View style={ms.fieldGroup}>
+              <Text style={ms.label}>נגני אודיו</Text>
+              {(form.audios || []).map((a, idx) => (
+                <View key={idx} style={{ flexDirection: 'row-reverse', gap: 8, marginBottom: 8 }}>
+                  <TextInput
+                    style={[ms.input, { flex: 1 }]}
+                    value={a.title || ''}
+                    onChangeText={(v) => {
+                      const next = [...(form.audios || [])];
+                      next[idx] = { ...next[idx], title: v };
+                      setForm((p) => ({ ...p, audios: next }));
+                    }}
+                    placeholder="שם"
+                    placeholderTextColor="#bbb"
+                    textAlign="right"
+                  />
+                  <TextInput
+                    style={[ms.input, { flex: 2 }]}
+                    value={a.url}
+                    onChangeText={(v) => {
+                      const next = [...(form.audios || [])];
+                      next[idx] = { ...next[idx], url: v };
+                      setForm((p) => ({ ...p, audios: next }));
+                    }}
+                    placeholder="URL"
+                    placeholderTextColor="#bbb"
+                    textAlign="left"
+                  />
+                  {Platform.OS === 'web' && React.createElement('label', {
+                    key: `upload-${idx}`,
+                    style: {
+                      backgroundColor: Colors.SECONDARY, color: '#fff', padding: '10px 12px',
+                      borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap',
+                    },
+                  }, [
+                    '📁 העלה',
+                    React.createElement('input', {
+                      key: 'file',
+                      type: 'file',
+                      accept: 'audio/*,.mp3,.wav,.m4a,.aac',
+                      style: { display: 'none' },
+                      onChange: async (e: any) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        const fd = new FormData();
+                        fd.append('file', file);
+                        try {
+                          const res = await fetch(`${API_BASE}/api/upload`, { method: 'POST', body: fd });
+                          const json = await res.json();
+                          if (json.success) {
+                            const next = [...(form.audios || [])];
+                            next[idx] = { ...next[idx], url: json.url, title: next[idx].title || file.name.replace(/\.[^.]+$/, '') };
+                            setForm((p) => ({ ...p, audios: next }));
+                          }
+                        } catch {}
+                      },
+                    }),
+                  ])}
+                  <TouchableOpacity
+                    onPress={() => {
+                      const next = (form.audios || []).filter((_, i) => i !== idx);
+                      setForm((p) => ({ ...p, audios: next }));
+                    }}
+                    style={{ padding: 10, backgroundColor: '#fee', borderRadius: 8, justifyContent: 'center' }}
+                  >
+                    <Text style={{ color: '#c33', fontWeight: '800' }}>✕</Text>
+                  </TouchableOpacity>
+                </View>
+              ))}
+              <TouchableOpacity
+                onPress={() => setForm((p) => ({ ...p, audios: [...(p.audios || []), { title: '', url: '' }] }))}
+                style={{ backgroundColor: Colors.PRIMARY, borderRadius: 10, paddingVertical: 10, alignItems: 'center', marginTop: 4 }}
+              >
+                <Text style={{ color: Colors.WHITE, fontWeight: '800' }}>+ הוסף נגן אודיו</Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={ms.fieldGroup}>
+              <Text style={ms.label}>אודיו ראשי (ישן — URL יחיד, אופציונלי)</Text>
+              <TextInput style={ms.input} value={form.audio || ''} onChangeText={v => set('audio', v)} textAlign="left" placeholder="https://... או assets/audio/..." placeholderTextColor="#bbb" />
+            </View>
+
+            <View style={ms.fieldGroup}>
+              <Text style={ms.label}>וידאו (URL — YouTube / MP4)</Text>
+              <TextInput style={ms.input} value={form.video || ''} onChangeText={v => set('video', v)} textAlign="left" placeholder="https://youtube.com/..." placeholderTextColor="#bbb" />
+            </View>
+
+            <View style={[ms.fieldRow, isWide && { flexDirection: 'row-reverse', gap: 12 }]}>
+              <View style={[ms.fieldGroup, isWide && { flex: 1 }]}>
+                <Text style={ms.label}>טקסט הכפתור</Text>
+                <TextInput style={ms.input} value={form.btnLabel || ''} onChangeText={v => set('btnLabel', v)} textAlign="right" placeholder="לחץ כאן" placeholderTextColor="#bbb" />
+              </View>
+              <View style={[ms.fieldGroup, isWide && { flex: 1 }]}>
+                <Text style={ms.label}>קישור הכפתור</Text>
+                <TextInput style={ms.input} value={form.btnLink || ''} onChangeText={v => set('btnLink', v)} textAlign="left" placeholder="https://..." placeholderTextColor="#bbb" />
+              </View>
+            </View>
+
+            {section.hasLocation && (
+              <>
+                <View style={[ms.fieldRow, isWide && { flexDirection: 'row-reverse', gap: 12 }]}>
+                  <View style={[ms.fieldGroup, isWide && { flex: 1 }]}>
+                    <Text style={ms.label}>קו רוחב (Lat)</Text>
+                    <TextInput style={ms.input} value={form.lat || ''} onChangeText={v => set('lat', v)} textAlign="left" keyboardType="numeric" placeholder="41.6488" placeholderTextColor="#bbb" />
+                  </View>
+                  <View style={[ms.fieldGroup, isWide && { flex: 1 }]}>
+                    <Text style={ms.label}>קו אורך (Lng)</Text>
+                    <TextInput style={ms.input} value={form.lng || ''} onChangeText={v => set('lng', v)} textAlign="left" keyboardType="numeric" placeholder="41.6436" placeholderTextColor="#bbb" />
+                  </View>
+                </View>
+                <View style={ms.fieldGroup}>
+                  <Text style={ms.label}>כתובת</Text>
+                  <TextInput style={ms.input} value={form.address || ''} onChangeText={v => set('address', v)} textAlign="right" />
+                </View>
+              </>
+            )}
+
+            {form.hotels && (
+              <View style={ms.fieldGroup}>
+                <Text style={[ms.label, { fontSize: 16, marginBottom: 10 }]}>בלוקי מלונות ({form.hotels.length})</Text>
+                {form.hotels.map((hb, idx) => (
+                  <View key={hb.id} style={{ borderWidth: 1, borderColor: '#e8e8e8', borderRadius: 12, padding: 12, marginBottom: 12, backgroundColor: idx % 2 === 0 ? '#fafafa' : '#e2e8f0' }}>
+                    <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                      <View style={{ flexDirection: 'row-reverse', gap: 8, alignItems: 'center' }}>
+                        <Text style={{ fontSize: 13, fontWeight: '800', color: Colors.PRIMARY }}>מיקום</Text>
+                        <TextInput
+                          style={{ width: 50, borderWidth: 1, borderColor: '#d1d5db', borderRadius: 8, paddingHorizontal: 8, paddingVertical: 6, textAlign: 'center', fontSize: 14, fontWeight: '700', backgroundColor: Colors.WHITE }}
+                          value={String(idx + 1)}
+                          keyboardType="numeric"
+                          onSubmitEditing={(e) => {
+                            const target = parseInt(e.nativeEvent.text, 10);
+                            if (!target || target < 1 || target > (form.hotels || []).length) return;
+                            const arr = [...(form.hotels || [])];
+                            const [moved] = arr.splice(idx, 1);
+                            arr.splice(target - 1, 0, moved);
+                            setForm(p => ({ ...p, hotels: arr }));
+                          }}
+                          onBlur={(e) => {
+                            const target = parseInt((e.nativeEvent as any).text, 10);
+                            if (!target || target < 1 || target > (form.hotels || []).length || target === idx + 1) return;
+                            const arr = [...(form.hotels || [])];
+                            const [moved] = arr.splice(idx, 1);
+                            arr.splice(target - 1, 0, moved);
+                            setForm(p => ({ ...p, hotels: arr }));
+                          }}
+                        />
+                        <Text style={{ fontSize: 12, color: '#888' }}>/ {(form.hotels || []).length}</Text>
+                      </View>
+                      <View style={{ flexDirection: 'row-reverse', gap: 10, alignItems: 'center' }}>
+                        <TouchableOpacity
+                          onPress={() => { const n=[...(form.hotels||[])]; n[idx]={...n[idx],visible:!(n[idx].visible!==false)}; setForm(p=>({...p,hotels:n})); }}
+                          style={{ paddingVertical: 4, paddingHorizontal: 10, borderRadius: 12, backgroundColor: (hb.visible !== false) ? '#10b981' : '#9ca3af' }}
+                        >
+                          <Text style={{ color: Colors.WHITE, fontSize: 11, fontWeight: '800' }}>{(hb.visible !== false) ? '👁 מוצג' : '🚫 מוסתר'}</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => {
+                          const next = (form.hotels || []).filter((_, i) => i !== idx);
+                          setForm(p => ({ ...p, hotels: next }));
+                        }}>
+                          <Text style={{ fontSize: 16, color: '#dc2626' }}>🗑</Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                    {hb.image && (hb.image.startsWith('http') || hb.image.startsWith('data:') || hb.image.startsWith('/')) ? (
+                      React.createElement('img', { src: hb.image, style: { width: '100%', height: 120, objectFit: 'cover', borderRadius: 8, marginBottom: 8 }, alt: '' })
+                    ) : (
+                      <View style={{ width: '100%', height: 120, backgroundColor: '#fee2e2', borderRadius: 8, marginBottom: 8, alignItems: 'center', justifyContent: 'center' }}>
+                        <Text style={{ color: '#dc2626', fontWeight: '800' }}>פנוי</Text>
+                      </View>
+                    )}
+                    <Text style={ms.label}>🖼 תמונה (URL)</Text>
+                    <TextInput style={[ms.input, { marginBottom: 8 }]} value={hb.image} onChangeText={v => { const n=[...(form.hotels||[])]; n[idx]={...n[idx],image:v}; setForm(p=>({...p,hotels:n})); }} placeholder="http://localhost:3001/uploads/..." placeholderTextColor="#bbb" textAlign="left" />
+
+                    <Text style={ms.label}>📝 כותרת</Text>
+                    <TextInput style={[ms.input, { marginBottom: 8 }]} value={hb.title} onChangeText={v => { const n=[...(form.hotels||[])]; n[idx]={...n[idx],title:v}; setForm(p=>({...p,hotels:n})); }} placeholder="שם המלון" placeholderTextColor="#bbb" textAlign="right" />
+
+                    <Text style={ms.label}>🔤 שם באנגלית (מוצג על התמונה)</Text>
+                    <TextInput style={[ms.input, { marginBottom: 8 }]} value={hb.titleEn || ''} onChangeText={v => { const n=[...(form.hotels||[])]; n[idx]={...n[idx],titleEn:v}; setForm(p=>({...p,hotels:n})); }} placeholder="English name" placeholderTextColor="#bbb" textAlign="left" />
+
+                    <Text style={ms.label}>📄 טקסט תיאור</Text>
+                    <TextInput style={[ms.input, ms.textArea, { marginBottom: 8 }]} value={hb.text} onChangeText={v => { const n=[...(form.hotels||[])]; n[idx]={...n[idx],text:v}; setForm(p=>({...p,hotels:n})); }} placeholder="תיאור המלון" placeholderTextColor="#bbb" textAlign="right" multiline numberOfLines={4} />
+
+                    <Text style={ms.label}>🔗 כפתור "{form.pageBtnLabel || 'לדף המלון'}" — לינק חיצוני</Text>
+                    <TextInput style={[ms.input, { marginBottom: 8 }]} value={hb.pageUrl || ''} onChangeText={v => { const n=[...(form.hotels||[])]; n[idx]={...n[idx],pageUrl:v}; setForm(p=>({...p,hotels:n})); }} placeholder="https://..." placeholderTextColor="#bbb" textAlign="left" />
+
+                    <Text style={ms.label}>🧭 כפתור "נווט למקום" — לינק Google Maps</Text>
+                    <TextInput style={[ms.input, { marginBottom: 8 }]} value={hb.mapUrl || ''} onChangeText={v => { const n=[...(form.hotels||[])]; n[idx]={...n[idx],mapUrl:v}; setForm(p=>({...p,hotels:n})); }} placeholder="https://www.google.com/maps/..." placeholderTextColor="#bbb" textAlign="left" />
+
+                    <Text style={ms.label}>🏷️ תגיות מידע מהיר (לחץ להוסיף/להסיר)</Text>
+                    <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 4, marginBottom: 8 }}>
+                      {['קזינו', 'בריכה', 'ספא'].map(tag => {
+                        const has = (hb.amenities || []).includes(tag);
+                        return (
+                          <TouchableOpacity key={tag} onPress={() => {
+                            const n=[...(form.hotels||[])];
+                            const cur = n[idx].amenities || [];
+                            n[idx]={...n[idx], amenities: has ? cur.filter(a => a !== tag) : [...cur, tag]};
+                            setForm(p=>({...p,hotels:n}));
+                          }} style={{ paddingHorizontal: 10, paddingVertical: 5, borderRadius: 10, backgroundColor: has ? '#1A6B8A' : '#f0f4f8', borderWidth: 1, borderColor: has ? '#1A6B8A' : '#e2e8f0' }}>
+                            <Text style={{ fontSize: 11, fontWeight: '700', color: has ? '#fff' : '#64748b' }}>{tag}</Text>
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </View>
+
+                    <Text style={ms.label}>🖼 גלריית "מה אוכלים" ({(hb.images || []).length}/9)</Text>
+                    {(hb.images || []).length > 0 && (
+                      <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 6, marginBottom: 6 }}>
+                        {(hb.images || []).map((src, gi) => (
+                          <View key={gi} style={{ position: 'relative' }}>
+                            {Platform.OS === 'web' && React.createElement('img', { src, style: { width: 64, height: 64, objectFit: 'cover', borderRadius: 6, border: '1px solid #e5e7eb' }, alt: '' })}
+                            <TouchableOpacity
+                              onPress={() => { const n=[...(form.hotels||[])]; n[idx]={...n[idx],images:(n[idx].images||[]).filter((_,i)=>i!==gi)}; setForm(p=>({...p,hotels:n})); }}
+                              style={{ position: 'absolute', top: -6, left: -6, width: 20, height: 20, borderRadius: 10, backgroundColor: '#dc2626', alignItems: 'center', justifyContent: 'center' }}
+                            >
+                              <Text style={{ color: Colors.WHITE, fontSize: 11, fontWeight: '900' }}>✕</Text>
+                            </TouchableOpacity>
+                          </View>
+                        ))}
+                      </View>
+                    )}
+                    {Platform.OS === 'web' && (hb.images || []).length < 9 && React.createElement('label', {
+                      style: {
+                        display: 'inline-block', backgroundColor: Colors.SECONDARY, color: '#fff',
+                        padding: '8px 14px', borderRadius: 8, fontSize: 13, fontWeight: 700,
+                        cursor: 'pointer', marginBottom: 8, alignSelf: 'flex-start',
+                      },
+                    }, [
+                      '📁 העלה תמונות מהמחשב',
+                      React.createElement('input', {
+                        key: 'file',
+                        type: 'file',
+                        accept: 'image/*',
+                        multiple: true,
+                        style: { display: 'none' },
+                        onChange: async (e: any) => {
+                          const files: File[] = Array.from(e.target.files || []);
+                          if (!files.length) return;
+                          const remaining = 9 - (hb.images || []).length;
+                          const slice = files.slice(0, remaining);
+                          const uploaded: string[] = [];
+                          for (const f of slice) {
+                            const fd = new FormData();
+                            fd.append('file', f);
+                            try {
+                              const res = await fetch(`${API_BASE}/api/upload`, { method: 'POST', body: fd });
+                              const json = await res.json();
+                              if (json.success && json.url) uploaded.push(json.url);
+                            } catch {}
+                          }
+                          const n=[...(form.hotels||[])];
+                          n[idx]={...n[idx],images:[...(n[idx].images||[]),...uploaded].slice(0,9)};
+                          setForm(p=>({...p,hotels:n}));
+                          e.target.value='';
+                        },
+                      }),
+                    ])}
+
+                    <Text style={ms.label}>📍 כפתור "איפה זה" — קואורדינטות (מפה מוטבעת)</Text>
+                    <View style={{ flexDirection: 'row-reverse', gap: 8 }}>
+                      <TextInput style={[ms.input, { flex: 1 }]} value={String(hb.coords?.lat ?? '')} onChangeText={v => { const n=[...(form.hotels||[])]; n[idx]={...n[idx],coords:{lat:parseFloat(v)||0,lng:n[idx].coords?.lng||0}}; setForm(p=>({...p,hotels:n})); }} placeholder="Lat (קו רוחב)" placeholderTextColor="#bbb" textAlign="left" keyboardType="numeric" />
+                      <TextInput style={[ms.input, { flex: 1 }]} value={String(hb.coords?.lng ?? '')} onChangeText={v => { const n=[...(form.hotels||[])]; n[idx]={...n[idx],coords:{lat:n[idx].coords?.lat||0,lng:parseFloat(v)||0}}; setForm(p=>({...p,hotels:n})); }} placeholder="Lng (קו אורך)" placeholderTextColor="#bbb" textAlign="left" keyboardType="numeric" />
+                    </View>
+                  </View>
+                ))}
+                <TouchableOpacity
+                  style={{ paddingVertical: 12, borderRadius: 10, backgroundColor: Colors.PRIMARY, alignItems: 'center' }}
+                  onPress={() => {
+                    const n = [...(form.hotels || []), { id: `hb_${Date.now()}`, title: '', text: '', image: '', pageUrl: '', mapUrl: '' }];
+                    setForm(p => ({ ...p, hotels: n }));
+                  }}
+                >
+                  <Text style={{ color: Colors.WHITE, fontWeight: '700' }}>+ הוסף בלוק</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+
+            {form.article && (
+              <View style={ms.fieldGroup}>
+                <Text style={[ms.label, { fontSize: 16, marginBottom: 10 }]}>📝 עריכת מאמר</Text>
+                {(form.article.sections || []).map((sec: any, idx: number) => (
+                  <View key={idx} style={{ borderWidth: 1, borderColor: '#e8e8e8', borderRadius: 12, padding: 12, marginBottom: 12, backgroundColor: idx % 2 === 0 ? '#fafafa' : '#e2e8f0' }}>
+                    <Text style={{ fontSize: 13, fontWeight: '800', color: Colors.PRIMARY, marginBottom: 6 }}>סקשן {idx + 1}</Text>
+                    <TextInput style={[ms.input, { marginBottom: 6 }]} value={sec.icon || ''} onChangeText={(v: string) => { const a={...form.article}; const s=[...(a.sections||[])]; s[idx]={...s[idx],icon:v}; a.sections=s; setForm((p: any)=>({...p,article:a})); }} placeholder="אייקון" placeholderTextColor="#bbb" textAlign="right" />
+                    <TextInput style={[ms.input, { marginBottom: 6 }]} value={sec.title || ''} onChangeText={(v: string) => { const a={...form.article}; const s=[...(a.sections||[])]; s[idx]={...s[idx],title:v}; a.sections=s; setForm((p: any)=>({...p,article:a})); }} placeholder="כותרת" placeholderTextColor="#bbb" textAlign="right" />
+                    <TextInput style={[ms.input, ms.textArea, { marginBottom: 6 }]} value={sec.tip || ''} onChangeText={(v: string) => { const a={...form.article}; const s=[...(a.sections||[])]; s[idx]={...s[idx],tip:v}; a.sections=s; setForm((p: any)=>({...p,article:a})); }} placeholder="טיפים (שורה = טיפ)" placeholderTextColor="#bbb" textAlign="right" multiline numberOfLines={8} />
+                  </View>
+                ))}
+                {(form.article.apps || []).length > 0 && (
+                  <View style={{ marginBottom: 12 }}>
+                    <Text style={{ fontSize: 13, fontWeight: '800', color: Colors.PRIMARY, marginBottom: 6 }}>📲 אפליקציות</Text>
+                    {(form.article.apps || []).map((app: any, idx: number) => (
+                      <View key={idx} style={{ flexDirection: 'row-reverse', gap: 6, marginBottom: 6 }}>
+                        <TextInput style={[ms.input, { flex: 1 }]} value={app.name || ''} onChangeText={(v: string) => { const a={...form.article}; const apps=[...(a.apps||[])]; apps[idx]={...apps[idx],name:v}; a.apps=apps; setForm((p: any)=>({...p,article:a})); }} placeholder="שם" placeholderTextColor="#bbb" textAlign="right" />
+                        <TextInput style={[ms.input, { flex: 1 }]} value={app.subtitle || ''} onChangeText={(v: string) => { const a={...form.article}; const apps=[...(a.apps||[])]; apps[idx]={...apps[idx],subtitle:v}; a.apps=apps; setForm((p: any)=>({...p,article:a})); }} placeholder="תיאור" placeholderTextColor="#bbb" textAlign="right" />
+                        <TextInput style={[ms.input, { flex: 1 }]} value={app.url || ''} onChangeText={(v: string) => { const a={...form.article}; const apps=[...(a.apps||[])]; apps[idx]={...apps[idx],url:v}; a.apps=apps; setForm((p: any)=>({...p,article:a})); }} placeholder="URL" placeholderTextColor="#bbb" textAlign="left" />
+                      </View>
+                    ))}
+                  </View>
+                )}
+              </View>
+            )}
+
+            {form.tours && (
+              <View style={ms.fieldGroup}>
+                <Text style={[ms.label, { fontSize: 16, marginBottom: 10 }]}>בלוקי סיורים קוליים ({form.tours.length})</Text>
+                {form.tours.map((tb, idx) => (
+                  <View key={tb.id} style={{ borderWidth: 1, borderColor: '#e8e8e8', borderRadius: 12, padding: 12, marginBottom: 12, backgroundColor: tb.color || '#f9f9f9' }}>
+                    <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                      <View style={{ alignItems: 'flex-end' }}>
+                        <Text style={{ fontSize: 13, fontWeight: '800', color: Colors.TEXT }}>בלוק {idx + 1}</Text>
+                        {ratings?.[tb.id] && ratings[tb.id].count > 0 && (
+                          <Text style={{ fontSize: 11, color: '#555', marginTop: 2 }}>⭐ {(ratings[tb.id].sum / ratings[tb.id].count).toFixed(1)} ({ratings[tb.id].count} דירוגים)</Text>
+                        )}
+                      </View>
+                      <View style={{ flexDirection: 'row-reverse', gap: 10, alignItems: 'center' }}>
+                        <TouchableOpacity
+                          onPress={() => { const n=[...(form.tours||[])]; n[idx]={...n[idx],visible:!(n[idx].visible!==false)}; setForm(p=>({...p,tours:n})); }}
+                          style={{ paddingVertical: 4, paddingHorizontal: 10, borderRadius: 12, backgroundColor: (tb.visible !== false) ? '#10b981' : '#9ca3af' }}
+                        >
+                          <Text style={{ color: Colors.WHITE, fontSize: 11, fontWeight: '800' }}>{(tb.visible !== false) ? '👁 מוצג' : '🚫 מוסתר'}</Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+
+                    <Text style={ms.label}>🎨 צבע רקע</Text>
+                    <TextInput
+                      style={[ms.input, { marginBottom: 8 }]}
+                      value={tb.color || ''}
+                      onChangeText={v => { const n=[...(form.tours||[])]; n[idx]={...n[idx],color:v}; setForm(p=>({...p,tours:n})); }}
+                      placeholder="#B8E6C1"
+                      placeholderTextColor="#bbb"
+                      textAlign="left"
+                    />
+
+                    <Text style={ms.label}>📝 כותרת</Text>
+                    <TextInput style={[ms.input, { marginBottom: 8 }]} value={tb.title} onChangeText={v => { const n=[...(form.tours||[])]; n[idx]={...n[idx],title:v}; setForm(p=>({...p,tours:n})); }} placeholder="שם הסיור" placeholderTextColor="#bbb" textAlign="right" />
+
+                    <Text style={ms.label}>📋 כותרת משנה</Text>
+                    <TextInput style={[ms.input, { marginBottom: 8 }]} value={tb.subtitle || ''} onChangeText={v => { const n=[...(form.tours||[])]; n[idx]={...n[idx],subtitle:v}; setForm(p=>({...p,tours:n})); }} placeholder="כותרת משנה" placeholderTextColor="#bbb" textAlign="right" />
+
+                    <Text style={ms.label}>📄 טקסט תיאור</Text>
+                    <TextInput style={[ms.input, ms.textArea, { marginBottom: 8 }]} value={tb.text} onChangeText={v => { const n=[...(form.tours||[])]; n[idx]={...n[idx],text:v}; setForm(p=>({...p,tours:n})); }} placeholder="תיאור" placeholderTextColor="#bbb" textAlign="right" multiline numberOfLines={4} />
+
+                    <Text style={ms.label}>🖼 תמונות לסליידר (URL בכל שורה)</Text>
+                    <TextInput
+                      style={[ms.input, ms.textArea, { marginBottom: 8 }]}
+                      value={(tb.images || []).join('\n')}
+                      onChangeText={v => { const n=[...(form.tours||[])]; n[idx]={...n[idx],images:v.split('\n').map(s=>s.trim()).filter(Boolean)}; setForm(p=>({...p,tours:n})); }}
+                      placeholder="http://localhost:3001/uploads/...&#10;http://localhost:3001/uploads/..."
+                      placeholderTextColor="#bbb"
+                      textAlign="left"
+                      multiline
+                      numberOfLines={4}
+                    />
+
+                    <Text style={ms.label}>📍 קואורדינטות כלליות של הסיור</Text>
+                    <View style={{ flexDirection: 'row-reverse', gap: 6, marginBottom: 8 }}>
+                      <TextInput
+                        style={[ms.input, { flex: 1 }]}
+                        value={String(tb.coords?.lat ?? '')}
+                        onChangeText={v => { const n=[...(form.tours||[])]; n[idx]={...n[idx],coords:{lat:parseFloat(v)||0,lng:n[idx].coords?.lng||0}}; setForm(p=>({...p,tours:n})); }}
+                        placeholder="Lat"
+                        placeholderTextColor="#bbb"
+                        textAlign="left"
+                        keyboardType="numeric"
+                      />
+                      <TextInput
+                        style={[ms.input, { flex: 1 }]}
+                        value={String(tb.coords?.lng ?? '')}
+                        onChangeText={v => { const n=[...(form.tours||[])]; n[idx]={...n[idx],coords:{lat:n[idx].coords?.lat||0,lng:parseFloat(v)||0}}; setForm(p=>({...p,tours:n})); }}
+                        placeholder="Lng"
+                        placeholderTextColor="#bbb"
+                        textAlign="left"
+                        keyboardType="numeric"
+                      />
+                    </View>
+
+                    <Text style={ms.label}>🎧 נגנים ({(tb.audios || []).length})</Text>
+                    {(tb.audios || []).map((au, aIdx) => (
+                      <View key={aIdx} style={{ borderWidth: 1, borderColor: '#d1d5db', borderRadius: 10, padding: 8, marginBottom: 8, backgroundColor: 'rgba(255,255,255,0.6)' }}>
+                        <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                          <Text style={{ fontSize: 12, fontWeight: '800', color: Colors.TEXT }}>תחנה {aIdx + 1}</Text>
+                          <TouchableOpacity
+                            onPress={() => { const n=[...(form.tours||[])]; const a=(n[idx].audios||[]).filter((_,i)=>i!==aIdx); n[idx]={...n[idx],audios:a}; setForm(p=>({...p,tours:n})); }}
+                          >
+                            <Text style={{ color: '#dc2626', fontSize: 16 }}>🗑</Text>
+                          </TouchableOpacity>
+                        </View>
+                        <TextInput
+                          style={[ms.input, { marginBottom: 4 }]}
+                          value={au.title || ''}
+                          onChangeText={v => { const n=[...(form.tours||[])]; const a=[...(n[idx].audios||[])]; a[aIdx]={...a[aIdx],title:v}; n[idx]={...n[idx],audios:a}; setForm(p=>({...p,tours:n})); }}
+                          placeholder="שם תחנה"
+                          placeholderTextColor="#bbb"
+                          textAlign="right"
+                        />
+                        <TextInput
+                          style={[ms.input, { marginBottom: 4 }]}
+                          value={au.url}
+                          onChangeText={v => { const n=[...(form.tours||[])]; const a=[...(n[idx].audios||[])]; a[aIdx]={...a[aIdx],url:v}; n[idx]={...n[idx],audios:a}; setForm(p=>({...p,tours:n})); }}
+                          placeholder="URL אודיו"
+                          placeholderTextColor="#bbb"
+                          textAlign="left"
+                        />
+                        <View style={{ flexDirection: 'row-reverse', gap: 6 }}>
+                          <TextInput
+                            style={[ms.input, { flex: 1 }]}
+                            value={String(au.coords?.lat ?? '')}
+                            onChangeText={v => { const n=[...(form.tours||[])]; const a=[...(n[idx].audios||[])]; a[aIdx]={...a[aIdx],coords:{lat:parseFloat(v)||0,lng:a[aIdx].coords?.lng||0}}; n[idx]={...n[idx],audios:a}; setForm(p=>({...p,tours:n})); }}
+                            placeholder="Lat"
+                            placeholderTextColor="#bbb"
+                            textAlign="left"
+                            keyboardType="numeric"
+                          />
+                          <TextInput
+                            style={[ms.input, { flex: 1 }]}
+                            value={String(au.coords?.lng ?? '')}
+                            onChangeText={v => { const n=[...(form.tours||[])]; const a=[...(n[idx].audios||[])]; a[aIdx]={...a[aIdx],coords:{lat:a[aIdx].coords?.lat||0,lng:parseFloat(v)||0}}; n[idx]={...n[idx],audios:a}; setForm(p=>({...p,tours:n})); }}
+                            placeholder="Lng"
+                            placeholderTextColor="#bbb"
+                            textAlign="left"
+                            keyboardType="numeric"
+                          />
+                        </View>
+                      </View>
+                    ))}
+                    <TouchableOpacity
+                      style={{ paddingVertical: 8, borderRadius: 8, backgroundColor: Colors.SECONDARY, alignItems: 'center' }}
+                      onPress={() => { const n=[...(form.tours||[])]; const a=[...(n[idx].audios||[]),{title:'',url:''}]; n[idx]={...n[idx],audios:a}; setForm(p=>({...p,tours:n})); }}
+                    >
+                      <Text style={{ color: Colors.WHITE, fontWeight: '700', fontSize: 13 }}>+ הוסף נגן</Text>
+                    </TouchableOpacity>
+                  </View>
+                ))}
+              </View>
+            )}
+
+            <View style={ms.btnRow}>
+              <TouchableOpacity style={ms.saveBtn} onPress={() => onSave(form)}>
+                <Text style={ms.saveTxt}>שמור</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={ms.cancelBtn} onPress={onClose}>
+                <Text style={ms.cancelTxt}>ביטול</Text>
+              </TouchableOpacity>
+            </View>
+
+            <TouchableOpacity style={ms.deleteBtn} onPress={onDelete}>
+              <Text style={ms.deleteTxt}>מחק פריט</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </View>
+    </Modal>
+  );
+}
+
+// ─── Dashboard ─────────────────────────────────────────────────
+export default function AdminDashboard() {
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 1024;
+  const isTablet = width >= 768;
+  const isWide = width >= 768;
+
+  useEffect(() => {
+    if (Platform.OS !== 'web' || typeof document === 'undefined') return;
+    const root = document.documentElement;
+    const prev = root.getAttribute('translate');
+    root.setAttribute('translate', 'no');
+    root.classList.add('notranslate');
+    let meta = document.querySelector('meta[name="google"]') as HTMLMetaElement | null;
+    const created = !meta;
+    if (!meta) { meta = document.createElement('meta'); meta.setAttribute('name', 'google'); document.head.appendChild(meta); }
+    meta.setAttribute('content', 'notranslate');
+    return () => {
+      if (prev) root.setAttribute('translate', prev); else root.removeAttribute('translate');
+      root.classList.remove('notranslate');
+      if (created && meta) meta.remove();
+    };
+  }, []);
+
+  const [data, setData] = useState<Record<string, DataItem[]>>({});
+  const [texts, setTexts] = useState(DEFAULT_TEXTS);
+  const [activeNav, setActiveNav] = useState('texts');
+  const [editItem, setEditItem] = useState<DataItem | null>(null);
+  const [saved, setSaved] = useState(false);
+  const [showMobileNav, setShowMobileNav] = useState(false);
+  const [childrenOf, setChildrenOf] = useState<DataItem | null>(null);
+  const [extraGroupVisible, setExtraGroupVisible] = useState(true);
+  const [groupVisibility, setGroupVisibility] = useState<Record<string, boolean>>({});
+  const [showDevBar, setShowDevBar] = useState(true);
+  const [finStats, setFinStats] = useState<any>({ inflation: { current: '', date: '' }, lendingRate: { current: '', date: '' }, gdp: { current: '', date: '' } });
+  const [sideTab, setSideTab] = useState<'dashboard' | 'blocks' | 'listings' | 'finance' | 'tourism' | 'realestate'>('dashboard');
+  const [sideTabOrder, setSideTabOrder] = useState<Array<'dashboard' | 'blocks' | 'listings' | 'finance' | 'tourism' | 'realestate'>>(['dashboard', 'blocks', 'listings', 'finance', 'tourism', 'realestate']);
+  const [sideTabDragIdx, setSideTabDragIdx] = useState(-1);
+  useEffect(() => {
+    AsyncStorage.getItem('@admin_sideTabOrder').then(raw => {
+      if (!raw) return;
+      try {
+        const arr = JSON.parse(raw);
+        const valid = ['dashboard', 'blocks', 'listings', 'finance', 'tourism', 'realestate'];
+        if (Array.isArray(arr) && arr.length === 6 && arr.every(k => valid.includes(k))) setSideTabOrder(arr);
+      } catch {}
+    });
+  }, []);
+  useEffect(() => {
+    AsyncStorage.setItem('@admin_sideTabOrder', JSON.stringify(sideTabOrder)).catch(() => {});
+  }, [sideTabOrder]);
+  const [mediaFiles, setMediaFiles] = useState<{ filename: string; originalName?: string; url: string; tags?: string[] }[]>([]);
+  const [galleryFiles, setGalleryFiles] = useState<{ filename: string; url: string }[]>([]);
+  const [mediaFilter, setMediaFilter] = useState<string>('');
+  const [mediaFolder, setMediaFolder] = useState<string>('');
+  const [dragOverIdx, setDragOverIdx] = useState<number>(-1);
+  const [selectedFiles, setSelectedFiles] = useState<Set<string>>(new Set());
+  const [mediaVersion, setMediaVersion] = useState(0);
+  const [ratings, setRatings] = useState<Record<string, { sum: number; count: number }>>({});
+  const [subBlock, setSubBlock] = useState<any>(null);
+  const [subTab, setSubTab] = useState<'banner' | 'dashboard' | 'crm' | 'paywall' | 'marketing' | 'accounting' | 'cancels' | 'subscribers' | 'messages' | 'popup' | 'auth' | 'recommendations' | 'photos' | 'ratings'>('dashboard');
+  const [adminAuth, setAdminAuth] = useState<{ password: string; users: Array<{ id: string; name: string; phone: string; password: string; role: 'owner'|'editor'|'viewer' }> }>({ password: '', users: [] });
+  type ClientBanner = { id: string; client: string; mediaUrl: string; mediaType: 'image'|'video'; position: 'top'|'middle'|'bottom'; size: 'small'|'medium'|'large'; targetPage: string; clickUrl: string; startAt: string; endAt: string; visible: boolean };
+  const [clientBanners, setClientBanners] = useState<ClientBanner[]>([]);
+  const [cbForm, setCbForm] = useState<ClientBanner>({ id: '', client: '', mediaUrl: '', mediaType: 'image', position: 'middle', size: 'medium', targetPage: 'home', clickUrl: '', startAt: '', endAt: '', visible: true });
+  const [cbUploading, setCbUploading] = useState(false);
+
+  const [pushStats, setPushStats] = useState<{ count: number; history: Array<{ id: string; title: string; body: string; sentAt: string; count: number }> }>({ count: 0, history: [] });
+  const [pushForm, setPushForm] = useState<{ title: string; body: string; deepLink: string }>({ title: '', body: '', deepLink: '' });
+  const [pushSending, setPushSending] = useState(false);
+  const loadPushStats = useCallback(async () => {
+    try {
+      const r = await fetch(`${API_BASE}/api/push/tokens`);
+      const j = await r.json();
+      if (j.success) setPushStats({ count: j.count || 0, history: j.history || [] });
+    } catch {}
+  }, []);
+  useEffect(() => { loadPushStats(); }, [loadPushStats]);
+
+  type Coupon = { id: string; code: string; label: string; type: 'percent'|'fixed'; value: number; maxUses: number; usedCount: number; startAt: string; endAt: string; visible: boolean };
+  const [coupons, setCoupons] = useState<Coupon[]>([]);
+  const [couponForm, setCouponForm] = useState<Coupon>({ id: '', code: '', label: '', type: 'percent', value: 10, maxUses: 0, usedCount: 0, startAt: '', endAt: '', visible: true });
+  const loadCoupons = useCallback(async () => {
+    try {
+      const r = await fetch(`${API_BASE}/api/content`);
+      const j = await r.json();
+      if (j.success && Array.isArray(j.data?.coupons)) setCoupons(j.data.coupons);
+    } catch {}
+  }, []);
+  const saveCoupons = async (arr: Coupon[]) => {
+    setCoupons(arr);
+    await fetch(`${API_BASE}/api/content/coupons`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(arr) });
+  };
+  useEffect(() => { loadCoupons(); }, [loadCoupons]);
+
+  const loadClientBanners = useCallback(async () => {
+    try {
+      const r = await fetch(`${API_BASE}/api/content`);
+      const j = await r.json();
+      if (j.success && Array.isArray(j.data?.clientBanners)) setClientBanners(j.data.clientBanners);
+    } catch {}
+  }, []);
+
+  const saveClientBanners = async (arr: ClientBanner[]) => {
+    setClientBanners(arr);
+    await fetch(`${API_BASE}/api/content/clientBanners`, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(arr),
+    });
+  };
+
+  useEffect(() => { loadClientBanners(); }, [loadClientBanners]);
+  const [authForm, setAuthForm] = useState<{ id: string; name: string; phone: string; password: string; role: 'owner'|'editor'|'viewer' }>({ id: '', name: '', phone: '', password: '', role: 'viewer' });
+  const [authNewPassword, setAuthNewPassword] = useState('');
+  const [authPinInput, setAuthPinInput] = useState('');
+  const [authPinUnlocked, setAuthPinUnlocked] = useState(false);
+
+  const loadAuth = useCallback(async () => {
+    try {
+      const r = await fetch(`${API_BASE}/api/content`);
+      const j = await r.json();
+      if (j.success && j.data?.adminAuth) setAdminAuth({ password: j.data.adminAuth.password || '', users: Array.isArray(j.data.adminAuth.users) ? j.data.adminAuth.users : [] });
+    } catch {}
+  }, []);
+
+  const saveAuth = async (next: typeof adminAuth) => {
+    setAdminAuth(next);
+    await fetch(`${API_BASE}/api/content/adminAuth`, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(next),
+    });
+  };
+
+  useEffect(() => { loadAuth(); }, [loadAuth]);
+  const [contactMessages, setContactMessages] = useState<Array<{ id: string; name: string; email: string; message: string; createdAt: string; read?: boolean; replied?: boolean; repliedAt?: string; replyNote?: string }>>([]);
+  const [messagesPage, setMessagesPage] = useState(1);
+  const MESSAGES_PER_PAGE = 10;
+  const [pendingRecsCount, setPendingRecsCount] = useState(0);
+  const [pendingPhotosCount, setPendingPhotosCount] = useState(0);
+  const [newRatingsCount, setNewRatingsCount] = useState(0);
+  useEffect(() => {
+    const loadCounts = () => {
+      fetch(`${API_BASE}/api/recommendations/all`).then(r => r.json()).then(j => {
+        const arr = Array.isArray(j.data) ? j.data : Array.isArray(j) ? j : [];
+        setPendingRecsCount(arr.filter((r: any) => r.approved == null).length);
+      }).catch(() => {});
+      fetch(`${API_BASE}/api/tour-album`).then(r => r.json()).then(j => {
+        const albums = j.data || {};
+        let pending = 0;
+        Object.values(albums).forEach((arr: any) => {
+          if (Array.isArray(arr)) pending += arr.filter((p: any) => p.status === 'pending').length;
+        });
+        setPendingPhotosCount(pending);
+      }).catch(() => {});
+      fetch(`${API_BASE}/api/ratings`).then(r => r.json()).then(j => {
+        const ratings = j.data || j || {};
+        let total = 0;
+        Object.values(ratings).forEach((r: any) => {
+          if (r && typeof r.count === 'number') total += r.count;
+        });
+        setNewRatingsCount(total);
+      }).catch(() => {});
+    };
+    loadCounts();
+    const iv = setInterval(loadCounts, 30000);
+    return () => clearInterval(iv);
+  }, []);
+  const [popups, setPopups] = useState<Array<{ id: string; title: string; message: string; target: string; position: 'top'|'center'|'bottom'; visible: boolean; startAt?: string; endAt?: string; bgColor?: string; redeemCode?: string }>>([]);
+  const [popupForm, setPopupForm] = useState<{ id: string; title: string; message: string; target: string; position: 'top'|'center'|'bottom'; visible: boolean; startAt: string; endAt: string; bgColor: string; redeemCode: string }>({ id: '', title: '', message: '', target: 'home', position: 'center', visible: true, startAt: '', endAt: '', bgColor: '#ffffff', redeemCode: '' });
+  const [popupEditing, setPopupEditing] = useState(false);
+  const [popupPreview, setPopupPreview] = useState<typeof popups[number] | null>(null);
+
+  const loadPopups = useCallback(async () => {
+    try {
+      const r = await fetch(`${API_BASE}/api/content`);
+      const j = await r.json();
+      if (j.success && Array.isArray(j.data?.popups)) setPopups(j.data.popups);
+    } catch {}
+  }, []);
+
+  const savePopups = async (arr: typeof popups) => {
+    setPopups(arr);
+    await fetch(`${API_BASE}/api/content/popups`, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(arr),
+    });
+  };
+
+  useEffect(() => { loadPopups(); }, [loadPopups]);
+
+  const loadMessages = useCallback(async () => {
+    try {
+      const r = await fetch(`${API_BASE}/api/contact`);
+      const j = await r.json();
+      if (j.success) setContactMessages(j.data || []);
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    loadMessages();
+    const iv = setInterval(loadMessages, 30000);
+    return () => clearInterval(iv);
+  }, [loadMessages]);
+
+  const persistMessages = async (arr: typeof contactMessages) => {
+    setContactMessages(arr);
+    await fetch(`${API_BASE}/api/content/contactSubmissions`, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(arr),
+    });
+  };
+
+  const markMessageRead = (id: string) => persistMessages(contactMessages.map(m => m.id === id ? { ...m, read: true } : m));
+  const deleteMessage = (id: string) => persistMessages(contactMessages.filter(m => m.id !== id));
+  const markReplied = (id: string) => persistMessages(contactMessages.map(m => m.id === id ? { ...m, read: true, replied: true, repliedAt: m.repliedAt || new Date().toISOString() } : m));
+  const unmarkReplied = (id: string) => persistMessages(contactMessages.map(m => m.id === id ? { ...m, replied: false } : m));
+  const setReplyNote = (id: string, note: string) => persistMessages(contactMessages.map(m => m.id === id ? { ...m, replyNote: note } : m));
+
+  const refreshMedia = useCallback(async () => {
+    try {
+      const res = await fetch(`${API_BASE}/api/uploads`);
+      const json = await res.json();
+      if (json.success) { setMediaFiles(json.files); setMediaVersion(v => v + 1); }
+    } catch {}
+  }, []);
+
+  const refreshGallery = useCallback(async () => {
+    try {
+      const res = await fetch(`${API_BASE}/api/gallery`);
+      const json = await res.json();
+      if (json.success) setGalleryFiles(json.files);
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    refreshMedia();
+  }, []);
+
+  useEffect(() => {
+    if (activeNav === 'media') refreshMedia();
+    if (activeNav === 'gallery') refreshGallery();
+  }, [activeNav, refreshMedia, refreshGallery]);
+
+  // Map section keys to API JSON keys
+  const API_KEYS: Record<string, string> = {
+    main: 'mainCategories', extra: 'extraCategories',
+    welcome: 'welcome', info: 'infoPortal',
+    bottom: 'bottomBanners', side: 'sideBanners',
+    locations: 'locations', audio: 'audio',
+    legal: 'legal',
+  };
+
+  useEffect(() => {
+    (async () => {
+      try {
+        // Try API first
+        const apiData = await fetchContent();
+        const loaded: Record<string, DataItem[]> = {};
+        for (const s of SECTIONS) {
+          const apiKey = API_KEYS[s.key];
+          loaded[s.key] = apiData[apiKey] || s.defaults;
+        }
+        setData(loaded);
+        if (apiData.texts) setTexts(apiData.texts);
+        if (typeof apiData.extraGroupVisible === 'boolean') setExtraGroupVisible(apiData.extraGroupVisible);
+        if (apiData.groupVisibility && typeof apiData.groupVisibility === 'object') setGroupVisibility(apiData.groupVisibility);
+        if (typeof apiData.showDevBar === 'boolean') setShowDevBar(apiData.showDevBar);
+        if (apiData.financeStats) setFinStats({
+          inflation: { current: apiData.financeStats.inflation?.current ?? '', date: apiData.financeStats.inflation?.date ?? '' },
+          lendingRate: { current: apiData.financeStats.lendingRate?.current ?? '', date: apiData.financeStats.lendingRate?.date ?? '' },
+          gdp: { current: apiData.financeStats.gdp?.current ?? '', date: apiData.financeStats.gdp?.date ?? '' },
+        });
+        try { const r = await fetchRatings(); setRatings(r); } catch {}
+        if (apiData.subscriptionBlock) setSubBlock(apiData.subscriptionBlock);
+        // Clear stale AsyncStorage
+        for (const s of SECTIONS) await AsyncStorage.removeItem(s.storageKey).catch(() => {});
+      } catch {
+        // API failed - show defaults only, no stale cache
+        const loaded: Record<string, DataItem[]> = {};
+        for (const s of SECTIONS) {
+          loaded[s.key] = s.defaults;
+        }
+        setData(loaded);
+        const rawTexts = await AsyncStorage.getItem('@admin_texts');
+        if (rawTexts) { try { setTexts(JSON.parse(rawTexts)); } catch {} }
+      }
+    })();
+  }, []);
+
+  const flash = useCallback(() => { setSaved(true); setTimeout(() => setSaved(false), 2000); }, []);
+
+  const saveSection = async (key: string, items: DataItem[]) => {
+    const section = SECTIONS.find(s => s.key === key)!;
+    // Save to API
+    const apiKey = API_KEYS[key];
+    try {
+      await updateSection(apiKey, items);
+    } catch {
+      // Fallback to AsyncStorage
+    }
+    await AsyncStorage.setItem(section.storageKey, JSON.stringify(items));
+    setData(prev => ({ ...prev, [key]: items }));
+    flash();
+  };
+
+  const saveChildren = (newChildren: DataItem[]) => {
+    if (!childrenOf) return;
+    const items = [...(data[activeNav] || [])];
+    const pIdx = items.findIndex(i => i.id === childrenOf.id);
+    if (pIdx < 0) return;
+    const updatedParent = { ...items[pIdx], children: newChildren };
+    items[pIdx] = updatedParent;
+    saveSection(activeNav, items);
+    setChildrenOf(updatedParent);
+  };
+
+  const handleSaveItem = (updated: DataItem) => {
+    const section = SECTIONS.find(s => s.key === activeNav);
+    if (!section) return;
+    // Tour block single-edit path
+    if (updated.id && updated.id.startsWith('__tour__') && childrenOf && updated.tours && updated.tours.length === 1) {
+      const parts = updated.id.split('__');
+      const tourIdx = parseInt(parts[3], 10);
+      const items = [...(data[activeNav] || [])];
+      const pIdx = items.findIndex(i => i.id === childrenOf.id);
+      if (pIdx >= 0) {
+        const parent = items[pIdx];
+        const newTours = [...(parent.tours || [])];
+        newTours[tourIdx] = updated.tours[0];
+        const newParent = { ...parent, tours: newTours };
+        items[pIdx] = newParent;
+        saveSection(activeNav, items);
+        setChildrenOf(newParent);
+      }
+      setEditItem(null);
+      return;
+    }
+    if (childrenOf && !toursMode) {
+      const kids = childrenOf.children || [];
+      const idx = kids.findIndex(i => i.id === updated.id);
+      const next = [...kids];
+      if (idx >= 0) next[idx] = updated; else next.push(updated);
+      saveChildren(next);
+      setEditItem(null);
+      return;
+    }
+    const items = data[activeNav] || [];
+    const idx = items.findIndex(i => i.id === updated.id);
+    const next = [...items];
+    if (idx >= 0) next[idx] = updated; else next.push(updated);
+    saveSection(activeNav, next);
+    setEditItem(null);
+  };
+
+  const handleDeleteItem = () => {
+    if (!editItem) return;
+    const doDelete = () => {
+      if (childrenOf) {
+        const next = (childrenOf.children || []).filter(i => i.id !== editItem.id);
+        saveChildren(next);
+      } else {
+        const items = (data[activeNav] || []).filter(i => i.id !== editItem.id);
+        saveSection(activeNav, items);
+      }
+      setEditItem(null);
+    };
+    if (Platform.OS === 'web') {
+      if (confirm(`למחוק את "${editItem.title}"?`)) doDelete();
+    } else {
+      Alert.alert('מחיקה', `למחוק את "${editItem.title}"?`, [
+        { text: 'ביטול', style: 'cancel' },
+        { text: 'מחק', style: 'destructive', onPress: doDelete },
+      ]);
+    }
+  };
+
+  const addItem = () => {
+    const section = SECTIONS.find(s => s.key === activeNav);
+    if (!section) return;
+    const newItem: DataItem = {
+      id: String(Date.now()), title: 'פריט חדש', subtitle: '', icon: '📌', bg: Colors.PRIMARY,
+      ...(section.hasImage ? { image: '' } : {}),
+      ...(section.hasAudio ? { audio: '' } : {}),
+      ...(section.hasLocation ? { lat: '', lng: '', address: '' } : {}),
+      ...(section.hasSummary ? { summary: '' } : {}),
+      ...(section.hasLongText ? { longText: '' } : {}),
+    };
+    setEditItem(newItem);
+  };
+
+  const moveItem = (idx: number, dir: -1 | 1) => {
+    const source = childrenOf ? (childrenOf.children || []) : (data[activeNav] || []);
+    const items = [...source];
+    const target = idx + dir;
+    if (target < 0 || target >= items.length) return;
+    [items[idx], items[target]] = [items[target], items[idx]];
+    if (childrenOf) saveChildren(items); else saveSection(activeNav, items);
+  };
+
+  const reorderItem = (from: number, to: number) => {
+    if (from === to || from < 0 || to < 0) return;
+    if (toursMode && childrenOf) {
+      const tours = [...(childrenOf.tours || [])];
+      if (from >= tours.length || to >= tours.length) return;
+      const [moved] = tours.splice(from, 1);
+      tours.splice(to, 0, moved);
+      const items = [...(data[activeNav] || [])];
+      const pIdx = items.findIndex(i => i.id === childrenOf.id);
+      if (pIdx >= 0) {
+        const newParent = { ...items[pIdx], tours };
+        items[pIdx] = newParent;
+        saveSection(activeNav, items);
+        setChildrenOf(newParent);
+      }
+      return;
+    }
+    const source = childrenOf ? (childrenOf.children || []) : (data[activeNav] || []);
+    const items = [...source];
+    if (from >= items.length || to >= items.length) return;
+    const [moved] = items.splice(from, 1);
+    items.splice(to, 0, moved);
+    if (childrenOf) saveChildren(items); else saveSection(activeNav, items);
+  };
+
+  const currentSection = SECTIONS.find(s => s.key === activeNav) || null;
+  const toursMode = !!(childrenOf && childrenOf.tours && childrenOf.tours.length > 0);
+  const currentItems: DataItem[] = toursMode
+    ? (childrenOf!.tours!.map((t, i) => ({
+        id: t.id,
+        title: t.title || `בלוק ${i + 1}`,
+        subtitle: t.text ? t.text.slice(0, 60) : '',
+        icon: '🎧',
+        bg: t.color,
+        visible: t.visible,
+        _tourIdx: i,
+      } as DataItem & { _tourIdx: number })))
+    : childrenOf
+      ? (childrenOf.children || [])
+      : (data[activeNav] || []);
+  const canHaveChildren = activeNav === 'main' || activeNav === 'extra';
+
+  // ─── Sidebar / Nav ──────────────────────────────────────────
+  const renderNav = () => (
+    <View style={[ns.nav, isWide && ns.navWide]}>
+      <View style={ns.navHeader}>
+        <Image source={require('../../assets/images/batumi_icon_light.png')} style={{ width: 40, height: 40, borderRadius: 8 }} resizeMode="contain" />
+        <View>
+          <Text style={ns.navTitle}>Batumi Online</Text>
+          <Text style={ns.navSub}>לוח ניהול</Text>
+        </View>
+      </View>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        {NAV_ITEMS.map(item => (
+          <TouchableOpacity
+            key={item.key}
+            style={[ns.navItem, activeNav === item.key && ns.navItemActive]}
+            onPress={() => { setActiveNav(item.key); setShowMobileNav(false); setChildrenOf(null); }}
+          >
+            <Text style={ns.navIcon}>{item.icon}</Text>
+            <Text style={[ns.navLabel, activeNav === item.key && ns.navLabelActive]}>{item.label}</Text>
+            {item.key === 'side' && listings.filter(l => !l.approved).length > 0 && (
+              <View style={{ position: 'absolute', top: 6, left: 6, minWidth: 20, paddingHorizontal: 6, height: 20, borderRadius: 10, backgroundColor: '#dc2626', alignItems: 'center', justifyContent: 'center' }}>
+                <Text style={{ fontSize: 10, color: '#fff', fontWeight: '900' }}>{listings.filter(l => !l.approved).length}</Text>
+              </View>
+            )}
+            {item.key === 'subscription' && (contactMessages.filter(m => !m.read).length + pendingRecsCount + pendingPhotosCount) > 0 && (
+              <View style={{ position: 'absolute', top: 6, left: 6, minWidth: 20, paddingHorizontal: 6, height: 20, borderRadius: 10, backgroundColor: '#dc2626', alignItems: 'center', justifyContent: 'center' }}>
+                <Text style={{ fontSize: 10, color: '#fff', fontWeight: '900' }}>{contactMessages.filter(m => !m.read).length + pendingRecsCount + pendingPhotosCount}</Text>
+              </View>
+            )}
+            {item.key !== 'texts' && (
+              <Text key={`${item.key}-${mediaVersion}`} style={ns.navBadge}>{item.key === 'media' ? mediaFiles.length : item.key === 'gallery' ? galleryFiles.length : item.key === 'audio' ? mediaFiles.filter(f => /\.(mp3|wav|m4a|aac)$/i.test(f.filename)).length : (data[item.key] || []).length}</Text>
+            )}
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+      <View style={ns.navFooter}>
+        <TouchableOpacity style={ns.navFooterBtn} onPress={() => { if (Platform.OS === 'web') (window as any).open('/preview/phones', '_blank'); else router.push('/preview/phones' as any); }}>
+          <Text style={ns.navFooterIcon}>📱</Text>
+          <Text style={ns.navFooterTxt}>תצוגת 10 ניידים</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={ns.navFooterBtn} onPress={() => router.replace('/')}>
+          <Text style={ns.navFooterIcon}>←</Text>
+          <Text style={ns.navFooterTxt}>חזרה לאפליקציה</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={ns.navFooterBtn} onPress={() => router.replace('/admin')}>
+          <Text style={ns.navFooterIcon}>🚪</Text>
+          <Text style={ns.navFooterTxt}>התנתק</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+
+  // ─── Home Preview ───────────────────────────────────────────
+  const renderTexts = () => {
+    const unreadMessages = contactMessages.filter(m => !m.read).length;
+    const pendingListings = listings.filter(l => !l.approved).length;
+    return (
+      <View style={cs.contentCard}>
+        <Text style={cs.contentTitle}>דף הבית</Text>
+        <Text style={cs.contentSub}>תצוגה מקדימה של דף הבית כפי שהגולש רואה</Text>
+
+        {(unreadMessages > 0 || pendingListings > 0) && (
+          <View style={{ flexDirection: 'row-reverse', gap: 10, marginTop: 12, marginBottom: 6, flexWrap: 'wrap' }}>
+            {unreadMessages > 0 && (
+              <TouchableOpacity onPress={() => { setActiveNav('subscription'); setSubTab('messages'); }} activeOpacity={0.85} style={{ flex: 1, minWidth: 240, flexDirection: 'row-reverse', alignItems: 'center', gap: 12, backgroundColor: '#fef2f2', borderWidth: 2, borderColor: '#fecaca', borderRadius: 12, padding: 14 }}>
+                <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: '#dc2626', alignItems: 'center', justifyContent: 'center' }}>
+                  <Text style={{ fontSize: 16, fontWeight: '900', color: '#fff' }}>{unreadMessages > 99 ? '99+' : unreadMessages}</Text>
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontSize: 14, fontWeight: '900', color: '#7f1d1d', writingDirection: 'rtl', textAlign: 'right' }}>📨 {unreadMessages} הודעות מהאתר</Text>
+                  <Text style={{ fontSize: 11, color: '#991b1b', writingDirection: 'rtl', textAlign: 'right', marginTop: 2 }}>שלא נקראו · לחץ לצפייה</Text>
+                </View>
+                <Text style={{ fontSize: 18, color: '#dc2626', fontWeight: '900' }}>‹</Text>
+              </TouchableOpacity>
+            )}
+            {pendingListings > 0 && (
+              <TouchableOpacity onPress={() => { setActiveNav('side'); setSideTab('listings'); }} activeOpacity={0.85} style={{ flex: 1, minWidth: 240, flexDirection: 'row-reverse', alignItems: 'center', gap: 12, backgroundColor: '#fffbeb', borderWidth: 2, borderColor: '#fde68a', borderRadius: 12, padding: 14 }}>
+                <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: '#f59e0b', alignItems: 'center', justifyContent: 'center' }}>
+                  <Text style={{ fontSize: 16, fontWeight: '900', color: '#fff' }}>{pendingListings > 99 ? '99+' : pendingListings}</Text>
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontSize: 14, fontWeight: '900', color: '#78350f', writingDirection: 'rtl', textAlign: 'right' }}>⏳ {pendingListings} מודעות ממתינות לאישור</Text>
+                  <Text style={{ fontSize: 11, color: '#92400e', writingDirection: 'rtl', textAlign: 'right', marginTop: 2 }}>נדל״ן · לחץ לאישור</Text>
+                </View>
+                <Text style={{ fontSize: 18, color: '#f59e0b', fontWeight: '900' }}>‹</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        )}
+
+        <HomeBannerEditorInner field="homeGallery" title="🖼️ גלריית דף הבית" hint="עד 6 תמונות שמתחלפות ב-fade חלק מעל הכותרת. ריק = משתמש בתמונות ברירת מחדל" />
+        <BgColorPicker />
+        <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 12, padding: 12, marginTop: 12, backgroundColor: '#f8fafc', borderRadius: 10, borderWidth: 1, borderColor: '#e2e8f0' }}>
+          <Text style={{ flex: 1, fontSize: 13, fontWeight: '700', color: '#1C2B35', writingDirection: 'rtl', textAlign: 'right' }}>הצג סרגל תצוגה (נייד/אייפד/מחשב)</Text>
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={async () => {
+              const next = !showDevBar;
+              setShowDevBar(next);
+              try { await fetch(`${API_BASE}/api/content/showDevBar`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(next) }); } catch {}
+            }}
+            style={{ width: 44, height: 24, borderRadius: 12, backgroundColor: showDevBar ? '#10b981' : '#cbd5e1', padding: 2, flexDirection: 'row', alignItems: 'center' }}
+          >
+            <View style={{ width: 20, height: 20, borderRadius: 10, backgroundColor: '#fff', marginLeft: showDevBar ? 20 : 0 }} />
+          </TouchableOpacity>
+        </View>
+
+        {Platform.OS === 'web' && (
+          <View style={{ alignItems: 'center', marginTop: 20 }}>
+            <View style={{
+              width: 591, height: 1246, backgroundColor: '#1C2B35', borderRadius: 48,
+              padding: 14, alignItems: 'center', justifyContent: 'center',
+              shadowColor: '#000', shadowOffset: { width: 0, height: 10 },
+              shadowOpacity: 0.25, shadowRadius: 30,
+            }}>
+              <View style={{ width: 563, height: 1218, backgroundColor: '#000', borderRadius: 36, overflow: 'hidden' }}>
+                {React.createElement('iframe', {
+                  src: '/',
+                  style: {
+                    width: '375px', height: '812px', border: 0, backgroundColor: '#fff',
+                    transform: 'scale(1.5)', transformOrigin: 'top left',
+                  },
+                  title: 'home-preview',
+                })}
+              </View>
+            </View>
+          </View>
+        )}
+      </View>
+    );
+  };
+
+  // ─── Subscription Block ─────────────────────────────────────
+  const saveSubBlock = async (updated: any) => {
+    setSubBlock(updated);
+    try {
+      await fetch(`${API_BASE}/api/content/subscriptionBlock`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updated),
+      });
+      setSaved(true); setTimeout(() => setSaved(false), 2000);
+    } catch {}
+  };
+
+  const [subTabOrder, setSubTabOrder] = useState([
+    { key: 'dashboard' as const, label: 'דשבורד לקוחות', icon: '👥' },
+    { key: 'crm' as const, label: 'CRM', icon: '🤝' },
+    { key: 'messages' as const, label: 'הודעות', icon: '📨' },
+    { key: 'recommendations' as const, label: 'המלצות', icon: '⭐' },
+    { key: 'photos' as const, label: 'תמונות מסיורים', icon: '📸' },
+    { key: 'ratings' as const, label: 'דירוגי סיורים', icon: '⭐' },
+    { key: 'popup' as const, label: 'פופ אפ', icon: '💬' },
+    { key: 'banner' as const, label: 'באנר פרסום', icon: '📢' },
+    { key: 'marketing' as const, label: 'שיווק ופרסום', icon: '📣' },
+    { key: 'paywall' as const, label: 'שליטה בתוכן', icon: '🔒' },
+    { key: 'accounting' as const, label: 'הנה״ח', icon: '📊' },
+    { key: 'cancels' as const, label: 'ביטולים', icon: '❌' },
+    { key: 'auth' as const, label: 'סיסמאות והרשאות', icon: '🔑' },
+  ]);
+  const [dragTabIdx, setDragTabIdx] = useState(-1);
+  const [demoMode, setDemoMode] = useState(true);
+  const [paywallData, setPaywallData] = useState<{ mode: string; lockedCategories: string[]; trialEnabled?: boolean }>({ mode: 'free', lockedCategories: [], trialEnabled: true });
+  const [pwCategories, setPwCategories] = useState<{ id: string; title: string; parent: string }[]>([]);
+
+  useEffect(() => {
+    fetchContent().then((apiData: any) => {
+      const cats: { id: string; title: string; parent: string }[] = [];
+      (apiData.mainCategories || []).forEach((c: any) => {
+        if (c.title) cats.push({ id: c.id, title: c.title, parent: 'ראשיות' });
+        (c.children || []).forEach((ch: any) => { if (ch.title) cats.push({ id: ch.id, title: ch.title, parent: c.title }); });
+      });
+      (apiData.extraCategories || []).forEach((c: any) => {
+        if (c.title) cats.push({ id: c.id, title: c.title, parent: 'נוספות' });
+        (c.children || []).forEach((ch: any) => { if (ch.title) cats.push({ id: ch.id, title: ch.title, parent: c.title }); });
+      });
+      setPwCategories(cats);
+      if (apiData.paywall) setPaywallData(apiData.paywall);
+    }).catch(() => {});
+  }, []);
+
+  const savePaywall = async (updated: any) => {
+    setPaywallData(updated);
+    try {
+      await fetch(`${API_BASE}/api/content/paywall`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(updated) });
+      setSaved(true); setTimeout(() => setSaved(false), 2000);
+    } catch {}
+  };
+
+  const tabColors: Record<string, string> = { subscribers: '#10b981', messages: '#0ea5e9', popup: '#a855f7', dashboard: '#1A6B8A', crm: '#8b5cf6', paywall: '#e91e63', marketing: '#f59e0b', accounting: '#3b82f6', cancels: '#dc2626', banner: '#64748b', auth: '#e11d48' };
+
+  const [subsList, setSubsList] = useState<any[]>([]);
+  const [subForm, setSubForm] = useState<{ phone: string; name: string; plan: '30d' | 'year' }>({ phone: '', name: '', plan: '30d' });
+  const [subsLoading, setSubsLoading] = useState(false);
+
+  const loadSubs = async () => {
+    setSubsLoading(true);
+    try {
+      const r = await fetch(`${API_BASE}/api/subscribers`);
+      const j = await r.json();
+      setSubsList(j.subscribers || []);
+    } catch {}
+    setSubsLoading(false);
+  };
+  useEffect(() => { loadSubs(); }, []);
+
+  const addSub = async () => {
+    if (!subForm.phone) return;
+    await fetch(`${API_BASE}/api/subscribers`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(subForm),
+    });
+    setSubForm({ phone: '', name: '', plan: '30d' });
+    loadSubs();
+  };
+
+  const delSub = async (phone: string) => {
+    await fetch(`${API_BASE}/api/subscribers/${encodeURIComponent(phone)}`, { method: 'DELETE' });
+    loadSubs();
+  };
+
+  const renderAuth = () => {
+    const roleLabel = (r: string) => ({ owner: '👑 בעלים', editor: '✏️ עורך', viewer: '👁️ צפייה בלבד' } as any)[r] || r;
+    const roleColor = (r: string) => ({ owner: '#e11d48', editor: '#f59e0b', viewer: '#64748b' } as any)[r] || '#64748b';
+    const fld = { padding: 12, border: '2px solid #fecdd3', borderRadius: 10, fontSize: 15, fontWeight: 500, direction: 'rtl' as const, textAlign: 'right' as const, background: '#fff', width: '100%' as const, boxSizing: 'border-box' as const, fontFamily: 'inherit' };
+    const saveNewPassword = () => {
+      if (!authNewPassword.trim()) { if (typeof window !== 'undefined') (window as any).alert('סיסמה ריקה'); return; }
+      saveAuth({ ...adminAuth, password: authNewPassword.trim() });
+      setAuthNewPassword('');
+      if (typeof window !== 'undefined') (window as any).alert('✅ הסיסמה עודכנה');
+    };
+    const saveUser = () => {
+      if (!authForm.name.trim() || !authForm.phone.trim()) { if (typeof window !== 'undefined') (window as any).alert('חסר שם או טלפון'); return; }
+      if (!authForm.id && !authForm.password.trim()) { if (typeof window !== 'undefined') (window as any).alert('חובה לקבוע סיסמה למשתמש חדש'); return; }
+      const id = authForm.id || `usr_${Date.now()}`;
+      const existing = adminAuth.users.find(u => u.id === id);
+      const password = authForm.password.trim() || (existing?.password || '');
+      const user = { ...authForm, id, password };
+      const users = authForm.id ? adminAuth.users.map(u => u.id === id ? user : u) : [...adminAuth.users, user];
+      saveAuth({ ...adminAuth, users });
+      setAuthForm({ id: '', name: '', phone: '', password: '', role: 'viewer' });
+    };
+    const delUser = (id: string) => {
+      if (typeof window !== 'undefined' && !(window as any).confirm('למחוק משתמש?')) return;
+      saveAuth({ ...adminAuth, users: adminAuth.users.filter(u => u.id !== id) });
+    };
+    return (
+      <View style={{ gap: 18 }}>
+        <Text style={{ fontSize: 22, fontWeight: '900', color: '#9f1239', writingDirection: 'rtl' }}>🔑 סיסמאות והרשאות</Text>
+
+        {/* Master password */}
+        <View style={{ backgroundColor: '#fff1f2', borderWidth: 2, borderColor: '#e11d48', borderRadius: 14, padding: 18, gap: 12 }}>
+          <Text style={{ fontSize: 17, fontWeight: '900', color: '#9f1239', writingDirection: 'rtl' }}>🔒 סיסמת מנהל ראשי</Text>
+          <Text style={{ fontSize: 14, color: '#4b5563', writingDirection: 'rtl' }}>סיסמה נוכחית: {adminAuth.password ? '••••••••' : '(לא הוגדרה)'}</Text>
+          {!authPinUnlocked ? (
+            <>
+              <Text style={{ fontSize: 13, color: '#9f1239', writingDirection: 'rtl', fontWeight: '700' }}>🔐 הקלד PIN להחלפת סיסמה</Text>
+              {Platform.OS === 'web' ? (
+                React.createElement('input', { type: 'password', placeholder: 'PIN', value: authPinInput, onChange: (e: any) => setAuthPinInput(e.target.value), onKeyDown: (e: any) => { if (e.key === 'Enter') { if (authPinInput === '33578521') { setAuthPinUnlocked(true); setAuthPinInput(''); } else { (window as any).alert('PIN שגוי'); setAuthPinInput(''); } } }, style: fld })
+              ) : (
+                <TextInput secureTextEntry placeholder="PIN" value={authPinInput} onChangeText={setAuthPinInput} keyboardType="number-pad" textAlign="right" style={{ borderWidth: 2, borderColor: '#fecdd3', borderRadius: 10, padding: 12, fontSize: 15 }} />
+              )}
+              <TouchableOpacity onPress={() => { if (authPinInput === '33578521') { setAuthPinUnlocked(true); setAuthPinInput(''); } else { if (typeof window !== 'undefined') (window as any).alert('PIN שגוי'); setAuthPinInput(''); } }} style={{ backgroundColor: '#9f1239', paddingVertical: 14, borderRadius: 10, alignItems: 'center' }}>
+                <Text style={{ color: '#fff', fontWeight: '900', fontSize: 15 }}>🔓 פתח</Text>
+              </TouchableOpacity>
+            </>
+          ) : (
+            <>
+              {Platform.OS === 'web' ? (
+                React.createElement('input', { type: 'password', placeholder: 'סיסמה חדשה', value: authNewPassword, onChange: (e: any) => setAuthNewPassword(e.target.value), style: fld })
+              ) : (
+                <TextInput secureTextEntry placeholder="סיסמה חדשה" value={authNewPassword} onChangeText={setAuthNewPassword} textAlign="right" style={{ borderWidth: 2, borderColor: '#fecdd3', borderRadius: 10, padding: 12, fontSize: 15 }} />
+              )}
+              <View style={{ flexDirection: 'row-reverse', gap: 8 }}>
+                <TouchableOpacity onPress={() => { saveNewPassword(); setAuthPinUnlocked(false); }} style={{ flex: 1, backgroundColor: '#e11d48', paddingVertical: 14, borderRadius: 10, alignItems: 'center' }}>
+                  <Text style={{ color: '#fff', fontWeight: '900', fontSize: 16 }}>💾 עדכן סיסמה</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => { setAuthPinUnlocked(false); setAuthNewPassword(''); }} style={{ backgroundColor: '#475569', paddingHorizontal: 18, paddingVertical: 14, borderRadius: 10 }}>
+                  <Text style={{ color: '#fff', fontWeight: '900', fontSize: 14 }}>🔒 נעל</Text>
+                </TouchableOpacity>
+              </View>
+            </>
+          )}
+        </View>
+
+        {/* Add/edit admin user */}
+        <View style={{ backgroundColor: '#fff7ed', borderWidth: 2, borderColor: '#f59e0b', borderRadius: 14, padding: 18, gap: 12 }}>
+          <Text style={{ fontSize: 17, fontWeight: '900', color: '#78350f', writingDirection: 'rtl' }}>{authForm.id ? '✏️ עריכת משתמש' : '➕ הוסף משתמש עם הרשאה'}</Text>
+          {!authPinUnlocked ? (
+            <Text style={{ fontSize: 13, color: '#78350f', writingDirection: 'rtl', textAlign: 'right', fontWeight: '700', backgroundColor: '#fffbeb', borderRadius: 8, padding: 12, borderWidth: 1, borderColor: '#fde68a' }}>🔐 בלוק נעול. הקלד PIN בבלוק שלמעלה כדי לפתוח.</Text>
+          ) : Platform.OS === 'web' ? (
+            <>
+              {React.createElement('input', { placeholder: 'שם', value: authForm.name, onChange: (e: any) => setAuthForm({ ...authForm, name: e.target.value }), style: { ...fld, border: '2px solid #fed7aa' } })}
+              {React.createElement('input', { placeholder: 'טלפון (ישמש כשם משתמש)', value: authForm.phone, onChange: (e: any) => setAuthForm({ ...authForm, phone: e.target.value }), style: { ...fld, border: '2px solid #fed7aa' } })}
+              {React.createElement('input', { type: 'password', placeholder: authForm.id ? 'סיסמה חדשה (להשארת הישנה – השאר ריק)' : 'סיסמה למשתמש', value: authForm.password, onChange: (e: any) => setAuthForm({ ...authForm, password: e.target.value }), style: { ...fld, border: '2px solid #fed7aa' } })}
+              {React.createElement('select', { value: authForm.role, onChange: (e: any) => setAuthForm({ ...authForm, role: e.target.value as any }), style: { ...fld, border: '2px solid #fed7aa' } }, [
+                React.createElement('option', { key: 'v', value: 'viewer' }, '👁️ צפייה בלבד'),
+                React.createElement('option', { key: 'e', value: 'editor' }, '✏️ עורך'),
+                React.createElement('option', { key: 'o', value: 'owner' }, '👑 בעלים'),
+              ])}
+            </>
+          ) : (
+            <>
+              <TextInput placeholder="שם" value={authForm.name} onChangeText={v => setAuthForm({ ...authForm, name: v })} textAlign="right" style={{ borderWidth: 2, borderColor: '#fed7aa', borderRadius: 10, padding: 12, fontSize: 15 }} />
+              <TextInput placeholder="טלפון (ישמש כשם משתמש)" value={authForm.phone} onChangeText={v => setAuthForm({ ...authForm, phone: v })} textAlign="right" style={{ borderWidth: 2, borderColor: '#fed7aa', borderRadius: 10, padding: 12, fontSize: 15 }} />
+              <TextInput secureTextEntry placeholder={authForm.id ? 'סיסמה חדשה (השאר ריק – לשמירת הישנה)' : 'סיסמה'} value={authForm.password} onChangeText={v => setAuthForm({ ...authForm, password: v })} textAlign="right" style={{ borderWidth: 2, borderColor: '#fed7aa', borderRadius: 10, padding: 12, fontSize: 15 }} />
+            </>
+          )}
+          {authPinUnlocked && (
+            <View style={{ flexDirection: 'row-reverse', gap: 8 }}>
+              <TouchableOpacity onPress={saveUser} style={{ flex: 1, backgroundColor: '#f59e0b', paddingVertical: 12, borderRadius: 10, alignItems: 'center' }}>
+                <Text style={{ color: '#fff', fontWeight: '900', fontSize: 15 }}>{authForm.id ? '💾 עדכן' : '➕ הוסף'}</Text>
+              </TouchableOpacity>
+              {authForm.id && (
+                <TouchableOpacity onPress={() => setAuthForm({ id: '', name: '', phone: '', password: '', role: 'viewer' })} style={{ backgroundColor: '#475569', paddingHorizontal: 20, paddingVertical: 12, borderRadius: 10, alignItems: 'center' }}>
+                  <Text style={{ color: '#fff', fontWeight: '900', fontSize: 15 }}>ביטול</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          )}
+        </View>
+
+        {/* Users list */}
+        <View style={{ gap: 10 }}>
+          <Text style={{ fontSize: 17, fontWeight: '900', color: '#1C2B35', writingDirection: 'rtl' }}>👥 משתמשים מורשים · {adminAuth.users.length}</Text>
+          {adminAuth.users.length === 0 ? (
+            <View style={{ backgroundColor: '#f8fafc', padding: 24, borderRadius: 12, alignItems: 'center' }}>
+              <Text style={{ color: '#64748b', fontWeight: '700', writingDirection: 'rtl' }}>אין משתמשים נוספים</Text>
+            </View>
+          ) : adminAuth.users.map(u => (
+            <View key={u.id} style={{ backgroundColor: '#fff', borderWidth: 2, borderColor: '#e2e8f0', borderRadius: 12, padding: 14, flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: 16, fontWeight: '900', color: '#0f172a', writingDirection: 'rtl' }}>{u.name}</Text>
+                <Text style={{ fontSize: 14, color: '#475569', fontWeight: '700' }}>{u.phone}</Text>
+                <Text style={{ fontSize: 13, fontWeight: '900', color: roleColor(u.role), writingDirection: 'rtl', marginTop: 4 }}>{roleLabel(u.role)}</Text>
+              </View>
+              <View style={{ flexDirection: 'row-reverse', gap: 8 }}>
+                <TouchableOpacity onPress={() => setAuthForm({ id: u.id, name: u.name, phone: u.phone, password: '', role: u.role })} style={{ backgroundColor: '#2563eb', paddingHorizontal: 14, paddingVertical: 9, borderRadius: 8 }}>
+                  <Text style={{ color: '#fff', fontSize: 13, fontWeight: '900' }}>✏️</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => delUser(u.id)} style={{ backgroundColor: '#dc2626', paddingHorizontal: 14, paddingVertical: 9, borderRadius: 8 }}>
+                  <Text style={{ color: '#fff', fontSize: 13, fontWeight: '900' }}>🗑️</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          ))}
+        </View>
+      </View>
+    );
+  };
+
+  const renderPopups = () => {
+    const targetOptions = [
+      { val: 'home', label: 'דף הבית' },
+      { val: 'welcome', label: 'ברוכים הבאים' },
+      { val: 'info', label: 'פורטל מידע' },
+      { val: 'map', label: 'מפה' },
+      { val: 'category:1', label: 'קטגוריה: אירוח' },
+      { val: 'category:2', label: 'קטגוריה: אטרקציות' },
+      { val: 'category:3', label: 'קטגוריה: סיורים קוליים' },
+      { val: 'category:5', label: 'קטגוריה: תחבורה' },
+      { val: 'category:6', label: 'קטגוריה: מסעדות' },
+      { val: 'category:casino', label: 'קטגוריה: קזינו' },
+      { val: 'all', label: 'כל העמודים' },
+    ];
+    const genId = () => `pop_${Date.now()}_${Math.floor(Math.random()*1000)}`;
+    const resetForm = () => { setPopupForm({ id: '', title: '', message: '', target: 'home', position: 'center', visible: true, startAt: '', endAt: '', bgColor: '#ffffff', redeemCode: '' }); setPopupEditing(false); };
+    const startEdit = (p: typeof popups[number]) => { setPopupForm({ id: p.id, title: p.title, message: p.message, target: p.target, position: p.position, visible: p.visible, startAt: p.startAt || '', endAt: p.endAt || '', bgColor: (p as any).bgColor || '#ffffff', redeemCode: (p as any).redeemCode || '' }); setPopupEditing(true); };
+    const BG_PALETTE = ['#1C2B35','#2D4A5E','#1A6B8A','#3DA5C4','#7ECFC0','#5BC0DE','#0ea5e9','#3b82f6','#6366f1','#8b5cf6','#a855f7','#ec4899','#ef4444','#f97316','#F4A94E','#eab308','#84cc16','#22c55e','#10b981','#14b8a6','#06b6d4','#0f172a','#1e293b','#334155','#475569','#64748b','#94a3b8','#cbd5e1','#e2e8f0','#ffffff','#fef3c7','#fdba74'];
+    const saveForm = () => {
+      if (!popupForm.title.trim() || !popupForm.message.trim()) { if (typeof window !== 'undefined') (window as any).alert('חסרה כותרת או הודעה'); return; }
+      const payload = { ...popupForm, id: popupForm.id || genId() };
+      const arr = popupForm.id ? popups.map(p => p.id === payload.id ? payload : p) : [payload, ...popups];
+      savePopups(arr);
+      resetForm();
+    };
+    const removePopup = (id: string) => {
+      if (typeof window !== 'undefined' && !(window as any).confirm('למחוק פופ-אפ?')) return;
+      savePopups(popups.filter(p => p.id !== id));
+    };
+    const toggleVisible = (id: string) => {
+      savePopups(popups.map(p => p.id === id ? { ...p, visible: !p.visible } : p));
+    };
+    const targetLabel = (v: string) => targetOptions.find(o => o.val === v)?.label || v;
+    const positionLabel = (v: string) => ({ top: 'למעלה', center: 'מרכז', bottom: 'למטה' } as any)[v] || v;
+    const fld = { padding: 12, border: '2px solid #c4b5fd', borderRadius: 10, fontSize: 15, fontWeight: 500, direction: 'rtl' as const, textAlign: 'right' as const, background: '#fff', width: '100%' as const, boxSizing: 'border-box' as const, fontFamily: 'inherit' };
+    return (
+      <View style={{ gap: 18 }}>
+        <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Text style={{ fontSize: 22, fontWeight: '900', color: '#581c87', writingDirection: 'rtl' }}>
+            💬 פופ-אפים · {popups.length}
+          </Text>
+          {popupEditing && (
+            <TouchableOpacity onPress={resetForm} style={{ backgroundColor: '#475569', paddingHorizontal: 18, paddingVertical: 10, borderRadius: 10 }}>
+              <Text style={{ color: '#fff', fontWeight: '900', fontSize: 15 }}>✕ ביטול</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+
+        {/* Create/Edit form */}
+        <View style={{ backgroundColor: '#f3e8ff', borderWidth: 2, borderColor: '#a855f7', borderRadius: 14, padding: 18, gap: 14 }}>
+          <Text style={{ fontSize: 17, fontWeight: '900', color: '#6b21a8', writingDirection: 'rtl' }}>{popupEditing ? '✏️ עריכת פופ-אפ' : '➕ פופ-אפ חדש'}</Text>
+          {Platform.OS === 'web' ? (
+            <>
+              {React.createElement('input', { placeholder: 'כותרת', value: popupForm.title, onChange: (e: any) => setPopupForm({ ...popupForm, title: e.target.value }), style: fld })}
+              {React.createElement('textarea', { placeholder: 'תוכן ההודעה', value: popupForm.message, onChange: (e: any) => setPopupForm({ ...popupForm, message: e.target.value }), rows: 3, style: { ...fld, resize: 'vertical' } })}
+              <View style={{ flexDirection: 'row-reverse', gap: 10 }}>
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontSize: 14, color: '#6b21a8', fontWeight: '900', writingDirection: 'rtl', marginBottom: 6 }}>עמוד יעד</Text>
+                  {React.createElement('select', { value: popupForm.target, onChange: (e: any) => setPopupForm({ ...popupForm, target: e.target.value }), style: fld }, targetOptions.map(o => React.createElement('option', { key: o.val, value: o.val }, o.label)))}
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontSize: 14, color: '#6b21a8', fontWeight: '900', writingDirection: 'rtl', marginBottom: 6 }}>מיקום</Text>
+                  {React.createElement('select', { value: popupForm.position, onChange: (e: any) => setPopupForm({ ...popupForm, position: e.target.value as any }), style: fld }, [
+                    React.createElement('option', { key: 'top', value: 'top' }, 'למעלה'),
+                    React.createElement('option', { key: 'center', value: 'center' }, 'מרכז'),
+                    React.createElement('option', { key: 'bottom', value: 'bottom' }, 'למטה'),
+                  ])}
+                </View>
+              </View>
+              <View style={{ flexDirection: 'row-reverse', gap: 10 }}>
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontSize: 14, color: '#6b21a8', fontWeight: '900', writingDirection: 'rtl', marginBottom: 6 }}>תחילה (לא חובה)</Text>
+                  {React.createElement('input', { type: 'date', value: popupForm.startAt, onChange: (e: any) => setPopupForm({ ...popupForm, startAt: e.target.value }), style: fld })}
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontSize: 14, color: '#6b21a8', fontWeight: '900', writingDirection: 'rtl', marginBottom: 6 }}>סיום (לא חובה)</Text>
+                  {React.createElement('input', { type: 'date', value: popupForm.endAt, onChange: (e: any) => setPopupForm({ ...popupForm, endAt: e.target.value }), style: fld })}
+                </View>
+              </View>
+              <View>
+                <Text style={{ fontSize: 14, color: '#6b21a8', fontWeight: '900', writingDirection: 'rtl', marginBottom: 6 }}>קוד/ברקוד למימוש הטבה (לא חובה)</Text>
+                {React.createElement('input', { placeholder: 'לדוגמה: BATUMI25 או 1234567890', value: popupForm.redeemCode, onChange: (e: any) => setPopupForm({ ...popupForm, redeemCode: e.target.value }), style: { ...fld, letterSpacing: 2, fontWeight: 700 } })}
+              </View>
+              <View>
+                <Text style={{ fontSize: 14, color: '#6b21a8', fontWeight: '900', writingDirection: 'rtl', marginBottom: 6 }}>צבע רקע</Text>
+                <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 6 }}>
+                  {BG_PALETTE.map(c => {
+                    const on = popupForm.bgColor === c;
+                    return (
+                      <TouchableOpacity key={c} onPress={() => setPopupForm({ ...popupForm, bgColor: c })} style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: c, borderWidth: on ? 4 : 1, borderColor: on ? '#7e22ce' : '#cbd5e1' }} />
+                    );
+                  })}
+                </View>
+              </View>
+              <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 10 }}>
+                {React.createElement('input', { type: 'checkbox', checked: popupForm.visible, onChange: (e: any) => setPopupForm({ ...popupForm, visible: e.target.checked }), style: { width: 20, height: 20 } })}
+                <Text style={{ fontSize: 16, fontWeight: '900', color: '#6b21a8', writingDirection: 'rtl' }}>פעיל</Text>
+              </View>
+            </>
+          ) : (
+            <Text style={{ color: '#64748b', fontSize: 15 }}>עריכה זמינה רק ב-Web</Text>
+          )}
+          <TouchableOpacity onPress={saveForm} style={{ backgroundColor: '#7e22ce', paddingVertical: 14, borderRadius: 10, alignItems: 'center' }}>
+            <Text style={{ color: '#fff', fontWeight: '900', fontSize: 16 }}>{popupEditing ? '💾 עדכן' : '➕ הוסף'}</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* List */}
+        {popups.length === 0 ? (
+          <View style={{ backgroundColor: '#f8fafc', padding: 24, borderRadius: 12, alignItems: 'center' }}>
+            <Text style={{ fontSize: 40 }}>💬</Text>
+            <Text style={{ color: '#64748b', fontWeight: '700', marginTop: 8, writingDirection: 'rtl' }}>אין פופ-אפים פעילים</Text>
+          </View>
+        ) : (
+          popups.map(p => (
+            <View key={p.id} style={{ backgroundColor: '#fff', borderWidth: 2, borderColor: p.visible ? '#a855f7' : '#cbd5e1', borderRadius: 14, padding: 18 }}>
+              <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', marginBottom: 10 }}>
+                <Text style={{ fontSize: 19, fontWeight: '900', color: '#0f172a', writingDirection: 'rtl' }}>{p.title}</Text>
+                <Text style={{ fontSize: 14, color: p.visible ? '#15803d' : '#475569', fontWeight: '900' }}>{p.visible ? '● פעיל' : '○ כבוי'}</Text>
+              </View>
+              <Text style={{ fontSize: 16, color: '#1e293b', writingDirection: 'rtl', marginBottom: 10, lineHeight: 24, fontWeight: '500' }}>{p.message}</Text>
+              {!!(p as any).redeemCode && (
+                <View style={{ backgroundColor: '#fef3c7', borderWidth: 2, borderColor: '#f59e0b', borderRadius: 8, padding: 10, marginBottom: 10 }}>
+                  <Text style={{ fontSize: 13, fontWeight: '800', color: '#78350f', writingDirection: 'rtl', marginBottom: 2 }}>🎁 קוד מימוש:</Text>
+                  <Text selectable style={{ fontSize: 18, fontWeight: '900', color: '#b45309', letterSpacing: 2 }}>{(p as any).redeemCode}</Text>
+                </View>
+              )}
+              <Text style={{ fontSize: 14, color: '#334155', fontWeight: '700', writingDirection: 'rtl', marginBottom: 12 }}>📍 {targetLabel(p.target)} · {positionLabel(p.position)}{p.startAt ? ` · מ-${p.startAt}` : ''}{p.endAt ? ` · עד-${p.endAt}` : ''}</Text>
+              <View style={{ flexDirection: 'row-reverse', gap: 8, flexWrap: 'wrap' }}>
+                <TouchableOpacity onPress={() => setPopupPreview(p)} style={{ backgroundColor: '#a855f7', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 10 }}>
+                  <Text style={{ color: '#fff', fontSize: 15, fontWeight: '900' }}>👁️ הצג</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => toggleVisible(p.id)} style={{ backgroundColor: p.visible ? '#475569' : '#16a34a', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 10 }}>
+                  <Text style={{ color: '#fff', fontSize: 15, fontWeight: '900' }}>{p.visible ? '⏸️ כבה' : '▶️ הפעל'}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => startEdit(p)} style={{ backgroundColor: '#2563eb', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 10 }}>
+                  <Text style={{ color: '#fff', fontSize: 15, fontWeight: '900' }}>✏️ ערוך</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => removePopup(p.id)} style={{ backgroundColor: '#dc2626', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 10 }}>
+                  <Text style={{ color: '#fff', fontSize: 15, fontWeight: '900' }}>🗑️ מחק</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          ))
+        )}
+        {popupPreview && (() => {
+          const p = popupPreview;
+          const cardBg = p.bgColor || '#fff';
+          const hex = cardBg.replace('#','');
+          const r = parseInt(hex.slice(0,2) || 'ff', 16);
+          const g = parseInt(hex.slice(2,4) || 'ff', 16);
+          const b = parseInt(hex.slice(4,6) || 'ff', 16);
+          const isDark = (r * 299 + g * 587 + b * 114) / 1000 < 140;
+          const titleC = isDark ? '#ffffff' : '#1C2B35';
+          const msgC = isDark ? '#e2e8f0' : '#475569';
+          const sigC = isDark ? 'rgba(255,255,255,0.6)' : '#94a3b8';
+          const brandC = isDark ? '#F4A94E' : '#1A6B8A';
+          return (
+            <View style={{ position: Platform.OS === 'web' ? ('fixed' as any) : 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.6)', zIndex: 100000, alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+              <TouchableOpacity activeOpacity={1} onPress={() => setPopupPreview(null)} style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }} />
+              <View style={{ width: '100%', maxWidth: 420, backgroundColor: cardBg, borderRadius: 16, padding: 20, borderTopWidth: 4, borderTopColor: '#a855f7', shadowColor: '#000', shadowOpacity: 0.2, shadowRadius: 20, shadowOffset: { width: 0, height: 10 } }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 14, alignSelf: 'flex-start' }}>
+                  <Image source={isDark ? require('../../assets/images/batumi_icon_light.png') : require('../../assets/images/batumi_icon.png')} style={{ width: 36, height: 36 }} resizeMode="contain" />
+                  <Text style={{ fontSize: 16, fontWeight: '900', letterSpacing: 0.5, color: brandC }}>Batumionline</Text>
+                </View>
+                <TouchableOpacity onPress={() => setPopupPreview(null)} style={{ position: 'absolute', top: 10, right: 10, width: 28, height: 28, borderRadius: 14, backgroundColor: 'rgba(241,245,249,0.9)', alignItems: 'center', justifyContent: 'center', zIndex: 2 }}>
+                  <Text style={{ fontSize: 14, color: '#64748b', fontWeight: '900' }}>✕</Text>
+                </TouchableOpacity>
+                <Text style={{ fontSize: 18, fontWeight: '900', color: titleC, writingDirection: 'rtl', textAlign: 'right', marginBottom: 10 }}>{p.title}</Text>
+                <Text style={{ fontSize: 14, color: msgC, writingDirection: 'rtl', textAlign: 'right', lineHeight: 22 }}>{p.message}</Text>
+                {!!p.redeemCode && (
+                  <View style={{ marginTop: 16, padding: 14, borderRadius: 10, backgroundColor: '#fef3c7', borderWidth: 2, borderColor: '#f59e0b', alignItems: 'center' }}>
+                    <Text style={{ fontSize: 13, fontWeight: '800', color: '#78350f', writingDirection: 'rtl', marginBottom: 6 }}>🎁 קוד למימוש ההטבה</Text>
+                    <Text selectable style={{ fontSize: 22, fontWeight: '900', color: '#b45309', letterSpacing: 3 }}>{p.redeemCode}</Text>
+                  </View>
+                )}
+                <View style={{ marginTop: 14, paddingTop: 10, borderTopWidth: 1, borderTopColor: 'rgba(0,0,0,0.08)', alignItems: 'flex-start' }}>
+                  <Text style={{ fontSize: 12, fontWeight: '700', fontStyle: 'italic', color: sigC }}>— Batumionline.app</Text>
+                </View>
+              </View>
+            </View>
+          );
+        })()}
+      </View>
+    );
+  };
+
+  const renderRecommendations = () => {
+    return (
+      <View style={{ gap: 14 }}>
+        <Text style={{ fontSize: 22, fontWeight: '900', color: '#7c2d12', writingDirection: 'rtl' }}>⭐ המלצות גולשים</Text>
+        <View style={{ backgroundColor: '#fffbeb', borderWidth: 2, borderColor: '#fde68a', borderRadius: 14, padding: 18, gap: 10 }}>
+          <Text style={{ fontSize: 16, fontWeight: '900', color: '#78350f', writingDirection: 'rtl', textAlign: 'right' }}>🍢 המלצות לדוכני מזון</Text>
+          <Text style={{ fontSize: 12, color: '#92400e', writingDirection: 'rtl', textAlign: 'right' }}>המלצות חדשות מגולשים - ממתינות לאישור לפני שיופיעו באפליקציה.</Text>
+          <RecommendationsList />
+        </View>
+      </View>
+    );
+  };
+
+  const renderMessages = () => {
+    const fmt = (iso: string) => { try { return new Date(iso).toLocaleString('he-IL'); } catch { return iso; } };
+    const unread = contactMessages.filter(m => !m.read).length;
+    const activeMsgs = contactMessages.filter(m => !m.replied);
+    const repliedMsgs = contactMessages.filter(m => m.replied);
+    const totalPages = Math.max(1, Math.ceil(repliedMsgs.length / MESSAGES_PER_PAGE));
+    const currentPage = Math.min(messagesPage, totalPages);
+    const startIdx = (currentPage - 1) * MESSAGES_PER_PAGE;
+    const pagedReplied = repliedMsgs.slice(startIdx, startIdx + MESSAGES_PER_PAGE);
+    const visibleMsgs = [...activeMsgs, ...pagedReplied];
+    return (
+      <View style={{ gap: 18 }}>
+        <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Text style={{ fontSize: 22, fontWeight: '900', color: '#0c4a6e', writingDirection: 'rtl' }}>
+            📨 הודעות מהאתר · {contactMessages.length}{unread > 0 ? ` · ${unread} חדשות` : ''}
+          </Text>
+          <TouchableOpacity onPress={loadMessages} style={{ backgroundColor: '#0284c7', paddingHorizontal: 18, paddingVertical: 10, borderRadius: 10 }}>
+            <Text style={{ color: '#fff', fontWeight: '900', fontSize: 15 }}>🔄 רענן</Text>
+          </TouchableOpacity>
+        </View>
+        {contactMessages.length === 0 ? (
+          <View style={{ backgroundColor: '#f8fafc', padding: 24, borderRadius: 12, alignItems: 'center' }}>
+            <Text style={{ fontSize: 40 }}>📭</Text>
+            <Text style={{ color: '#64748b', fontWeight: '700', marginTop: 8, writingDirection: 'rtl' }}>אין הודעות כרגע</Text>
+          </View>
+        ) : (
+          visibleMsgs.map(m => {
+            const bg = m.replied ? '#dcfce7' : (!m.read ? '#dbeafe' : '#fff');
+            const border = m.replied ? '#22c55e' : (!m.read ? '#3b82f6' : '#cbd5e1');
+            const statusBadge = m.replied ? '✅ הושב' : (!m.read ? '🔵 חדש' : '👁️ נקרא');
+            const statusColor = m.replied ? '#15803d' : (!m.read ? '#1d4ed8' : '#475569');
+            return (
+              <View key={m.id} style={{ backgroundColor: bg, borderWidth: 2, borderColor: border, borderRadius: 14, padding: 18 }}>
+                <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                  <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 10 }}>
+                    <Text style={{ fontSize: 19, fontWeight: '900', color: '#0f172a', writingDirection: 'rtl' }}>{m.name}</Text>
+                    <Text style={{ fontSize: 13, fontWeight: '900', color: statusColor }}>{statusBadge}</Text>
+                  </View>
+                  <Text style={{ fontSize: 13, color: '#334155', fontWeight: '700' }}>{fmt(m.createdAt)}</Text>
+                </View>
+                {!!m.email && (
+                  <Text style={{ fontSize: 15, color: '#0369a1', fontWeight: '700', marginBottom: 10 }} selectable>{m.email}</Text>
+                )}
+                <Text style={{ fontSize: 16, color: '#0f172a', writingDirection: 'rtl', lineHeight: 24, marginBottom: 14, fontWeight: '500' }} selectable>{m.message}</Text>
+                {!!m.repliedAt && (
+                  <Text style={{ fontSize: 13, color: '#15803d', fontWeight: '800', writingDirection: 'rtl', marginBottom: 10 }}>הושב: {fmt(m.repliedAt)}</Text>
+                )}
+                {Platform.OS === 'web' ? (
+                  React.createElement('textarea', {
+                    value: m.replyNote || '',
+                    onChange: (e: any) => setReplyNote(m.id, e.target.value),
+                    placeholder: 'תיעוד פנימי (לא נשלח ללקוח)…',
+                    rows: 2,
+                    style: { width: '100%', padding: 10, border: '2px solid #94a3b8', borderRadius: 10, fontSize: 15, direction: 'rtl', textAlign: 'right', background: '#fff', resize: 'vertical', marginBottom: 12, fontWeight: 500, boxSizing: 'border-box', fontFamily: 'inherit' },
+                  })
+                ) : (
+                  <TextInput value={m.replyNote || ''} onChangeText={v => setReplyNote(m.id, v)} placeholder="תיעוד פנימי…" multiline numberOfLines={2} textAlign="right" style={{ borderWidth: 2, borderColor: '#94a3b8', borderRadius: 10, padding: 10, fontSize: 15, marginBottom: 12, backgroundColor: '#fff' }} />
+                )}
+                <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 8 }}>
+                  {!!m.email && (
+                    <TouchableOpacity onPress={() => { Linking.openURL(`mailto:${m.email}?subject=${encodeURIComponent('תשובה לפנייתך - Batumionline')}`); markReplied(m.id); }} style={{ backgroundColor: '#2563eb', paddingHorizontal: 18, paddingVertical: 11, borderRadius: 10 }}>
+                      <Text style={{ color: '#fff', fontSize: 15, fontWeight: '900' }}>✉️ השב</Text>
+                    </TouchableOpacity>
+                  )}
+                  {m.replied ? (
+                    <TouchableOpacity onPress={() => unmarkReplied(m.id)} style={{ backgroundColor: '#475569', paddingHorizontal: 18, paddingVertical: 11, borderRadius: 10 }}>
+                      <Text style={{ color: '#fff', fontSize: 15, fontWeight: '900' }}>↩️ לא הושב</Text>
+                    </TouchableOpacity>
+                  ) : (
+                    <TouchableOpacity onPress={() => markReplied(m.id)} style={{ backgroundColor: '#16a34a', paddingHorizontal: 18, paddingVertical: 11, borderRadius: 10 }}>
+                      <Text style={{ color: '#fff', fontSize: 15, fontWeight: '900' }}>✅ סמן הושב</Text>
+                    </TouchableOpacity>
+                  )}
+                  {!m.read && !m.replied && (
+                    <TouchableOpacity onPress={() => markMessageRead(m.id)} style={{ backgroundColor: '#059669', paddingHorizontal: 18, paddingVertical: 11, borderRadius: 10 }}>
+                      <Text style={{ color: '#fff', fontSize: 15, fontWeight: '900' }}>👁️ סמן נקרא</Text>
+                    </TouchableOpacity>
+                  )}
+                  <TouchableOpacity onPress={() => { if (typeof window !== 'undefined' && !(window as any).confirm('למחוק את ההודעה?')) return; deleteMessage(m.id); }} style={{ backgroundColor: '#dc2626', paddingHorizontal: 18, paddingVertical: 11, borderRadius: 10 }}>
+                    <Text style={{ color: '#fff', fontSize: 15, fontWeight: '900' }}>🗑️ מחק</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            );
+          })
+        )}
+        {repliedMsgs.length > MESSAGES_PER_PAGE && (
+          <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 12, marginTop: 6, backgroundColor: '#f8fafc', borderRadius: 10 }}>
+            <TouchableOpacity disabled={currentPage === 1} onPress={() => setMessagesPage(p => Math.max(1, p - 1))} style={{ backgroundColor: currentPage === 1 ? '#cbd5e1' : '#0284c7', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 8 }}>
+              <Text style={{ color: '#fff', fontWeight: '900', fontSize: 13 }}>› הקודם</Text>
+            </TouchableOpacity>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map(n => (
+              <TouchableOpacity key={n} onPress={() => setMessagesPage(n)} style={{ minWidth: 32, height: 32, borderRadius: 6, backgroundColor: n === currentPage ? '#0284c7' : '#fff', borderWidth: 1, borderColor: n === currentPage ? '#0284c7' : '#cbd5e1', alignItems: 'center', justifyContent: 'center', paddingHorizontal: 6 }}>
+                <Text style={{ fontSize: 13, fontWeight: '800', color: n === currentPage ? '#fff' : '#475569' }}>{n}</Text>
+              </TouchableOpacity>
+            ))}
+            <TouchableOpacity disabled={currentPage === totalPages} onPress={() => setMessagesPage(p => Math.min(totalPages, p + 1))} style={{ backgroundColor: currentPage === totalPages ? '#cbd5e1' : '#0284c7', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 8 }}>
+              <Text style={{ color: '#fff', fontWeight: '900', fontSize: 13 }}>הבא ‹</Text>
+            </TouchableOpacity>
+            <Text style={{ fontSize: 12, color: '#64748b', fontWeight: '700', marginRight: 8, writingDirection: 'rtl' }}>עמוד {currentPage} מתוך {totalPages} · {repliedMsgs.length} הודעות שהושבו</Text>
+          </View>
+        )}
+      </View>
+    );
+  };
+
+  const renderSubscribers = () => {
+    const fmtDate = (iso: string) => { try { return new Date(iso).toLocaleDateString('he-IL'); } catch { return iso; } };
+    const activeCount = subsList.filter(s => s.active !== false && new Date(s.expiresAt) > new Date()).length;
+    const expiredCount = subsList.length - activeCount;
+    return (
+      <View style={{ gap: 14 }}>
+        <View style={{ flexDirection: 'row-reverse', gap: 10 }}>
+          <View style={{ flex: 1, backgroundColor: '#ecfdf5', borderRadius: 12, padding: 14, alignItems: 'center' }}>
+            <Text style={{ fontSize: 11, color: '#047857', fontWeight: '700', writingDirection: 'rtl' }}>פעילים</Text>
+            <Text style={{ fontSize: 24, fontWeight: '900', color: '#10b981' }}>{activeCount}</Text>
+          </View>
+          <View style={{ flex: 1, backgroundColor: '#fef2f2', borderRadius: 12, padding: 14, alignItems: 'center' }}>
+            <Text style={{ fontSize: 11, color: '#b91c1c', fontWeight: '700', writingDirection: 'rtl' }}>פג תוקף</Text>
+            <Text style={{ fontSize: 24, fontWeight: '900', color: '#dc2626' }}>{expiredCount}</Text>
+          </View>
+          <View style={{ flex: 1, backgroundColor: '#f0f9ff', borderRadius: 12, padding: 14, alignItems: 'center' }}>
+            <Text style={{ fontSize: 11, color: '#0369a1', fontWeight: '700', writingDirection: 'rtl' }}>סה״כ</Text>
+            <Text style={{ fontSize: 24, fontWeight: '900', color: '#0ea5e9' }}>{subsList.length}</Text>
+          </View>
+        </View>
+
+        <View style={{ backgroundColor: '#fff', borderRadius: 14, padding: 14, borderWidth: 1, borderColor: '#e2e8f0' }}>
+          <Text style={{ fontSize: 14, fontWeight: '900', color: '#1C2B35', textAlign: 'right', writingDirection: 'rtl', marginBottom: 10 }}>➕ הוסף מנוי חדש</Text>
+          <View style={{ gap: 8 }}>
+            <TextInput style={{ borderWidth: 1, borderColor: '#cbd5e1', borderRadius: 10, padding: 10, fontSize: 14, textAlign: 'right' }} placeholder="טלפון (חובה)" value={subForm.phone} onChangeText={v => setSubForm(p => ({ ...p, phone: v }))} keyboardType="phone-pad" />
+            <TextInput style={{ borderWidth: 1, borderColor: '#cbd5e1', borderRadius: 10, padding: 10, fontSize: 14, textAlign: 'right' }} placeholder="שם" value={subForm.name} onChangeText={v => setSubForm(p => ({ ...p, name: v }))} />
+            <View style={{ flexDirection: 'row-reverse', gap: 8 }}>
+              {(['30d', 'year'] as const).map(pl => (
+                <TouchableOpacity key={pl} onPress={() => setSubForm(p => ({ ...p, plan: pl }))} style={{ flex: 1, padding: 10, borderRadius: 10, backgroundColor: subForm.plan === pl ? '#10b981' : '#f1f5f9', alignItems: 'center' }}>
+                  <Text style={{ fontSize: 13, fontWeight: '800', color: subForm.plan === pl ? '#fff' : '#475569' }}>{pl === '30d' ? '30 יום' : 'שנה'}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+            <TouchableOpacity onPress={addSub} style={{ padding: 12, borderRadius: 10, backgroundColor: '#10b981', alignItems: 'center', marginTop: 4 }}>
+              <Text style={{ fontSize: 14, fontWeight: '900', color: '#fff' }}>הוסף / חדש תוקף</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        <View style={{ backgroundColor: '#fff', borderRadius: 14, padding: 14, borderWidth: 1, borderColor: '#e2e8f0' }}>
+          <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+            <Text style={{ fontSize: 14, fontWeight: '900', color: '#1C2B35', writingDirection: 'rtl' }}>📋 רשימת מנויים</Text>
+            <TouchableOpacity onPress={loadSubs} style={{ paddingVertical: 4, paddingHorizontal: 10, borderRadius: 8, backgroundColor: '#f1f5f9' }}>
+              <Text style={{ fontSize: 11, fontWeight: '700', color: '#475569' }}>{subsLoading ? '...' : '↻ רענן'}</Text>
+            </TouchableOpacity>
+          </View>
+          {subsList.length === 0 ? (
+            <Text style={{ fontSize: 12, color: '#94a3b8', textAlign: 'center', padding: 20, writingDirection: 'rtl' }}>אין מנויים עדיין</Text>
+          ) : (
+            <View style={{ gap: 6 }}>
+              {subsList.map(s => {
+                const isActive = s.active !== false && new Date(s.expiresAt) > new Date();
+                return (
+                  <View key={s.phone} style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 10, padding: 10, borderRadius: 10, backgroundColor: isActive ? '#f0fdf4' : '#fef2f2' }}>
+                    <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: isActive ? '#10b981' : '#dc2626' }} />
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ fontSize: 13, fontWeight: '800', color: '#1C2B35', textAlign: 'right', writingDirection: 'rtl' }}>{s.name || '(ללא שם)'} · {s.phone}</Text>
+                      <Text style={{ fontSize: 11, color: '#64748b', textAlign: 'right', writingDirection: 'rtl' }}>{s.plan === 'year' ? 'שנתי' : '30 יום'} · תוקף: {fmtDate(s.expiresAt)}</Text>
+                    </View>
+                    <TouchableOpacity onPress={() => delSub(s.phone)} style={{ paddingVertical: 4, paddingHorizontal: 8, borderRadius: 6, backgroundColor: '#fee2e2' }}>
+                      <Text style={{ fontSize: 11, fontWeight: '800', color: '#dc2626' }}>✕</Text>
+                    </TouchableOpacity>
+                  </View>
+                );
+              })}
+            </View>
+          )}
+        </View>
+      </View>
+    );
+  };
+
+  const renderPaywall = () => {
+    const pw = paywallData;
+    const isFree = pw.mode === 'free';
+    return (
+      <View style={{ gap: 14 }}>
+        <View style={{ borderRadius: 16, overflow: 'hidden' }}>
+          <View style={{ backgroundColor: '#1C2B35', padding: 16, alignItems: 'center' }}>
+            <Text style={{ fontSize: 16, fontWeight: '900', color: '#F4A94E', marginBottom: 10 }}>🔒 שליטה בתוכן</Text>
+            <TouchableOpacity
+              onPress={() => savePaywall({ ...pw, mode: isFree ? 'premium' : 'free' })}
+              style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 10, backgroundColor: isFree ? 'rgba(16,185,129,0.2)' : 'rgba(244,169,78,0.2)', paddingVertical: 10, paddingHorizontal: 20, borderRadius: 14 }}
+            >
+              <View style={{ width: 50, height: 26, borderRadius: 13, backgroundColor: isFree ? '#10b981' : '#F4A94E', justifyContent: 'center', padding: 3 }}>
+                <View style={{ width: 20, height: 20, borderRadius: 10, backgroundColor: '#fff', alignSelf: isFree ? 'flex-start' : 'flex-end' }} />
+              </View>
+              <Text style={{ fontSize: 14, fontWeight: '900', color: isFree ? '#34d399' : '#F4A94E' }}>{isFree ? '🟢 מצב חינמי - הכל פתוח' : '🔒 מצב פרימיום - חלקי בתשלום'}</Text>
+            </TouchableOpacity>
+            <Text style={{ fontSize: 11, color: '#94a3b8', marginTop: 8, textAlign: 'center', writingDirection: 'rtl' }}>{isFree ? 'כל התוכן פתוח לכולם (מצב בדיקות)' : 'קטגוריות נעולות יציגו מסך שדרוג'}</Text>
+            {!isFree && (
+              <TouchableOpacity
+                onPress={() => savePaywall({ ...pw, trialEnabled: !pw.trialEnabled })}
+                style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 8, marginTop: 10, backgroundColor: pw.trialEnabled ? 'rgba(16,185,129,0.2)' : 'rgba(220,38,38,0.2)', paddingVertical: 8, paddingHorizontal: 16, borderRadius: 10 }}
+              >
+                <View style={{ width: 36, height: 20, borderRadius: 10, backgroundColor: pw.trialEnabled ? '#10b981' : '#dc2626', justifyContent: 'center', padding: 2 }}>
+                  <View style={{ width: 16, height: 16, borderRadius: 8, backgroundColor: '#fff', alignSelf: pw.trialEnabled ? 'flex-end' : 'flex-start' }} />
+                </View>
+                <Text style={{ fontSize: 12, fontWeight: '800', color: pw.trialEnabled ? '#34d399' : '#f87171' }}>{pw.trialEnabled ? '⏳ 24 שעות ניסיון: פעיל' : '⏳ 24 שעות ניסיון: כבוי - נעילה מיידית'}</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        </View>
+        {!isFree && (
+          <View style={{ borderRadius: 16, overflow: 'hidden', borderWidth: 2, borderColor: '#F4A94E' }}>
+            <View style={{ backgroundColor: '#F4A94E', paddingVertical: 8, paddingHorizontal: 16 }}>
+              <Text style={{ fontSize: 14, fontWeight: '900', color: '#fff', textAlign: 'right', writingDirection: 'rtl' }}>🔐 בחר קטגוריות נעולות</Text>
+            </View>
+            <View style={{ backgroundColor: '#fffbeb', padding: 12, gap: 12 }}>
+              {(() => {
+                const groups: Record<string, typeof pwCategories> = {};
+                pwCategories.forEach(cat => {
+                  const g = cat.parent === 'ראשיות' || cat.parent === 'נוספות' ? cat.title : cat.parent;
+                  if (!groups[g]) groups[g] = [];
+                  if (cat.parent !== 'ראשיות' && cat.parent !== 'נוספות') groups[g].push(cat);
+                });
+                const parentCats = pwCategories.filter(c => c.parent === 'ראשיות' || c.parent === 'נוספות');
+                const Toggle = ({ on, onPress, small }: { on: boolean; onPress: () => void; small?: boolean }) => (
+                  <TouchableOpacity onPress={onPress} activeOpacity={0.8}
+                    style={{ width: small ? 36 : 44, height: small ? 20 : 24, borderRadius: small ? 10 : 12, backgroundColor: on ? '#dc2626' : '#10b981', padding: 2, flexDirection: 'row', alignItems: 'center' }}>
+                    <View style={{ width: small ? 16 : 20, height: small ? 16 : 20, borderRadius: small ? 8 : 10, backgroundColor: '#fff', marginLeft: on ? (small ? 16 : 20) : 0 }} />
+                  </TouchableOpacity>
+                );
+                return parentCats.map(pc => {
+                  const children = groups[pc.title] || [];
+                  const pcLocked = pw.lockedCategories.includes(pc.id);
+                  const allChildIds = children.map(c => c.id);
+                  const toggleParent = () => {
+                    const idsToRemove = new Set([pc.id, ...allChildIds]);
+                    if (pcLocked) {
+                      savePaywall({ ...pw, lockedCategories: pw.lockedCategories.filter((id: string) => !idsToRemove.has(id)) });
+                    } else {
+                      const merged = Array.from(new Set([...pw.lockedCategories, pc.id, ...allChildIds]));
+                      savePaywall({ ...pw, lockedCategories: merged });
+                    }
+                  };
+                  return (
+                    <View key={pc.id} style={{ borderRadius: 12, overflow: 'hidden', borderWidth: 1, borderColor: '#e0e0e0' }}>
+                      <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 10, backgroundColor: pcLocked ? '#fef2f2' : '#f0fdf4', padding: 12 }}>
+                        <Text style={{ fontSize: 16 }}>{pcLocked ? '🔒' : '🔓'}</Text>
+                        <Text style={{ flex: 1, fontSize: 14, fontWeight: '900', color: '#1C2B35', writingDirection: 'rtl' }}>{pc.title}</Text>
+                        <Text style={{ fontSize: 10, fontWeight: '800', color: pcLocked ? '#dc2626' : '#16a34a' }}>{pcLocked ? 'נעול' : 'חינם'}</Text>
+                        <Toggle on={pcLocked} onPress={toggleParent} />
+                      </View>
+                      {children.length > 0 && (
+                        <View style={{ backgroundColor: '#fff', padding: 6, gap: 4 }}>
+                          {children.map(ch => {
+                            const chLocked = pw.lockedCategories.includes(ch.id);
+                            return (
+                              <View key={ch.id} style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 8, paddingVertical: 8, paddingHorizontal: 10, borderBottomWidth: 1, borderBottomColor: '#f5f5f5' }}>
+                                <Text style={{ fontSize: 14 }}>{chLocked ? '🔒' : '🔓'}</Text>
+                                <Text style={{ flex: 1, fontSize: 12, fontWeight: '700', color: '#555', writingDirection: 'rtl' }}>{ch.title}</Text>
+                                <Text style={{ fontSize: 9, fontWeight: '800', color: chLocked ? '#dc2626' : '#16a34a' }}>{chLocked ? 'נעול' : 'חינם'}</Text>
+                                <Toggle small on={chLocked} onPress={() => savePaywall({ ...pw, lockedCategories: chLocked ? pw.lockedCategories.filter((id: string) => id !== ch.id) : [...pw.lockedCategories, ch.id] })} />
+                              </View>
+                            );
+                          })}
+                        </View>
+                      )}
+                    </View>
+                  );
+                });
+              })()}
+            </View>
+          </View>
+        )}
+      </View>
+    );
+  };
+
+  const renderSubscription = () => {
+    const activeColor = tabColors[subTab] || '#1A6B8A';
+    return (
+      <View style={{ padding: 16 }}>
+        {/* Header */}
+        <View style={{ borderRadius: 16, overflow: 'hidden', marginBottom: 14 }}>
+          <View style={{ backgroundColor: '#1C2B35', padding: 16 }}>
+            <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Text style={{ fontSize: 20, fontWeight: '900', color: '#F4A94E', writingDirection: 'rtl' }}>💳 ניהול מנויים</Text>
+              <TouchableOpacity
+                onPress={() => setDemoMode(!demoMode)}
+                style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 6, paddingVertical: 6, paddingHorizontal: 14, borderRadius: 20, backgroundColor: demoMode ? 'rgba(245,158,11,0.2)' : 'rgba(16,185,129,0.2)' }}
+              >
+                <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: demoMode ? '#f59e0b' : '#10b981' }} />
+                <Text style={{ fontSize: 11, fontWeight: '800', color: demoMode ? '#fbbf24' : '#34d399' }}>{demoMode ? 'מצב דמו' : 'נתוני אמת'}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+        {/* Tabs */}
+        {Platform.OS === 'web' ? (
+          React.createElement('div', {
+            style: { display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 8, marginBottom: 16 },
+          }, subTabOrder.map((t, i) => {
+            const on = subTab === t.key;
+            const unread = t.key === 'messages' ? contactMessages.filter(m => !m.read).length : t.key === 'recommendations' ? pendingRecsCount : t.key === 'photos' ? pendingPhotosCount : t.key === 'ratings' ? newRatingsCount : 0;
+            const accent = tabColors[t.key] || '#64748b';
+            return React.createElement('div', {
+              key: t.key,
+              draggable: true,
+              onClick: () => setSubTab(t.key),
+              onDragStart: (e: any) => { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', String(i)); },
+              onDragOver: (e: any) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; setDragTabIdx(i); },
+              onDragLeave: () => setDragTabIdx(-1),
+              onDrop: (e: any) => { e.preventDefault(); setDragTabIdx(-1); const from = parseInt(e.dataTransfer.getData('text/plain'), 10); if (!isNaN(from) && from !== i) { const arr = [...subTabOrder]; const [moved] = arr.splice(from, 1); arr.splice(i, 0, moved); setSubTabOrder(arr); } },
+              onDragEnd: () => setDragTabIdx(-1),
+              style: {
+                position: 'relative',
+                padding: '8px 6px', borderRadius: 10, cursor: 'grab', userSelect: 'none',
+                backgroundColor: on ? accent : '#fff',
+                border: `1px solid ${on ? accent : '#e2e8f0'}`,
+                boxShadow: on ? `0 2px 8px ${accent}40` : '0 1px 2px rgba(0,0,0,0.04)',
+                borderTopWidth: dragTabIdx === i ? '3px' : '1px',
+                borderTopColor: dragTabIdx === i ? Colors.PRIMARY : (on ? accent : '#e2e8f0'),
+                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4,
+                minHeight: 56,
+                transition: 'all 0.15s ease',
+                fontFamily: 'Arial, sans-serif',
+              },
+            }, [
+              React.createElement('span', { key: 'icon', style: { fontSize: 32, lineHeight: '1' } }, t.icon),
+              React.createElement('span', { key: 'txt', style: { fontSize: 15, fontWeight: 900, color: on ? '#fff' : '#1C2B35', textAlign: 'center', direction: 'rtl' } }, t.label),
+              React.createElement('span', {
+                key: 'badge',
+                style: {
+                  position: 'absolute', top: -8, left: -8,
+                  minWidth: 22, height: 22, borderRadius: 11,
+                  backgroundColor: '#dc2626', color: '#fff',
+                  fontSize: 12, fontWeight: 900,
+                  display: unread > 0 ? 'flex' : 'none',
+                  alignItems: 'center', justifyContent: 'center',
+                  padding: '0 6px',
+                  boxShadow: '0 2px 6px rgba(220,38,38,0.5), 0 0 0 3px #fff',
+                },
+              }, unread > 99 ? '99+' : String(unread)),
+            ]);
+          }))
+        ) : (
+          <View style={{ flexDirection: 'row-reverse', gap: 8, marginBottom: 20, flexWrap: 'wrap' }}>
+            {subTabOrder.map(t => {
+              const on = subTab === t.key;
+              const unread = t.key === 'messages' ? contactMessages.filter(m => !m.read).length : t.key === 'recommendations' ? pendingRecsCount : t.key === 'photos' ? pendingPhotosCount : t.key === 'ratings' ? newRatingsCount : 0;
+              const accent = tabColors[t.key] || '#64748b';
+              return (
+                <TouchableOpacity key={t.key} onPress={() => setSubTab(t.key)} style={{ minWidth: 120, paddingVertical: 8, paddingHorizontal: 10, borderRadius: 10, backgroundColor: on ? accent : '#fff', borderWidth: 1, borderColor: on ? accent : '#e2e8f0', alignItems: 'center', gap: 3 }}>
+                  <Text style={{ fontSize: 26 }}>{t.icon}</Text>
+                  <Text style={{ fontSize: 13, fontWeight: '900', color: on ? '#fff' : '#1C2B35' }}>{t.label}{unread > 0 ? ` · ${unread}` : ''}</Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        )}
+        {subTab === 'subscribers' ? renderSubscribers()
+          : subTab === 'messages' ? renderMessages()
+          : subTab === 'popup' ? renderPopups()
+          : subTab === 'auth' ? renderAuth()
+          : subTab === 'banner' ? renderSubBanner()
+          : subTab === 'dashboard' ? renderSubDashboard()
+          : subTab === 'crm' ? renderSubCrm()
+          : subTab === 'paywall' ? renderPaywall()
+          : subTab === 'marketing' ? renderSubMarketing()
+          : subTab === 'accounting' ? renderSubAccounting()
+          : subTab === 'recommendations' ? renderRecommendations()
+          : renderSubCancels()}
+      </View>
+    );
+  };
+
+  const demoStats = {
+    totalDownloads: 1247,
+    activeUsers: 389,
+    totalPurchases: 156,
+    dailyRevenue: 384,
+    monthlyRevenue: 8920,
+    yearlyRevenue: 67400,
+    iosUsers: 98,
+    androidUsers: 58,
+    recentUsers: [
+      { name: 'ישראל כ.', city: 'תל אביב', date: '18/04', plan: 'שנתי', status: 'פעיל', device: 'iOS' },
+      { name: 'מיכל ד.', city: 'חיפה', date: '17/04', plan: '30 ימים', status: 'פעיל', device: 'Android' },
+      { name: 'אבי ר.', city: 'ירושלים', date: '16/04', plan: 'שנתי', status: 'פעיל', device: 'iOS' },
+      { name: 'דנה ל.', city: 'רעננה', date: '15/04', plan: '30 ימים', status: 'פג', device: 'Android' },
+      { name: 'יוסי מ.', city: 'באר שבע', date: '14/04', plan: 'שנתי', status: 'פעיל', device: 'iOS' },
+    ],
+    mapPoints: [
+      { city: 'תל אביב', count: 52, pct: 33 },
+      { city: 'ירושלים', count: 31, pct: 20 },
+      { city: 'חיפה', count: 24, pct: 15 },
+      { city: 'רעננה', count: 18, pct: 12 },
+      { city: 'באר שבע', count: 12, pct: 8 },
+      { city: 'נתניה', count: 10, pct: 6 },
+      { city: 'אחר', count: 9, pct: 6 },
+    ],
+  };
+
+  const StatCard = ({ icon, label, value, color }: { icon: string; label: string; value: string; color: string }) => (
+    <View style={{ flex: 1, backgroundColor: '#fff', borderRadius: 14, padding: 14, borderRightWidth: 4, borderRightColor: color, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 }}>
+      <Text style={{ fontSize: 22, marginBottom: 4 }}>{icon}</Text>
+      <Text style={{ fontSize: 22, fontWeight: '900', color: Colors.TEXT }}>{value}</Text>
+      <Text style={{ fontSize: 11, color: '#888', fontWeight: '600', writingDirection: 'rtl' }}>{label}</Text>
+    </View>
+  );
+
+  const renderSubDashboard = () => {
+    if (!demoMode) return (
+      <View style={{ backgroundColor: '#f8fafc', borderRadius: 14, padding: 30, alignItems: 'center' }}>
+        <Text style={{ fontSize: 40, marginBottom: 10 }}>📡</Text>
+        <Text style={{ fontSize: 16, fontWeight: '800', color: Colors.TEXT, textAlign: 'center', writingDirection: 'rtl' }}>ממתין לחיבור מערכת תשלומים</Text>
+        <Text style={{ fontSize: 12, color: '#888', textAlign: 'center', writingDirection: 'rtl', marginTop: 6 }}>נתוני אמת יופיעו כאן לאחר חיבור RevenueCat / Stripe</Text>
+      </View>
+    );
+    return (
+    <View style={{ gap: 14 }}>
+      {/* Live indicator */}
+      <View style={{ borderRadius: 16, overflow: 'hidden' }}>
+        <View style={{ backgroundColor: '#1C2B35', padding: 16 }}>
+          <Text style={{ fontSize: 14, fontWeight: '900', color: '#F4A94E', textAlign: 'center', marginBottom: 12 }}>📊 סקירה כללית</Text>
+          <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-around' }}>
+            <View style={{ alignItems: 'center' }}>
+              <Text style={{ fontSize: 28, fontWeight: '900', color: '#fff' }}>{demoStats.totalDownloads.toLocaleString()}</Text>
+              <Text style={{ fontSize: 10, color: '#94a3b8' }}>📥 הורדות</Text>
+            </View>
+            <View style={{ width: 1, backgroundColor: '#334155' }} />
+            <View style={{ alignItems: 'center' }}>
+              <Text style={{ fontSize: 28, fontWeight: '900', color: '#10b981' }}>{demoStats.activeUsers}</Text>
+              <Text style={{ fontSize: 10, color: '#94a3b8' }}>👥 פעילים</Text>
+            </View>
+            <View style={{ width: 1, backgroundColor: '#334155' }} />
+            <View style={{ alignItems: 'center' }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: '#22c55e' }} />
+                <Text style={{ fontSize: 28, fontWeight: '900', color: '#22c55e' }}>14</Text>
+              </View>
+              <Text style={{ fontSize: 10, color: '#94a3b8' }}>🟢 אונליין</Text>
+            </View>
+            <View style={{ width: 1, backgroundColor: '#334155' }} />
+            <View style={{ alignItems: 'center' }}>
+              <Text style={{ fontSize: 28, fontWeight: '900', color: '#F4A94E' }}>{demoStats.totalPurchases}</Text>
+              <Text style={{ fontSize: 10, color: '#94a3b8' }}>💰 רכישות</Text>
+            </View>
+          </View>
+        </View>
+      </View>
+
+      {/* Platform split */}
+      <View style={{ flexDirection: 'row-reverse', gap: 10 }}>
+        <View style={{ flex: 1, borderRadius: 14, overflow: 'hidden', borderWidth: 2, borderColor: '#007AFF' }}>
+          <View style={{ backgroundColor: '#007AFF', paddingVertical: 6, alignItems: 'center' }}>
+            <Text style={{ fontSize: 11, fontWeight: '800', color: '#fff' }}>🍎 iOS</Text>
+          </View>
+          <View style={{ backgroundColor: '#eff6ff', padding: 12, alignItems: 'center' }}>
+            <Text style={{ fontSize: 24, fontWeight: '900', color: '#007AFF' }}>{demoStats.iosUsers}</Text>
+            <Text style={{ fontSize: 10, color: '#888' }}>משתמשים</Text>
+          </View>
+        </View>
+        <View style={{ flex: 1, borderRadius: 14, overflow: 'hidden', borderWidth: 2, borderColor: '#3DDC84' }}>
+          <View style={{ backgroundColor: '#3DDC84', paddingVertical: 6, alignItems: 'center' }}>
+            <Text style={{ fontSize: 11, fontWeight: '800', color: '#fff' }}>🤖 Android</Text>
+          </View>
+          <View style={{ backgroundColor: '#f0fdf4', padding: 12, alignItems: 'center' }}>
+            <Text style={{ fontSize: 24, fontWeight: '900', color: '#16a34a' }}>{demoStats.androidUsers}</Text>
+            <Text style={{ fontSize: 10, color: '#888' }}>משתמשים</Text>
+          </View>
+        </View>
+      </View>
+
+      {/* Revenue */}
+      <View style={{ borderRadius: 16, overflow: 'hidden', borderWidth: 2, borderColor: '#10b981' }}>
+        <View style={{ backgroundColor: '#10b981', paddingVertical: 8, paddingHorizontal: 16 }}>
+          <Text style={{ fontSize: 14, fontWeight: '900', color: '#fff', textAlign: 'right', writingDirection: 'rtl' }}>💰 הכנסות</Text>
+        </View>
+        <View style={{ backgroundColor: '#f0fdf4', padding: 12 }}>
+          <View style={{ flexDirection: 'row-reverse', gap: 8 }}>
+            <View style={{ flex: 1, backgroundColor: '#fff', borderRadius: 12, padding: 14, alignItems: 'center', borderRightWidth: 4, borderRightColor: '#10b981' }}>
+              <Text style={{ fontSize: 9, color: '#888', fontWeight: '700' }}>יומי</Text>
+              <Text style={{ fontSize: 22, fontWeight: '900', color: '#10b981' }}>₪{demoStats.dailyRevenue}</Text>
+            </View>
+            <View style={{ flex: 1, backgroundColor: '#fff', borderRadius: 12, padding: 14, alignItems: 'center', borderRightWidth: 4, borderRightColor: '#3b82f6' }}>
+              <Text style={{ fontSize: 9, color: '#888', fontWeight: '700' }}>חודשי</Text>
+              <Text style={{ fontSize: 22, fontWeight: '900', color: '#3b82f6' }}>₪{demoStats.monthlyRevenue.toLocaleString()}</Text>
+            </View>
+            <View style={{ flex: 1, backgroundColor: '#fff', borderRadius: 12, padding: 14, alignItems: 'center', borderRightWidth: 4, borderRightColor: '#f59e0b' }}>
+              <Text style={{ fontSize: 9, color: '#888', fontWeight: '700' }}>שנתי</Text>
+              <Text style={{ fontSize: 22, fontWeight: '900', color: '#f59e0b' }}>₪{demoStats.yearlyRevenue.toLocaleString()}</Text>
+            </View>
+          </View>
+        </View>
+      </View>
+
+      {/* City breakdown */}
+      <View style={{ borderRadius: 16, overflow: 'hidden', borderWidth: 2, borderColor: '#3DA5C4' }}>
+        <View style={{ backgroundColor: '#3DA5C4', paddingVertical: 8, paddingHorizontal: 16 }}>
+          <Text style={{ fontSize: 14, fontWeight: '900', color: '#fff', textAlign: 'right', writingDirection: 'rtl' }}>🗺️ התפלגות לפי עיר</Text>
+        </View>
+        <View style={{ backgroundColor: '#f0f9ff', padding: 12 }}>
+        {demoStats.mapPoints.map((p, i) => (
+          <View key={i} style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 8, marginBottom: 8, backgroundColor: '#fff', borderRadius: 10, padding: 8 }}>
+            <Text style={{ fontSize: 12, fontWeight: '700', color: Colors.TEXT, width: 65, textAlign: 'right', writingDirection: 'rtl' }}>{p.city}</Text>
+            <View style={{ flex: 1, height: 20, backgroundColor: '#e2e8f0', borderRadius: 10, overflow: 'hidden' }}>
+              <View style={{ width: `${p.pct}%`, height: '100%', backgroundColor: i === 0 ? '#1A6B8A' : i === 1 ? '#3DA5C4' : i === 2 ? '#F4A94E' : '#94a3b8', borderRadius: 10 } as any} />
+            </View>
+            <Text style={{ fontSize: 12, color: '#1C2B35', fontWeight: '800', width: 30, textAlign: 'center' }}>{p.count}</Text>
+          </View>
+        ))}
+        </View>
+      </View>
+
+      {/* Recent users */}
+      <View style={{ borderRadius: 16, overflow: 'hidden', borderWidth: 2, borderColor: '#8b5cf6' }}>
+        <View style={{ backgroundColor: '#8b5cf6', paddingVertical: 8, paddingHorizontal: 16 }}>
+          <Text style={{ fontSize: 14, fontWeight: '900', color: '#fff', textAlign: 'right', writingDirection: 'rtl' }}>👥 לקוחות אחרונים</Text>
+        </View>
+        <View style={{ backgroundColor: '#faf5ff', padding: 12 }}>
+        {demoStats.recentUsers.map((u, i) => (
+          <View key={i} style={{ flexDirection: 'row-reverse', alignItems: 'center', paddingVertical: 10, borderBottomWidth: i < demoStats.recentUsers.length - 1 ? 1 : 0, borderBottomColor: '#e9d5ff', gap: 10 }}>
+            <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: '#8b5cf6', alignItems: 'center', justifyContent: 'center' }}>
+              <Text style={{ fontSize: 16 }}>👤</Text>
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={{ fontSize: 13, fontWeight: '800', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl' }}>{u.name}</Text>
+              <Text style={{ fontSize: 11, color: '#888', textAlign: 'right', writingDirection: 'rtl' }}>{u.device === 'iOS' ? '🍎' : '🤖'} {u.city} · {u.date} · {u.plan}</Text>
+            </View>
+            <View style={{ paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8, backgroundColor: u.status === 'פעיל' ? '#dcfce7' : '#fee2e2' }}>
+              <Text style={{ fontSize: 10, fontWeight: '800', color: u.status === 'פעיל' ? '#16a34a' : '#dc2626' }}>{u.status}</Text>
+            </View>
+          </View>
+        ))}
+        </View>
+      </View>
+
+      <View style={{ backgroundColor: '#fffbeb', borderRadius: 10, padding: 12, borderWidth: 1, borderColor: '#fde68a' }}>
+        <Text style={{ fontSize: 11, color: '#92400e', textAlign: 'center', writingDirection: 'rtl', fontWeight: '600' }}>📊 נתוני דמו — יתעדכנו אוטומטית עם חיבור מערכת תשלומים</Text>
+      </View>
+    </View>
+  );
+  };
+
+  const demoCrmContacts = [
+    { name: 'ישראל כהן', email: 'israel@gmail.com', phone: '054-1234567', plan: 'שנתי', joined: '18/04/2026', lastActive: 'היום', score: 92 },
+    { name: 'מיכל דהן', email: 'michal@gmail.com', phone: '052-9876543', plan: '30 ימים', joined: '17/04/2026', lastActive: 'אתמול', score: 78 },
+    { name: 'אבי רוזן', email: 'avi@gmail.com', phone: '050-5551234', plan: 'שנתי', joined: '16/04/2026', lastActive: 'לפני 3 ימים', score: 65 },
+    { name: 'דנה לוי', email: 'dana@gmail.com', phone: '053-7778899', plan: '30 ימים', joined: '15/04/2026', lastActive: 'לפני שבוע', score: 34 },
+    { name: 'יוסי מזרחי', email: 'yossi@gmail.com', phone: '058-1112233', plan: 'שנתי', joined: '14/04/2026', lastActive: 'היום', score: 88 },
+  ];
+
+  const renderSubCrm = () => {
+    if (!demoMode) return (
+      <View style={{ backgroundColor: '#f8fafc', borderRadius: 14, padding: 30, alignItems: 'center' }}>
+        <Text style={{ fontSize: 40, marginBottom: 10 }}>📡</Text>
+        <Text style={{ fontSize: 16, fontWeight: '800', color: Colors.TEXT, textAlign: 'center', writingDirection: 'rtl' }}>ממתין לחיבור מערכת תשלומים</Text>
+        <Text style={{ fontSize: 12, color: '#888', textAlign: 'center', writingDirection: 'rtl', marginTop: 6 }}>נתוני אמת יופיעו כאן לאחר חיבור RevenueCat / Stripe</Text>
+      </View>
+    );
+    return (
+    <View style={{ gap: 14 }}>
+      <View style={{ flexDirection: 'row-reverse', gap: 10 }}>
+        <StatCard icon="👥" label="סה״כ לקוחות" value="156" color="#3DA5C4" />
+        <StatCard icon="🔥" label="פעילים השבוע" value="89" color="#10b981" />
+        <StatCard icon="⚠️" label="בסיכון נטישה" value="12" color="#f59e0b" />
+      </View>
+
+      <View style={{ backgroundColor: '#fff', borderRadius: 14, padding: 16, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 }}>
+        <Text style={{ fontSize: 15, fontWeight: '800', color: Colors.TEXT, textAlign: 'right', marginBottom: 12, writingDirection: 'rtl' }}>🤝 כרטיסי לקוחות</Text>
+        {demoCrmContacts.map((c, i) => (
+          <View key={i} style={{ backgroundColor: i % 2 === 0 ? '#fafafa' : '#e2e8f0', borderRadius: 12, padding: 12, marginBottom: 8 }}>
+            <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+              <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 8 }}>
+                <View style={{ width: 34, height: 34, borderRadius: 17, backgroundColor: '#e8f4f8', alignItems: 'center', justifyContent: 'center' }}>
+                  <Text style={{ fontSize: 14 }}>👤</Text>
+                </View>
+                <View>
+                  <Text style={{ fontSize: 13, fontWeight: '800', color: Colors.TEXT, writingDirection: 'rtl' }}>{c.name}</Text>
+                  <Text style={{ fontSize: 10, color: '#888' }}>{c.email}</Text>
+                </View>
+              </View>
+              <View style={{ alignItems: 'center' }}>
+                <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: c.score >= 80 ? '#dcfce7' : c.score >= 50 ? '#fef3c7' : '#fee2e2', alignItems: 'center', justifyContent: 'center' }}>
+                  <Text style={{ fontSize: 12, fontWeight: '900', color: c.score >= 80 ? '#16a34a' : c.score >= 50 ? '#92400e' : '#dc2626' }}>{c.score}</Text>
+                </View>
+                <Text style={{ fontSize: 8, color: '#888', marginTop: 1 }}>ציון</Text>
+              </View>
+            </View>
+            <View style={{ flexDirection: 'row-reverse', gap: 12, marginTop: 4 }}>
+              <Text style={{ fontSize: 10, color: '#888', writingDirection: 'rtl' }}>📱 {c.phone}</Text>
+              <Text style={{ fontSize: 10, color: '#888', writingDirection: 'rtl' }}>📦 {c.plan}</Text>
+              <Text style={{ fontSize: 10, color: '#888', writingDirection: 'rtl' }}>🕐 {c.lastActive}</Text>
+            </View>
+          </View>
+        ))}
+      </View>
+
+      <View style={{ backgroundColor: '#fffbeb', borderRadius: 10, padding: 12, borderWidth: 1, borderColor: '#fde68a' }}>
+        <Text style={{ fontSize: 11, color: '#92400e', textAlign: 'center', writingDirection: 'rtl', fontWeight: '600' }}>📊 נתוני דמו — יתעדכנו אוטומטית עם חיבור מערכת תשלומים</Text>
+      </View>
+    </View>
+  );
+  };
+
+  const demoCoupons = [
+    { code: 'BATUMI10', discount: '10%', uses: 23, maxUses: 50, expires: '30/05/2026', status: 'פעיל' },
+    { code: 'WELCOME', discount: '7 ימים חינם', uses: 45, maxUses: 100, expires: '31/12/2026', status: 'פעיל' },
+    { code: 'FRIEND25', discount: '25%', uses: 12, maxUses: 30, expires: '15/04/2026', status: 'פג' },
+  ];
+
+  const demoCampaigns = [
+    { name: 'שתף וקבל חודש חינם', shares: 67, conversions: 18, status: 'פעיל' },
+    { name: 'מבצע קיץ 2026', shares: 0, conversions: 0, status: 'טיוטה' },
+  ];
+
+  const demoPushHistory = [
+    { title: '🎧 סיור חדש: חוף הים', sent: 389, opened: 156, date: '17/04/2026' },
+    { title: '🔥 מבצע סוף שבוע!', sent: 412, opened: 203, date: '14/04/2026' },
+    { title: '📍 עדכון מפות חדש', sent: 350, opened: 128, date: '10/04/2026' },
+  ];
+
+  const renderSubMarketing = () => {
+    if (!demoMode) return (
+      <View style={{ backgroundColor: '#f8fafc', borderRadius: 14, padding: 30, alignItems: 'center' }}>
+        <Text style={{ fontSize: 40, marginBottom: 10 }}>📡</Text>
+        <Text style={{ fontSize: 16, fontWeight: '800', color: Colors.TEXT, textAlign: 'center', writingDirection: 'rtl' }}>ממתין לחיבור מערכת תשלומים</Text>
+        <Text style={{ fontSize: 12, color: '#888', textAlign: 'center', writingDirection: 'rtl', marginTop: 6 }}>כלי שיווק יהיו זמינים לאחר חיבור מערכת תשלומים והתראות</Text>
+      </View>
+    );
+    return (
+    <View style={{ gap: 16 }}>
+      <Text style={{ fontSize: 22, fontWeight: '900', color: '#1C2B35', textAlign: 'right', writingDirection: 'rtl' }}>📣 מרכז שיווק ופרסום</Text>
+      {false && (
+      <View>
+      {/* Campaigns */}
+      <View style={{ borderRadius: 16, overflow: 'hidden', borderWidth: 2, borderColor: '#10b981' }}>
+        <View style={{ backgroundColor: '#10b981', paddingVertical: 10, paddingHorizontal: 16, flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Text style={{ fontSize: 14, fontWeight: '900', color: '#fff' }}>🚀 קמפיינים</Text>
+          <TouchableOpacity style={{ paddingVertical: 5, paddingHorizontal: 14, borderRadius: 20, backgroundColor: '#fff' }}>
+            <Text style={{ fontSize: 11, fontWeight: '800', color: '#10b981' }}>+ צור קמפיין</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={{ backgroundColor: '#f0fdf4', padding: 12 }}>
+          {demoCampaigns.map((c, i) => (
+            <View key={i} style={{ backgroundColor: '#fff', borderRadius: 12, padding: 14, marginBottom: 8 }}>
+              <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                <Text style={{ fontSize: 14, fontWeight: '800', color: '#1C2B35', writingDirection: 'rtl' }}>{c.name}</Text>
+                <View style={{ paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12, backgroundColor: c.status === 'פעיל' ? '#10b981' : '#e2e8f0' }}>
+                  <Text style={{ fontSize: 11, fontWeight: '800', color: c.status === 'פעיל' ? '#fff' : '#64748b' }}>{c.status}</Text>
+                </View>
+              </View>
+              <View style={{ flexDirection: 'row-reverse', gap: 10 }}>
+                <View style={{ flex: 1, backgroundColor: '#eff6ff', borderRadius: 10, padding: 10, alignItems: 'center' }}>
+                  <Text style={{ fontSize: 22, fontWeight: '900', color: '#3b82f6' }}>{c.shares}</Text>
+                  <Text style={{ fontSize: 9, color: '#64748b', fontWeight: '700' }}>שיתופים</Text>
+                </View>
+                <View style={{ flex: 1, backgroundColor: '#f0fdf4', borderRadius: 10, padding: 10, alignItems: 'center' }}>
+                  <Text style={{ fontSize: 22, fontWeight: '900', color: '#10b981' }}>{c.conversions}</Text>
+                  <Text style={{ fontSize: 9, color: '#64748b', fontWeight: '700' }}>הרשמות</Text>
+                </View>
+                <View style={{ flex: 1, backgroundColor: '#fffbeb', borderRadius: 10, padding: 10, alignItems: 'center' }}>
+                  <Text style={{ fontSize: 22, fontWeight: '900', color: '#f59e0b' }}>{c.shares > 0 ? Math.round(c.conversions / c.shares * 100) : 0}%</Text>
+                  <Text style={{ fontSize: 9, color: '#64748b', fontWeight: '700' }}>המרה</Text>
+                </View>
+              </View>
+            </View>
+          ))}
+        </View>
+      </View>
+
+      {/* Audience Targeting */}
+      <View style={{ borderRadius: 16, overflow: 'hidden', borderWidth: 2, borderColor: '#3DA5C4' }}>
+        <View style={{ backgroundColor: '#3DA5C4', paddingVertical: 10, paddingHorizontal: 16 }}>
+          <Text style={{ fontSize: 14, fontWeight: '900', color: '#fff', textAlign: 'right', writingDirection: 'rtl' }}>🎯 קהלי יעד</Text>
+        </View>
+        <View style={{ backgroundColor: '#f0f9ff', padding: 12, gap: 8 }}>
+          {[
+            { label: 'כל המשתמשים', count: 156, color: '#3DA5C4' },
+            { label: 'מנויים שנתיים', count: 82, color: '#10b981' },
+            { label: 'מנויים חודשיים', count: 74, color: '#F4A94E' },
+            { label: 'לא רכשו עדיין', count: 233, color: '#6366f1' },
+            { label: 'מנוי פג תוקף', count: 18, color: '#dc2626' },
+          ].map((seg, i) => (
+            <View key={i} style={{ flexDirection: 'row-reverse', alignItems: 'center', backgroundColor: '#fff', borderRadius: 10, padding: 10, gap: 10 }}>
+              <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: seg.color }} />
+              <Text style={{ flex: 1, fontSize: 13, fontWeight: '700', color: '#1C2B35', textAlign: 'right', writingDirection: 'rtl' }}>{seg.label}</Text>
+              <Text style={{ fontSize: 14, fontWeight: '900', color: seg.color }}>{seg.count}</Text>
+              <TouchableOpacity style={{ paddingVertical: 4, paddingHorizontal: 10, borderRadius: 8, backgroundColor: seg.color }}>
+                <Text style={{ fontSize: 10, fontWeight: '800', color: '#fff' }}>שלח</Text>
+              </TouchableOpacity>
+            </View>
+          ))}
+        </View>
+      </View>
+      </View>
+      )}
+
+      {/* Push — real, sends to devices */}
+      {renderPush()}
+
+      {/* Client Banners — real, editable */}
+      {renderClientBanners()}
+
+      {/* Coupons — real, editable */}
+      {renderCoupons()}
+    </View>
+  );
+  };
+
+  const renderPush = () => {
+    const fld = { padding: 12, border: '2px solid #c7d2fe', borderRadius: 10, fontSize: 15, fontWeight: 500, direction: 'rtl' as const, textAlign: 'right' as const, background: '#fff', width: '100%' as const, boxSizing: 'border-box' as const, fontFamily: 'inherit' };
+    const send = async () => {
+      if (!pushForm.title.trim() || !pushForm.body.trim()) { (window as any).alert('חסר כותרת או טקסט'); return; }
+      setPushSending(true);
+      try {
+        const r = await fetch(`${API_BASE}/api/push/send`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title: pushForm.title.trim(), body: pushForm.body.trim(), data: pushForm.deepLink ? { url: pushForm.deepLink } : {} }),
+        });
+        const j = await r.json();
+        if (j.success) {
+          (window as any).alert(`✅ נשלח ל-${j.sent} מכשירים`);
+          setPushForm({ title: '', body: '', deepLink: '' });
+          loadPushStats();
+        } else (window as any).alert('שגיאה: ' + (j.error || 'לא ידוע'));
+      } catch (e: any) { (window as any).alert('שגיאת תקשורת'); }
+      setPushSending(false);
+    };
+    const fmt = (iso: string) => { try { return new Date(iso).toLocaleString('he-IL'); } catch { return iso; } };
+    return (
+      <View style={{ borderRadius: 16, overflow: 'hidden', borderWidth: 2, borderColor: '#6366f1' }}>
+        <View style={{ backgroundColor: '#6366f1', paddingVertical: 12, paddingHorizontal: 16, flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Text style={{ fontSize: 17, fontWeight: '900', color: '#fff', writingDirection: 'rtl' }}>🔔 התראות פוש · {pushStats.count} מכשירים רשומים</Text>
+          <TouchableOpacity onPress={loadPushStats} style={{ backgroundColor: '#fff', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8 }}>
+            <Text style={{ color: '#6366f1', fontSize: 13, fontWeight: '900' }}>🔄</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={{ backgroundColor: '#eef2ff', padding: 16, gap: 12 }}>
+          <View style={{ backgroundColor: '#fff', borderRadius: 12, padding: 16, gap: 10, borderWidth: 2, borderColor: '#c7d2fe' }}>
+            <Text style={{ fontSize: 16, fontWeight: '900', color: '#3730a3', writingDirection: 'rtl' }}>📤 שלח התראה חדשה</Text>
+            {Platform.OS === 'web' && (
+              <>
+                {React.createElement('input', { placeholder: 'כותרת', value: pushForm.title, onChange: (e: any) => setPushForm({ ...pushForm, title: e.target.value }), style: fld })}
+                {React.createElement('textarea', { placeholder: 'תוכן ההתראה', value: pushForm.body, onChange: (e: any) => setPushForm({ ...pushForm, body: e.target.value }), rows: 3, style: { ...fld, resize: 'vertical' } })}
+                {React.createElement('input', { placeholder: 'קישור פנימי (לא חובה, למשל /category/3)', value: pushForm.deepLink, onChange: (e: any) => setPushForm({ ...pushForm, deepLink: e.target.value }), style: fld })}
+              </>
+            )}
+            <TouchableOpacity onPress={send} disabled={pushSending || pushStats.count === 0} style={{ backgroundColor: pushStats.count === 0 ? '#94a3b8' : '#6366f1', paddingVertical: 14, borderRadius: 10, alignItems: 'center', opacity: pushSending ? 0.5 : 1 }}>
+              <Text style={{ color: '#fff', fontWeight: '900', fontSize: 16 }}>{pushSending ? '⏳ שולח…' : pushStats.count === 0 ? '📵 אין מכשירים רשומים עדיין' : '📤 שלח לכולם'}</Text>
+            </TouchableOpacity>
+            {pushStats.count === 0 && <Text style={{ fontSize: 12, color: '#475569', writingDirection: 'rtl' }}>⚠️ רישום אוטומטי יקרה כשמשתמשים יפתחו את האפליקציה (לאחר Build הבא)</Text>}
+          </View>
+          <View style={{ backgroundColor: '#fff', borderRadius: 12, padding: 14, gap: 8 }}>
+            <Text style={{ fontSize: 15, fontWeight: '900', color: '#1e293b', writingDirection: 'rtl' }}>📜 היסטוריית שליחה ({pushStats.history.length})</Text>
+            {pushStats.history.length === 0 ? (
+              <Text style={{ fontSize: 13, color: '#64748b', writingDirection: 'rtl', textAlign: 'center', paddingVertical: 14 }}>אין שליחות עדיין</Text>
+            ) : pushStats.history.slice().reverse().map(h => (
+              <View key={h.id} style={{ backgroundColor: '#f8fafc', padding: 10, borderRadius: 8, borderRightWidth: 3, borderRightColor: '#6366f1' }}>
+                <Text style={{ fontSize: 14, fontWeight: '900', color: '#1e293b', writingDirection: 'rtl' }}>{h.title}</Text>
+                <Text style={{ fontSize: 13, color: '#475569', writingDirection: 'rtl' }}>{h.body}</Text>
+                <Text style={{ fontSize: 11, color: '#64748b', fontWeight: '700', marginTop: 4 }}>{fmt(h.sentAt)} · {h.count} נמענים</Text>
+              </View>
+            ))}
+          </View>
+        </View>
+      </View>
+    );
+  };
+
+  const renderCoupons = () => {
+    const fld = { padding: 12, border: '2px solid #86efac', borderRadius: 10, fontSize: 15, fontWeight: 500, direction: 'rtl' as const, textAlign: 'right' as const, background: '#fff', width: '100%' as const, boxSizing: 'border-box' as const, fontFamily: 'inherit' };
+    const reset = () => setCouponForm({ id: '', code: '', label: '', type: 'percent', value: 10, maxUses: 0, usedCount: 0, startAt: '', endAt: '', visible: true });
+    const save = () => {
+      if (!couponForm.code.trim()) { (window as any).alert('חסר קוד קופון'); return; }
+      const id = couponForm.id || `cpn_${Date.now()}`;
+      const item = { ...couponForm, id, code: couponForm.code.trim().toUpperCase() };
+      const arr = couponForm.id ? coupons.map(c => c.id === id ? item : c) : [item, ...coupons];
+      saveCoupons(arr);
+      reset();
+    };
+    const del = (id: string) => { if ((window as any).confirm('למחוק קופון?')) saveCoupons(coupons.filter(c => c.id !== id)); };
+    const toggle = (id: string) => saveCoupons(coupons.map(c => c.id === id ? { ...c, visible: !c.visible } : c));
+    const resetUses = (id: string) => { if ((window as any).confirm('לאפס מונה שימושים?')) saveCoupons(coupons.map(c => c.id === id ? { ...c, usedCount: 0 } : c)); };
+    return (
+      <View style={{ borderRadius: 16, overflow: 'hidden', borderWidth: 2, borderColor: '#16a34a' }}>
+        <View style={{ backgroundColor: '#16a34a', paddingVertical: 12, paddingHorizontal: 16 }}>
+          <Text style={{ fontSize: 17, fontWeight: '900', color: '#fff', textAlign: 'right', writingDirection: 'rtl' }}>🎟️ קופונים והנחות · {coupons.length}</Text>
+        </View>
+        <View style={{ backgroundColor: '#f0fdf4', padding: 16, gap: 14 }}>
+          <View style={{ backgroundColor: '#fff', borderRadius: 12, padding: 16, gap: 10, borderWidth: 2, borderColor: '#86efac' }}>
+            <Text style={{ fontSize: 16, fontWeight: '900', color: '#14532d', writingDirection: 'rtl' }}>{couponForm.id ? '✏️ עריכת קופון' : '➕ קופון חדש'}</Text>
+            {Platform.OS === 'web' && (
+              <>
+                {React.createElement('input', { placeholder: 'קוד (לדוגמה: BATUMI25)', value: couponForm.code, onChange: (e: any) => setCouponForm({ ...couponForm, code: e.target.value.toUpperCase() }), style: { ...fld, letterSpacing: 2, fontWeight: 900, textTransform: 'uppercase' } })}
+                {React.createElement('input', { placeholder: 'תווית תצוגה (למשל: הנחת פתיחה)', value: couponForm.label, onChange: (e: any) => setCouponForm({ ...couponForm, label: e.target.value }), style: fld })}
+                <View style={{ flexDirection: 'row-reverse', gap: 10 }}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 13, fontWeight: '900', color: '#14532d', writingDirection: 'rtl', marginBottom: 4 }}>סוג הנחה</Text>
+                    {React.createElement('select', { value: couponForm.type, onChange: (e: any) => setCouponForm({ ...couponForm, type: e.target.value as any }), style: fld }, [
+                      React.createElement('option', { key: 'p', value: 'percent' }, 'אחוזים (%)'),
+                      React.createElement('option', { key: 'f', value: 'fixed' }, 'סכום קבוע (₪)'),
+                    ])}
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 13, fontWeight: '900', color: '#14532d', writingDirection: 'rtl', marginBottom: 4 }}>ערך</Text>
+                    {React.createElement('input', { type: 'number', value: String(couponForm.value), onChange: (e: any) => setCouponForm({ ...couponForm, value: parseFloat(e.target.value) || 0 }), style: fld })}
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 13, fontWeight: '900', color: '#14532d', writingDirection: 'rtl', marginBottom: 4 }}>מקסימום שימושים (0 = ללא הגבלה)</Text>
+                    {React.createElement('input', { type: 'number', value: String(couponForm.maxUses), onChange: (e: any) => setCouponForm({ ...couponForm, maxUses: parseInt(e.target.value) || 0 }), style: fld })}
+                  </View>
+                </View>
+                <View style={{ flexDirection: 'row-reverse', gap: 10 }}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 13, fontWeight: '900', color: '#14532d', writingDirection: 'rtl', marginBottom: 4 }}>תחילה</Text>
+                    {React.createElement('input', { type: 'date', value: couponForm.startAt, onChange: (e: any) => setCouponForm({ ...couponForm, startAt: e.target.value }), style: fld })}
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 13, fontWeight: '900', color: '#14532d', writingDirection: 'rtl', marginBottom: 4 }}>סיום</Text>
+                    {React.createElement('input', { type: 'date', value: couponForm.endAt, onChange: (e: any) => setCouponForm({ ...couponForm, endAt: e.target.value }), style: fld })}
+                  </View>
+                </View>
+                <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 10 }}>
+                  {React.createElement('input', { type: 'checkbox', checked: couponForm.visible, onChange: (e: any) => setCouponForm({ ...couponForm, visible: e.target.checked }), style: { width: 20, height: 20 } })}
+                  <Text style={{ fontSize: 15, fontWeight: '900', color: '#14532d', writingDirection: 'rtl' }}>פעיל</Text>
+                </View>
+              </>
+            )}
+            <View style={{ flexDirection: 'row-reverse', gap: 8 }}>
+              <TouchableOpacity onPress={save} style={{ flex: 1, backgroundColor: '#16a34a', paddingVertical: 14, borderRadius: 10, alignItems: 'center' }}>
+                <Text style={{ color: '#fff', fontWeight: '900', fontSize: 16 }}>{couponForm.id ? '💾 עדכן' : '➕ הוסף'}</Text>
+              </TouchableOpacity>
+              {couponForm.id && (
+                <TouchableOpacity onPress={reset} style={{ backgroundColor: '#475569', paddingHorizontal: 18, paddingVertical: 14, borderRadius: 10 }}>
+                  <Text style={{ color: '#fff', fontWeight: '900', fontSize: 15 }}>ביטול</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          </View>
+          {coupons.length === 0 ? (
+            <View style={{ backgroundColor: '#fff', padding: 20, borderRadius: 12, alignItems: 'center' }}>
+              <Text style={{ fontSize: 32 }}>🎟️</Text>
+              <Text style={{ color: '#64748b', fontWeight: '700', marginTop: 6, writingDirection: 'rtl' }}>עדיין אין קופונים</Text>
+            </View>
+          ) : coupons.map(c => (
+            <View key={c.id} style={{ backgroundColor: '#fff', borderRadius: 12, padding: 14, borderWidth: 2, borderColor: c.visible ? '#16a34a' : '#cbd5e1', gap: 10 }}>
+              <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Text selectable style={{ fontSize: 22, fontWeight: '900', color: '#14532d', letterSpacing: 3 }}>{c.code}</Text>
+                <Text style={{ fontSize: 13, fontWeight: '900', color: c.visible ? '#16a34a' : '#94a3b8' }}>{c.visible ? '● פעיל' : '○ כבוי'}</Text>
+              </View>
+              {!!c.label && <Text style={{ fontSize: 14, color: '#475569', writingDirection: 'rtl' }}>{c.label}</Text>}
+              <Text style={{ fontSize: 16, fontWeight: '900', color: '#0369a1', writingDirection: 'rtl' }}>הנחה: {c.type === 'percent' ? `${c.value}%` : `₪${c.value}`}</Text>
+              <Text style={{ fontSize: 13, color: '#334155', fontWeight: '700', writingDirection: 'rtl' }}>שימושים: {c.usedCount || 0}{c.maxUses ? ` / ${c.maxUses}` : ' (ללא הגבלה)'}{c.startAt ? ` · מ-${c.startAt}` : ''}{c.endAt ? ` · עד-${c.endAt}` : ''}</Text>
+              <View style={{ flexDirection: 'row-reverse', gap: 8, flexWrap: 'wrap' }}>
+                <TouchableOpacity onPress={() => toggle(c.id)} style={{ backgroundColor: c.visible ? '#475569' : '#16a34a', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 10 }}>
+                  <Text style={{ color: '#fff', fontSize: 14, fontWeight: '900' }}>{c.visible ? '⏸️ כבה' : '▶️ הפעל'}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => setCouponForm({ ...c })} style={{ backgroundColor: '#2563eb', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 10 }}>
+                  <Text style={{ color: '#fff', fontSize: 14, fontWeight: '900' }}>✏️ ערוך</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => resetUses(c.id)} style={{ backgroundColor: '#f59e0b', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 10 }}>
+                  <Text style={{ color: '#fff', fontSize: 14, fontWeight: '900' }}>🔄 אפס</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => del(c.id)} style={{ backgroundColor: '#dc2626', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 10 }}>
+                  <Text style={{ color: '#fff', fontSize: 14, fontWeight: '900' }}>🗑️</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          ))}
+        </View>
+      </View>
+    );
+  };
+
+  const renderClientBanners = () => {
+    const PAGES = [
+      { val: 'home', label: 'דף הבית' },
+      { val: 'welcome', label: 'ברוכים הבאים' },
+      { val: 'info', label: 'פורטל מידע' },
+      { val: 'map', label: 'מפה' },
+      { val: 'category:1', label: 'אירוח' },
+      { val: 'category:2', label: 'אטרקציות' },
+      { val: 'category:3', label: 'סיורים קוליים' },
+      { val: 'category:5', label: 'תחבורה' },
+      { val: 'category:6', label: 'מסעדות' },
+      { val: 'category:casino', label: 'קזינו' },
+      { val: 'all', label: 'כל העמודים' },
+    ];
+    const fld = { padding: 12, border: '2px solid #fcd34d', borderRadius: 10, fontSize: 15, fontWeight: 500, direction: 'rtl' as const, textAlign: 'right' as const, background: '#fff', width: '100%' as const, boxSizing: 'border-box' as const, fontFamily: 'inherit' };
+    const reset = () => setCbForm({ id: '', client: '', mediaUrl: '', mediaType: 'image', position: 'middle', size: 'medium', targetPage: 'home', clickUrl: '', startAt: '', endAt: '', visible: true });
+    const uploadFile = async (file: File) => {
+      setCbUploading(true);
+      try {
+        const fd = new FormData();
+        fd.append('file', file);
+        const r = await fetch(`${API_BASE}/api/upload`, { method: 'POST', body: fd });
+        const j = await r.json();
+        if (j.success && j.data?.filename) {
+          const url = `/uploads/${j.data.filename}`;
+          const isVideo = /\.(mp4|webm|mov)$/i.test(file.name);
+          setCbForm(prev => ({ ...prev, mediaUrl: url, mediaType: isVideo ? 'video' : 'image' }));
+        } else {
+          (window as any).alert('שגיאה בהעלאה');
+        }
+      } catch { (window as any).alert('שגיאה בהעלאה'); }
+      setCbUploading(false);
+    };
+    const save = () => {
+      if (!cbForm.client.trim() || !cbForm.mediaUrl.trim()) { (window as any).alert('חסר שם לקוח או קובץ מדיה'); return; }
+      const id = cbForm.id || `cb_${Date.now()}`;
+      const item = { ...cbForm, id };
+      const arr = cbForm.id ? clientBanners.map(b => b.id === id ? item : b) : [item, ...clientBanners];
+      saveClientBanners(arr);
+      reset();
+    };
+    const del = (id: string) => { if ((window as any).confirm('למחוק?')) saveClientBanners(clientBanners.filter(b => b.id !== id)); };
+    const toggle = (id: string) => saveClientBanners(clientBanners.map(b => b.id === id ? { ...b, visible: !b.visible } : b));
+    const pageLabel = (v: string) => PAGES.find(p => p.val === v)?.label || v;
+    return (
+      <View style={{ borderRadius: 16, overflow: 'hidden', borderWidth: 2, borderColor: '#f59e0b' }}>
+        <View style={{ backgroundColor: '#f59e0b', paddingVertical: 12, paddingHorizontal: 16 }}>
+          <Text style={{ fontSize: 17, fontWeight: '900', color: '#fff', textAlign: 'right', writingDirection: 'rtl' }}>📺 באנרים ללקוחות · {clientBanners.length}</Text>
+        </View>
+        <View style={{ backgroundColor: '#fffbeb', padding: 16, gap: 14 }}>
+          <View style={{ backgroundColor: '#fff', borderRadius: 12, padding: 16, gap: 10, borderWidth: 2, borderColor: '#fcd34d' }}>
+            <Text style={{ fontSize: 16, fontWeight: '900', color: '#78350f', writingDirection: 'rtl' }}>{cbForm.id ? '✏️ עריכה' : '➕ באנר חדש'}</Text>
+            {Platform.OS === 'web' && (
+              <>
+                {React.createElement('input', { placeholder: 'שם לקוח', value: cbForm.client, onChange: (e: any) => setCbForm({ ...cbForm, client: e.target.value }), style: fld })}
+                {React.createElement('input', { type: 'file', accept: 'image/*,video/*,.gif', onChange: (e: any) => { const f = e.target.files?.[0]; if (f) uploadFile(f); }, style: { ...fld, padding: 8 } })}
+                {cbUploading && <Text style={{ fontSize: 13, color: '#d97706', fontWeight: '700' }}>⏳ מעלה…</Text>}
+                {!!cbForm.mediaUrl && (
+                  cbForm.mediaType === 'video' ? (
+                    React.createElement('video', { src: cbForm.mediaUrl, controls: true, style: { width: '100%', maxHeight: 200, borderRadius: 8, background: '#000' } })
+                  ) : (
+                    React.createElement('img', { src: cbForm.mediaUrl, style: { width: '100%', maxHeight: 200, objectFit: 'contain', borderRadius: 8, background: '#f8fafc' } })
+                  )
+                )}
+                <View style={{ flexDirection: 'row-reverse', gap: 10 }}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 13, fontWeight: '900', color: '#78350f', writingDirection: 'rtl', marginBottom: 4 }}>עמוד יעד</Text>
+                    {React.createElement('select', { value: cbForm.targetPage, onChange: (e: any) => setCbForm({ ...cbForm, targetPage: e.target.value }), style: fld }, PAGES.map(p => React.createElement('option', { key: p.val, value: p.val }, p.label)))}
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 13, fontWeight: '900', color: '#78350f', writingDirection: 'rtl', marginBottom: 4 }}>מיקום</Text>
+                    {React.createElement('select', { value: cbForm.position, onChange: (e: any) => setCbForm({ ...cbForm, position: e.target.value as any }), style: fld }, [
+                      React.createElement('option', { key: 't', value: 'top' }, 'למעלה'),
+                      React.createElement('option', { key: 'm', value: 'middle' }, 'אמצע'),
+                      React.createElement('option', { key: 'b', value: 'bottom' }, 'תחתית'),
+                    ])}
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 13, fontWeight: '900', color: '#78350f', writingDirection: 'rtl', marginBottom: 4 }}>גודל</Text>
+                    {React.createElement('select', { value: cbForm.size, onChange: (e: any) => setCbForm({ ...cbForm, size: e.target.value as any }), style: fld }, [
+                      React.createElement('option', { key: 's', value: 'small' }, 'קטן (50px)'),
+                      React.createElement('option', { key: 'm', value: 'medium' }, 'בינוני (100px)'),
+                      React.createElement('option', { key: 'l', value: 'large' }, 'גדול (180px)'),
+                    ])}
+                  </View>
+                </View>
+                {React.createElement('input', { placeholder: 'קישור בלחיצה (URL, לא חובה)', value: cbForm.clickUrl, onChange: (e: any) => setCbForm({ ...cbForm, clickUrl: e.target.value }), style: fld })}
+                <View style={{ flexDirection: 'row-reverse', gap: 10 }}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 13, fontWeight: '900', color: '#78350f', writingDirection: 'rtl', marginBottom: 4 }}>תחילה</Text>
+                    {React.createElement('input', { type: 'date', value: cbForm.startAt, onChange: (e: any) => setCbForm({ ...cbForm, startAt: e.target.value }), style: fld })}
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 13, fontWeight: '900', color: '#78350f', writingDirection: 'rtl', marginBottom: 4 }}>סיום</Text>
+                    {React.createElement('input', { type: 'date', value: cbForm.endAt, onChange: (e: any) => setCbForm({ ...cbForm, endAt: e.target.value }), style: fld })}
+                  </View>
+                </View>
+                <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 10 }}>
+                  {React.createElement('input', { type: 'checkbox', checked: cbForm.visible, onChange: (e: any) => setCbForm({ ...cbForm, visible: e.target.checked }), style: { width: 20, height: 20 } })}
+                  <Text style={{ fontSize: 15, fontWeight: '900', color: '#78350f', writingDirection: 'rtl' }}>פעיל</Text>
+                </View>
+              </>
+            )}
+            <View style={{ flexDirection: 'row-reverse', gap: 8 }}>
+              <TouchableOpacity onPress={save} style={{ flex: 1, backgroundColor: '#d97706', paddingVertical: 14, borderRadius: 10, alignItems: 'center' }}>
+                <Text style={{ color: '#fff', fontWeight: '900', fontSize: 16 }}>{cbForm.id ? '💾 עדכן' : '➕ הוסף'}</Text>
+              </TouchableOpacity>
+              {cbForm.id && (
+                <TouchableOpacity onPress={reset} style={{ backgroundColor: '#475569', paddingHorizontal: 18, paddingVertical: 14, borderRadius: 10 }}>
+                  <Text style={{ color: '#fff', fontWeight: '900', fontSize: 15 }}>ביטול</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          </View>
+
+          {clientBanners.length === 0 ? (
+            <View style={{ backgroundColor: '#fff', padding: 20, borderRadius: 12, alignItems: 'center' }}>
+              <Text style={{ fontSize: 32 }}>📺</Text>
+              <Text style={{ color: '#64748b', fontWeight: '700', marginTop: 6, writingDirection: 'rtl' }}>עדיין אין באנרים ללקוחות</Text>
+            </View>
+          ) : clientBanners.map(b => (
+            <View key={b.id} style={{ backgroundColor: '#fff', borderRadius: 12, padding: 14, borderWidth: 2, borderColor: b.visible ? '#f59e0b' : '#cbd5e1', gap: 10 }}>
+              <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Text style={{ fontSize: 17, fontWeight: '900', color: '#0f172a', writingDirection: 'rtl' }}>{b.client}</Text>
+                <Text style={{ fontSize: 13, fontWeight: '900', color: b.visible ? '#16a34a' : '#94a3b8' }}>{b.visible ? '● פעיל' : '○ כבוי'}</Text>
+              </View>
+              {Platform.OS === 'web' && (
+                b.mediaType === 'video' ? (
+                  React.createElement('video', { src: b.mediaUrl, controls: true, style: { width: '100%', maxHeight: 160, borderRadius: 8, background: '#000' } })
+                ) : (
+                  React.createElement('img', { src: b.mediaUrl, style: { width: '100%', maxHeight: 160, objectFit: 'contain', borderRadius: 8, background: '#f8fafc' } })
+                )
+              )}
+              <Text style={{ fontSize: 14, color: '#334155', fontWeight: '700', writingDirection: 'rtl' }}>📍 {pageLabel(b.targetPage)} · {({top:'למעלה',middle:'אמצע',bottom:'תחתית'} as any)[b.position]} · {({small:'קטן',medium:'בינוני',large:'גדול'} as any)[b.size]}{b.startAt ? ` · מ-${b.startAt}` : ''}{b.endAt ? ` · עד-${b.endAt}` : ''}</Text>
+              {!!b.clickUrl && <Text style={{ fontSize: 13, color: '#0369a1' }} selectable>🔗 {b.clickUrl}</Text>}
+              <View style={{ flexDirection: 'row-reverse', gap: 8 }}>
+                <TouchableOpacity onPress={() => toggle(b.id)} style={{ backgroundColor: b.visible ? '#475569' : '#16a34a', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 10 }}>
+                  <Text style={{ color: '#fff', fontSize: 14, fontWeight: '900' }}>{b.visible ? '⏸️ כבה' : '▶️ הפעל'}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => setCbForm({ ...b })} style={{ backgroundColor: '#2563eb', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 10 }}>
+                  <Text style={{ color: '#fff', fontSize: 14, fontWeight: '900' }}>✏️ ערוך</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => del(b.id)} style={{ backgroundColor: '#dc2626', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 10 }}>
+                  <Text style={{ color: '#fff', fontSize: 14, fontWeight: '900' }}>🗑️ מחק</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          ))}
+        </View>
+      </View>
+    );
+  };
+
+  const demoTransactions = [
+    { id: 'INV-001', name: 'ישראל כ.', amount: '₪130.8', plan: 'שנתי', date: '18/04/2026', status: 'שולם' },
+    { id: 'INV-002', name: 'מיכל ד.', amount: '₪64', plan: '30 ימים', date: '17/04/2026', status: 'שולם' },
+    { id: 'INV-003', name: 'אבי ר.', amount: '₪130.8', plan: 'שנתי', date: '16/04/2026', status: 'שולם' },
+    { id: 'INV-004', name: 'דנה ל.', amount: '₪64', plan: '30 ימים', date: '15/04/2026', status: 'החזר' },
+    { id: 'INV-005', name: 'יוסי מ.', amount: '₪130.8', plan: 'שנתי', date: '14/04/2026', status: 'שולם' },
+  ];
+
+  const renderSubAccounting = () => {
+    if (!demoMode) return (
+      <View style={{ backgroundColor: '#f8fafc', borderRadius: 14, padding: 30, alignItems: 'center' }}>
+        <Text style={{ fontSize: 40, marginBottom: 10 }}>📡</Text>
+        <Text style={{ fontSize: 16, fontWeight: '800', color: Colors.TEXT, textAlign: 'center', writingDirection: 'rtl' }}>ממתין לחיבור מערכת תשלומים</Text>
+        <Text style={{ fontSize: 12, color: '#888', textAlign: 'center', writingDirection: 'rtl', marginTop: 6 }}>נתוני אמת יופיעו כאן לאחר חיבור RevenueCat / Stripe</Text>
+      </View>
+    );
+    return (
+    <View style={{ gap: 14 }}>
+      <View style={{ flexDirection: 'row-reverse', gap: 10 }}>
+        <View style={{ flex: 1, backgroundColor: '#f0fdf4', borderRadius: 14, padding: 14, alignItems: 'center' }}>
+          <Text style={{ fontSize: 10, color: '#888', fontWeight: '700' }}>סה״כ נכנס</Text>
+          <Text style={{ fontSize: 20, fontWeight: '900', color: '#10b981' }}>₪67,400</Text>
+        </View>
+        <View style={{ flex: 1, backgroundColor: '#fef2f2', borderRadius: 14, padding: 14, alignItems: 'center' }}>
+          <Text style={{ fontSize: 10, color: '#888', fontWeight: '700' }}>החזרים</Text>
+          <Text style={{ fontSize: 20, fontWeight: '900', color: '#dc2626' }}>₪1,280</Text>
+        </View>
+        <View style={{ flex: 1, backgroundColor: '#eff6ff', borderRadius: 14, padding: 14, alignItems: 'center' }}>
+          <Text style={{ fontSize: 10, color: '#888', fontWeight: '700' }}>נטו</Text>
+          <Text style={{ fontSize: 20, fontWeight: '900', color: '#3b82f6' }}>₪66,120</Text>
+        </View>
+      </View>
+
+      <View style={{ backgroundColor: '#fff', borderRadius: 14, padding: 16, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 }}>
+        <Text style={{ fontSize: 15, fontWeight: '800', color: Colors.TEXT, textAlign: 'right', marginBottom: 12, writingDirection: 'rtl' }}>🧾 תנועות אחרונות</Text>
+        {demoTransactions.map((t, i) => (
+          <View key={i} style={{ flexDirection: 'row-reverse', alignItems: 'center', paddingVertical: 10, borderBottomWidth: i < demoTransactions.length - 1 ? 1 : 0, borderBottomColor: '#f0f0f0', gap: 8 }}>
+            <Text style={{ fontSize: 11, color: '#888', fontWeight: '700', width: 60 }}>{t.id}</Text>
+            <View style={{ flex: 1 }}>
+              <Text style={{ fontSize: 13, fontWeight: '700', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl' }}>{t.name}</Text>
+              <Text style={{ fontSize: 10, color: '#888', textAlign: 'right' }}>{t.date} · {t.plan}</Text>
+            </View>
+            <Text style={{ fontSize: 14, fontWeight: '900', color: t.status === 'החזר' ? '#dc2626' : '#10b981' }}>{t.amount}</Text>
+            <View style={{ paddingHorizontal: 6, paddingVertical: 2, borderRadius: 6, backgroundColor: t.status === 'שולם' ? '#dcfce7' : '#fee2e2' }}>
+              <Text style={{ fontSize: 9, fontWeight: '800', color: t.status === 'שולם' ? '#16a34a' : '#dc2626' }}>{t.status}</Text>
+            </View>
+          </View>
+        ))}
+      </View>
+
+      <View style={{ backgroundColor: '#fffbeb', borderRadius: 10, padding: 12, borderWidth: 1, borderColor: '#fde68a' }}>
+        <Text style={{ fontSize: 11, color: '#92400e', textAlign: 'center', writingDirection: 'rtl', fontWeight: '600' }}>📊 נתוני דמו — יתעדכנו אוטומטית עם חיבור מערכת תשלומים</Text>
+      </View>
+    </View>
+  );
+  };
+
+  const demoCancels = [
+    { name: 'דנה ל.', plan: '30 ימים', date: '15/04/2026', reason: 'לא רלוונטי יותר', refund: '₪64', status: 'הוחזר' },
+    { name: 'רונית ש.', plan: 'שנתי', date: '10/04/2026', reason: 'מחיר גבוה', refund: '₪98.2', status: 'הוחזר' },
+    { name: 'עמית כ.', plan: '30 ימים', date: '08/04/2026', reason: 'בעיה טכנית', refund: '₪64', status: 'ממתין' },
+  ];
+
+  const renderSubCancels = () => {
+    if (!demoMode) return (
+      <View style={{ backgroundColor: '#f8fafc', borderRadius: 14, padding: 30, alignItems: 'center' }}>
+        <Text style={{ fontSize: 40, marginBottom: 10 }}>📡</Text>
+        <Text style={{ fontSize: 16, fontWeight: '800', color: Colors.TEXT, textAlign: 'center', writingDirection: 'rtl' }}>ממתין לחיבור מערכת תשלומים</Text>
+        <Text style={{ fontSize: 12, color: '#888', textAlign: 'center', writingDirection: 'rtl', marginTop: 6 }}>נתוני אמת יופיעו כאן לאחר חיבור RevenueCat / Stripe</Text>
+      </View>
+    );
+    return (
+    <View style={{ gap: 14 }}>
+      <View style={{ flexDirection: 'row-reverse', gap: 10 }}>
+        <View style={{ flex: 1, backgroundColor: '#fef2f2', borderRadius: 14, padding: 14, alignItems: 'center' }}>
+          <Text style={{ fontSize: 10, color: '#888', fontWeight: '700' }}>סה״כ ביטולים</Text>
+          <Text style={{ fontSize: 24, fontWeight: '900', color: '#dc2626' }}>3</Text>
+        </View>
+        <View style={{ flex: 1, backgroundColor: '#fff7ed', borderRadius: 14, padding: 14, alignItems: 'center' }}>
+          <Text style={{ fontSize: 10, color: '#888', fontWeight: '700' }}>ממתינים</Text>
+          <Text style={{ fontSize: 24, fontWeight: '900', color: '#f59e0b' }}>1</Text>
+        </View>
+        <View style={{ flex: 1, backgroundColor: '#f0fdf4', borderRadius: 14, padding: 14, alignItems: 'center' }}>
+          <Text style={{ fontSize: 10, color: '#888', fontWeight: '700' }}>הוחזרו</Text>
+          <Text style={{ fontSize: 24, fontWeight: '900', color: '#10b981' }}>2</Text>
+        </View>
+      </View>
+
+      <View style={{ backgroundColor: '#fff', borderRadius: 14, padding: 16, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 1 }}>
+        <Text style={{ fontSize: 15, fontWeight: '800', color: Colors.TEXT, textAlign: 'right', marginBottom: 12, writingDirection: 'rtl' }}>❌ בקשות ביטול</Text>
+        {demoCancels.map((c, i) => (
+          <View key={i} style={{ backgroundColor: i % 2 === 0 ? '#fafafa' : '#e2e8f0', borderRadius: 12, padding: 12, marginBottom: 8 }}>
+            <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+              <Text style={{ fontSize: 14, fontWeight: '800', color: Colors.TEXT, writingDirection: 'rtl' }}>{c.name}</Text>
+              <View style={{ paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8, backgroundColor: c.status === 'הוחזר' ? '#dcfce7' : '#fef3c7' }}>
+                <Text style={{ fontSize: 10, fontWeight: '800', color: c.status === 'הוחזר' ? '#16a34a' : '#92400e' }}>{c.status}</Text>
+              </View>
+            </View>
+            <Text style={{ fontSize: 11, color: '#888', textAlign: 'right', writingDirection: 'rtl' }}>{c.date} · {c.plan} · החזר: {c.refund}</Text>
+            <Text style={{ fontSize: 12, color: '#666', textAlign: 'right', writingDirection: 'rtl', marginTop: 4 }}>סיבה: {c.reason}</Text>
+          </View>
+        ))}
+      </View>
+
+      <View style={{ backgroundColor: '#fffbeb', borderRadius: 10, padding: 12, borderWidth: 1, borderColor: '#fde68a' }}>
+        <Text style={{ fontSize: 11, color: '#92400e', textAlign: 'center', writingDirection: 'rtl', fontWeight: '600' }}>📊 נתוני דמו — יתעדכנו אוטומטית עם חיבור מערכת תשלומים</Text>
+      </View>
+    </View>
+  );
+  };
+
+  const renderSubBanner = () => {
+    if (!subBlock) return <Text style={{ textAlign: 'center', padding: 20, color: '#888' }}>טוען...</Text>;
+    const s = subBlock;
+    const upd = (key: string, val: any) => saveSubBlock({ ...s, [key]: val });
+    const updPlan = (plan: 'plan1' | 'plan2', key: string, val: string) => saveSubBlock({ ...s, [plan]: { ...s[plan], [key]: val } });
+    return (
+      <View style={{ gap: 14 }}>
+        {/* General settings */}
+        <View style={{ borderRadius: 16, overflow: 'hidden', borderWidth: 2, borderColor: '#64748b' }}>
+          <View style={{ backgroundColor: '#64748b', paddingVertical: 8, paddingHorizontal: 16 }}>
+            <Text style={{ fontSize: 14, fontWeight: '900', color: '#fff', textAlign: 'right', writingDirection: 'rtl' }}>✏️ הגדרות כלליות</Text>
+          </View>
+          <View style={{ backgroundColor: '#f8fafc', padding: 14, gap: 8 }}>
+            <View>
+              <Text style={ms.label}>📝 כותרת</Text>
+              <TextInput style={[ms.input]} value={s.title} onChangeText={v => upd('title', v)} textAlign="right" />
+            </View>
+            <View>
+              <Text style={ms.label}>📋 תיאור</Text>
+              <TextInput style={[ms.input, ms.textArea]} value={s.desc} onChangeText={v => upd('desc', v)} textAlign="right" multiline numberOfLines={3} />
+            </View>
+            <View style={{ flexDirection: 'row-reverse', gap: 8 }}>
+              <View style={{ flex: 1 }}>
+                <Text style={ms.label}>🎨 צבע רקע</Text>
+                <TextInput style={ms.input} value={s.bgColor || ''} onChangeText={v => upd('bgColor', v)} textAlign="left" placeholder="#ffffff" placeholderTextColor="#bbb" />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={ms.label}>🎨 צבע כותרת</Text>
+                <TextInput style={ms.input} value={s.titleColor || ''} onChangeText={v => upd('titleColor', v)} textAlign="left" placeholder="#1C2B35" placeholderTextColor="#bbb" />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={ms.label}>🔤 גודל פונט</Text>
+                <TextInput style={ms.input} value={String(s.fontSize || 20)} onChangeText={v => upd('fontSize', parseInt(v) || 20)} textAlign="left" keyboardType="numeric" />
+              </View>
+            </View>
+          </View>
+        </View>
+
+        {/* Plans side by side */}
+        <View style={{ flexDirection: 'row-reverse', gap: 10 }}>
+          {/* Plan 1 */}
+          <View style={{ flex: 1, borderRadius: 16, overflow: 'hidden', borderWidth: 2, borderColor: '#F4A94E' }}>
+            <View style={{ backgroundColor: '#F4A94E', paddingVertical: 8, paddingHorizontal: 12 }}>
+              <Text style={{ fontSize: 13, fontWeight: '900', color: '#fff', textAlign: 'center' }}>📦 מסלול 1</Text>
+            </View>
+            <View style={{ backgroundColor: '#fffbeb', padding: 10, gap: 6 }}>
+              <Text style={ms.label}>שם</Text>
+              <TextInput style={ms.input} value={s.plan1?.label || ''} onChangeText={v => updPlan('plan1', 'label', v)} textAlign="right" />
+              <Text style={ms.label}>מחיר</Text>
+              <TextInput style={ms.input} value={s.plan1?.price || ''} onChangeText={v => updPlan('plan1', 'price', v)} textAlign="right" />
+              <Text style={ms.label}>תקופה</Text>
+              <TextInput style={ms.input} value={s.plan1?.period || ''} onChangeText={v => updPlan('plan1', 'period', v)} textAlign="right" />
+              <Text style={ms.label}>הערה</Text>
+              <TextInput style={ms.input} value={s.plan1?.note || ''} onChangeText={v => updPlan('plan1', 'note', v)} textAlign="right" />
+              <Text style={ms.label}>🎨 צבע</Text>
+              <TextInput style={ms.input} value={s.plan1Color || ''} onChangeText={v => upd('plan1Color', v)} textAlign="left" placeholder="#f0f4f8" placeholderTextColor="#bbb" />
+            </View>
+          </View>
+
+          {/* Plan 2 */}
+          <View style={{ flex: 1, borderRadius: 16, overflow: 'hidden', borderWidth: 2, borderColor: '#1A6B8A' }}>
+            <View style={{ backgroundColor: '#1A6B8A', paddingVertical: 8, paddingHorizontal: 12 }}>
+              <Text style={{ fontSize: 13, fontWeight: '900', color: '#fff', textAlign: 'center' }}>📦 מסלול 2</Text>
+            </View>
+            <View style={{ backgroundColor: '#f0f9ff', padding: 10, gap: 6 }}>
+              <Text style={ms.label}>שם</Text>
+              <TextInput style={ms.input} value={s.plan2?.label || ''} onChangeText={v => updPlan('plan2', 'label', v)} textAlign="right" />
+              <Text style={ms.label}>מחיר</Text>
+              <TextInput style={ms.input} value={s.plan2?.price || ''} onChangeText={v => updPlan('plan2', 'price', v)} textAlign="right" />
+              <Text style={ms.label}>תקופה</Text>
+              <TextInput style={ms.input} value={s.plan2?.period || ''} onChangeText={v => updPlan('plan2', 'period', v)} textAlign="right" />
+              <Text style={ms.label}>הערה</Text>
+              <TextInput style={ms.input} value={s.plan2?.note || ''} onChangeText={v => updPlan('plan2', 'note', v)} textAlign="right" />
+              <Text style={ms.label}>🎨 צבע</Text>
+              <TextInput style={ms.input} value={s.plan2Color || ''} onChangeText={v => upd('plan2Color', v)} textAlign="left" placeholder="#1A6B8A" placeholderTextColor="#bbb" />
+            </View>
+          </View>
+        </View>
+
+        {/* Store links */}
+        <View style={{ borderRadius: 16, overflow: 'hidden', borderWidth: 2, borderColor: '#1C2B35' }}>
+          <View style={{ backgroundColor: '#1C2B35', paddingVertical: 8, paddingHorizontal: 16 }}>
+            <Text style={{ fontSize: 14, fontWeight: '900', color: '#F4A94E', textAlign: 'right', writingDirection: 'rtl' }}>🔗 קישורים לחנויות</Text>
+          </View>
+          <View style={{ backgroundColor: '#f8fafc', padding: 14, gap: 8 }}>
+            <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 8, backgroundColor: '#fff', borderRadius: 10, padding: 10, borderRightWidth: 4, borderRightColor: '#007AFF' }}>
+              <Text style={{ fontSize: 20 }}>🍎</Text>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: 11, fontWeight: '800', color: '#888', writingDirection: 'rtl' }}>Apple App Store</Text>
+                <TextInput style={[ms.input, { marginTop: 4 }]} value={s.appleUrl || ''} onChangeText={v => upd('appleUrl', v)} textAlign="left" />
+              </View>
+            </View>
+            <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 8, backgroundColor: '#fff', borderRadius: 10, padding: 10, borderRightWidth: 4, borderRightColor: '#3DDC84' }}>
+              <Text style={{ fontSize: 20 }}>🤖</Text>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: 11, fontWeight: '800', color: '#888', writingDirection: 'rtl' }}>Google Play</Text>
+                <TextInput style={[ms.input, { marginTop: 4 }]} value={s.googleUrl || ''} onChangeText={v => upd('googleUrl', v)} textAlign="left" />
+              </View>
+            </View>
+          </View>
+        </View>
+      </View>
+    );
+  };
+
+  // ─── Media Library ──────────────────────────────────────────
+  const renderMedia = () => {
+    const handleUpload = async (file: File) => {
+      const fd = new FormData();
+      fd.append('file', file);
+      try {
+        await fetch(`${API_BASE}/api/upload`, { method: 'POST', body: fd });
+        await refreshMedia();
+      } catch {}
+    };
+    const handleDelete = async (filename: string) => {
+      if (Platform.OS === 'web' && !confirm(`למחוק את ${filename}?`)) return;
+      try {
+        await fetch(`/api/uploads/${encodeURIComponent(filename)}`, { method: 'DELETE' });
+        await refreshMedia();
+      } catch {}
+    };
+    const toggleTag = async (filename: string, tag: string) => {
+      const file = mediaFiles.find(f => f.filename === filename);
+      const current = file?.tags || [];
+      const next = current.includes(tag) ? current.filter(t => t !== tag) : [...current, tag];
+      setMediaFiles(prev => prev.map(f => f.filename === filename ? { ...f, tags: next } : f));
+      try {
+        await fetch(`/api/uploads/${encodeURIComponent(filename)}/tags`, {
+          method: 'PUT', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ tags: next }),
+        });
+      } catch {}
+    };
+    const setTagSingle = async (filename: string, tag: string) => {
+      const next = tag ? [tag] : [];
+      setMediaFiles(prev => prev.map(f => f.filename === filename ? { ...f, tags: next } : f));
+      try {
+        await fetch(`/api/uploads/${encodeURIComponent(filename)}/tags`, {
+          method: 'PUT', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ tags: next }),
+        });
+      } catch {}
+    };
+    const FOLDERS = TAG_GROUPS.map(g => ({
+      ...g,
+      count: mediaFiles.filter(f => g.tags.some(t => (f.tags || []).includes(t.key))).length,
+    }));
+    const untaggedCount = mediaFiles.filter(f => !(f.tags || []).length).length;
+    const activeGrp = TAG_GROUPS.find(g => g.group === mediaFolder);
+    const filteredFiles = mediaFiles.filter(f => {
+      if (!mediaFolder) return true;
+      if (mediaFolder === '__none') return !(f.tags || []).length;
+      if (mediaFilter && mediaFilter !== '__none') return (f.tags || []).includes(mediaFilter);
+      return activeGrp ? activeGrp.tags.some(t => (f.tags || []).includes(t.key)) : false;
+    }).slice().sort((a, b) => (a.originalName || a.filename).localeCompare(b.originalName || b.filename, 'he'));
+
+    if (!mediaFolder) {
+      return (
+        <View style={cs.contentCard}>
+          <Text style={{ fontSize: 20, fontWeight: '900', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl', marginBottom: 4 }}>📁 תיקיות תמונות</Text>
+          <Text style={{ fontSize: 13, color: '#888', textAlign: 'right', writingDirection: 'rtl', marginBottom: 16 }}>{mediaFiles.length} תמונות בסה״כ</Text>
+          <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 12 }}>
+            <TouchableOpacity onPress={() => setMediaFolder('__listings')} activeOpacity={0.7}
+              style={{ width: 130, height: 110, borderRadius: 16, backgroundColor: '#fef3c7', borderWidth: 1, borderColor: '#fde68a', alignItems: 'center', justifyContent: 'center' }}>
+              <Text style={{ fontSize: 32 }}>🏠</Text>
+              <Text style={{ fontSize: 12, fontWeight: '800', color: '#713f12', textAlign: 'center', marginTop: 4 }}>מודעות נדל"ן</Text>
+              <Text style={{ fontSize: 10, color: '#888', marginTop: 2 }}>מתוך מודעות גולשים</Text>
+            </TouchableOpacity>
+            {FOLDERS.map(g => (
+              <TouchableOpacity key={g.group} onPress={() => { setMediaFolder(g.group); setMediaFilter(''); }} activeOpacity={0.7}
+                style={{ width: 130, height: 110, borderRadius: 16, backgroundColor: '#f8fafc', borderWidth: 1, borderColor: '#e2e8f0', alignItems: 'center', justifyContent: 'center' }}>
+                <Text style={{ fontSize: 32 }}>{g.icon}</Text>
+                <Text style={{ fontSize: 12, fontWeight: '800', color: Colors.TEXT, textAlign: 'center', writingDirection: 'rtl', marginTop: 4 }}>{g.group.replace(/^[^\s]+\s/, '')}</Text>
+                <Text style={{ fontSize: 10, color: '#888', marginTop: 2 }}>{g.count}</Text>
+              </TouchableOpacity>
+            ))}
+            <TouchableOpacity onPress={() => { setMediaFolder('__none'); setMediaFilter('__none'); }} activeOpacity={0.7}
+              style={{ width: 130, height: 110, borderRadius: 16, backgroundColor: '#fef2f2', borderWidth: 1, borderColor: '#fecaca', alignItems: 'center', justifyContent: 'center' }}>
+              <Text style={{ fontSize: 32 }}>❓</Text>
+              <Text style={{ fontSize: 12, fontWeight: '800', color: '#dc2626', textAlign: 'center', marginTop: 4 }}>ללא קטגוריה</Text>
+              <Text style={{ fontSize: 10, color: '#888', marginTop: 2 }}>{untaggedCount}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      );
+    }
+
+    if (mediaFolder === '__listings') {
+      return <ListingsFolderViewer onBack={() => { setMediaFolder(''); setMediaFilter(''); }} />;
+    }
+    return (
+      <View style={cs.contentCard}>
+        <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+          <TouchableOpacity onPress={() => { setMediaFolder(''); setMediaFilter(''); }}>
+            <Text style={{ fontSize: 24, color: Colors.PRIMARY, fontWeight: '700' }}>→</Text>
+          </TouchableOpacity>
+          <View style={{ flex: 1 }}>
+            <Text style={{ fontSize: 18, fontWeight: '900', color: Colors.TEXT, writingDirection: 'rtl' }}>{mediaFolder === '__none' ? '❓ ללא קטגוריה' : mediaFolder}</Text>
+            <Text style={{ fontSize: 12, color: '#888', writingDirection: 'rtl' }}>{filteredFiles.length} תמונות</Text>
+          </View>
+          {activeGrp && activeGrp.tags.length > 1 && Platform.OS === 'web' && React.createElement('select', {
+            value: mediaFilter,
+            onChange: (e: any) => setMediaFilter(e.target.value),
+            style: { padding: '8px 12px', borderRadius: 8, border: '1px solid #d1d5db', fontSize: 13, fontWeight: 700, direction: 'rtl', cursor: 'pointer' },
+          }, [
+            React.createElement('option', { key: '', value: '' }, 'הכל'),
+            ...activeGrp.tags.map(t => React.createElement('option', { key: t.key, value: t.key }, `${t.label} (${mediaFiles.filter(f => (f.tags || []).includes(t.key)).length})`)),
+          ])}
+          {Platform.OS === 'web' && React.createElement('label', {
+            style: { backgroundColor: '#10b981', color: '#fff', padding: '10px 18px', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer' },
+          }, [
+            '📁 העלה לתיקייה',
+            React.createElement('input', {
+              key: 'file', type: 'file', accept: 'image/*,audio/*', multiple: true, style: { display: 'none' },
+              onChange: async (e: any) => {
+                const files = Array.from(e.target.files || []) as File[];
+                const tag = mediaFilter || (activeGrp?.tags[0]?.key) || '';
+                const beforeUpload = new Set(mediaFiles.map(f => f.filename));
+                for (const f of files) await handleUpload(f);
+                await refreshMedia();
+                if (tag) {
+                  const latestRes = await fetch(`${API_BASE}/api/uploads`).then(r => r.json());
+                  const newFiles = (latestRes.files || []).filter((f: any) => !beforeUpload.has(f.filename));
+                  for (const nf of newFiles) {
+                    await fetch(`${API_BASE}/api/uploads/${encodeURIComponent(nf.filename)}/tags`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tags: [tag] }) }).catch(() => {});
+                  }
+                  await refreshMedia();
+                }
+                e.target.value = '';
+              },
+            }),
+          ])}
+          <TouchableOpacity
+            style={{ backgroundColor: Colors.SECONDARY, paddingHorizontal: 14, paddingVertical: 10, borderRadius: 10 }}
+            onPress={async () => { await refreshMedia(); }}
+          >
+            <Text style={{ color: '#fff', fontWeight: '700', fontSize: 14 }}>🔄 רענן</Text>
+          </TouchableOpacity>
+          {selectedFiles.size > 0 && (
+            <TouchableOpacity
+              style={{ backgroundColor: '#dc2626', paddingHorizontal: 14, paddingVertical: 10, borderRadius: 10 }}
+              onPress={async () => {
+                if (Platform.OS === 'web' && !confirm(`למחוק ${selectedFiles.size} קבצים?`)) return;
+                for (const fn of selectedFiles) {
+                  await fetch(`${API_BASE}/api/uploads/${encodeURIComponent(fn)}`, { method: 'DELETE' }).catch(() => {});
+                }
+                setSelectedFiles(new Set());
+                await refreshMedia();
+              }}
+            >
+              <Text style={{ color: '#fff', fontWeight: '700', fontSize: 14 }}>🗑 מחק {selectedFiles.size} נבחרים</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+        <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 12 }}>
+          {filteredFiles.map(f => (
+            <View key={f.filename} style={{ width: 160, backgroundColor: '#fafafa', borderRadius: 12, overflow: 'hidden', borderWidth: selectedFiles.has(f.filename) ? 2 : 1, borderColor: selectedFiles.has(f.filename) ? '#dc2626' : '#e8e8e8' }}>
+              <TouchableOpacity
+                style={{ position: 'absolute', top: 6, right: 6, zIndex: 10, width: 24, height: 24, borderRadius: 12, backgroundColor: selectedFiles.has(f.filename) ? '#dc2626' : 'rgba(255,255,255,0.8)', borderWidth: 2, borderColor: selectedFiles.has(f.filename) ? '#dc2626' : '#999', alignItems: 'center', justifyContent: 'center' }}
+                onPress={() => {
+                  const next = new Set(selectedFiles);
+                  if (next.has(f.filename)) next.delete(f.filename); else next.add(f.filename);
+                  setSelectedFiles(next);
+                }}
+              >
+                {selectedFiles.has(f.filename) && <Text style={{ color: '#fff', fontSize: 14, fontWeight: '900' }}>✓</Text>}
+              </TouchableOpacity>
+              {Platform.OS === 'web' && (/\.(mp3|wav|m4a|aac)$/i.test(f.filename)
+                ? React.createElement('div', { style: { width: '100%', height: 110, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#1e293b', fontSize: 40 } }, '🎵')
+                : React.createElement('img', { src: f.url, style: { width: '100%', height: 110, objectFit: 'cover', display: 'block' }, alt: f.filename })
+              )}
+              <View style={{ padding: 8 }}>
+                <Text numberOfLines={1} style={{ fontSize: 10, color: f.originalName ? Colors.TEXT : '#999', fontWeight: f.originalName ? '700' : '400', textAlign: 'right', writingDirection: 'rtl', marginBottom: 2 }}>{f.originalName || f.filename}</Text>
+                {f.originalName && <Text numberOfLines={1} style={{ fontSize: 8, color: '#bbb', textAlign: 'right', writingDirection: 'rtl', marginBottom: 4 }}>{f.filename}</Text>}
+                <View style={{ marginBottom: 6 }}>
+                  {Platform.OS === 'web' && React.createElement('select', {
+                    value: (f.tags || []).find((t: string) => TAG_OPTIONS.some((o) => o.key === t)) || '',
+                    onChange: (e: any) => setTagSingle(f.filename, e.target.value),
+                    style: { width: '100%', padding: '6px 8px', borderRadius: 6, border: '1px solid #e8e8e8', fontSize: 11, fontWeight: 700, color: (f.tags || []).length ? Colors.WHITE : '#666', backgroundColor: (f.tags || []).length ? (() => { const t=(f.tags||[])[0]; const g=TAG_GROUPS.find(gr=>gr.tags.some(tt=>tt.key===t)); return g ? ({'📂':'#1A6B8A','📁':'#3DA5C4','👋':'#F4A94E','📋':'#7ECFC0','🏷️':'#2D4A5E','📌':'#F4A94E','📍':'#3DA5C4','🎧':'#1C2B35','📜':'#c0392b','🖼️':'#8e44ad','🎞️':'#e67e22'}[g.icon]||Colors.PRIMARY) : Colors.PRIMARY; })() : '#f0f2f5', direction: 'rtl', cursor: 'pointer' },
+                  }, (() => {
+                    const grp = TAG_GROUPS.find(g => g.group === mediaFolder) as any;
+                    const subs = grp?.subgroups;
+                    return [
+                      React.createElement('option', { key: '', value: '' }, '— בחר —'),
+                      ...(subs ? subs.map((sg: any) =>
+                        React.createElement('optgroup', { key: sg.label, label: sg.label },
+                          sg.tags.map((t: any) => React.createElement('option', { key: t.key, value: t.key, style: { backgroundColor: '#fff', color: '#222' } }, t.label))
+                        )
+                      ) : grp ? grp.tags.map((t: any) => React.createElement('option', { key: t.key, value: t.key, style: { backgroundColor: '#fff', color: '#222' } }, t.label)) : []),
+                      React.createElement('optgroup', { key: '_move', label: '↩ העבר לתיקייה אחרת' },
+                        TAG_GROUPS.filter(g => g.group !== mediaFolder).map(g => {
+                          const unsorted = g.tags.find(t => t.key.includes('_unsorted'));
+                          const tagKey = unsorted ? unsorted.key : g.tags[0]?.key || '';
+                          return React.createElement('option', { key: g.group, value: tagKey, style: { backgroundColor: '#fff', color: '#222' } }, g.group);
+                        })
+                      ),
+                    ];
+                  })())}
+                </View>
+                <View style={{ flexDirection: 'row-reverse', gap: 6 }}>
+                  <TouchableOpacity style={{ flex: 1, backgroundColor: '#e8f4f8', paddingVertical: 6, borderRadius: 6, alignItems: 'center' }} onPress={() => { if (Platform.OS === 'web') (navigator as any).clipboard?.writeText(f.url); }}>
+                    <Text style={{ fontSize: 11, color: Colors.PRIMARY, fontWeight: '600' }}>העתק URL</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={{ backgroundColor: '#fdecea', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 6 }} onPress={() => handleDelete(f.filename)}>
+                    <Text style={{ fontSize: 11, color: '#c0392b', fontWeight: '600' }}>מחק</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          ))}
+          {filteredFiles.length === 0 && (
+            <Text style={{ color: '#999', fontSize: 14, textAlign: 'right', writingDirection: 'rtl', width: '100%' }}>אין תמונות בתיקייה זו</Text>
+          )}
+        </View>
+      </View>
+    );
+  };
+
+  // ─── Home Gallery ───────────────────────────────────────────
+  const renderGallery = () => {
+    const handleUpload = async (file: File) => {
+      const fd = new FormData();
+      fd.append('file', file);
+      try {
+        await fetch(`${API_BASE}/api/gallery`, { method: 'POST', body: fd });
+        await refreshGallery();
+      } catch {}
+    };
+    const handleDelete = async (filename: string) => {
+      if (Platform.OS === 'web' && !confirm(`למחוק את ${filename}?`)) return;
+      try {
+        await fetch(`/api/gallery/${encodeURIComponent(filename)}`, { method: 'DELETE' });
+        await refreshGallery();
+      } catch {}
+    };
+    const reorder = async (from: number, to: number) => {
+      if (from === to) return;
+      const next = [...galleryFiles];
+      const [moved] = next.splice(from, 1);
+      next.splice(to, 0, moved);
+      setGalleryFiles(next);
+      await fetch('/api/gallery/order', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ order: next.map(f => f.filename) }),
+      });
+    };
+    return (
+      <View style={cs.contentCard}>
+        <View style={cs.contentHeaderRow}>
+          <View style={{ flex: 1 }}>
+            <Text style={cs.contentTitle}>גלריית דף הבית</Text>
+            <Text style={cs.contentSub}>{galleryFiles.length} תמונות — תוצג כסליידר אוטומטי בדף הבית</Text>
+          </View>
+          {Platform.OS === 'web' && React.createElement('label', {
+            style: {
+              backgroundColor: Colors.PRIMARY, color: '#fff', padding: '10px 16px',
+              borderRadius: 10, fontSize: 14, fontWeight: 600, cursor: 'pointer',
+            },
+          }, [
+            '+ העלה תמונות',
+            React.createElement('input', {
+              key: 'file',
+              type: 'file',
+              accept: 'image/*',
+              multiple: true,
+              style: { display: 'none' },
+              onChange: async (e: any) => {
+                const files = Array.from(e.target.files || []) as File[];
+                for (const f of files) await handleUpload(f);
+                e.target.value = '';
+              },
+            }),
+          ])}
+        </View>
+
+        <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 12, marginTop: 16 }}>
+          {galleryFiles.map((f, idx) => {
+            const card = (
+              <View style={{ width: 200, backgroundColor: '#fafafa', borderRadius: 12, overflow: 'hidden', borderWidth: 1, borderColor: '#e8e8e8' }}>
+                {Platform.OS === 'web' && React.createElement('img', {
+                  src: f.url,
+                  style: { width: '100%', height: 130, objectFit: 'cover', display: 'block' },
+                  alt: f.filename,
+                })}
+                <View style={{ padding: 8, flexDirection: 'row-reverse', alignItems: 'center', gap: 6 }}>
+                  <Text style={{ fontSize: 11, color: '#999', fontWeight: '600', width: 22, textAlign: 'center' }}>{idx + 1}</Text>
+                  <Text numberOfLines={1} style={{ flex: 1, fontSize: 11, color: '#666', textAlign: 'right' }}>{f.filename}</Text>
+                  <TouchableOpacity
+                    style={{ backgroundColor: '#fdecea', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 6 }}
+                    onPress={() => handleDelete(f.filename)}
+                  >
+                    <Text style={{ fontSize: 11, color: '#c0392b', fontWeight: '600' }}>מחק</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            );
+            if (Platform.OS === 'web') {
+              return React.createElement('div', {
+                key: f.filename,
+                draggable: true,
+                onDragStart: (e: any) => { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', String(idx)); },
+                onDragOver: (e: any) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; },
+                onDrop: (e: any) => {
+                  e.preventDefault();
+                  const from = parseInt(e.dataTransfer.getData('text/plain'), 10);
+                  if (!isNaN(from)) reorder(from, idx);
+                },
+                style: { cursor: 'move' },
+              }, card);
+            }
+            return <View key={f.filename}>{card}</View>;
+          })}
+          {galleryFiles.length === 0 && (
+            <Text style={{ color: '#999', fontSize: 14, textAlign: 'right', writingDirection: 'rtl', width: '100%' }}>
+              אין תמונות עדיין — לחץ על "העלה תמונות" כדי להוסיף
+            </Text>
+          )}
+        </View>
+      </View>
+    );
+  };
+
+  const [listings, setListings] = useState<any[]>([]);
+  const loadListings = async () => {
+    try {
+      const r = await fetch(`${API_BASE}/api/listings?all=1`);
+      const j = await r.json();
+      setListings(j.listings || []);
+    } catch {}
+  };
+  useEffect(() => { loadListings(); }, [activeNav]);
+
+  const [mapBackups, setMapBackups] = useState<{ backups: Record<string, { timestamp: string; pointsCount: number }[]>; current: { name: string; pointsCount: number }[] }>({ backups: {}, current: [] });
+  const [expandedLayer, setExpandedLayer] = useState<string | null>(null);
+  const loadMapBackups = async () => {
+    try {
+      const r = await fetch(`${API_BASE}/api/map-backups`);
+      const j = await r.json();
+      if (j.success) setMapBackups({ backups: j.backups || {}, current: j.current || [] });
+    } catch {}
+  };
+  useEffect(() => { if (activeNav === 'locations') loadMapBackups(); }, [activeNav]);
+
+  const restoreBackup = async (layerName: string, timestamp: string) => {
+    if (Platform.OS === 'web' && !(window as any).confirm(`לשחזר את שכבת "${layerName}" מ-${new Date(timestamp).toLocaleString('he-IL')}?`)) return;
+    try {
+      await fetch(`${API_BASE}/api/map-backups/restore`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ layerName, timestamp }),
+      });
+      await loadMapBackups();
+    } catch {}
+  };
+
+  const deleteBackup = async (layerName: string, timestamp: string) => {
+    if (Platform.OS === 'web' && !(window as any).confirm(`למחוק את הגיבוי?`)) return;
+    try {
+      await fetch(`${API_BASE}/api/map-backups/${encodeURIComponent(layerName)}/${encodeURIComponent(timestamp)}`, { method: 'DELETE' });
+      await loadMapBackups();
+    } catch {}
+  };
+
+  const renderLocations = () => {
+    const layerNames = Object.keys(mapBackups.backups).sort();
+    const currentByName = Object.fromEntries(mapBackups.current.map(c => [c.name, c.pointsCount]));
+    return (
+      <View style={cs.contentCard}>
+        <View style={{ padding: 16 }}>
+          <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+            <Text style={{ fontSize: 18, fontWeight: '900', color: Colors.TEXT, writingDirection: 'rtl' }}>📍 גיבוי מפות ונקודות</Text>
+            <TouchableOpacity onPress={loadMapBackups} style={{ paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8, backgroundColor: Colors.PRIMARY }}>
+              <Text style={{ color: '#fff', fontSize: 12, fontWeight: '800' }}>רענן</Text>
+            </TouchableOpacity>
+          </View>
+
+          <Text style={{ fontSize: 12, color: '#64748b', writingDirection: 'rtl', textAlign: 'right', marginBottom: 10 }}>
+            לפני כל סנכרון מ-Google My Maps נשמרים 5 גרסאות אחרונות לכל שכבה. אם משהו נמחק בטעות מ-Google, ניתן לשחזר כאן.
+          </Text>
+
+          {layerNames.length === 0 && (
+            <Text style={{ textAlign: 'center', color: '#94a3b8', padding: 20, writingDirection: 'rtl' }}>אין עדיין גיבויים. הגיבוי הראשון ייווצר בסנכרון הבא.</Text>
+          )}
+
+          {layerNames.map(name => {
+            const versions = mapBackups.backups[name] || [];
+            const currentCount = currentByName[name];
+            const isOpen = expandedLayer === name;
+            return (
+              <View key={name} style={{ borderWidth: 1, borderColor: '#e2e8f0', borderRadius: 10, marginBottom: 8, overflow: 'hidden' }}>
+                <TouchableOpacity onPress={() => setExpandedLayer(isOpen ? null : name)} style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', padding: 12, backgroundColor: '#f8fafc' }}>
+                  <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 8 }}>
+                    <Text style={{ fontSize: 14, fontWeight: '800', color: Colors.TEXT, writingDirection: 'rtl' }}>{name}</Text>
+                    {currentCount != null && (
+                      <View style={{ paddingHorizontal: 8, paddingVertical: 2, borderRadius: 10, backgroundColor: '#10b981' }}>
+                        <Text style={{ fontSize: 10, color: '#fff', fontWeight: '800' }}>נוכחי: {currentCount}</Text>
+                      </View>
+                    )}
+                    <Text style={{ fontSize: 11, color: '#64748b' }}>{versions.length} גיבויים</Text>
+                  </View>
+                  <Text style={{ fontSize: 16, color: '#64748b' }}>{isOpen ? '▲' : '▼'}</Text>
+                </TouchableOpacity>
+                {isOpen && versions.map(v => (
+                  <View key={v.timestamp} style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', padding: 10, borderTopWidth: 1, borderTopColor: '#e2e8f0', backgroundColor: '#fff' }}>
+                    <View>
+                      <Text style={{ fontSize: 12, fontWeight: '700', color: Colors.TEXT, writingDirection: 'rtl' }}>{new Date(v.timestamp).toLocaleString('he-IL')}</Text>
+                      <Text style={{ fontSize: 10, color: '#64748b', writingDirection: 'rtl' }}>{v.pointsCount} נקודות</Text>
+                    </View>
+                    <View style={{ flexDirection: 'row-reverse', gap: 6 }}>
+                      <TouchableOpacity onPress={() => restoreBackup(name, v.timestamp)} style={{ paddingHorizontal: 10, paddingVertical: 6, borderRadius: 6, backgroundColor: '#1A6B8A' }}>
+                        <Text style={{ color: '#fff', fontSize: 11, fontWeight: '800' }}>שחזר</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity onPress={() => deleteBackup(name, v.timestamp)} style={{ paddingHorizontal: 10, paddingVertical: 6, borderRadius: 6, backgroundColor: '#fee2e2' }}>
+                        <Text style={{ color: '#dc2626', fontSize: 11, fontWeight: '800' }}>מחק</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                ))}
+              </View>
+            );
+          })}
+        </View>
+      </View>
+    );
+  };
+
+  const renderListings = () => {
+    const typeLabel = (t: string) => t === 'sale' ? 'למכירה' : t === 'rent-daily' ? 'יומי' : t === 'rent-yearly' ? 'שנתי' : t;
+    const pending = listings.filter(l => !l.approved);
+    const approved = listings.filter(l => l.approved);
+    return (
+      <View style={cs.contentCard}>
+        <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+          <Text style={cs.contentTitle}>🏠 מודעות נדל"ן</Text>
+          <TouchableOpacity onPress={loadListings} style={{ paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8, backgroundColor: '#f1f5f9' }}>
+            <Text style={{ fontSize: 12, fontWeight: '700', color: '#475569' }}>↻ רענן</Text>
+          </TouchableOpacity>
+        </View>
+
+        {pending.length > 0 && (
+          <View style={{ marginBottom: 16 }}>
+            <Text style={{ fontSize: 13, fontWeight: '800', color: '#b91c1c', marginBottom: 8, writingDirection: 'rtl', textAlign: 'right' }}>⏳ ממתינות לאישור ({pending.length})</Text>
+            {pending.map(l => (
+              <View key={l.id} style={{ backgroundColor: '#fef3c7', borderRadius: 10, padding: 12, marginBottom: 8, borderWidth: 1, borderColor: '#fbbf24' }}>
+                <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 10, marginBottom: 6 }}>
+                  {l.images && l.images[0] && <Image source={{ uri: l.images[0] }} style={{ width: 60, height: 60, borderRadius: 6 }} />}
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 13, fontWeight: '900', color: '#1C2B35', textAlign: 'right', writingDirection: 'rtl' }}>{l.title}</Text>
+                    <Text style={{ fontSize: 11, color: '#475569', textAlign: 'right', writingDirection: 'rtl' }}>{typeLabel(l.type)} · {l.location || ''} · ${l.price || '—'}</Text>
+                    <Text style={{ fontSize: 11, color: '#64748b', textAlign: 'right', writingDirection: 'rtl' }}>📞 {l.phone}</Text>
+                  </View>
+                </View>
+                {l.description && <Text style={{ fontSize: 12, color: '#334155', writingDirection: 'rtl', textAlign: 'right', marginVertical: 6 }}>{l.description}</Text>}
+                <View style={{ flexDirection: 'row-reverse', gap: 8 }}>
+                  <TouchableOpacity
+                    style={{ flex: 1, backgroundColor: '#10b981', borderRadius: 8, paddingVertical: 8, alignItems: 'center' }}
+                    onPress={async () => {
+                      await fetch(`${API_BASE}/api/listings/${l.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ approved: true }) });
+                      loadListings();
+                    }}
+                  >
+                    <Text style={{ color: '#fff', fontSize: 12, fontWeight: '900' }}>✓ אשר</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={{ flex: 1, backgroundColor: '#dc2626', borderRadius: 8, paddingVertical: 8, alignItems: 'center' }}
+                    onPress={async () => {
+                      await fetch(`${API_BASE}/api/listings/${l.id}`, { method: 'DELETE' });
+                      loadListings();
+                    }}
+                  >
+                    <Text style={{ color: '#fff', fontSize: 12, fontWeight: '900' }}>✕ מחק</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            ))}
+          </View>
+        )}
+
+        <Text style={{ fontSize: 13, fontWeight: '800', color: '#10b981', marginBottom: 8, writingDirection: 'rtl', textAlign: 'right' }}>✓ מאושרות ({approved.length})</Text>
+        {approved.length === 0 && <Text style={{ fontSize: 12, color: '#94a3b8', textAlign: 'center', writingDirection: 'rtl', padding: 20 }}>אין מודעות מאושרות</Text>}
+        {approved.map(l => (
+          <View key={l.id} style={{ backgroundColor: '#f0fdf4', borderRadius: 10, padding: 10, marginBottom: 6, borderWidth: 1, borderColor: '#bbf7d0' }}>
+            <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 8 }}>
+              {l.images && l.images[0] && <Image source={{ uri: l.images[0] }} style={{ width: 44, height: 44, borderRadius: 6 }} />}
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: 12, fontWeight: '800', color: '#1C2B35', textAlign: 'right', writingDirection: 'rtl' }}>{l.title}</Text>
+                <Text style={{ fontSize: 10, color: '#64748b', textAlign: 'right', writingDirection: 'rtl' }}>{typeLabel(l.type)} · ${l.price || '—'} · 📞 {l.phone}</Text>
+              </View>
+              <TouchableOpacity
+                onPress={async () => { await fetch(`${API_BASE}/api/listings/${l.id}`, { method: 'DELETE' }); loadListings(); }}
+                style={{ paddingHorizontal: 10, paddingVertical: 4, borderRadius: 6, backgroundColor: '#fee2e2' }}
+              >
+                <Text style={{ fontSize: 11, color: '#dc2626', fontWeight: '800' }}>✕</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        ))}
+      </View>
+    );
+  };
+
+  // ─── Items List ─────────────────────────────────────────────
+  const renderItems = () => {
+    if (!currentSection) return null;
+    const pendingCount = listings.filter(l => !l.approved).length;
+    return (
+      <View style={cs.contentCard}>
+        {activeNav === 'side' && !childrenOf && (() => {
+          const tabLabels: Record<string, string> = {
+            dashboard: '📊 דשבורד',
+            blocks: '📦 דף הפורטל',
+            listings: `🏠 מודעות${pendingCount > 0 ? ' (' + pendingCount + ')' : ''}`,
+            finance: '💰 מדד הכסף',
+            tourism: '🧳 מדד התיירים',
+            realestate: '🏠 מדד הנדל״ן',
+          };
+          return Platform.OS === 'web'
+            ? React.createElement('div', { style: { display: 'flex', flexDirection: 'row-reverse', gap: 6, marginBottom: 14, background: '#f1f5f9', borderRadius: 10, padding: 4 } },
+                sideTabOrder.map((k, i) => React.createElement('div', {
+                  key: k,
+                  draggable: true,
+                  onClick: () => setSideTab(k),
+                  onDragStart: (e: any) => { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', String(i)); },
+                  onDragOver: (e: any) => { e.preventDefault(); setSideTabDragIdx(i); },
+                  onDragLeave: () => setSideTabDragIdx(-1),
+                  onDrop: (e: any) => {
+                    e.preventDefault();
+                    setSideTabDragIdx(-1);
+                    const from = parseInt(e.dataTransfer.getData('text/plain'), 10);
+                    if (!isNaN(from) && from !== i) {
+                      const arr = [...sideTabOrder];
+                      const [moved] = arr.splice(from, 1);
+                      arr.splice(i, 0, moved);
+                      setSideTabOrder(arr);
+                    }
+                  },
+                  onDragEnd: () => setSideTabDragIdx(-1),
+                  style: {
+                    flex: 1, padding: '8px 12px', borderRadius: 8, cursor: 'grab', userSelect: 'none', textAlign: 'center',
+                    background: sideTab === k ? '#fff' : 'transparent',
+                    borderTop: sideTabDragIdx === i ? `3px solid ${Colors.PRIMARY}` : '3px solid transparent',
+                    fontSize: 12, fontWeight: 800, color: sideTab === k ? Colors.PRIMARY : '#64748b',
+                    fontFamily: 'Arial, sans-serif',
+                    transition: 'all 0.15s ease',
+                  },
+                }, tabLabels[k])))
+            : (
+              <View style={{ flexDirection: 'row-reverse', gap: 6, marginBottom: 14, backgroundColor: '#f1f5f9', borderRadius: 10, padding: 4 }}>
+                {sideTabOrder.map(k => (
+                  <TouchableOpacity key={k} onPress={() => setSideTab(k)} style={{ flex: 1, paddingVertical: 8, borderRadius: 8, backgroundColor: sideTab === k ? Colors.WHITE : 'transparent', alignItems: 'center' }}>
+                    <Text style={{ fontSize: 12, fontWeight: '800', color: sideTab === k ? Colors.PRIMARY : '#64748b' }}>{tabLabels[k]}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            );
+        })()}
+        {activeNav === 'side' && !childrenOf && sideTab === 'dashboard' && (() => {
+          const approved = listings.filter(l => l.approved);
+          const pending = listings.filter(l => !l.approved);
+          const totalListings = listings.length;
+          const activeBigCount = approved.filter(l => l.size === 'full').length;
+          const activeBannerCount = approved.filter(l => l.size !== 'full').length;
+          const monthlyRevenue = activeBigCount * 10;
+          const daysSince = (iso: string) => { try { return Math.floor((Date.now() - new Date(iso).getTime()) / 86400000); } catch { return 0; } };
+          const expiryDays = (iso: string) => Math.max(0, 30 - daysSince(iso));
+          const unreadMessages = contactMessages.filter(m => !m.read).length;
+          const totalAlerts = unreadMessages + pending.length;
+          return (
+            <View>
+              {totalAlerts > 0 && (
+                <View style={{ flexDirection: 'row-reverse', gap: 10, marginBottom: 14, flexWrap: 'wrap' }}>
+                  {unreadMessages > 0 && (
+                    <TouchableOpacity onPress={() => { setActiveNav('subscription'); setSubTab('messages'); }} activeOpacity={0.85} style={{ flex: 1, minWidth: 240, flexDirection: 'row-reverse', alignItems: 'center', gap: 12, backgroundColor: '#fef2f2', borderWidth: 2, borderColor: '#fecaca', borderRadius: 12, padding: 14 }}>
+                      <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: '#dc2626', alignItems: 'center', justifyContent: 'center' }}>
+                        <Text style={{ fontSize: 16, fontWeight: '900', color: '#fff' }}>{unreadMessages > 99 ? '99+' : unreadMessages}</Text>
+                      </View>
+                      <View style={{ flex: 1 }}>
+                        <Text style={{ fontSize: 14, fontWeight: '900', color: '#7f1d1d', writingDirection: 'rtl', textAlign: 'right' }}>📨 הודעות חדשות מהאתר</Text>
+                        <Text style={{ fontSize: 11, color: '#991b1b', writingDirection: 'rtl', textAlign: 'right', marginTop: 2 }}>{unreadMessages} הודעות שלא נקראו · לחץ לצפייה</Text>
+                      </View>
+                      <Text style={{ fontSize: 18, color: '#dc2626', fontWeight: '900' }}>‹</Text>
+                    </TouchableOpacity>
+                  )}
+                  {pending.length > 0 && (
+                    <TouchableOpacity onPress={() => setSideTab('listings')} activeOpacity={0.85} style={{ flex: 1, minWidth: 240, flexDirection: 'row-reverse', alignItems: 'center', gap: 12, backgroundColor: '#fffbeb', borderWidth: 2, borderColor: '#fde68a', borderRadius: 12, padding: 14 }}>
+                      <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: '#f59e0b', alignItems: 'center', justifyContent: 'center' }}>
+                        <Text style={{ fontSize: 16, fontWeight: '900', color: '#fff' }}>{pending.length > 99 ? '99+' : pending.length}</Text>
+                      </View>
+                      <View style={{ flex: 1 }}>
+                        <Text style={{ fontSize: 14, fontWeight: '900', color: '#78350f', writingDirection: 'rtl', textAlign: 'right' }}>⏳ מודעות ממתינות לאישור</Text>
+                        <Text style={{ fontSize: 11, color: '#92400e', writingDirection: 'rtl', textAlign: 'right', marginTop: 2 }}>{pending.length} מודעות נדל״ן · לחץ לאישור</Text>
+                      </View>
+                      <Text style={{ fontSize: 18, color: '#f59e0b', fontWeight: '900' }}>‹</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+              )}
+              <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 10, marginBottom: 14 }}>
+                {[
+                  { label: 'סה"כ מודעות', value: totalListings, color: '#1A6B8A', icon: '📋' },
+                  { label: 'ממתינות לאישור', value: pending.length, color: '#f59e0b', icon: '⏳' },
+                  { label: 'פעילות', value: approved.length, color: '#10b981', icon: '✓' },
+                  { label: 'הכנסה חודשית משוערת', value: `$${monthlyRevenue}`, color: '#8b5cf6', icon: '💰' },
+                  { label: 'מודעות גדולות ($10)', value: activeBigCount, color: '#ec4899', icon: '📏' },
+                  { label: 'באנרים (חינם)', value: activeBannerCount, color: '#64748b', icon: '🆓' },
+                ].map((c, i) => (
+                  <View key={i} style={{ flex: 1, minWidth: 160, backgroundColor: c.color + '15', borderRadius: 10, padding: 12, borderLeftWidth: 4, borderLeftColor: c.color }}>
+                    <Text style={{ fontSize: 11, color: '#64748b', writingDirection: 'rtl', textAlign: 'right' }}>{c.icon} {c.label}</Text>
+                    <Text style={{ fontSize: 22, fontWeight: '900', color: c.color, textAlign: 'right', marginTop: 4 }}>{c.value}</Text>
+                  </View>
+                ))}
+              </View>
+
+              <View style={{ backgroundColor: '#fff', borderRadius: 10, borderWidth: 1, borderColor: '#e2e8f0', overflow: 'hidden' }}>
+                <View style={{ flexDirection: 'row-reverse', paddingVertical: 8, paddingHorizontal: 12, backgroundColor: '#f1f5f9', gap: 6 }}>
+                  <Text style={{ flex: 2, fontSize: 11, fontWeight: '800', color: '#475569', textAlign: 'right', writingDirection: 'rtl' }}>מודעה</Text>
+                  <Text style={{ flex: 1, fontSize: 11, fontWeight: '800', color: '#475569', textAlign: 'center' }}>סוג</Text>
+                  <Text style={{ flex: 1, fontSize: 11, fontWeight: '800', color: '#475569', textAlign: 'center' }}>גודל</Text>
+                  <Text style={{ flex: 1, fontSize: 11, fontWeight: '800', color: '#475569', textAlign: 'center' }}>מחיר</Text>
+                  <Text style={{ flex: 1, fontSize: 11, fontWeight: '800', color: '#475569', textAlign: 'center' }}>תוקף</Text>
+                  <Text style={{ flex: 1, fontSize: 11, fontWeight: '800', color: '#475569', textAlign: 'center' }}>תשלום חודשי</Text>
+                </View>
+                {approved.length === 0 ? (
+                  <Text style={{ textAlign: 'center', color: '#94a3b8', padding: 20, writingDirection: 'rtl' }}>אין מודעות פעילות</Text>
+                ) : approved.map((l, idx) => {
+                  const days = expiryDays(l.createdAt || '');
+                  const revenue = l.size === 'full' ? 10 : 0;
+                  return (
+                    <View key={l.id} style={{ flexDirection: 'row-reverse', paddingVertical: 10, paddingHorizontal: 12, gap: 6, backgroundColor: idx % 2 === 0 ? '#fff' : '#fafafa', borderTopWidth: 1, borderTopColor: '#f1f5f9' }}>
+                      <Text style={{ flex: 2, fontSize: 12, color: '#1C2B35', textAlign: 'right', writingDirection: 'rtl' }} numberOfLines={1}>{l.title}</Text>
+                      <Text style={{ flex: 1, fontSize: 11, color: '#64748b', textAlign: 'center' }}>{l.type === 'sale' ? 'מכירה' : l.type === 'rent' ? 'שכירות' : l.type === 'hotels' ? 'מלונאי' : l.type}</Text>
+                      <Text style={{ flex: 1, fontSize: 11, color: '#64748b', textAlign: 'center' }}>{l.size === 'full' ? 'גדולה' : 'קטנה'}</Text>
+                      <Text style={{ flex: 1, fontSize: 11, color: '#1C2B35', textAlign: 'center', fontWeight: '700' }}>${l.price || '—'}</Text>
+                      <Text style={{ flex: 1, fontSize: 11, color: days <= 5 ? '#dc2626' : days <= 10 ? '#f59e0b' : '#10b981', textAlign: 'center', fontWeight: '700' }}>{days > 0 ? `${days} ימים` : 'פג'}</Text>
+                      <Text style={{ flex: 1, fontSize: 11, color: revenue > 0 ? '#10b981' : '#94a3b8', textAlign: 'center', fontWeight: '700' }}>${revenue}</Text>
+                    </View>
+                  );
+                })}
+              </View>
+
+              <Text style={{ fontSize: 10, color: '#94a3b8', textAlign: 'center', marginTop: 10, writingDirection: 'rtl' }}>
+                * חישוב משוער. תוקף = 30 ימים מהפרסום. לידים והקפצות יתווספו בהמשך.
+              </Text>
+            </View>
+          );
+        })()}
+        {activeNav === 'side' && !childrenOf && sideTab === 'finance' && (
+          <FinanceWorldBankTable />
+        )}
+        {activeNav === 'side' && !childrenOf && sideTab === 'finance' && (
+          <SourceLinksBar
+            accentColor="#1A6B8A"
+            links={[
+              { icon: '🏦', label: 'NBG', url: 'https://nbg.gov.ge/en/statistics' },
+              { icon: '📊', label: 'Geostat', url: 'https://www.geostat.ge/en' },
+              { icon: '💰', label: 'משרד האוצר', url: 'https://mof.ge/en' },
+              { icon: '📈', label: 'בורסה (GSE)', url: 'https://gse.ge/en' },
+            ]}
+          />
+        )}
+        {activeNav === 'side' && !childrenOf && sideTab === 'finance' && (
+          <FinanceManualTable />
+        )}
+        {activeNav === 'side' && !childrenOf && sideTab === 'tourism' && (
+          <TourismWorldBankTable />
+        )}
+        {activeNav === 'side' && !childrenOf && sideTab === 'tourism' && (
+          <SourceLinksBar
+            accentColor="#15803d"
+            links={[
+              { icon: '🧳', label: 'GNTA', url: 'https://gnta.ge/statistics' },
+              { icon: '🌊', label: 'Visit Batumi', url: 'https://visitbatumi.com/en/statistics' },
+            ]}
+          />
+        )}
+        {activeNav === 'side' && !childrenOf && sideTab === 'tourism' && (
+          <ManualIndicatorsTable
+            title="🧳 מדדי תיירות ידניים"
+            subtitle="ישראלים, תיירים לבטומי, וכל מדד שתרצה"
+            storageField="tourismStatsCustom"
+            accentColor="#15803d"
+            headerBg="#f0fdf4"
+            lineColor="#22c55e"
+            cellBg="#bbf7d0"
+          />
+        )}
+        {activeNav === 'side' && !childrenOf && sideTab === 'blocks' && (
+          <BlocksMenu />
+        )}
+        {activeNav === 'side' && !childrenOf && sideTab === 'realestate' && (
+          <SourceLinksBar
+            accentColor="#1C2B35"
+            links={[
+              { icon: '🏢', label: 'Galt & Taggart', url: 'https://galtandtaggart.com/research/real-estate' },
+              { icon: '🏗️', label: 'Colliers', url: 'https://www.colliers.com/en-ge/research' },
+              { icon: '🏠', label: 'MyHome', url: 'https://www.myhome.ge/en' },
+            ]}
+          />
+        )}
+        {activeNav === 'side' && !childrenOf && sideTab === 'realestate' && (
+          <ManualIndicatorsTable
+            title="🏠 מדדי נדל״ן ידניים"
+            subtitle="מחירי דירות, עלויות בנייה, תשואה, וכל מדד שתרצה"
+            storageField="realestateStatsCustom"
+            accentColor="#1C2B35"
+            headerBg="#f1f5f9"
+            lineColor="#334155"
+            cellBg="#cbd5e1"
+          />
+        )}
+        {false && activeNav === 'side' && !childrenOf && sideTab === 'finance' && (
+          <View style={{ padding: 12, marginBottom: 14, backgroundColor: '#f8fafc', borderRadius: 10, borderWidth: 1, borderColor: '#e2e8f0' }}>
+            <Text style={{ fontSize: 13, fontWeight: '900', color: '#1C2B35', writingDirection: 'rtl', textAlign: 'right', marginBottom: 10 }}>💰 מדד הכסף - ערך ידני עדכני</Text>
+            {([
+              { key: 'inflation', label: 'אינפלציה (%)' },
+              { key: 'lendingRate', label: 'ריבית הלוואות (%)' },
+              { key: 'gdp', label: 'צמיחת תמ"ג (%)' },
+            ] as const).map(f => (
+              <View key={f.key} style={{ flexDirection: 'row-reverse', gap: 6, marginBottom: 6 }}>
+                <Text style={{ width: 130, fontSize: 12, fontWeight: '700', color: '#475569', textAlign: 'right', writingDirection: 'rtl', alignSelf: 'center' }}>{f.label}</Text>
+                <TextInput
+                  style={{ flex: 1, borderWidth: 1, borderColor: '#cbd5e1', borderRadius: 8, padding: 6, fontSize: 13, textAlign: 'left' }}
+                  value={String(finStats[f.key]?.current ?? '')}
+                  onChangeText={v => setFinStats((p: any) => ({ ...p, [f.key]: { ...p[f.key], current: v } }))}
+                  keyboardType="numeric"
+                  placeholder="ערך"
+                  placeholderTextColor="#bbb"
+                />
+                <TextInput
+                  style={{ width: 90, borderWidth: 1, borderColor: '#cbd5e1', borderRadius: 8, padding: 6, fontSize: 13, textAlign: 'center' }}
+                  value={String(finStats[f.key]?.date ?? '')}
+                  onChangeText={v => setFinStats((p: any) => ({ ...p, [f.key]: { ...p[f.key], date: v } }))}
+                  placeholder="MM/YY"
+                  placeholderTextColor="#bbb"
+                />
+              </View>
+            ))}
+            <TouchableOpacity
+              style={{ backgroundColor: '#10b981', borderRadius: 8, paddingVertical: 8, alignItems: 'center', marginTop: 6 }}
+              onPress={async () => {
+                const toSave = {
+                  inflation: { current: finStats.inflation.current === '' ? null : parseFloat(finStats.inflation.current), date: finStats.inflation.date },
+                  lendingRate: { current: finStats.lendingRate.current === '' ? null : parseFloat(finStats.lendingRate.current), date: finStats.lendingRate.date },
+                  gdp: { current: finStats.gdp.current === '' ? null : parseFloat(finStats.gdp.current), date: finStats.gdp.date },
+                };
+                try { await fetch(`${API_BASE}/api/content/financeStats`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(toSave) }); } catch {}
+              }}
+            >
+              <Text style={{ color: '#fff', fontWeight: '800', fontSize: 13 }}>שמור מדד הכסף</Text>
+            </TouchableOpacity>
+            <Text style={{ fontSize: 10, color: '#94a3b8', textAlign: 'right', writingDirection: 'rtl', marginTop: 6 }}>השאר ריק כדי להשתמש בערך השנתי של World Bank</Text>
+          </View>
+        )}
+
+        {activeNav === 'side' && !childrenOf && sideTab === 'listings' && (
+          <CuratedListingsEditor />
+        )}
+        {activeNav === 'side' && !childrenOf && sideTab === 'listings' && (() => {
+          const typeLabel = (t: string) => t === 'sale' ? 'למכירה' : t === 'rent-daily' ? 'יומי' : t === 'rent-yearly' ? 'שנתי' : t;
+          const pending = listings.filter(l => !l.approved);
+          const approved = listings.filter(l => l.approved);
+          return (
+            <View style={{ padding: 12, marginBottom: 14, backgroundColor: '#f8fafc', borderRadius: 10, borderWidth: 1, borderColor: '#e2e8f0' }}>
+              <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                <Text style={{ fontSize: 13, fontWeight: '900', color: '#1C2B35', writingDirection: 'rtl', textAlign: 'right' }}>🏠 מודעות נדל"ן - אישור ופרסום</Text>
+                <TouchableOpacity onPress={loadListings} style={{ paddingHorizontal: 10, paddingVertical: 4, borderRadius: 6, backgroundColor: '#e2e8f0' }}>
+                  <Text style={{ fontSize: 11, fontWeight: '700', color: '#475569' }}>↻ רענן</Text>
+                </TouchableOpacity>
+              </View>
+              {pending.length > 0 && (
+                <View style={{ marginBottom: 10 }}>
+                  <Text style={{ fontSize: 12, fontWeight: '800', color: '#b91c1c', marginBottom: 6, writingDirection: 'rtl', textAlign: 'right' }}>⏳ ממתינות ({pending.length})</Text>
+                  {pending.map(l => (
+                    <View key={l.id} style={{ backgroundColor: '#fef3c7', borderRadius: 8, padding: 10, marginBottom: 6, borderWidth: 1, borderColor: '#fbbf24' }}>
+                      <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                        {l.images && l.images[0] && <Image source={{ uri: l.images[0] }} style={{ width: 50, height: 50, borderRadius: 6 }} />}
+                        <View style={{ flex: 1 }}>
+                          <Text style={{ fontSize: 12, fontWeight: '900', color: '#1C2B35', textAlign: 'right', writingDirection: 'rtl' }}>{l.title}</Text>
+                          <Text style={{ fontSize: 10, color: '#475569', textAlign: 'right', writingDirection: 'rtl' }}>{typeLabel(l.type)} · {l.location || ''} · ${l.price || '—'}</Text>
+                          <Text style={{ fontSize: 10, color: '#64748b', textAlign: 'right', writingDirection: 'rtl' }}>📞 {l.phone}</Text>
+                        </View>
+                      </View>
+                      {l.description && <Text style={{ fontSize: 11, color: '#334155', writingDirection: 'rtl', textAlign: 'right', marginVertical: 4 }}>{l.description}</Text>}
+                      <View style={{ flexDirection: 'row-reverse', gap: 6 }}>
+                        <TouchableOpacity
+                          style={{ flex: 1, backgroundColor: '#10b981', borderRadius: 6, paddingVertical: 6, alignItems: 'center' }}
+                          onPress={async () => { await fetch(`${API_BASE}/api/listings/${l.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ approved: true }) }); loadListings(); }}
+                        >
+                          <Text style={{ color: '#fff', fontSize: 11, fontWeight: '900' }}>✓ אשר</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          style={{ flex: 1, backgroundColor: '#dc2626', borderRadius: 6, paddingVertical: 6, alignItems: 'center' }}
+                          onPress={async () => { await fetch(`${API_BASE}/api/listings/${l.id}`, { method: 'DELETE' }); loadListings(); }}
+                        >
+                          <Text style={{ color: '#fff', fontSize: 11, fontWeight: '900' }}>✕ מחק</Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  ))}
+                </View>
+              )}
+              <Text style={{ fontSize: 12, fontWeight: '800', color: '#10b981', marginBottom: 6, writingDirection: 'rtl', textAlign: 'right' }}>✓ מאושרות ({approved.length})</Text>
+              {approved.length === 0 && <Text style={{ fontSize: 11, color: '#94a3b8', textAlign: 'center', writingDirection: 'rtl', padding: 10 }}>אין מודעות מאושרות</Text>}
+              {approved.map(l => (
+                <View key={l.id} style={{ backgroundColor: '#f0fdf4', borderRadius: 8, padding: 8, marginBottom: 4, borderWidth: 1, borderColor: '#bbf7d0', flexDirection: 'row-reverse', alignItems: 'center', gap: 8 }}>
+                  {l.images && l.images[0] && <Image source={{ uri: l.images[0] }} style={{ width: 36, height: 36, borderRadius: 4 }} />}
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 11, fontWeight: '800', color: '#1C2B35', textAlign: 'right', writingDirection: 'rtl' }}>{l.title}</Text>
+                    <Text style={{ fontSize: 10, color: '#64748b', textAlign: 'right', writingDirection: 'rtl' }}>{typeLabel(l.type)} · ${l.price || '—'} · 📞 {l.phone}</Text>
+                  </View>
+                  <TouchableOpacity onPress={async () => { await fetch(`${API_BASE}/api/listings/${l.id}`, { method: 'DELETE' }); loadListings(); }} style={{ paddingHorizontal: 8, paddingVertical: 3, borderRadius: 4, backgroundColor: '#fee2e2' }}>
+                    <Text style={{ fontSize: 10, color: '#dc2626', fontWeight: '800' }}>✕</Text>
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </View>
+          );
+        })()}
+
+        {(activeNav !== 'side' || childrenOf || sideTab === 'blocks') && (
+        <>
+        {childrenOf && (
+          <TouchableOpacity onPress={() => setChildrenOf(null)} style={{ marginBottom: 10, alignSelf: 'flex-end' }}>
+            <Text style={{ color: Colors.PRIMARY, fontSize: 14, fontWeight: '600' }}>→ חזרה ל{currentSection.label}</Text>
+          </TouchableOpacity>
+        )}
+        {!(activeNav === 'side' && sideTab === 'blocks' && !childrenOf) && (
+        <View style={cs.contentHeaderRow}>
+          <View style={{ flex: 1 }}>
+            <Text style={cs.contentTitle}>
+              {toursMode ? `בלוקי סיורים — ${childrenOf!.title}` : childrenOf ? `תת-קטגוריות של ${childrenOf.title}` : currentSection.label}
+            </Text>
+            <Text style={cs.contentSub}>{currentItems.length} {toursMode ? 'בלוקים' : 'פריטים'}</Text>
+          </View>
+          {!childrenOf && ['main','extra','welcome','info','bottom','side'].includes(activeNav) && (() => {
+            const isExtra = activeNav === 'extra';
+            const on = isExtra ? extraGroupVisible : groupVisibility[activeNav] !== false;
+            const toggle = async () => {
+              const next = !on;
+              if (isExtra) {
+                setExtraGroupVisible(next);
+                try { await fetch(`${API_BASE}/api/content/extraGroupVisible`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(next) }); } catch {}
+              } else {
+                const updated = { ...groupVisibility, [activeNav]: next };
+                setGroupVisibility(updated);
+                try { await fetch(`${API_BASE}/api/content/groupVisibility`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(updated) }); } catch {}
+              }
+            };
+            return (
+              <TouchableOpacity
+                activeOpacity={0.8}
+                style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 8, paddingHorizontal: 12, paddingVertical: 8, marginLeft: 8 }}
+                onPress={toggle}
+              >
+                <Text style={{ fontSize: 11, fontWeight: '800', color: on ? '#dc2626' : '#9ca3af', letterSpacing: 0.5 }}>
+                  {on ? 'קבוצה גלויה' : 'כל הקבוצה חבויה'}
+                </Text>
+                <View style={{ width: 44, height: 24, borderRadius: 12, backgroundColor: on ? '#dc2626' : '#cbd5e1', padding: 2, flexDirection: 'row', alignItems: 'center' }}>
+                  <View style={{ width: 20, height: 20, borderRadius: 10, backgroundColor: '#fff', marginLeft: on ? 20 : 0 }} />
+                </View>
+              </TouchableOpacity>
+            );
+          })()}
+          <TouchableOpacity style={cs.addBtn} onPress={addItem}>
+            <Text style={cs.addBtnTxt}>+ הוסף פריט</Text>
+          </TouchableOpacity>
+        </View>
+        )}
+
+        {/* Table header on wide screens */}
+        {isWide && currentItems.length > 0 && (
+          <View style={cs.tableHeader}>
+            <Text style={[cs.thCell, { width: 50 }]}>סדר</Text>
+            <Text style={[cs.thCell, { width: 50 }]}>צבע</Text>
+            <Text style={[cs.thCell, { width: 50 }]}>אייקון</Text>
+            <Text style={[cs.thCell, { flex: 1 }]}>כותרת</Text>
+            {currentSection.hasSubtitle && <Text style={[cs.thCell, { flex: 1 }]}>תיאור</Text>}
+            {currentSection.hasLocation && <Text style={[cs.thCell, { width: 120 }]}>מיקום</Text>}
+            {currentSection.hasAudio && <Text style={[cs.thCell, { width: 80 }]}>אודיו</Text>}
+            <Text style={[cs.thCell, { width: 70 }]}>פעולות</Text>
+          </View>
+        )}
+
+        {currentItems.map((item, idx) => {
+          const stripe = idx % 2 === 0 ? { backgroundColor: '#fafafa' } : { backgroundColor: '#e2e8f0' };
+          const rowInner = (
+            <View style={[cs.itemRow, isWide && cs.itemRowWide, stripe]}>
+              <View style={cs.orderBtns}>
+                <Text style={{ fontSize: 18, color: '#999', ...(Platform.OS === 'web' ? ({ cursor: 'grab' } as any) : {}) }}>⋮⋮</Text>
+                <Text style={cs.orderNum}>{idx + 1}</Text>
+                {Platform.OS !== 'web' && (
+                  <>
+                    <TouchableOpacity onPress={() => moveItem(idx, -1)} disabled={idx === 0}>
+                      <Text style={[cs.orderArrow, idx === 0 && { opacity: 0.2 }]}>▲</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => moveItem(idx, 1)} disabled={idx === currentItems.length - 1}>
+                      <Text style={[cs.orderArrow, idx === currentItems.length - 1 && { opacity: 0.2 }]}>▼</Text>
+                    </TouchableOpacity>
+                  </>
+                )}
+              </View>
+
+              <View style={[cs.colorBar, { backgroundColor: item.bg }]} />
+              {item.icon && (item.icon.startsWith('data:') || item.icon.startsWith('http') || item.icon.startsWith('/'))
+                ? (Platform.OS === 'web'
+                    ? React.createElement('img', { src: item.icon, style: { width: 60, height: 36, objectFit: 'cover', borderRadius: 6 }, alt: '' })
+                    : null)
+                : <Text style={cs.itemIcon}>{item.icon}</Text>}
+
+              <View style={cs.itemInfo}>
+                <Text style={cs.itemTitle}>{item.title}</Text>
+                {item.subtitle ? <Text style={cs.itemSub}>{item.subtitle}</Text> : null}
+                {!isWide && item.address ? <Text style={cs.itemMeta}>📍 {item.address}</Text> : null}
+                {!isWide && item.audio ? <Text style={cs.itemMeta}>🎧 אודיו מצורף</Text> : null}
+              </View>
+
+              {isWide && currentSection.hasLocation && (
+                <Text style={[cs.itemMeta, { width: 120 }]}>{item.address || '—'}</Text>
+              )}
+              {isWide && currentSection.hasAudio && (
+                <Text style={[cs.itemMeta, { width: 80 }]}>{item.audio ? '✓' : '—'}</Text>
+              )}
+
+              {canHaveChildren && !childrenOf && (
+                <TouchableOpacity
+                  style={[cs.editBtn, { backgroundColor: '#fff3e0' }]}
+                  onPress={() => setChildrenOf(item)}
+                >
+                  <Text style={[cs.editTxt, { color: Colors.ACCENT }]}>
+                    {item.tours && item.tours.length > 0
+                      ? `בלוקי סיורים (${item.tours.length})`
+                      : `תת-קטגוריות (${(item.children || []).length})`}
+                  </Text>
+                </TouchableOpacity>
+              )}
+
+              {activeNav !== 'side' && (
+              <TouchableOpacity
+                activeOpacity={0.8}
+                onPress={() => {
+                  const isVisible = (item as any).visible !== false;
+                  const next = !isVisible;
+                  if (toursMode && childrenOf) {
+                    const ti = (item as any)._tourIdx as number;
+                    const tours = [...(childrenOf.tours || [])];
+                    tours[ti] = { ...tours[ti], visible: next } as any;
+                    const updatedCat = { ...childrenOf, tours };
+                    setChildrenOf(updatedCat);
+                    const items = [...(data[activeNav] || [])];
+                    const pIdx = items.findIndex(x => x.id === childrenOf.id);
+                    if (pIdx >= 0) {
+                      items[pIdx] = updatedCat as any;
+                      saveSection(activeNav, items);
+                    }
+                  } else if (childrenOf) {
+                    const children = [...(childrenOf.children || [])];
+                    const ci = children.findIndex(x => x.id === item.id);
+                    if (ci >= 0) {
+                      children[ci] = { ...children[ci], visible: next } as any;
+                      saveChildren(children);
+                    }
+                  } else {
+                    const items = [...(data[activeNav] || [])];
+                    items[idx] = { ...items[idx], visible: next } as any;
+                    saveSection(activeNav, items);
+                  }
+                }}
+                style={{ width: 40, height: 22, borderRadius: 11, backgroundColor: (item as any).visible !== false ? '#10b981' : '#cbd5e1', padding: 2, flexDirection: 'row', alignItems: 'center', marginHorizontal: 6 }}
+              >
+                <View style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: '#fff', marginLeft: (item as any).visible !== false ? 18 : 0 }} />
+              </TouchableOpacity>
+              )}
+
+              <TouchableOpacity
+                style={cs.editBtn}
+                onPress={() => {
+                  if (toursMode && childrenOf) {
+                    const ti = (item as any)._tourIdx as number;
+                    const tour = childrenOf.tours![ti];
+                    setEditItem({
+                      id: `__tour__${childrenOf.id}__${ti}`,
+                      title: tour.title || '',
+                      subtitle: '',
+                      icon: '🎧',
+                      bg: tour.color,
+                      tours: [tour],
+                    } as DataItem);
+                  } else {
+                    setEditItem(item);
+                  }
+                }}
+              >
+                <Text style={cs.editTxt}>ערוך</Text>
+              </TouchableOpacity>
+            </View>
+          );
+
+          if (Platform.OS === 'web') {
+            return React.createElement('div', {
+              key: item.id,
+              draggable: true,
+              onDragStart: (e: any) => { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', String(idx)); },
+              onDragOver: (e: any) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; setDragOverIdx(idx); },
+              onDragLeave: () => setDragOverIdx(-1),
+              onDrop: (e: any) => {
+                e.preventDefault();
+                setDragOverIdx(-1);
+                const from = parseInt(e.dataTransfer.getData('text/plain'), 10);
+                if (!isNaN(from)) reorderItem(from, idx);
+              },
+              onDragEnd: () => setDragOverIdx(-1),
+              style: {
+                cursor: 'move',
+                borderTop: dragOverIdx === idx ? '3px solid #1A6B8A' : '3px solid transparent',
+                transition: 'border-top 0.15s ease',
+              },
+            }, rowInner);
+          }
+          return <View key={item.id}>{rowInner}</View>;
+        })}
+
+        {currentItems.length === 0 && (
+          <View style={cs.emptyState}>
+            <Text style={cs.emptyIcon}>{currentSection.icon}</Text>
+            <Text style={cs.emptyText}>אין פריטים עדיין</Text>
+            <TouchableOpacity style={cs.addBtn} onPress={addItem}>
+              <Text style={cs.addBtnTxt}>+ הוסף פריט ראשון</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+        </>
+        )}
+      </View>
+    );
+  };
+
+  // ─── Main Render ────────────────────────────────────────────
+  return (
+    <View style={ds.container}>
+      {/* Mobile top bar */}
+      {!isWide && (
+        <View style={ds.mobileHeader}>
+          <TouchableOpacity onPress={() => setShowMobileNav(!showMobileNav)}>
+            <Text style={ds.hamburger}>{showMobileNav ? '✕' : '☰'}</Text>
+          </TouchableOpacity>
+          <Text style={ds.mobileTitle}>לוח ניהול</Text>
+          {saved && <Text style={ds.savedBadge}>נשמר ✓</Text>}
+        </View>
+      )}
+
+      <View style={[ds.body, isWide && { flexDirection: 'row-reverse' }]}>
+        {/* Sidebar: always on desktop, togglable on mobile */}
+        {(isWide || showMobileNav) && renderNav()}
+
+        {/* Content area */}
+        {(!showMobileNav || isWide) && (
+          <ScrollView
+            style={ds.content}
+            contentContainerStyle={[ds.contentInner, isDesktop && { maxWidth: 900, marginLeft: 'auto', marginRight: 0 }]}
+            showsVerticalScrollIndicator={false}
+          >
+            {/* Saved badge on wide */}
+            {isWide && saved && (
+              <View style={ds.savedBanner}>
+                <Text style={ds.savedBannerTxt}>נשמר בהצלחה ✓</Text>
+              </View>
+            )}
+
+            {/* Stats bar */}
+            <View style={[ds.statsRow, isWide && { flexDirection: 'row-reverse' }]}>
+              {[
+                { label: 'קטגוריות', count: (data.main?.length || 0) + (data.extra?.length || 0), color: Colors.PRIMARY },
+                { label: 'באנרים', count: (data.bottom?.length || 0) + (data.side?.length || 0), color: Colors.ACCENT },
+                { label: 'תמונות', count: mediaFiles.length, color: Colors.SECONDARY },
+                { label: 'אודיו', count: data.audio?.length || 0, color: '#1C2B35' },
+              ].map(stat => (
+                <View key={stat.label} style={[ds.statCard, { borderRightColor: stat.color }]}>
+                  <Text style={ds.statNum}>{stat.count}</Text>
+                  <Text style={ds.statLabel}>{stat.label}</Text>
+                </View>
+              ))}
+            </View>
+
+            {/* Active section content */}
+            {activeNav === 'texts' ? renderTexts()
+              : activeNav === 'media' ? renderMedia()
+              : activeNav === 'gallery' ? renderGallery()
+              : activeNav === 'subscription' ? renderSubscription()
+              : activeNav === 'locations' ? renderLocations()
+              : renderItems()}
+
+            <View style={{ height: 40 }} />
+          </ScrollView>
+        )}
+      </View>
+
+      {/* Edit Modal */}
+      <EditModal
+        visible={!!editItem}
+        item={editItem}
+        section={currentSection}
+        onSave={handleSaveItem}
+        allMedia={mediaFiles}
+        ratings={ratings}
+        onDelete={handleDeleteItem}
+        onClose={() => setEditItem(null)}
+        isWide={isWide}
+        onMoveSection={(target) => {
+          if (!editItem || childrenOf) return;
+          if (target === activeNav) return;
+          const fromKey = activeNav;
+          const fromItems = (data[fromKey] || []).filter(i => i.id !== editItem.id);
+          const toItems = [...(data[target] || []), editItem];
+          saveSection(fromKey, fromItems);
+          saveSection(target, toItems);
+          setActiveNav(target);
+          setEditItem(null);
+        }}
+      />
+    </View>
+  );
+}
+
+// ─── Nav Styles ────────────────────────────────────────────────
+const ns = StyleSheet.create({
+  nav: {
+    backgroundColor: '#1C2B35', width: '100%', paddingTop: 20, paddingBottom: 12,
+  },
+  navWide: {
+    width: 260, minHeight: '100%',
+  },
+  navHeader: {
+    flexDirection: 'row-reverse', alignItems: 'center', gap: 12,
+    paddingHorizontal: 20, paddingTop: 16, paddingBottom: 20, borderBottomWidth: 1, borderBottomColor: '#2a3f4d',
+  },
+  navLogo: {
+    width: 40, height: 40, borderRadius: 10, backgroundColor: Colors.PRIMARY,
+    textAlign: 'center', lineHeight: 40, fontSize: 20, fontWeight: '900', color: Colors.WHITE, overflow: 'hidden',
+  },
+  navTitle: { fontSize: 16, fontWeight: '700', color: Colors.WHITE },
+  navSub: { fontSize: 12, color: '#8899a6', writingDirection: 'rtl' },
+  navItem: {
+    flexDirection: 'row-reverse', alignItems: 'center', gap: 10,
+    paddingVertical: 14, paddingHorizontal: 20, marginHorizontal: 8, marginVertical: 2, borderRadius: 10,
+    borderBottomWidth: 1, borderBottomColor: '#2a3f4d',
+  },
+  navItemActive: { backgroundColor: Colors.PRIMARY + '30', borderBottomColor: Colors.PRIMARY },
+  navIcon: { fontSize: 18 },
+  navLabel: { flex: 1, fontSize: 14, color: '#b0bec5', textAlign: 'right', writingDirection: 'rtl' },
+  navLabelActive: { color: Colors.WHITE, fontWeight: '600' },
+  navBadge: {
+    fontSize: 11, color: '#8899a6', backgroundColor: '#2a3f4d',
+    paddingHorizontal: 6, paddingVertical: 1, borderRadius: 8, overflow: 'hidden',
+  },
+  navFooter: {
+    borderTopWidth: 1, borderTopColor: '#2a3f4d', paddingTop: 12, paddingHorizontal: 20, gap: 4,
+  },
+  navFooterBtn: { flexDirection: 'row-reverse', alignItems: 'center', gap: 8, paddingVertical: 8 },
+  navFooterIcon: { fontSize: 16 },
+  navFooterTxt: { fontSize: 13, color: '#8899a6', writingDirection: 'rtl' },
+});
+
+// ─── Dashboard Layout Styles ──────────────────────────────────
+const ds = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#f0f2f5' },
+  mobileHeader: {
+    backgroundColor: Colors.PRIMARY, flexDirection: 'row-reverse', alignItems: 'center',
+    paddingTop: 52, paddingBottom: 12, paddingHorizontal: 16, gap: 12,
+  },
+  hamburger: { fontSize: 24, color: Colors.WHITE },
+  mobileTitle: { flex: 1, fontSize: 18, fontWeight: '700', color: Colors.WHITE, textAlign: 'right', writingDirection: 'rtl' },
+  savedBadge: { fontSize: 13, color: '#2ecc71', fontWeight: '700' },
+  body: { flex: 1 },
+  content: { flex: 1 },
+  contentInner: { padding: 20 },
+  savedBanner: {
+    backgroundColor: '#d4edda', borderRadius: 10, padding: 12, marginBottom: 16, alignItems: 'center',
+  },
+  savedBannerTxt: { color: '#155724', fontWeight: '600', fontSize: 14 },
+  statsRow: { flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 12, marginBottom: 20 },
+  statCard: {
+    flex: 1, minWidth: 140, backgroundColor: Colors.WHITE, borderRadius: 14, padding: 16,
+    alignItems: 'flex-end',
+    borderRightWidth: 4, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 4, elevation: 1,
+  },
+  statNum: { fontSize: 28, fontWeight: '800', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl' },
+  statLabel: { fontSize: 13, color: '#999', marginTop: 2, textAlign: 'right', writingDirection: 'rtl' },
+});
+
+// ─── Content Styles ───────────────────────────────────────────
+const cs = StyleSheet.create({
+  contentCard: {
+    backgroundColor: Colors.WHITE, borderRadius: 16, padding: 20, marginBottom: 16,
+    shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 6, elevation: 2,
+  },
+  contentHeaderRow: { flexDirection: 'row-reverse', alignItems: 'center', marginBottom: 16 },
+  contentTitle: { fontSize: 20, fontWeight: '800', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl' },
+  contentSub: { fontSize: 13, color: '#999', textAlign: 'right', writingDirection: 'rtl', marginTop: 2 },
+  fieldLabel: { fontSize: 13, fontWeight: '600', color: '#555', textAlign: 'right', writingDirection: 'rtl', marginBottom: 4 },
+  fieldInput: {
+    borderWidth: 1.5, borderColor: '#e8e8e8', borderRadius: 10, paddingHorizontal: 14, paddingVertical: 11,
+    fontSize: 15, color: Colors.TEXT, backgroundColor: '#fafafa', writingDirection: 'rtl',
+  },
+  primaryBtn: {
+    backgroundColor: Colors.PRIMARY, borderRadius: 12, padding: 14, alignItems: 'center', marginTop: 20,
+  },
+  primaryBtnTxt: { fontSize: 16, fontWeight: '700', color: Colors.WHITE },
+  addBtn: {
+    backgroundColor: Colors.PRIMARY, borderRadius: 10, paddingHorizontal: 16, paddingVertical: 10,
+  },
+  addBtnTxt: { fontSize: 14, fontWeight: '600', color: Colors.WHITE, writingDirection: 'rtl' },
+  tableHeader: {
+    flexDirection: 'row-reverse', alignItems: 'center', gap: 10, paddingVertical: 8, paddingHorizontal: 4,
+    borderBottomWidth: 2, borderBottomColor: '#f0f0f0', marginBottom: 4,
+  },
+  thCell: { fontSize: 12, fontWeight: '700', color: '#999', textAlign: 'right', writingDirection: 'rtl' },
+  itemRow: {
+    flexDirection: 'row-reverse', alignItems: 'center', gap: 10, paddingVertical: 12,
+    borderBottomWidth: 1, borderBottomColor: '#f5f5f5',
+  },
+  itemRowWide: { paddingHorizontal: 4 },
+  orderBtns: { alignItems: 'center', gap: 0, width: 30 },
+  orderArrow: { fontSize: 10, color: Colors.PRIMARY, padding: 4 },
+  orderNum: { fontSize: 11, color: '#999', fontWeight: '600' },
+  colorBar: { width: 6, height: 40, borderRadius: 3 },
+  itemIcon: { fontSize: 36 },
+  itemInfo: { flex: 1 },
+  itemTitle: { fontSize: 15, fontWeight: '600', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl' },
+  itemSub: { fontSize: 12, color: '#999', textAlign: 'right', writingDirection: 'rtl', marginTop: 2 },
+  itemMeta: { fontSize: 11, color: '#aaa', textAlign: 'right', writingDirection: 'rtl', marginTop: 2 },
+  editBtn: { backgroundColor: '#e8f4f8', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 8 },
+  editTxt: { fontSize: 13, fontWeight: '600', color: Colors.PRIMARY },
+  emptyState: { alignItems: 'center', paddingVertical: 40, gap: 12 },
+  emptyIcon: { fontSize: 48 },
+  emptyText: { fontSize: 16, color: '#999', writingDirection: 'rtl' },
+});
+
+// ─── Modal Styles ──────────────────────────────────────────────
+const ms = StyleSheet.create({
+  overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)' },
+  scrollWrap: { flexGrow: 1, justifyContent: 'center', alignItems: 'center', padding: 20 },
+  modal: {
+    width: '100%', maxWidth: 420, backgroundColor: Colors.WHITE, borderRadius: 20, padding: 24,
+  },
+  modalHeader: { flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 },
+  modalTitle: { fontSize: 20, fontWeight: '800', color: Colors.TEXT, writingDirection: 'rtl' },
+  closeX: { fontSize: 20, color: '#999', padding: 4 },
+  fieldGroup: { marginBottom: 12 },
+  fieldRow: {},
+  label: { fontSize: 13, fontWeight: '600', color: '#555', textAlign: 'right', writingDirection: 'rtl', marginBottom: 4 },
+  input: {
+    borderWidth: 1.5, borderColor: '#e8e8e8', borderRadius: 10, paddingHorizontal: 14, paddingVertical: 11,
+    fontSize: 15, color: Colors.TEXT, backgroundColor: '#fafafa', writingDirection: 'rtl',
+  },
+  colorRow: { flexDirection: 'row-reverse', alignItems: 'center', gap: 10 },
+  colorPreview: { width: 42, height: 42, borderRadius: 10, borderWidth: 1.5, borderColor: '#e0e0e0' },
+  btnRow: { flexDirection: 'row-reverse', gap: 10, marginTop: 20 },
+  saveBtn: { flex: 1, backgroundColor: Colors.PRIMARY, borderRadius: 12, padding: 14, alignItems: 'center' },
+  saveTxt: { fontSize: 16, fontWeight: '700', color: Colors.WHITE },
+  cancelBtn: { flex: 1, backgroundColor: '#f0f0f0', borderRadius: 12, padding: 14, alignItems: 'center' },
+  cancelTxt: { fontSize: 16, fontWeight: '600', color: '#666' },
+  textArea: { height: 80, textAlignVertical: 'top', paddingTop: 10 },
+  textAreaLong: { height: 160, textAlignVertical: 'top', paddingTop: 10 },
+  deleteBtn: { marginTop: 14, padding: 10, alignItems: 'center' },
+  deleteTxt: { fontSize: 14, color: '#e74c3c', fontWeight: '600' },
+});

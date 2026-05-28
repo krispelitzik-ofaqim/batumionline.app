@@ -1,0 +1,36 @@
+# Everything in server is for the Node.js backend, not the mobile app
+server
+server/**
+**/server/
+
+# Web build output (regenerated)
+dist
+dist/**
+
+# Local build artifacts
+builds
+builds/**
+
+# Local backup folders
+_backup_orig
+**/_backup_orig
+**/_backup_orig/**
+
+# Editor / OS
+.DS_Store
+.vscode
+.idea
+
+# Docs
+*.md
+
+# Local AAB / APK artifacts not needed for build context
+*.aab
+*.apk
+*.keystore
+*.jks
+*.p12
+my-release-key*
+
+# Old screenshots
+application-*.aab
