@@ -1,10 +1,11 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform, Modal } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform, Modal, Linking } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { Colors } from '../../constants/colors';
 import { ThemeContext } from '../../constants/theme';
 import { fetchContent } from '../../constants/api';
 import MapEmbed from '../../components/MapEmbed';
+import * as Location from 'expo-location';
 
 type MapPoint = { name: string; lat: number; lng: number; description?: string };
 type MapLayer = { name: string; points: MapPoint[] };
@@ -24,15 +25,31 @@ export default function MapScreen() {
 
   useEffect(() => {
     if (!nearMode) return;
-    if (Platform.OS === 'web' && typeof navigator !== 'undefined' && navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => setUserLoc({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-        (err) => setLocError(err.message || 'לא ניתן לקבל מיקום'),
-        { enableHighAccuracy: true, timeout: 8000 }
-      );
-    } else {
-      setLocError('זמין כרגע רק בגרסת ה-Web');
+    if (Platform.OS === 'web') {
+      if (typeof navigator !== 'undefined' && navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (pos) => setUserLoc({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+          (err) => setLocError(err.message || 'לא ניתן לקבל מיקום'),
+          { enableHighAccuracy: true, timeout: 8000 }
+        );
+      } else {
+        setLocError('לא ניתן לקבל מיקום בדפדפן הזה');
+      }
+      return;
     }
+    (async () => {
+      try {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') {
+          setLocError('כדי לראות מה קרוב אליך צריך לאשר גישה למיקום בהגדרות המכשיר');
+          return;
+        }
+        const pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+        setUserLoc({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+      } catch (e) {
+        setLocError('לא ניתן לקבל מיקום כרגע, נסה שוב');
+      }
+    })();
   }, [nearMode]);
 
   const filteredLayers = nearFilter ? layers.filter(l => l.name.includes(nearFilter)) : layers;
@@ -76,6 +93,11 @@ export default function MapScreen() {
       }
     }
     return 'https://www.google.com/maps/d/embed?mid=1gr51dJM54EabXWSMhPE5f8n2J3-iiyQ&ehbc=2E312F';
+  };
+
+  const openNav = (plat: number, plng: number) => {
+    const url = `https://www.google.com/maps/dir/?api=1&destination=${plat},${plng}&travelmode=driving`;
+    Linking.openURL(url).catch(() => {});
   };
 
   const categories = ['הכל', ...layers.map(l => l.name)];
@@ -149,7 +171,9 @@ export default function MapScreen() {
                       <Text style={styles.panelName} numberOfLines={1}>{p.name}</Text>
                       <Text style={styles.panelDesc}>{(p as any).category} · {(p as any).distKm < 1 ? `${Math.round((p as any).distKm * 1000)} מ׳` : `${(p as any).distKm.toFixed(1)} ק״מ`}</Text>
                     </View>
-                    <Text style={styles.panelArrow}>←</Text>
+                    <TouchableOpacity onPress={() => openNav(p.lat, p.lng)} style={styles.navBtn} hitSlop={8} activeOpacity={0.8}>
+                      <Text style={styles.navBtnTxt}>🧭 נווט</Text>
+                    </TouchableOpacity>
                   </TouchableOpacity>
                 ))}
               </ScrollView>
@@ -189,6 +213,9 @@ export default function MapScreen() {
                         ) : <Text style={styles.panelDesc}>{(p.description || '').replace(/<[^>]+>/g, '')}</Text>
                       ) : p.description ? <Text style={styles.panelDesc} numberOfLines={1}>{p.description.replace(/<[^>]+>/g, '').substring(0, 40)}</Text> : null}
                     </View>
+                    <TouchableOpacity onPress={() => openNav(p.lat, p.lng)} style={styles.navBtn} hitSlop={8} activeOpacity={0.8}>
+                      <Text style={styles.navBtnTxt}>🧭 נווט</Text>
+                    </TouchableOpacity>
                     <Text style={styles.panelArrow}>{focusPoint?.name === p.name ? '▼' : '←'}</Text>
                   </TouchableOpacity>
                 ))}
@@ -229,6 +256,8 @@ const styles = StyleSheet.create({
   panelName: { fontSize: 14, fontWeight: '700', color: '#fff', writingDirection: 'rtl', textAlign: 'right' },
   panelDesc: { fontSize: 11, color: 'rgba(255,255,255,0.7)', writingDirection: 'rtl', textAlign: 'right', marginTop: 2 },
   panelArrow: { fontSize: 16, color: '#fff', fontWeight: '700' },
+  navBtn: { backgroundColor: 'rgba(255,255,255,0.92)', borderRadius: 16, paddingHorizontal: 12, paddingVertical: 7 },
+  navBtnTxt: { fontSize: 12, fontWeight: '900', color: Colors.PRIMARY, writingDirection: 'rtl' },
   panelClose: { width: 30, height: 30, borderRadius: 15, backgroundColor: 'rgba(255,255,255,0.3)', alignItems: 'center', justifyContent: 'center' },
   panelCloseX: { fontSize: 16, color: '#fff', fontWeight: '700' },
   layerGrid: { flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 4, padding: 8 },

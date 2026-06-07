@@ -18,7 +18,8 @@
       "bundleIdentifier": "com.batumionline.app",
       "buildNumber": "41",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSLocationWhenInUseUsageDescription": "האפליקציה משתמשת במיקום שלך כדי להציג אתרים ומקומות קרובים אליך בבטומי."
       }
     },
     "android": {
@@ -28,12 +29,22 @@
       },
       "edgeToEdgeEnabled": true,
       "package": "com.batumionline.batumi",
-      "versionCode": 10003
+      "versionCode": 10003,
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION"
+      ]
     },
     "plugins": [
       "expo-router",
       "expo-font",
-      "expo-web-browser"
+      "expo-web-browser",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "האפליקציה משתמשת במיקום שלך כדי להציג אתרים ומקומות קרובים אליך בבטומי."
+        }
+      ]
     ],
     "extra": {
       "router": {},
