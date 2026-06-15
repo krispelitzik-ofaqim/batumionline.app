@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Image, Modal, useWindowDimensions } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Image, Modal, Linking, useWindowDimensions } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '../../constants/colors';
@@ -91,6 +91,19 @@ export default function BusinessPortal() {
                 <Text style={{ fontSize: 18, fontWeight: '900', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl' }}>{open?.title}</Text>
                 {!!open?.caption && <Text style={{ fontSize: 13, color: '#64748b', textAlign: 'right', writingDirection: 'rtl', marginTop: 4 }}>{open.caption}</Text>}
                 {!!open?.article && <Text style={{ fontSize: 13, color: '#475569', textAlign: 'right', writingDirection: 'rtl', marginTop: 14, lineHeight: 20 }}>{open.article}</Text>}
+                {open?.id === 'bp_bank' ? (
+                  <TouchableOpacity
+                    onPress={() => Linking.openURL('https://www.batumionline.biz')}
+                    style={{ marginTop: 18, backgroundColor: Colors.PRIMARY, borderRadius: 12, paddingVertical: 13, alignItems: 'center' }}>
+                    <Text style={{ color: '#fff', fontSize: 15, fontWeight: '800', writingDirection: 'rtl' }}>לפתיחת חשבון בנק ←</Text>
+                  </TouchableOpacity>
+                ) : (
+                  <TouchableOpacity
+                    onPress={() => { setOpen(null); router.push('/contact'); }}
+                    style={{ marginTop: 18, backgroundColor: Colors.PRIMARY, borderRadius: 12, paddingVertical: 13, alignItems: 'center' }}>
+                    <Text style={{ color: '#fff', fontSize: 15, fontWeight: '800', writingDirection: 'rtl' }}>צור קשר ←</Text>
+                  </TouchableOpacity>
+                )}
               </View>
             </ScrollView>
           </View>
