@@ -73,7 +73,7 @@ const FALLBACK_MONEY_INDEX = [
 const LISTINGS_BY_TOP: Record<string, Listing[]> = {
   'new-hotels': [
     { id: 'nh1', title: 'Orbi Sea Towers Phase 4', image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80', price: '$65,000', features: ['אולפנים החל מ-22 מ"ר', 'מסירה 2028', 'בריכה ו-SPA', 'מרחק 50 מ׳ מהים'], cta: 'פרטים נוספים', size: 'full' },
-    { id: 'nh2', title: 'Batumi Riviera Residence', image: 'https://images.unsplash.com/photo-1582407947092-45795aba4166?w=800&q=80', price: '$82,000', features: ['דירת 1 חדר', 'תשואה 9% מובטחת'], cta: 'פרטים נוספים', size: 'half' },
+    { id: 'nh2', title: 'Batumi Riviera Residence', image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&q=80', price: '$82,000', features: ['דירת 1 חדר', 'תשואה 9% מובטחת'], cta: 'פרטים נוספים', size: 'half' },
     { id: 'nh3', title: 'Palm Tower by Sea', image: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&q=80', price: '$54,000', features: ['אולפן 25 מ"ר', 'קו ראשון לים'], cta: 'פרטים נוספים', size: 'half' },
   ],
   'running-hotels': [
@@ -92,7 +92,7 @@ const LISTINGS_BY_TOP: Record<string, Listing[]> = {
   ],
   'future': [
     { id: 'fu1', title: 'פארק עסקים החדש', image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&q=80', price: 'החל מ-$1,400/מ"ר', features: ['אזור עסקים מתוכנן', 'תשתיות חדשות 2028', 'פוטנציאל עליית מחירים'], cta: 'פרטים נוספים' },
-    { id: 'fu2', title: 'קו רכבת קל עתידי', image: 'https://images.unsplash.com/photo-1565881545969-15d1c0dee1c2?w=800&q=80', price: 'מיליארד דולר השקעה', features: ['פרויקט ממשלתי', 'תחילת עבודות 2027', 'יעלה ערך נכסים לאורך הקו'], cta: 'פרטים נוספים' },
+    { id: 'fu2', title: 'קו רכבת קל עתידי', image: 'https://images.unsplash.com/photo-1474487548417-781cb71495f3?w=800&q=80', price: 'מיליארד דולר השקעה', features: ['פרויקט ממשלתי', 'תחילת עבודות 2027', 'יעלה ערך נכסים לאורך הקו'], cta: 'פרטים נוספים' },
   ],
 };
 
@@ -149,7 +149,7 @@ export default function RealEstatePortal() {
         'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80',
         'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80',
         'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&q=80',
-        'https://images.unsplash.com/photo-1582407947092-45795aba4166?w=800&q=80',
+        'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&q=80',
       ];
       try {
         const r = await fetch(`${API_BASE}/api/realestate-news`);
