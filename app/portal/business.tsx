@@ -5,6 +5,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '../../constants/colors';
 import { fetchContent, resolveUri } from '../../constants/api';
 import BottomTabBar from '../../components/BottomTabBar';
+import BusinessServicesSlider from '../../components/BusinessServicesSlider';
+import { SERVICE_DETAILS } from '../../constants/serviceDetails';
 
 type BusinessItem = {
   id: string;
@@ -59,6 +61,13 @@ export default function BusinessPortal() {
       )}
 
       <ScrollView style={{ flex: 1 }}>
+        <BusinessServicesSlider
+          variant="large"
+          onPressService={(svc) => {
+            if (svc?.id && SERVICE_DETAILS[svc.id]) router.push(`/portal/service/${svc.id}` as any);
+            else router.push('/contact' as any);
+          }}
+        />
         {grouped ? grouped.map(g => (
           <View key={g.cat.id} style={{ marginTop: 16 }}>
             <Text style={s.groupTitle}>{g.cat.icon} {g.cat.title}</Text>

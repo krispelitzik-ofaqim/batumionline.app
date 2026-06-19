@@ -7,6 +7,7 @@ import { Video, ResizeMode } from 'expo-av';
 import { WebView } from 'react-native-webview';
 import { Colors } from '../../constants/colors';
 import { fetchContent, API_BASE, resolveUri } from '../../constants/api';
+import { SERVICE_DETAILS } from '../../constants/serviceDetails';
 import BusinessServicesSlider from '../../components/BusinessServicesSlider';
 import CurrencyTicker from '../../components/CurrencyTicker';
 import BottomTabBar from '../../components/BottomTabBar';
@@ -122,6 +123,11 @@ export default function RealEstatePortal() {
 
   const [openServiceArticle, setOpenServiceArticle] = useState<any>(null);
   const handleService = useCallback((svc: any) => {
+    // The 7 portal services open their detail page (description + requirements + CTA)
+    if (svc?.id && SERVICE_DETAILS[svc.id]) {
+      router.push(`/portal/service/${svc.id}` as any);
+      return;
+    }
     const type = svc.actionType;
     if (type === 'link' && svc.url) {
       Linking.openURL(svc.url);
@@ -129,8 +135,6 @@ export default function RealEstatePortal() {
       setOpenServiceArticle(svc);
     } else if (svc.id === 'realestate') {
       router.push('/portal/brokers' as any);
-    } else if (svc.id === 'bank') {
-      Linking.openURL('https://batumionline.biz');
     } else {
       router.push('/contact' as any);
     }
