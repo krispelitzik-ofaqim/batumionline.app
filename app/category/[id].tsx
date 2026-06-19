@@ -1218,7 +1218,7 @@ export default function CategoryScreen() {
         {cat.heroImage ? (
           <View style={st.heroImgWrap}>
             <Image source={{ uri: resolveUri(cat.heroImage) }} style={st.heroImgBg} resizeMode="cover" />
-            <View style={st.heroImgBottomBar}>
+            <View style={[st.heroImgBottomBar, (cat as any).heroBarColor ? { backgroundColor: (cat as any).heroBarColor } : null]}>
               <Text style={st.heroImgBarTxt}>{cat.titleEn || ''}</Text>
               <Text style={st.heroImgBarTxt}>{cat.titleGe || ''}</Text>
               <Text style={st.heroImgBarTxt}>{cat.title}</Text>
@@ -1828,14 +1828,14 @@ function TimetableTabs({ timetable, color, terminal }: { timetable: { title?: st
         <TerminalClock light={!dark} />
       </View>
       <View style={[artSt.cardHeader, dark && { marginBottom: 4 }]}>
-        <Text style={[artSt.cardIcon, { fontSize: dark ? 22 : 28 }]}>{dark ? '🚆' : '🚌'}</Text>
+        <Text style={[artSt.cardIcon, { fontSize: dark ? 22 : 28 }]}>{(timetable as any).emoji || (dark ? '🚆' : '🚌')}</Text>
         <Text style={[artSt.cardTitle, dark && { color: '#4ade80' }]}>{timetable.title || 'לוח זמנים'}</Text>
       </View>
       {timetable.source ? (
         <Text style={{ fontSize: 11, color: dark ? '#6b7280' : '#888', textAlign: 'center', writingDirection: 'rtl', marginBottom: 10 }}>{timetable.source}</Text>
       ) : null}
 
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 6, paddingBottom: 10 }}>
+      {!(timetable as any).hideDays && (<ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 6, paddingBottom: 10 }}>
         {days.map((d, i) => {
           const isOn = selectedDay === i;
           return (
@@ -1863,9 +1863,9 @@ function TimetableTabs({ timetable, color, terminal }: { timetable: { title?: st
             </TouchableOpacity>
           );
         })}
-      </ScrollView>
+      </ScrollView>)}
 
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingBottom: 10 }}>
+      <View style={{ flexDirection: 'row', gap: 8, paddingBottom: 10 }}>
         {timetable.tabs.map((t, i) => {
           const on = activeTab === i;
           return (
@@ -1878,7 +1878,7 @@ function TimetableTabs({ timetable, color, terminal }: { timetable: { title?: st
               ]}
               onPress={() => setActiveTab(i)}
             >
-              <Text style={[
+              <Text numberOfLines={1} style={[
                 artSt.tabTxt,
                 { color: dark ? '#94a3b8' : '#475569', fontWeight: '700' },
                 on && { color: '#fff', fontWeight: '900' },
@@ -1886,7 +1886,7 @@ function TimetableTabs({ timetable, color, terminal }: { timetable: { title?: st
             </TouchableOpacity>
           );
         })}
-      </ScrollView>
+      </View>
       <View style={[artSt.tableHeader, dark && { borderBottomColor: '#334155' }]}>
         <Text style={[artSt.tableCell, artSt.tableBold, dark && { color: '#94a3b8' }]}>יציאה</Text>
         <Text style={[artSt.tableCell, artSt.tableBold, dark && { color: '#94a3b8' }]}>הגעה</Text>
@@ -1906,7 +1906,7 @@ function TimetableTabs({ timetable, color, terminal }: { timetable: { title?: st
       ))}
       <View style={termSt.countRow}>
         <Text style={[termSt.countTxt, !dark && { color: Colors.PRIMARY }]}>
-          {dark ? '🚆' : '🚌'} {tab.rows.length} {dark ? 'רכבות' : 'קווים'} — {days[selectedDay].label} ({days[selectedDay].date}) — {tab.label}
+          {(timetable as any).emoji || (dark ? '🚆' : '🚌')} {tab.rows.length} {(timetable as any).unit || (dark ? 'רכבות' : 'קווים')}{!(timetable as any).hideDays ? ` — ${days[selectedDay].label} (${days[selectedDay].date})` : ''} — {tab.label}
         </Text>
       </View>
     </View>
