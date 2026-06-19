@@ -1,13 +1,11 @@
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const DEV_HOST = Platform.OS === 'android' ? '10.0.2.2' : 'localhost';
-
+// On a physical device "localhost" is the phone itself, so dev native builds
+// can't reach a local backend — always load content from the live server.
 export const API_BASE = Platform.OS === 'web'
   ? (typeof window !== 'undefined' && (window.location.port === '8081' || window.location.port === '19006') ? 'http://localhost:3001' : '')
-  : __DEV__
-    ? `http://${DEV_HOST}:3001`
-    : 'https://www.batumionline.app';
+  : 'https://www.batumionline.app';
 
 /**
  * Resolve a stored asset URL to one that works on the current platform.
