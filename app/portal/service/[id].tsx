@@ -60,18 +60,49 @@ export default function ServiceDetailScreen() {
           <Text style={s.desc}>{svc.description}</Text>
         </View>
 
-        {/* Requirements */}
-        <View style={s.section}>
-          <Text style={s.sectionTitle}>תנאים בסיסיים שצריך לדעת</Text>
-          <View style={s.reqCard}>
-            {svc.requirements.map((req, i) => (
-              <View key={i} style={[s.reqRow, i === svc.requirements.length - 1 && { borderBottomWidth: 0 }]}>
-                <Ionicons name="checkmark-circle" size={22} color={svc.colors[0]} />
-                <Text style={s.reqText}>{req}</Text>
+        {/* Tracks (multi-route services) */}
+        {svc.tracks && svc.tracks.length > 0 && (
+          <View style={s.section}>
+            <Text style={s.sectionTitle}>המסלולים האפשריים</Text>
+            {svc.tracks.map((t, i) => (
+              <View key={i} style={s.trackCard}>
+                <View style={s.trackHead}>
+                  <View style={[s.trackIcon, { backgroundColor: svc.colors[0] }]}>
+                    <Ionicons name={(t.icon || svc.icon) as any} size={20} color="#fff" />
+                  </View>
+                  <Text style={s.trackTitle}>{t.title}</Text>
+                  {!!t.tag && <View style={[s.trackTag, { backgroundColor: svc.colors[0] }]}><Text style={s.trackTagText}>{t.tag}</Text></View>}
+                </View>
+                <Text style={s.trackBody}>{t.body}</Text>
               </View>
             ))}
           </View>
-        </View>
+        )}
+
+        {/* Requirements (simple services) */}
+        {svc.requirements && svc.requirements.length > 0 && (
+          <View style={s.section}>
+            <Text style={s.sectionTitle}>תנאים בסיסיים שצריך לדעת</Text>
+            <View style={s.reqCard}>
+              {svc.requirements.map((req, i) => (
+                <View key={i} style={[s.reqRow, i === svc.requirements!.length - 1 && { borderBottomWidth: 0 }]}>
+                  <Ionicons name="checkmark-circle" size={22} color={svc.colors[0]} />
+                  <Text style={s.reqText}>{req}</Text>
+                </View>
+              ))}
+            </View>
+          </View>
+        )}
+
+        {/* General conditions footnote */}
+        {!!svc.generalConditions && (
+          <View style={s.section}>
+            <View style={[s.noteCard, { borderColor: svc.colors[0] }]}>
+              <Ionicons name="information-circle" size={20} color={svc.colors[0]} />
+              <Text style={s.noteText}>{svc.generalConditions}</Text>
+            </View>
+          </View>
+        )}
 
         {/* CTA */}
         <TouchableOpacity activeOpacity={0.9} onPress={onCta} style={s.ctaWrap}>
@@ -104,6 +135,15 @@ const s = StyleSheet.create({
   reqCard: { backgroundColor: '#fff', borderRadius: 16, paddingHorizontal: 14, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 6, elevation: 2 },
   reqRow: { flexDirection: 'row-reverse', alignItems: 'center', gap: 10, paddingVertical: 13, borderBottomWidth: 1, borderBottomColor: '#eef2f6' },
   reqText: { flex: 1, fontSize: 14.5, color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl' },
+  trackCard: { backgroundColor: '#fff', borderRadius: 16, padding: 15, marginBottom: 12, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.07, shadowRadius: 6, elevation: 2 },
+  trackHead: { flexDirection: 'row-reverse', alignItems: 'center', gap: 10, marginBottom: 8, flexWrap: 'wrap' },
+  trackIcon: { width: 36, height: 36, borderRadius: 11, alignItems: 'center', justifyContent: 'center' },
+  trackTitle: { fontSize: 16, fontWeight: '900', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl', flexShrink: 1 },
+  trackTag: { paddingHorizontal: 10, paddingVertical: 3, borderRadius: 50 },
+  trackTagText: { color: '#fff', fontSize: 11, fontWeight: '800', writingDirection: 'rtl' },
+  trackBody: { fontSize: 14, lineHeight: 22, color: '#475569', textAlign: 'right', writingDirection: 'rtl' },
+  noteCard: { flexDirection: 'row-reverse', alignItems: 'flex-start', gap: 10, backgroundColor: '#fff', borderRadius: 14, borderWidth: 1.5, padding: 14 },
+  noteText: { flex: 1, fontSize: 13.5, lineHeight: 21, color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl' },
   ctaWrap: { marginTop: 18, marginHorizontal: 16, borderRadius: 14, overflow: 'hidden', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.18, shadowRadius: 8, elevation: 4 },
   cta: { flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'center', gap: 10, paddingVertical: 16 },
   ctaText: { color: '#fff', fontSize: 16, fontWeight: '900', writingDirection: 'rtl' },
