@@ -48,6 +48,9 @@ type Item = {
   };
 };
 
+// Soft alternating backgrounds so each recommendation card stands apart
+const CARD_BGS = ['#FFFFFF', '#FFF7ED', '#F0F9FF', '#F0FDF4', '#FEF2F2', '#FAF5FF'];
+
 function FoodieCard({ h, isLast }: { h: Hotel; isLast?: boolean }) {
   const [imgFailed, setImgFailed] = useState(!h.image || h.image.includes('city.jpg'));
   const badge = h.amenities?.[0] || '🔥 חובה לטעום';
@@ -828,7 +831,7 @@ function CategoryMapModal({ visible, points, focusName, focusCoords, layerColor,
   );
 }
 
-function HotelCard({ h, dark, pageBtnLabel, mapPoints, layerColor, placesQuery, isHotel, isAttraction, isRestaurant, isNightlife, sourcePath }: { h: Hotel; dark: boolean; pageBtnLabel: string; mapPoints?: MapPoint[]; layerColor?: string; placesQuery?: string; isHotel?: boolean; isAttraction?: boolean; isRestaurant?: boolean; isNightlife?: boolean; sourcePath?: string }) {
+function HotelCard({ h, dark, cardBg, pageBtnLabel, mapPoints, layerColor, placesQuery, isHotel, isAttraction, isRestaurant, isNightlife, sourcePath }: { h: Hotel; dark: boolean; cardBg?: string; pageBtnLabel: string; mapPoints?: MapPoint[]; layerColor?: string; placesQuery?: string; isHotel?: boolean; isAttraction?: boolean; isRestaurant?: boolean; isNightlife?: boolean; sourcePath?: string }) {
   const [showMap, setShowMap] = useState(false);
   const [showGallery, setShowGallery] = useState(false);
   const [showCatMapModal, setShowCatMapModal] = useState(false);
@@ -859,7 +862,7 @@ function HotelCard({ h, dark, pageBtnLabel, mapPoints, layerColor, placesQuery, 
     );
   }
   return (
-    <View style={[st.hotelCard, dark && { backgroundColor: '#2a3942' }]}>
+    <View style={[st.hotelCard, cardBg && !dark && { backgroundColor: cardBg }, dark && { backgroundColor: '#2a3942' }]}>
       <View style={{ position: 'relative' }}>
         <HotelImage uri={h.image} titleEn={h.titleEn} placesQuery={placesQuery} badgeText={isNightlife ? h.title : undefined} hideBadge={!isNightlife && !!h.titleEn && h.title === h.titleEn} />
         <AddToTourButton
@@ -1479,12 +1482,12 @@ export default function CategoryScreen() {
                 <AudioPlayer tracks={[{ title: cat.title, url: cat.introAudio }]} compact playOnLeft tint={darkCat ? '#1A6B8A' : undefined} textLight={darkCat} ringPlay={darkCat} />
               </View>
             )}
-            {cat.hotels.filter(h => h.visible !== false && (cat.id !== '10' || Boolean((h as any).isLocal) === (guideMode === 'local'))).map(h => (
+            {cat.hotels.filter(h => h.visible !== false && (cat.id !== '10' || Boolean((h as any).isLocal) === (guideMode === 'local'))).map((h, idx) => (
               cat.cardStyle === 'passport'
                 ? <PassportCard key={h.id} h={h} pageBtnLabel={cat.pageBtnLabel || 'אתר/פייסבוק'} />
                 : cat.cardStyle === 'foodie'
                 ? <FoodieCard key={h.id} h={h} isLast={cat.hotels!.filter(x => x.visible !== false).indexOf(h) === cat.hotels!.filter(x => x.visible !== false).length - 1} />
-                : <HotelCard key={h.id} h={h} dark={darkCat} pageBtnLabel={cat.pageBtnLabel || 'לדף המלון'} mapPoints={mapPoints} layerColor={mapLayerColor || (mapPoints.length > 0 ? Colors.PRIMARY : undefined)} placesQuery={extractEnNameFromMapUrl(h.mapUrl) || `${h.title} Batumi`} isHotel={rootId === '1'} isAttraction={rootId === '2'} isRestaurant={rootId === '6'} isNightlife={rootId === '4'} sourcePath={`/category/${cat.id}`} />
+                : <HotelCard key={h.id} h={h} dark={darkCat} cardBg={CARD_BGS[idx % CARD_BGS.length]} pageBtnLabel={cat.pageBtnLabel || 'לדף המלון'} mapPoints={mapPoints} layerColor={mapLayerColor || (mapPoints.length > 0 ? Colors.PRIMARY : undefined)} placesQuery={extractEnNameFromMapUrl(h.mapUrl) || `${h.title} Batumi`} isHotel={rootId === '1'} isAttraction={rootId === '2'} isRestaurant={rootId === '6'} isNightlife={rootId === '4'} sourcePath={`/category/${cat.id}`} />
             ))}
             {cat.longText && cat.hotels.length > 10 && (
               <View style={{ width: '100%', alignSelf: 'stretch', paddingBottom: 16, paddingHorizontal: 16 }}>
