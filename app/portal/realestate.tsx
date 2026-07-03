@@ -371,7 +371,7 @@ export default function RealEstatePortal() {
                               <Text style={{ color: '#fff', fontSize: 13, fontWeight: '900' }}>💬 WhatsApp</Text>
                             </TouchableOpacity>
                             <TouchableOpacity onPress={() => Linking.openURL(`tel:${(lst as any).phone}`)} style={{ flex: 1, paddingVertical: 10, backgroundColor: '#10b981', borderRadius: 8, alignItems: 'center' }}>
-                              <Text style={{ color: '#fff', fontSize: 13, fontWeight: '900' }}>📞 חייג · {(lst as any).phone}</Text>
+                              <Text style={{ color: '#fff', fontSize: 13, fontWeight: '900' }}>📞 חייג · {'⁦'}{(lst as any).phone}{'⁩'}</Text>
                             </TouchableOpacity>
                           </View>
                         )}

@@ -134,7 +134,7 @@ export default function PlacePage() {
             <View style={{ gap: 8, marginTop: 6 }}>
               {!!data.phone && (
                 <TouchableOpacity style={[s.btn, { backgroundColor: '#10b981' }]} onPress={() => Linking.openURL(`tel:${data.phone}`)}>
-                  <Text style={s.btnTxt}>{isRestaurant ? 'להזמנת שולחן' : 'חייג'} · {data.phone}</Text>
+                  <Text style={s.btnTxt}>{isRestaurant ? 'להזמנת שולחן' : 'חייג'} · {'⁦'}{data.phone}{'⁩'}</Text>
                 </TouchableOpacity>
               )}
               {/* website link embedded in address above */}
