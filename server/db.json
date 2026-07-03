@@ -288,6 +288,95 @@
           ]
         },
         {
+          "id": "h7",
+          "title": "מלונות לקהל אירופאי",
+          "subtitle": "בוטיק אירופאי ואינטימי",
+          "icon": "🛎️",
+          "bg": "#5C6BC0",
+          "hotels": [
+            {
+              "id": "h7_1",
+              "title": "מלון Rooms (רומס)",
+              "text": "מלון עיצוב יוקרתי (Design Hotels) בעיר העתיקה, במבנה היסטורי מ-1890, עם בריכה על הגג ונוף לנמל. אווירה אירופאית מוקפדת וחוויית בוטיק ברמה הגבוהה ביותר בבטומי",
+              "mapUrl": "https://www.google.com/maps/search/?api=1&query=Rooms+Batumi+Hotel",
+              "pageUrl": "https://www.marriott.com/en-us/hotels/busrh-rooms-batumi-a-member-of-design-hotels/overview/",
+              "visible": true
+            },
+            {
+              "id": "h7_2",
+              "title": "מלון לה פורט",
+              "text": "מלון בוטיק אלגנטי במרחק דקות מהנמל ומהחוף, המשלב עיצוב מודרני, שירות אישי ואווירה שקטה ואינטימית לקהל אירופאי",
+              "mapUrl": "https://www.google.com/maps/search/?api=1&query=Le+Port+Boutique+Aparthotel+Batumi",
+              "pageUrl": "https://www.booking.com/searchresults.html?ss=Le+Port+Boutique+Batumi",
+              "visible": true
+            },
+            {
+              "id": "h7_3",
+              "title": "מלון טאפי רוז'",
+              "text": "מלון בוטיק 5★ בשדרה העתיקה, בסגנון קלאסי-אירופאי, קרוב לכיכר אירופה ולחוף, עם דגש על עיצוב ושירות אישי",
+              "mapUrl": "https://www.google.com/maps/search/?api=1&query=Tapis+Rouge+Batumi",
+              "pageUrl": "https://www.booking.com/searchresults.html?ss=Tapis+Rouge+Batumi",
+              "visible": true
+            },
+            {
+              "id": "h7_4",
+              "title": "קרפה דיים ריזורט",
+              "text": "ריזורט בוטיק מפנק עם אווירה נינוחה, בריכה וגינה, מתאים לחופשה שקטה ואיכותית הרחק מההמון",
+              "mapUrl": "https://www.google.com/maps/search/?api=1&query=Carpe+Diem+Boutique+Resort+Batumi",
+              "pageUrl": "https://www.booking.com/searchresults.html?ss=Carpe+Diem+Boutique+Resort+Batumi",
+              "visible": true
+            },
+            {
+              "id": "h7_5",
+              "title": "ריבר בוטיק אנד ספא",
+              "text": "מלון בוטיק עם ספא, אווירה רגועה ומעוצבת, לחופשת פינוק שקטה בסגנון אירופאי",
+              "mapUrl": "https://www.google.com/maps/search/?api=1&query=River+Boutique+Hotel+Spa+Batumi",
+              "pageUrl": "https://www.booking.com/searchresults.html?ss=River+Boutique+Hotel+Spa+Batumi",
+              "visible": true
+            },
+            {
+              "id": "h7_6",
+              "title": "בל מארה בוטיק",
+              "text": "מלון בוטיק במרכז העיר, קטן ואינטימי, עם עיצוב נעים ושירות אישי חם",
+              "mapUrl": "https://www.google.com/maps/search/?api=1&query=Bel+Mare+Boutique+Hotel+Batumi",
+              "pageUrl": "https://www.booking.com/searchresults.html?ss=Bel+Mare+Boutique+Batumi",
+              "visible": true
+            },
+            {
+              "id": "h7_7",
+              "title": "ריצה בוטיק",
+              "text": "מלון בוטיק אינטימי בעל אופי ביתי ואירוח לבבי, במיקום נוח ושקט",
+              "mapUrl": "https://www.google.com/maps/search/?api=1&query=Ritsa+Boutique+Hotel+Batumi",
+              "pageUrl": "https://www.booking.com/searchresults.html?ss=Ritsa+Boutique+Hotel+Batumi",
+              "visible": true
+            },
+            {
+              "id": "h7_8",
+              "title": "מלון קרטולי",
+              "text": "מלון בוטיק גאורגי אותנטי, המשלב מסורת מקומית עם נוחות מודרנית ואווירה חמה",
+              "mapUrl": "https://www.google.com/maps/search/?api=1&query=Kartuli+Hotel+Batumi",
+              "pageUrl": "https://www.booking.com/searchresults.html?ss=Kartuli+Hotel+Batumi",
+              "visible": true
+            },
+            {
+              "id": "h7_9",
+              "title": "סיגל בוטיק (Seagull)",
+              "text": "מלון בוטיק על קו החוף, עם נוף לים ואווירה נינוחה, לחופשה מול הים השחור",
+              "mapUrl": "https://www.google.com/maps/search/?api=1&query=Seagull+Beachfront+Boutique+Hotel+Batumi",
+              "pageUrl": "https://www.booking.com/searchresults.html?ss=Seagull+Beachfront+Boutique+Batumi",
+              "visible": true
+            },
+            {
+              "id": "h7_10",
+              "title": "בטומי בוטיק הוטל",
+              "text": "מלון בוטיק קסום המשלב אלגנטיות וקסם אירופאי, עם חדרים מעוצבים ושירות אישי במיקום מרכזי",
+              "mapUrl": "https://www.google.com/maps/search/?api=1&query=Batumi+Boutique+Hotel",
+              "pageUrl": "https://batumi.boutiquhotel.com/",
+              "visible": true
+            }
+          ]
+        },
+        {
           "id": "h2",
           "title": "מלונות 4-3 כוכבים",
           "subtitle": "תמורה לכסף",
