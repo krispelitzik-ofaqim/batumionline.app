@@ -66,7 +66,7 @@ export const SERVICE_DETAILS: Record<string, ServiceDetail> = {
       'ייפוי כוח נוטוריוני חתום',
     ],
     cta: { kind: 'link', label: 'התחל תהליך', url: 'https://www.batumionline.biz' },
-    guide: { label: 'הורדת המדריך החינמי (PDF)', url: 'https://www.batumionline.biz/guide-bank-georgia.pdf' },
+    guide: { label: '📘 קבלת המדריך החינם', url: 'https://www.batumionline.biz/bank-guide.html' },
   },
   residency: {
     id: 'residency',
