@@ -16,6 +16,7 @@ export type ServiceDetail = {
   tracks?: ServiceTrack[];        // multi-route services: a banner per route/step
   generalConditions?: string;     // shared conditions footnote
   cta: ServiceCta;
+  guide?: { label: string; url: string };   // optional free-guide download button
 };
 
 export const SERVICE_DETAILS: Record<string, ServiceDetail> = {
@@ -65,6 +66,7 @@ export const SERVICE_DETAILS: Record<string, ServiceDetail> = {
       'ייפוי כוח נוטוריוני חתום',
     ],
     cta: { kind: 'link', label: 'התחל תהליך', url: 'https://www.batumionline.biz' },
+    guide: { label: 'הורדת המדריך החינמי (PDF)', url: 'https://www.batumionline.biz/guide-bank-georgia.pdf' },
   },
   residency: {
     id: 'residency',

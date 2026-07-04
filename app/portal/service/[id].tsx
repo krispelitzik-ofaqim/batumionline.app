@@ -111,6 +111,16 @@ export default function ServiceDetailScreen() {
             <Ionicons name="arrow-back" size={20} color={Colors.WHITE} />
           </LinearGradient>
         </TouchableOpacity>
+
+        {/* Optional free-guide download */}
+        {!!svc.guide && (
+          <TouchableOpacity activeOpacity={0.9} onPress={() => Linking.openURL(svc.guide!.url)} style={s.guideWrap}>
+            <View style={[s.guideBtn, { borderColor: svc.colors[0] }]}>
+              <Ionicons name="download-outline" size={20} color={svc.colors[1]} />
+              <Text style={[s.guideText, { color: svc.colors[1] }]}>{svc.guide.label}</Text>
+            </View>
+          </TouchableOpacity>
+        )}
       </ScrollView>
 
       <BottomTabBar />
@@ -147,4 +157,7 @@ const s = StyleSheet.create({
   ctaWrap: { marginTop: 18, marginHorizontal: 16, borderRadius: 14, overflow: 'hidden', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.18, shadowRadius: 8, elevation: 4 },
   cta: { flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'center', gap: 10, paddingVertical: 16 },
   ctaText: { color: '#fff', fontSize: 16, fontWeight: '900', writingDirection: 'rtl' },
+  guideWrap: { marginTop: 10, marginHorizontal: 16 },
+  guideBtn: { flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 13, borderRadius: 14, borderWidth: 1.5, backgroundColor: '#fff' },
+  guideText: { fontSize: 15, fontWeight: '800', writingDirection: 'rtl' },
 });
