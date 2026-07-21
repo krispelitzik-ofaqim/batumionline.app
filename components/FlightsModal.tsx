@@ -58,6 +58,7 @@ const AIRLINE_LOGOS: Record<string, any> = {
   A4: require('../assets/images/flights/A4.png'),
   WZ: require('../assets/images/flights/WZ.png'),
   B2: require('../assets/images/flights/B2.png'),
+  '4L': require('../assets/images/flights/4L.png'),
 };
 
 export default function FlightsModal({ visible, onClose, bgColor }: { visible: boolean; onClose: () => void; bgColor: string }) {
@@ -585,6 +586,7 @@ function cleanAirline(name: string | undefined): string {
   return name
     .replace(/Arkia\s+Israeli(\s+Airlines)?/i, 'Arkia')
     .replace(/El\s*Al\s*Israel(\s+Airlines)?/i, 'El Al')
+    .replace(/^LAS\s*SA$/i, 'One Click')
     .trim();
 }
 
