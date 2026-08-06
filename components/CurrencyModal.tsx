@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useI18n } from '../constants/i18n';
 import { View, Text, Modal, TouchableOpacity, TextInput, StyleSheet, ActivityIndicator, ScrollView } from 'react-native';
 import { Colors } from '../constants/colors';
 
@@ -8,6 +9,7 @@ const FLAGS: Record<string, string> = { ILS: '🇮🇱', GEL: '🇬🇪', USD: '
 const NAMES: Record<string, string> = { ILS: 'שקל', GEL: 'לארי', USD: 'דולר', EUR: 'יורו' };
 
 export default function CurrencyModal({ visible, onClose, bgColor }: { visible: boolean; onClose: () => void; bgColor: string }) {
+  const { t } = useI18n();
   const [rates, setRates] = useState<Rates | null>(null);
   const [loading, setLoading] = useState(true);
   const [amount, setAmount] = useState('');
@@ -60,8 +62,8 @@ export default function CurrencyModal({ visible, onClose, bgColor }: { visible: 
         </TouchableOpacity>
 
         <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
-          <Text style={s.title}>המרת מטבעות</Text>
-          <Text style={s.subtitle}>שערים מתעדכנים בזמן אמת</Text>
+          <Text style={s.title}>{t('cur.title')}</Text>
+          <Text style={s.subtitle}>{t('cur.sub')}</Text>
           {lastUpdate ? <Text style={s.updatedTxt}>עודכן: {lastUpdate}</Text> : null}
           <TouchableOpacity style={s.refreshBtn} onPress={loadRates} disabled={loading}>
             {loading ? (
@@ -69,7 +71,7 @@ export default function CurrencyModal({ visible, onClose, bgColor }: { visible: 
             ) : (
               <Text style={s.refreshIcon}>🔄</Text>
             )}
-            <Text style={s.refreshTxt}>רענן נתונים</Text>
+            <Text style={s.refreshTxt}>{t('cur.refresh')}</Text>
           </TouchableOpacity>
 
           {loading ? (
@@ -120,7 +122,7 @@ export default function CurrencyModal({ visible, onClose, bgColor }: { visible: 
                   style={{ width: '23%', paddingVertical: 6, backgroundColor: 'rgba(220,38,38,0.6)', borderRadius: 8, alignItems: 'center', justifyContent: 'center' }}
                   activeOpacity={0.7}
                 >
-                  <Text style={{ fontSize: 12, fontWeight: '800', color: '#fff' }}>נקה</Text>
+                  <Text style={{ fontSize: 12, fontWeight: '800', color: '#fff' }}>{t('cur.clear')}</Text>
                 </TouchableOpacity>
               </View>
 

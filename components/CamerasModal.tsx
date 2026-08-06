@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useI18n } from '../constants/i18n';
 import { View, Text, Modal, TouchableOpacity, ScrollView, StyleSheet, Platform, Linking, Image } from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
 import { Colors } from '../constants/colors';
@@ -22,6 +23,7 @@ const POSTER_URLS: string[] = [
 ];
 
 export default function CamerasModal({ visible, onClose, bgColor }: { visible: boolean; onClose: () => void; bgColor: string }) {
+  const { t } = useI18n();
   const [selected, setSelected] = useState<Camera | null>(null);
   const [mapCam, setMapCam] = useState<Camera | null>(null);
   const [cameras, setCameras] = useState<Camera[]>([]);
@@ -77,7 +79,7 @@ export default function CamerasModal({ visible, onClose, bgColor }: { visible: b
         {cam.poster ? (
           <View style={featured ? s.posterFull : s.posterThumb}>
             <Image source={{ uri: resolveUri(cam.poster) }} style={s.posterImg} resizeMode="cover" />
-            {cam.url && <Text style={s.liveTag}>● חי</Text>}
+            {cam.url && <Text style={s.liveTag}>{t('cam.live')}</Text>}
           </View>
         ) : (
           <View style={featured ? s.posterFull : s.posterThumb}>
@@ -88,7 +90,7 @@ export default function CamerasModal({ visible, onClose, bgColor }: { visible: b
           <Text style={[s.name, featured && s.nameFeatured]} numberOfLines={1}>{cam.name}</Text>
           {cam.lat && cam.lng ? (
             <TouchableOpacity onPress={(e) => { e.stopPropagation?.(); setMapCam(cam); }} style={s.locBtn}>
-              <Text style={s.locTxt}>📍 מיקום</Text>
+              <Text style={s.locTxt}>{t('cam.location')}</Text>
             </TouchableOpacity>
           ) : null}
         </View>
@@ -107,8 +109,8 @@ export default function CamerasModal({ visible, onClose, bgColor }: { visible: b
         </TouchableOpacity>
 
         <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
-          <Text style={s.title}>📹 מצלמות חיות מבטומי</Text>
-          <Text style={s.subtitle}>לחץ לצפייה בשידור חי</Text>
+          <Text style={s.title}>{t('cam.title')}</Text>
+          <Text style={s.subtitle}>{t('cam.sub')}</Text>
 
           {featured && renderTile(featured, true)}
 

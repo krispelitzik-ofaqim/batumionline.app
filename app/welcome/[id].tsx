@@ -4,6 +4,7 @@ import { useLocalSearchParams, Stack, router } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '../../constants/colors';
+import { useI18n } from '../../constants/i18n';
 import { fetchContent, resolveUri } from '../../constants/api';
 import AudioPlayer from '../../components/AudioPlayer';
 import HtmlContent from '../../components/HtmlContent';
@@ -47,6 +48,7 @@ type WelcomeItem = {
 };
 
 export default function WelcomeScreen() {
+  const { t } = useI18n();
   const { id } = useLocalSearchParams<{ id: string }>();
   const [item, setItem] = useState<WelcomeItem | null>(null);
   const [sub, setSub] = useState<any>(null);
@@ -63,7 +65,7 @@ export default function WelcomeScreen() {
     return (
       <SafeAreaView style={styles.safe}>
         <Stack.Screen options={{ headerShown: true, title: 'ברוכים הבאים', headerBackTitle: 'חזרה' }} />
-        <View style={styles.center}><Text style={styles.loadTxt}>טוען...</Text></View>
+        <View style={styles.center}><Text style={styles.loadTxt}>{t('c.loading')}</Text></View>
       </SafeAreaView>
     );
   }
@@ -120,7 +122,7 @@ export default function WelcomeScreen() {
                 <Text style={subSt.planNote}>{sub.plan1?.note}</Text>
               </View>
               <View style={[subSt.plan, { backgroundColor: sub.plan2Color || '#1A6B8A', borderColor: sub.plan2Color || '#1A6B8A' }]}>
-                <Text style={subSt.bestBadge}>משתלם!</Text>
+                <Text style={subSt.bestBadge}>{t('wl.worthIt')}</Text>
                 <Text style={[subSt.planLabel, { color: '#fff' }]}>{sub.plan2?.label}</Text>
                 <Text style={[subSt.planPrice, { color: '#fff' }]}>{sub.plan2?.price}</Text>
                 <Text style={[subSt.planPeriod, { color: 'rgba(255,255,255,0.8)' }]}>{sub.plan2?.period}</Text>

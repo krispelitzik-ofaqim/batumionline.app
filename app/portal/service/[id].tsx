@@ -5,10 +5,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../../../constants/colors';
+import { useI18n } from '../../../constants/i18n';
 import { SERVICE_DETAILS } from '../../../constants/serviceDetails';
 import BottomTabBar from '../../../components/BottomTabBar';
 
 export default function ServiceDetailScreen() {
+  const { t } = useI18n();
   const { id } = useLocalSearchParams<{ id: string }>();
   const svc = id ? SERVICE_DETAILS[id] : undefined;
 
@@ -19,7 +21,7 @@ export default function ServiceDetailScreen() {
           <TouchableOpacity onPress={() => router.canGoBack() ? router.back() : router.replace('/')} style={s.backBtn}>
             <Text style={s.backTxt}>‹</Text>
           </TouchableOpacity>
-          <Text style={s.headerTitle}>שירות</Text>
+          <Text style={s.headerTitle}>{t('po.service')}</Text>
         </View>
         <Text style={{ textAlign: 'center', color: '#94a3b8', marginTop: 40, writingDirection: 'rtl' }}>השירות לא נמצא</Text>
         <BottomTabBar />
@@ -63,7 +65,7 @@ export default function ServiceDetailScreen() {
         {/* Tracks (multi-route services) */}
         {svc.tracks && svc.tracks.length > 0 && (
           <View style={s.section}>
-            <Text style={s.sectionTitle}>המסלולים האפשריים</Text>
+            <Text style={s.sectionTitle}>{t('po.routes')}</Text>
             {svc.tracks.map((t, i) => (
               <View key={i} style={s.trackCard}>
                 <View style={s.trackHead}>
@@ -82,7 +84,7 @@ export default function ServiceDetailScreen() {
         {/* Requirements (simple services) */}
         {svc.requirements && svc.requirements.length > 0 && (
           <View style={s.section}>
-            <Text style={s.sectionTitle}>תנאים בסיסיים שצריך לדעת</Text>
+            <Text style={s.sectionTitle}>{t('po.basics')}</Text>
             <View style={s.reqCard}>
               {svc.requirements.map((req, i) => (
                 <View key={i} style={[s.reqRow, i === svc.requirements!.length - 1 && { borderBottomWidth: 0 }]}>

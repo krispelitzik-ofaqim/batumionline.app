@@ -16,6 +16,7 @@ import { PreviewContext } from '../../constants/previewContext';
 import { router } from 'expo-router';
 import { fetchContent, getCachedContent, resolveUri } from '../../constants/api';
 import { Colors } from '../../constants/colors';
+import { useI18n } from '../../constants/i18n';
 import WelcomeSlider from '../../components/WelcomeSlider';
 import HomeGallery from '../../components/HomeGallery';
 import AccessibilityButton from '../../components/AccessibilityButton';
@@ -150,6 +151,7 @@ function CatCard({ item, width }: { item: CatItem; width: number }) {
 }
 
 export default function HomeScreen() {
+  const { t } = useI18n();
   const { width: screenW } = useWindowDimensions();
   const [showExtra, setShowExtra] = useState(false);
   const [extraGroupVisible, setExtraGroupVisible] = useState(false);
@@ -290,7 +292,7 @@ export default function HomeScreen() {
         {extraGroupVisible && (
           <View style={styles.section}>
             <TouchableOpacity style={styles.dropdownBtn} onPress={() => setShowExtra(!showExtra)}>
-              <Text style={styles.dropdownTxt}>{showExtra ? '▲' : '▼'} קטגוריות נוספות</Text>
+              <Text style={styles.dropdownTxt}>{showExtra ? '▲' : '▼'} {t('home.moreCategories')}</Text>
             </TouchableOpacity>
             {showExtra && (
               <View style={styles.grid}>
@@ -346,7 +348,7 @@ export default function HomeScreen() {
         {/* 6. באנרים רוחביים */}
         {bottomGroupVisible && (
           <View style={styles.section}>
-            <Text style={styles.bottomSectionTitle}>מידע On Line</Text>
+            <Text style={styles.bottomSectionTitle}>{t('home.onlineInfo')}</Text>
             {editBottomBanners.filter((b: any) => b.visible !== false).map((b, idx) => (
               <View key={b.id} style={{ position: 'relative' }}>
                 {editMode && <ReorderControls index={idx} total={editBottomBanners.length} onMove={(dir) => moveBottomBanner(idx, dir)} />}

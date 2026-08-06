@@ -45,6 +45,7 @@ import { ThemeContext } from '../constants/theme';
 import { AdminContext } from '../constants/adminContext';
 import { PreviewContext, PreviewMode } from '../constants/previewContext';
 import { AccessibilityProvider, useAccessibility } from '../constants/accessibilityContext';
+import { I18nProvider } from '../constants/i18n';
 
 function AccessibilityToThemeBridge({ dark, setDark, children }: { dark: boolean; setDark: (v: boolean) => void; children: React.ReactNode }) {
   const { settings } = useAccessibility();
@@ -142,6 +143,7 @@ export default function RootLayout() {
 
   return (
     <ErrorBoundary>
+      <I18nProvider>
       <AccessibilityProvider>
         <PreviewContext.Provider value={previewCtx}>
           <AdminContext.Provider value={{ isAdmin, setAdmin }}>
@@ -157,6 +159,7 @@ export default function RootLayout() {
           </AdminContext.Provider>
         </PreviewContext.Provider>
       </AccessibilityProvider>
+      </I18nProvider>
     </ErrorBoundary>
   );
 }

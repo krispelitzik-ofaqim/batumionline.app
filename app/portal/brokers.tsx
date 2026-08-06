@@ -3,6 +3,7 @@ import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Image, Linking, M
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '../../constants/colors';
+import { useI18n } from '../../constants/i18n';
 import { fetchContent, resolveUri } from '../../constants/api';
 import BottomTabBar from '../../components/BottomTabBar';
 
@@ -42,6 +43,7 @@ const FALLBACK: Broker[] = Array.from({ length: 6 }, (_, i) => ({
 }));
 
 export default function BrokersPortal() {
+  const { t } = useI18n();
   const [items, setItems] = useState<Broker[]>(FALLBACK);
   const [showCriteria, setShowCriteria] = useState(false);
 
@@ -54,7 +56,7 @@ export default function BrokersPortal() {
   return (
     <SafeAreaView style={s.safe}>
       <View style={s.header}>
-        <Text style={s.title}>סוכני נדל"ן מורשים</Text>
+        <Text style={s.title}>{t('po.brokersTitle')}</Text>
         <TouchableOpacity onPress={() => router.canGoBack() ? router.back() : router.replace('/portal/realestate' as any)} style={s.backBtn}>
           <Text style={s.backTxt}>‹</Text>
         </TouchableOpacity>
@@ -62,26 +64,26 @@ export default function BrokersPortal() {
 
       <View style={{ flexDirection: 'row-reverse', gap: 8, padding: 12, backgroundColor: '#f0fdf4', borderBottomWidth: 1, borderBottomColor: '#bbf7d0' }}>
         <TouchableOpacity onPress={() => setShowCriteria(true)} style={[s.topBtn, { backgroundColor: '#fff', borderWidth: 1, borderColor: '#15803d' }]} activeOpacity={0.85}>
-          <Text style={[s.topBtnTxt, { color: '#15803d', textAlign: 'center' }]}>מה נדרש מהסוכן?</Text>
+          <Text style={[s.topBtnTxt, { color: '#15803d', textAlign: 'center' }]}>{t('po.whatRequired')}</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => Linking.openURL('https://wa.me/972502844867?text=' + encodeURIComponent('שלום, אני רוצה להמליץ על סוכן נדל"ן בבטומי. שם הסוכן: '))} style={[s.topBtn, { backgroundColor: Colors.PRIMARY }]} activeOpacity={0.85}>
-          <Text style={[s.topBtnTxt, { color: '#fff', textAlign: 'center' }]}>המלצה על סוכן נדל"ן</Text>
+          <Text style={[s.topBtnTxt, { color: '#fff', textAlign: 'center' }]}>{t('po.recommendAgent')}</Text>
         </TouchableOpacity>
       </View>
 
       <Modal visible={showCriteria} transparent animationType="slide" onRequestClose={() => setShowCriteria(false)}>
         <TouchableOpacity activeOpacity={1} onPress={() => setShowCriteria(false)} style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'flex-start' }}>
           <TouchableOpacity activeOpacity={1} style={{ backgroundColor: '#fff', borderBottomLeftRadius: 20, borderBottomRightRadius: 20, padding: 20, paddingTop: 50 }}>
-            <Text style={{ fontSize: 16, fontWeight: '900', color: '#15803d', writingDirection: 'rtl', textAlign: 'right', marginBottom: 12 }}>✓ קריטריוני אימות סוכנים</Text>
-            <Text style={s.introBullet}>• ניסיון מוכח בנדל"ן בבטומי - מעל שנתיים</Text>
-            <Text style={s.introBullet}>• חשבון בנק פעיל בבטומי</Text>
-            <Text style={s.introBullet}>• ערוץ תקשורת (אתר, פייסבוק, אחר)</Text>
-            <Text style={s.introBullet}>• הצגת הסכם מכר שבוצע בעבר</Text>
-            <Text style={s.introBullet}>• שיחת טלפון אישית</Text>
-            <Text style={s.introBullet}>• שליחת פרטים, תמונה ומסמכים נוספים (ככל שיידרשו)</Text>
-            <Text style={s.introBullet}>• 2 ממליצים לפחות</Text>
+            <Text style={{ fontSize: 16, fontWeight: '900', color: '#15803d', writingDirection: 'rtl', textAlign: 'right', marginBottom: 12 }}>{t('po.critTitle')}</Text>
+            <Text style={s.introBullet}>{t('po.crit1')}</Text>
+            <Text style={s.introBullet}>{t('po.crit2')}</Text>
+            <Text style={s.introBullet}>{t('po.crit3')}</Text>
+            <Text style={s.introBullet}>{t('po.crit4')}</Text>
+            <Text style={s.introBullet}>{t('po.crit5')}</Text>
+            <Text style={s.introBullet}>{t('po.crit6')}</Text>
+            <Text style={s.introBullet}>{t('po.crit7')}</Text>
             <TouchableOpacity onPress={() => setShowCriteria(false)} style={{ marginTop: 16, paddingVertical: 10, borderRadius: 8, backgroundColor: '#15803d', alignItems: 'center' }}>
-              <Text style={{ color: '#fff', fontWeight: '900', fontSize: 14 }}>הבנתי</Text>
+              <Text style={{ color: '#fff', fontWeight: '900', fontSize: 14 }}>{t('c.gotIt')}</Text>
             </TouchableOpacity>
           </TouchableOpacity>
         </TouchableOpacity>
@@ -109,7 +111,7 @@ export default function BrokersPortal() {
                 </View>
               )}
               <View style={{ flex: 1 }}>
-                <Text style={s.cardKicker}>✓ סוכן נדל״ן מומלץ בבטומי</Text>
+                <Text style={s.cardKicker}>{t('po.recommendedAgent')}</Text>
                 <Text style={s.cardName}>{b.name}</Text>
                 {!!b.title && <Text style={[s.cardMeta, { fontWeight: '700' }]}>{b.title}</Text>}
                 {!!b.city && <Text style={s.cardMeta}>📍 {b.city}{b.yearsActive ? ` · ${b.yearsActive}` : ''}</Text>}
@@ -124,14 +126,14 @@ export default function BrokersPortal() {
               )}
               {b.phone && (
                 <TouchableOpacity onPress={() => Linking.openURL(`tel:${b.phone}`)} style={[s.btn, { backgroundColor: Colors.PRIMARY }]}>
-                  <Text style={s.btnTxt}>📞 חייג</Text>
+                  <Text style={s.btnTxt}>{t('c.call')}</Text>
                 </TouchableOpacity>
               )}
             </View>
           </View>
           );
         })}
-        {items.length === 0 && <Text style={s.empty}>אין סוכנים זמינים כרגע</Text>}
+        {items.length === 0 && <Text style={s.empty}>{t('po.noAgents')}</Text>}
       </ScrollView>
       <BottomTabBar />
     </SafeAreaView>

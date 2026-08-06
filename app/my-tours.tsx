@@ -5,6 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'expo-image-picker';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '../constants/colors';
+import { useI18n } from '../constants/i18n';
 import AppHeader from '../components/AppHeader';
 import BottomTabBar from '../components/BottomTabBar';
 
@@ -34,6 +35,7 @@ function groupByDay(stops: TourStop[]): { day: number; items: TourStop[] }[] {
 }
 
 export default function MyToursScreen() {
+  const { t } = useI18n();
   const [tours, setTours] = useState<Tour[]>([]);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
@@ -67,7 +69,7 @@ export default function MyToursScreen() {
   };
 
   const removeTour = (id: string) => {
-    Alert.alert('מחיקת סיור', 'למחוק את הסיור?', [
+    Alert.alert(t('mt.delTitle'), t('mt.delMsg'), [
       { text: 'ביטול', style: 'cancel' },
       { text: 'מחק', style: 'destructive', onPress: () => saveTours(tours.filter(t => t.id !== id)) },
     ]);
@@ -80,7 +82,7 @@ export default function MyToursScreen() {
   const takePhoto = async () => {
     try {
       const perm = await ImagePicker.requestCameraPermissionsAsync();
-      if (!perm.granted) { Alert.alert('הרשאה נדרשת', 'יש לאפשר גישה למצלמה'); return; }
+      if (!perm.granted) { Alert.alert(t('mt.permTitle'), t('mt.permMsg')); return; }
       const r = await ImagePicker.launchCameraAsync({ mediaTypes: ImagePicker.MediaTypeOptions.Images, quality: 0.7 });
       if (r.canceled) return;
       const asset = r.assets?.[0];
@@ -88,14 +90,14 @@ export default function MyToursScreen() {
       if (tours.length === 0) {
         const t: Tour = { id: 't_' + Date.now(), name: 'הזכרונות שלי', createdAt: new Date().toISOString(), stops: [{ id: 'p_' + Date.now(), title: 'צילום שלי', image: asset.uri }] };
         saveTours([t, ...tours]);
-        Alert.alert('✓ נשמר', 'נוצר סיור "הזכרונות שלי" עם הצילום');
+        Alert.alert(t('mt.savedTitle'), t('mt.savedMsg'));
       } else {
         const list = [...tours];
         list[0].stops.push({ id: 'p_' + Date.now(), title: 'צילום שלי', image: asset.uri });
         saveTours(list);
-        Alert.alert('✓ נוסף', `הצילום נוסף ל"${list[0].name}"`);
+        Alert.alert(t('mt.addedTitle'), `${t('mt.addedTitle')} → ${list[0].name}`);
       }
-    } catch { Alert.alert('שגיאה', 'לא ניתן לצלם'); }
+    } catch { Alert.alert(t('c.error'), t('mt.camErr')); }
   };
 
   const startEdit = (tourId: string, stop: TourStop) => {
@@ -123,7 +125,7 @@ export default function MyToursScreen() {
       <AppHeader crumbs={[{ title: 'אתרים ואטרקציות', path: '/category/2' }, { title: '❤️ הסיורים שלי' }]} />
       <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 100 }}>
         <Text style={{ fontSize: 18, fontWeight: '900', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl', marginBottom: 6 }}>❤️ הסיורים שלי</Text>
-        <Text style={s.intro}>בנה סיור משלך לפי ימים ושעות. לחץ על "✏️" ליד עצירה כדי לקבוע יום ושעה.</Text>
+        <Text style={s.intro}>{t('mt.intro')}</Text>
 
         <TouchableOpacity onPress={takePhoto} activeOpacity={0.85} style={s.cameraBlock}>
           <Text style={{ fontSize: 32 }}>📷</Text>
@@ -135,38 +137,38 @@ export default function MyToursScreen() {
 
         {creating ? (
           <View style={s.createBox}>
-            <Text style={s.createLabel}>שם הסיור החדש:</Text>
+            <Text style={s.createLabel}>{t('mt.newName')}</Text>
             <TextInput
               style={s.input}
               value={newName}
               onChangeText={setNewName}
-              placeholder="לדוגמה: סוף שבוע ראשון בבטומי"
+              placeholder={t('mt.newNamePh')}
               placeholderTextColor="#94a3b8"
               textAlign="right"
               autoFocus
             />
             <View style={{ flexDirection: 'row-reverse', gap: 8 }}>
               <TouchableOpacity onPress={createTour} style={[s.btn, { backgroundColor: Colors.PRIMARY, flex: 1 }]}>
-                <Text style={s.btnTxt}>✓ צור סיור</Text>
+                <Text style={s.btnTxt}>{t('mt.create')}</Text>
               </TouchableOpacity>
               <TouchableOpacity onPress={() => { setCreating(false); setNewName(''); }} style={[s.btn, { backgroundColor: '#cbd5e1', flex: 1 }]}>
-                <Text style={[s.btnTxt, { color: '#1C2B35' }]}>ביטול</Text>
+                <Text style={[s.btnTxt, { color: '#1C2B35' }]}>{t('c.cancel')}</Text>
               </TouchableOpacity>
             </View>
           </View>
         ) : (
           <TouchableOpacity onPress={() => setCreating(true)} style={[s.btn, { backgroundColor: Colors.PRIMARY, marginBottom: 16 }]}>
-            <Text style={s.btnTxt}>+ צור סיור חדש</Text>
+            <Text style={s.btnTxt}>{t('mt.createNew')}</Text>
           </TouchableOpacity>
         )}
 
         {loading ? (
-          <Text style={{ textAlign: 'center', color: '#64748b', padding: 20 }}>טוען...</Text>
+          <Text style={{ textAlign: 'center', color: '#64748b', padding: 20 }}>{t('c.loading')}</Text>
         ) : tours.length === 0 ? (
           <View style={s.empty}>
             <Text style={{ fontSize: 50 }}>🗺️</Text>
-            <Text style={s.emptyTxt}>עדיין לא יצרת סיורים</Text>
-            <Text style={s.emptySub}>כשתוסיף אטרקציה לסיור היא תופיע כאן</Text>
+            <Text style={s.emptyTxt}>{t('mt.empty')}</Text>
+            <Text style={s.emptySub}>{t('mt.emptySub')}</Text>
           </View>
         ) : tours.map(t => (
           <View key={t.id} style={s.card}>

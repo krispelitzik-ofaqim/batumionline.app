@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, Linkin
 import { router, useLocalSearchParams } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Colors } from '../../constants/colors';
+import { useI18n } from '../../constants/i18n';
 import { fetchContent, API_BASE, resolveUri } from '../../constants/api';
 import HtmlContent from '../../components/HtmlContent';
 import BottomTabBar from '../../components/BottomTabBar';
@@ -24,6 +25,7 @@ const WHATSAPP = '972502844867';
 const SITE = 'https://www.batumionline.app';
 
 export default function InfoPage() {
+  const { t } = useI18n();
   const { id } = useLocalSearchParams<{ id: string }>();
   const [tabs, setTabs] = useState<Tab[]>(DEFAULTS);
   const [portalItem, setPortalItem] = useState<{ title: string; subtitle?: string; body: string; image?: string } | null>(null);
@@ -97,7 +99,7 @@ export default function InfoPage() {
   if (!isLegal && !portalItem) {
     return (
       <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
-        <Text style={{ fontSize: 16, color: '#999' }}>טוען...</Text>
+        <Text style={{ fontSize: 16, color: '#999' }}>{t('c.loading')}</Text>
       </View>
     );
   }
@@ -106,7 +108,7 @@ export default function InfoPage() {
 
   const sendContact = async () => {
     if (!name.trim() || !message.trim()) {
-      Alert.alert('חסרים פרטים', 'אנא מלאו שם והודעה');
+      Alert.alert(t('c.missing'), t('c.missingMsg'));
       return;
     }
     try {
@@ -120,7 +122,7 @@ export default function InfoPage() {
       setName(''); setEmail(''); setMessage('');
       setSent(true);
     } catch (e: any) {
-      Alert.alert('שגיאה', e?.message || 'לא ניתן לשלוח כרגע');
+      Alert.alert(t('c.error'), e?.message || t('c.cantSend'));
     }
   };
 
@@ -158,48 +160,48 @@ export default function InfoPage() {
               תודה על פנייתך 🙏{'\n'}נחזור אליך בהקדם האפשרי
             </Text>
             <TouchableOpacity onPress={() => setSent(false)} style={{ backgroundColor: '#1A6B8A', paddingHorizontal: 32, paddingVertical: 14, borderRadius: 12, marginBottom: 12 }} activeOpacity={0.85}>
-              <Text style={{ color: '#fff', fontWeight: '800', fontSize: 15 }}>הודעה</Text>
+              <Text style={{ color: '#fff', fontWeight: '800', fontSize: 15 }}>{t('c.message')}</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => router.replace('/')} style={{ paddingHorizontal: 32, paddingVertical: 10 }} activeOpacity={0.7}>
-              <Text style={{ color: '#64748b', fontWeight: '700', fontSize: 14 }}>חזרה לדף הבית</Text>
+              <Text style={{ color: '#64748b', fontWeight: '700', fontSize: 14 }}>{t('ct.backHome')}</Text>
             </TouchableOpacity>
           </View>
         ) : current.id === 'contact' ? (
           <View>
             <LinearGradient colors={['#1A6B8A', '#3DA5C4']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.hero}>
               <Text style={styles.heroIcon}>✉️</Text>
-              <Text style={styles.heroTitle}>נשמח לשמוע מכם</Text>
-              <Text style={styles.heroSub}>שאלה, הצעה או שיתוף פעולה — דברו איתנו</Text>
+              <Text style={styles.heroTitle}>{t('ct.heroTitle')}</Text>
+              <Text style={styles.heroSub}>{t('ct.heroSub')}</Text>
             </LinearGradient>
 
             <View style={styles.quickRow}>
               <TouchableOpacity style={styles.quickBtn} onPress={() => Linking.openURL(`https://wa.me/${WHATSAPP}`)}>
                 <Text style={styles.quickIcon}>💬</Text>
-                <Text style={styles.quickTxt}>וואטסאפ</Text>
+                <Text style={styles.quickTxt}>{t('c.whatsapp')}</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.quickBtn} onPress={() => Linking.openURL(`mailto:${EMAIL}`)}>
                 <Text style={styles.quickIcon}>📧</Text>
-                <Text style={styles.quickTxt}>אימייל</Text>
+                <Text style={styles.quickTxt}>{t('c.email')}</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.quickBtn} onPress={() => Linking.openURL(SITE)}>
                 <Text style={styles.quickIcon}>🌐</Text>
-                <Text style={styles.quickTxt}>האתר</Text>
+                <Text style={styles.quickTxt}>{t('c.website')}</Text>
               </TouchableOpacity>
             </View>
 
             <View style={styles.formCard}>
-              <Text style={styles.formTitle}>שליחת הודעה</Text>
-              <TextInput style={styles.input} placeholder="שם מלא" placeholderTextColor="#999" value={name} onChangeText={setName} textAlign="right" />
-              <TextInput style={styles.input} placeholder="אימייל" placeholderTextColor="#999" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" textAlign="right" />
-              <TextInput style={[styles.input, styles.textarea]} placeholder="ההודעה שלכם" placeholderTextColor="#999" value={message} onChangeText={setMessage} multiline numberOfLines={5} textAlign="right" textAlignVertical="top" />
+              <Text style={styles.formTitle}>{t('ct.formTitle')}</Text>
+              <TextInput style={styles.input} placeholder={t('c.fullName')} placeholderTextColor="#999" value={name} onChangeText={setName} textAlign="right" />
+              <TextInput style={styles.input} placeholder={t('c.email')} placeholderTextColor="#999" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" textAlign="right" />
+              <TextInput style={[styles.input, styles.textarea]} placeholder={t('ct.msgPh')} placeholderTextColor="#999" value={message} onChangeText={setMessage} multiline numberOfLines={5} textAlign="right" textAlignVertical="top" />
               <TouchableOpacity style={styles.sendBtn} onPress={sendContact} activeOpacity={0.85}>
-                <Text style={styles.sendBtnTxt}>שליחה ←</Text>
+                <Text style={styles.sendBtnTxt}>{t('ct.sendArrow')}</Text>
               </TouchableOpacity>
             </View>
 
             <View style={styles.infoRow}>
-              <Text style={styles.infoLine}>📍 בטומי, גאורגיה</Text>
-              <Text style={styles.infoLine}>🕐 ראשון-חמישי 09:00-18:00</Text>
+              <Text style={styles.infoLine}>{t('ct.locLine')}</Text>
+              <Text style={styles.infoLine}>{t('ct.hoursLine')}</Text>
             </View>
           </View>
         ) : (

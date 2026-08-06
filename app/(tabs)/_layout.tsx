@@ -6,11 +6,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '../../constants/colors';
 import { ThemeContext } from '../../constants/theme';
 import { PreviewContext } from '../../constants/previewContext';
+import { useI18n } from '../../constants/i18n';
 import HeaderBar from '../../components/HeaderBar';
 import DevicePreviewBar from '../../components/DevicePreviewBar';
 import SearchModal from '../../components/SearchModal';
 
 export default function TabLayout() {
+  const { t } = useI18n();
   const { dark } = useContext(ThemeContext);
   const { simulatedWidth } = useContext(PreviewContext);
   const { width: realWidth } = useWindowDimensions();
@@ -69,7 +71,7 @@ export default function TabLayout() {
         <Tabs.Screen
           name="info"
           options={{
-            title: 'מידע',
+            title: t('tab.info'),
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="information-circle" size={isMobile ? 22 : size} color={color} />
             ),
@@ -78,7 +80,7 @@ export default function TabLayout() {
         <Tabs.Screen
           name="map"
           options={{
-            title: 'מפה',
+            title: t('tab.map'),
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="map" size={isMobile ? 22 : size} color={color} />
             ),
@@ -87,7 +89,7 @@ export default function TabLayout() {
         <Tabs.Screen
           name="search"
           options={{
-            title: 'חיפוש',
+            title: t('tab.search'),
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="search" size={isMobile ? 22 : size} color={color} />
             ),
@@ -102,7 +104,7 @@ export default function TabLayout() {
         <Tabs.Screen
           name="index"
           options={{
-            title: 'בית',
+            title: t('tab.home'),
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="home" size={isMobile ? 22 : size} color={color} />
             ),

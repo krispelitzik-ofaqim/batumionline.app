@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useI18n } from '../constants/i18n';
 import { View, Text, Modal, TextInput, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
 import { Colors } from '../constants/colors';
@@ -14,6 +15,7 @@ type Result = {
 };
 
 export default function SearchModal({ visible, onClose }: { visible: boolean; onClose: () => void }) {
+  const { t } = useI18n();
   const [query, setQuery] = useState('');
   const [data, setData] = useState<any>(null);
 
@@ -138,17 +140,17 @@ export default function SearchModal({ visible, onClose }: { visible: boolean; on
             style={s.input}
             value={query}
             onChangeText={setQuery}
-            placeholder="חפש באפליקציה..."
+            placeholder={t('srch.ph')}
             placeholderTextColor="#9ca3af"
             autoFocus
           />
           <TouchableOpacity onPress={onClose} style={s.closeBtn}>
-            <Text style={s.closeTxt}>סגור</Text>
+            <Text style={s.closeTxt}>{t('c.close')}</Text>
           </TouchableOpacity>
         </View>
         <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 20 }} keyboardShouldPersistTaps="handled">
           {!query.trim() && (
-            <Text style={s.hint}>הקלד מילת חיפוש — קטגוריות, מקומות, סיורים</Text>
+            <Text style={s.hint}>{t('srch.hint')}</Text>
           )}
           {query.trim() && results.length === 0 && (
             <Text style={s.hint}>לא נמצאו תוצאות עבור "{query}"</Text>

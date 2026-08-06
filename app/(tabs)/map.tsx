@@ -2,6 +2,7 @@ import React, { useContext, useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform, Modal, Linking } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { Colors } from '../../constants/colors';
+import { useI18n } from '../../constants/i18n';
 import { ThemeContext } from '../../constants/theme';
 import { fetchContent } from '../../constants/api';
 import MapEmbed from '../../components/MapEmbed';
@@ -11,6 +12,7 @@ type MapPoint = { name: string; lat: number; lng: number; description?: string }
 type MapLayer = { name: string; points: MapPoint[] };
 
 export default function MapScreen() {
+  const { t } = useI18n();
   const { dark } = useContext(ThemeContext);
   const [active, setActive] = useState('הכל');
   const [layers, setLayers] = useState<MapLayer[]>([]);
@@ -109,7 +111,7 @@ export default function MapScreen() {
           <TouchableOpacity activeOpacity={1} style={{ backgroundColor: '#fff', borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: '60%', paddingBottom: 20 }}>
             <View style={{ width: 40, height: 4, backgroundColor: '#cbd5e1', borderRadius: 2, alignSelf: 'center', marginTop: 10, marginBottom: 8 }} />
             <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, marginBottom: 10 }}>
-              <Text style={{ fontSize: 15, fontWeight: '900', color: Colors.TEXT, writingDirection: 'rtl' }}>קטגוריות מפה</Text>
+              <Text style={{ fontSize: 15, fontWeight: '900', color: Colors.TEXT, writingDirection: 'rtl' }}>{t('map.categories')}</Text>
               <TouchableOpacity onPress={() => setMenuOpen(false)} style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: '#f1f5f9', alignItems: 'center', justifyContent: 'center' }}>
                 <Text style={{ fontSize: 16, color: '#64748b', fontWeight: '900' }}>✕</Text>
               </TouchableOpacity>
@@ -143,7 +145,7 @@ export default function MapScreen() {
           <View style={[styles.panel, { backgroundColor: '#F4A94E', maxHeight: '55%' }]}>
             <View style={styles.panelHandle} />
             <View style={styles.panelHeader}>
-              <Text style={styles.panelTitle}>📍 קרוב אליי</Text>
+              <Text style={styles.panelTitle}>{t('map.nearMe')}</Text>
               <Text style={styles.panelCount}>{nearby.length} מיקומים קרובים</Text>
               <TouchableOpacity onPress={() => { setUserLoc(null); setLocError(null); setActive('הכל'); }} style={styles.panelClose}>
                 <Text style={styles.panelCloseX}>✕</Text>
@@ -155,7 +157,7 @@ export default function MapScreen() {
               </View>
             ) : !userLoc ? (
               <View style={{ padding: 16 }}>
-                <Text style={{ color: '#fff', fontSize: 13, fontWeight: '800', writingDirection: 'rtl', textAlign: 'right' }}>טוען מיקום...</Text>
+                <Text style={{ color: '#fff', fontSize: 13, fontWeight: '800', writingDirection: 'rtl', textAlign: 'right' }}>{t('map.loadingLoc')}</Text>
               </View>
             ) : (
               <ScrollView style={styles.panelScroll} showsVerticalScrollIndicator={false}>
@@ -172,7 +174,7 @@ export default function MapScreen() {
                       <Text style={styles.panelDesc}>{(p as any).category} · {(p as any).distKm < 1 ? `${Math.round((p as any).distKm * 1000)} מ׳` : `${(p as any).distKm.toFixed(1)} ק״מ`}</Text>
                     </View>
                     <TouchableOpacity onPress={() => openNav(p.lat, p.lng)} style={styles.navBtn} hitSlop={8} activeOpacity={0.8}>
-                      <Text style={styles.navBtnTxt}>🧭 נווט</Text>
+                      <Text style={styles.navBtnTxt}>{t('c.navigate')}</Text>
                     </TouchableOpacity>
                   </TouchableOpacity>
                 ))}
@@ -214,7 +216,7 @@ export default function MapScreen() {
                       ) : p.description ? <Text style={styles.panelDesc} numberOfLines={1}>{p.description.replace(/<[^>]+>/g, '').substring(0, 40)}</Text> : null}
                     </View>
                     <TouchableOpacity onPress={() => openNav(p.lat, p.lng)} style={styles.navBtn} hitSlop={8} activeOpacity={0.8}>
-                      <Text style={styles.navBtnTxt}>🧭 נווט</Text>
+                      <Text style={styles.navBtnTxt}>{t('c.navigate')}</Text>
                     </TouchableOpacity>
                     <Text style={styles.panelArrow}>{focusPoint?.name === p.name ? '▼' : '←'}</Text>
                   </TouchableOpacity>

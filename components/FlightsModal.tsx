@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { useI18n } from '../constants/i18n';
 import {
   View, Text, Modal, TouchableOpacity, StyleSheet, ActivityIndicator, ScrollView, Animated, Image, Linking,
 } from 'react-native';
@@ -62,6 +63,8 @@ const AIRLINE_LOGOS: Record<string, any> = {
 };
 
 export default function FlightsModal({ visible, onClose, bgColor }: { visible: boolean; onClose: () => void; bgColor: string }) {
+  const { t, lang } = useI18n();
+  const allFlights = lang === 'en'; // English edition: show ALL Batumi flights, not only Israel routes
   const [flights, setFlights] = useState<Flight[]>([]);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<'arrival' | 'departure'>('arrival');
@@ -147,7 +150,7 @@ export default function FlightsModal({ visible, onClose, bgColor }: { visible: b
 
       const IL_AIRPORTS = new Set(['TLV', 'ETM', 'VDA', 'HFA']);
       const arrivals: Flight[] = (data.arrivals || [])
-        .filter((f: any) => IL_AIRPORTS.has(f.departure?.airport?.iata))
+        .filter((f: any) => allFlights || IL_AIRPORTS.has(f.departure?.airport?.iata))
         .map((f: any) => ({
           flight: f.number || '—',
           airline: f.airline?.name || '',
@@ -161,7 +164,7 @@ export default function FlightsModal({ visible, onClose, bgColor }: { visible: b
         }));
 
       const departures: Flight[] = (data.departures || [])
-        .filter((f: any) => IL_AIRPORTS.has(f.arrival?.airport?.iata))
+        .filter((f: any) => allFlights || IL_AIRPORTS.has(f.arrival?.airport?.iata))
         .map((f: any) => ({
           flight: f.number || '—',
           airline: f.airline?.name || '',
@@ -186,14 +189,14 @@ export default function FlightsModal({ visible, onClose, bgColor }: { visible: b
     reload();
     const interval = setInterval(reload, 60_000);
     return () => clearInterval(interval);
-  }, [visible]);
+  }, [visible, lang]);
 
   // ─── AviationStack API ──────────────────────────────────────
   const fetchAviationStack = async () => {
     try {
       const [arrRes, depRes] = await Promise.all([
-        fetch(`http://api.aviationstack.com/v1/flights?access_key=${AVIATIONSTACK_KEY}&arr_iata=BUS&dep_iata=TLV&flight_status=active,scheduled,landed`),
-        fetch(`http://api.aviationstack.com/v1/flights?access_key=${AVIATIONSTACK_KEY}&dep_iata=BUS&arr_iata=TLV&flight_status=active,scheduled,landed`),
+        fetch(`http://api.aviationstack.com/v1/flights?access_key=${AVIATIONSTACK_KEY}&arr_iata=BUS${allFlights ? '' : '&dep_iata=TLV'}&flight_status=active,scheduled,landed`),
+        fetch(`http://api.aviationstack.com/v1/flights?access_key=${AVIATIONSTACK_KEY}&dep_iata=BUS${allFlights ? '' : '&arr_iata=TLV'}&flight_status=active,scheduled,landed`),
       ]);
       const arrData = await arrRes.json();
       const depData = await depRes.json();
@@ -257,7 +260,7 @@ export default function FlightsModal({ visible, onClose, bgColor }: { visible: b
       const depData = await depRes.json();
 
       const arrivals: Flight[] = (arrData.arrivals || [])
-        .filter((f: any) => f.departure?.airport?.iata === 'TLV')
+        .filter((f: any) => allFlights || f.departure?.airport?.iata === 'TLV')
         .map((f: any) => ({
           flight: f.number || '—',
           airline: f.airline?.name || '',
@@ -270,7 +273,7 @@ export default function FlightsModal({ visible, onClose, bgColor }: { visible: b
         }));
 
       const departures: Flight[] = (depData.departures || [])
-        .filter((f: any) => f.arrival?.airport?.iata === 'TLV')
+        .filter((f: any) => allFlights || f.arrival?.airport?.iata === 'TLV')
         .map((f: any) => ({
           flight: f.number || '—',
           airline: f.airline?.name || '',
@@ -319,7 +322,7 @@ export default function FlightsModal({ visible, onClose, bgColor }: { visible: b
           {/* Clock + refresh */}
           <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'center', gap: 14, marginBottom: 8 }}>
             <View style={s.clockWrap}>
-              <Text style={s.clockLabelTop}>שעון בטומי</Text>
+              <Text style={s.clockLabelTop}>{t('flt.clock')}</Text>
               <View style={s.clockBoard}>
                 <Text style={s.clockDigits}>{batumiTime}</Text>
               </View>
@@ -331,7 +334,7 @@ export default function FlightsModal({ visible, onClose, bgColor }: { visible: b
               ) : (
                 <>
                   <Text style={s.refreshCircleIcon}>↻</Text>
-                  <Text style={s.refreshCircleTxt}>רענן</Text>
+                  <Text style={s.refreshCircleTxt}>{t('flt.refresh')}</Text>
                 </>
               )}
             </TouchableOpacity>
@@ -348,23 +351,23 @@ export default function FlightsModal({ visible, onClose, bgColor }: { visible: b
             <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 10, flex: 1 }}>
               <Text style={{ fontSize: 22 }}>✈️</Text>
               <View style={{ flex: 1 }}>
-                <Text style={{ fontSize: 14, fontWeight: '900', color: '#fff', writingDirection: 'rtl' }}>חפש טיסה זולה ל-BUS</Text>
-                <Text style={{ fontSize: 11, color: '#F4A94E', writingDirection: 'rtl', marginTop: 2 }}>השוואת מחירים — TLV → בטומי</Text>
+                <Text style={{ fontSize: 14, fontWeight: '900', color: '#fff', writingDirection: 'rtl' }}>{t('flt.searchTitle')}</Text>
+                <Text style={{ fontSize: 11, color: '#F4A94E', writingDirection: 'rtl', marginTop: 2 }}>{t('flt.searchSub')}</Text>
               </View>
             </View>
             <View style={{ backgroundColor: '#F4A94E', paddingHorizontal: 14, paddingVertical: 7, borderRadius: 16 }}>
-              <Text style={{ color: '#1C2B35', fontSize: 12, fontWeight: '900' }}>חפש</Text>
+              <Text style={{ color: '#1C2B35', fontSize: 12, fontWeight: '900' }}>{t('c.search')}</Text>
             </View>
           </TouchableOpacity>
 
           {/* Tabs */}
           <View style={s.tabRow}>
             <TouchableOpacity style={[s.tab, tab === 'departure' && s.tabActive]} onPress={() => setTab('departure')}>
-              <Text style={[s.tabTxt, tab === 'departure' && s.tabTxtActive]}>המראות מבטומי</Text>
+              <Text style={[s.tabTxt, tab === 'departure' && s.tabTxtActive]}>{t('flt.departures')}</Text>
               <Text style={[s.tabSub, tab === 'departure' && s.tabSubActive]}>BUS → TLV</Text>
             </TouchableOpacity>
             <TouchableOpacity style={[s.tab, tab === 'arrival' && s.tabActive]} onPress={() => setTab('arrival')}>
-              <Text style={[s.tabTxt, tab === 'arrival' && s.tabTxtActive]}>נחיתות בבטומי</Text>
+              <Text style={[s.tabTxt, tab === 'arrival' && s.tabTxtActive]}>{t('flt.arrivals')}</Text>
               <Text style={[s.tabSub, tab === 'arrival' && s.tabSubActive]}>TLV → BUS</Text>
             </TouchableOpacity>
           </View>
@@ -376,9 +379,9 @@ export default function FlightsModal({ visible, onClose, bgColor }: { visible: b
               {/* Table header */}
               {filtered.length > 0 && (
                 <View style={s.tableHeader}>
-                  <Text style={[s.thCell, { width: 70, textAlign: 'center' }]}>טיסה</Text>
-                  <Text style={[s.thCell, { flex: 1, textAlign: 'center' }]}>המראה / נחיתה</Text>
-                  <Text style={[s.thCell, { width: 70, textAlign: 'center' }]}>סטטוס</Text>
+                  <Text style={[s.thCell, { width: 70, textAlign: 'center' }]}>{t('flt.colFlight')}</Text>
+                  <Text style={[s.thCell, { flex: 1, textAlign: 'center' }]}>{t('flt.colRoute')}</Text>
+                  <Text style={[s.thCell, { width: 70, textAlign: 'center' }]}>{t('flt.colStatus')}</Text>
                 </View>
               )}
 
@@ -416,7 +419,7 @@ export default function FlightsModal({ visible, onClose, bgColor }: { visible: b
               {filtered.length === 0 && (
                 <View style={s.empty}>
                   <Text style={s.emptyIcon}>✈️</Text>
-                  <Text style={s.emptyTxt}>אין טיסות ב-12 השעות הקרובות</Text>
+                  <Text style={s.emptyTxt}>{t('flt.empty')}</Text>
                 </View>
               )}
 
@@ -488,7 +491,7 @@ export default function FlightsModal({ visible, onClose, bgColor }: { visible: b
                       }}
                     >
                       <Text style={s.fr24Icon}>📡</Text>
-                      <Text style={s.fr24Txt}>עקוב ב-FlightRadar24</Text>
+                      <Text style={s.fr24Txt}>{t('flt.followFr24')}</Text>
                     </TouchableOpacity>
                   </>
                 );

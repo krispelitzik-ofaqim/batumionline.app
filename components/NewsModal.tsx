@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useI18n } from '../constants/i18n';
 import {
   View, Text, Modal, TouchableOpacity, StyleSheet, ActivityIndicator, ScrollView, Linking, Image,
 } from 'react-native';
@@ -56,6 +57,7 @@ function detectTopic(text: string): Topic {
 }
 
 export default function NewsModal({ visible, onClose, bgColor }: { visible: boolean; onClose: () => void; bgColor: string }) {
+  const { t } = useI18n();
   const [news, setNews] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<Topic | 'all'>('all');
@@ -200,8 +202,8 @@ export default function NewsModal({ visible, onClose, bgColor }: { visible: bool
         </TouchableOpacity>
 
         <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
-          <Text style={s.title}>חדשות בעברית</Text>
-          <Text style={s.subtitle}>חדשות ועדכונים מבטומי וגאורגיה</Text>
+          <Text style={s.title}>{t('news.title')}</Text>
+          <Text style={s.subtitle}>{t('news.sub')}</Text>
 
           {/* Topic filter chips */}
           <ScrollView
@@ -222,7 +224,7 @@ export default function NewsModal({ visible, onClose, bgColor }: { visible: bool
               </TouchableOpacity>
             ))}
             <TouchableOpacity style={[s.chip, filter === 'all' && s.chipActive]} onPress={() => setFilter('all')}>
-              <Text style={[s.chipTxt, filter === 'all' && s.chipTxtActive]}>הכל</Text>
+              <Text style={[s.chipTxt, filter === 'all' && s.chipTxtActive]}>{t('c.all')}</Text>
             </TouchableOpacity>
           </ScrollView>
 
@@ -237,7 +239,7 @@ export default function NewsModal({ visible, onClose, bgColor }: { visible: bool
           {!loading && filtered.length === 0 && (
             <View style={s.empty}>
               <Text style={s.emptyIcon}>📭</Text>
-              <Text style={s.emptyTxt}>אין חדשות בקטגוריה זו</Text>
+              <Text style={s.emptyTxt}>{t('news.empty')}</Text>
             </View>
           )}
         </ScrollView>
@@ -262,7 +264,7 @@ export default function NewsModal({ visible, onClose, bgColor }: { visible: bool
                 <Text style={s.expandedSummary}>{expanded.summary}</Text>
                 {expanded.link ? (
                   <TouchableOpacity style={s.linkBtn} onPress={() => Linking.openURL(expanded.link)}>
-                    <Text style={s.linkBtnTxt}>המשך לכתבה המלאה באתר המקור ←</Text>
+                    <Text style={s.linkBtnTxt}>{t('news.readMore')}</Text>
                   </TouchableOpacity>
                 ) : null}
               </View>

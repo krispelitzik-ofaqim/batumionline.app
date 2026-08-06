@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useI18n } from '../constants/i18n';
 import { View, Text, Modal, TouchableOpacity, StyleSheet, ActivityIndicator, ScrollView, Animated } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Colors } from '../constants/colors';
@@ -29,6 +30,7 @@ const BATUMI_LAT = 41.6168;
 const BATUMI_LON = 41.6367;
 
 export default function WeatherModal({ visible, onClose, bgColor }: { visible: boolean; onClose: () => void; bgColor: string }) {
+  const { t } = useI18n();
   const [current, setCurrent] = useState<CurrentWeather | null>(null);
   const [forecast, setForecast] = useState<DayForecast[]>([]);
   const [hourly, setHourly] = useState<HourForecast[]>([]);
@@ -282,7 +284,7 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
               <Text style={s.liveTxt}>LIVE</Text>
             </View>
           </View>
-          <Text style={[s.title, { fontSize: 16, marginBottom: 4, textAlign: 'center' }]}>מזג האוויר בבטומי</Text>
+          <Text style={[s.title, { fontSize: 16, marginBottom: 4, textAlign: 'center' }]}>{t('wthr.title')}</Text>
           <Text style={[s.batumiClock, { textAlign: 'center', alignSelf: 'center', marginBottom: 6 }]}>🕐 {batumiTime}</Text>
           {lastUpdated && (
             <Text style={s.updatedTxt}>עודכן: {lastUpdated.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })} · מתרענן כל 10 דק׳</Text>
@@ -290,7 +292,7 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
 
           <TouchableOpacity style={s.camBanner} activeOpacity={0.85} onPress={() => setCamerasOpen(true)}>
             <Text style={s.camBannerIcon}>📹</Text>
-            <Text style={s.camBannerTxt}>צפה במצלמות חיות מבטומי</Text>
+            <Text style={s.camBannerTxt}>{t('wthr.camBanner')}</Text>
             <Text style={s.camBannerArrow}>‹</Text>
           </TouchableOpacity>
 
@@ -310,19 +312,19 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
                     <View style={s.detailItem}>
                       <Text style={s.detailIcon}>🌡️</Text>
                       <Text style={s.detailVal}>{current.feels}°</Text>
-                      <Text style={s.detailLabel}>מרגיש כמו</Text>
+                      <Text style={s.detailLabel}>{t('wthr.feels')}</Text>
                     </View>
                     <View style={s.divider} />
                     <View style={s.detailItem}>
                       <Text style={s.detailIcon}>💧</Text>
                       <Text style={s.detailVal}>{current.humidity}%</Text>
-                      <Text style={s.detailLabel}>לחות</Text>
+                      <Text style={s.detailLabel}>{t('wthr.humidity')}</Text>
                     </View>
                     <View style={s.divider} />
                     <View style={s.detailItem}>
                       <Text style={s.detailIcon}>💨</Text>
                       <Text style={s.detailVal}>{current.wind}</Text>
-                      <Text style={s.detailLabel}>רוח קמ״ש</Text>
+                      <Text style={s.detailLabel}>{t('wthr.wind')}</Text>
                     </View>
                   </View>
 
@@ -332,7 +334,7 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
                         <View style={s.detailItem}>
                           <Text style={s.detailIcon}>🌊</Text>
                           <Text style={s.detailVal}>{current.seaTemp}°</Text>
-                          <Text style={s.detailLabel}>טמפ׳ הים</Text>
+                          <Text style={s.detailLabel}>{t('wthr.seaTemp')}</Text>
                         </View>
                         <View style={s.divider} />
                       </>
@@ -342,7 +344,7 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
                         <View style={s.detailItem}>
                           <Text style={s.detailIcon}>☀️</Text>
                           <Text style={s.detailVal}>{current.uv}</Text>
-                          <Text style={s.detailLabel}>אינדקס UV</Text>
+                          <Text style={s.detailLabel}>{t('wthr.uv')}</Text>
                         </View>
                         <View style={s.divider} />
                       </>
@@ -351,7 +353,7 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
                       <View style={s.detailItem}>
                         <Text style={s.detailIcon}>🌅</Text>
                         <Text style={s.detailVal}>{current.sunrise}</Text>
-                        <Text style={s.detailLabel}>זריחה</Text>
+                        <Text style={s.detailLabel}>{t('wthr.sunrise')}</Text>
                       </View>
                     )}
                     {current.sunset && (
@@ -360,7 +362,7 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
                         <View style={s.detailItem}>
                           <Text style={s.detailIcon}>🌇</Text>
                           <Text style={s.detailVal}>{current.sunset}</Text>
-                          <Text style={s.detailLabel}>שקיעה</Text>
+                          <Text style={s.detailLabel}>{t('wthr.sunset')}</Text>
                         </View>
                       </>
                     )}
@@ -371,10 +373,10 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
               {/* Hourly forecast */}
               {hourly.length > 0 && (
                 <>
-                  <Text style={s.weekTitle}>24 השעות הקרובות</Text>
+                  <Text style={s.weekTitle}>{t('wthr.next24')}</Text>
                   <View style={{ position: 'relative', paddingTop: 18 }}>
                     <View style={{ position: 'absolute', top: 0, right: 22, backgroundColor: '#F4A94E', paddingHorizontal: 10, paddingVertical: 3, borderRadius: 10, zIndex: 5 }}>
-                      <Text style={{ color: '#1C2B35', fontSize: 10, fontWeight: '900' }}>עכשיו</Text>
+                      <Text style={{ color: '#1C2B35', fontSize: 10, fontWeight: '900' }}>{t('wthr.now')}</Text>
                     </View>
                     <Text style={s.hourArrowFloat}>←</Text>
                     <ScrollView
@@ -409,7 +411,7 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
               )}
 
               {/* 7-day weekly forecast */}
-              <Text style={s.weekTitle}>תחזית שבועית</Text>
+              <Text style={s.weekTitle}>{t('wthr.weekly')}</Text>
               {forecast.map((day, i) => {
                 const isToday = i === 0;
                 const icon = isToday && current ? current.icon : day.icon;
@@ -444,7 +446,7 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
                 <View style={s.skippersWrap}>
                   <TouchableOpacity onPress={() => setSkippersOpen(o => !o)} style={s.skippersHeader} activeOpacity={0.85}>
                     <Text style={s.skippersIcon}>⛵</Text>
-                    <Text style={s.skippersTitle}>מזג אוויר לספנים ושייטים</Text>
+                    <Text style={s.skippersTitle}>{t('wthr.skippers')}</Text>
                     <Text style={s.skippersArrow}>{skippersOpen ? '▲' : '▼'}</Text>
                   </TouchableOpacity>
                   {skippersOpen && (
@@ -463,7 +465,7 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
                         <SkCell icon="📏" label="מפלס ים" val={marine.seaLevel != null ? `${marine.seaLevel.toFixed(2)} m` : '—'} />
                         <SkCell icon="🌡️" label="טמפ׳ מים" val={marine.waterTemp != null ? `${marine.waterTemp.toFixed(1)}°C` : '—'} />
                       </View>
-                      <Text style={s.skippersNote}>נתונים מ-Stormglass · מתרענן כל שעה</Text>
+                      <Text style={s.skippersNote}>{t('wthr.skippersNote')}</Text>
                     </View>
                   )}
                 </View>

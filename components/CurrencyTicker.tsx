@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
+import { useI18n } from '../constants/i18n';
 import { View, Text, StyleSheet } from 'react-native';
 import { Colors } from '../constants/colors';
 
 type Rates = { ILS: number; GEL: number; USD: number; EUR: number };
 
 export default function CurrencyTicker() {
+  const { t } = useI18n();
   const [rates, setRates] = useState<Rates | null>(null);
   const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
 
@@ -37,7 +39,7 @@ export default function CurrencyTicker() {
 
   return (
     <View style={s.wrap}>
-      <Text style={s.header}>שערי מטבעות חיים</Text>
+      <Text style={s.header}>{t('cur.tickerHdr')}</Text>
       <Text style={s.updated}>מעודכן ליום {dd}/{mm}/{yyyy} שעה {hh}:{mi}</Text>
       <View style={s.row}>
         {items.map((it, i) => (

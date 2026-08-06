@@ -4,6 +4,7 @@ import { useLocalSearchParams, router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { API_BASE } from '../constants/api';
 import { Colors } from '../constants/colors';
+import { useI18n } from '../constants/i18n';
 import { openInAppBrowser, bookingSearch, hotellookSearch } from '../constants/affiliates';
 import MapEmbed from '../components/MapEmbed';
 
@@ -23,6 +24,7 @@ type PlaceData = {
 };
 
 export default function PlacePage() {
+  const { t } = useI18n();
   const { q, title, type, ticketType, ticketUrl, ticketUrlAlt } = useLocalSearchParams<{ q?: string; title?: string; type?: string; ticketType?: string; ticketUrl?: string; ticketUrlAlt?: string }>();
   const insets = useSafeAreaInsets();
   const [data, setData] = useState<PlaceData | null>(null);
@@ -61,7 +63,7 @@ export default function PlacePage() {
       {loading ? (
         <ActivityIndicator size="large" color={Colors.PRIMARY} style={{ marginTop: 40 }} />
       ) : !data?.found ? (
-        <View style={{ padding: 24 }}><Text style={s.notFound}>לא נמצא מידע</Text></View>
+        <View style={{ padding: 24 }}><Text style={s.notFound}>{t('pl.notFound')}</Text></View>
       ) : (
         <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
           {!!(data.photos && data.photos.length) && (
@@ -119,9 +121,9 @@ export default function PlacePage() {
               const allSame = timesOnly.every(t => t === timesOnly[0]);
               return (
                 <View style={s.hours}>
-                  <Text style={s.hoursTitle}>שעות פתיחה</Text>
+                  <Text style={s.hoursTitle}>{t('pl.hours')}</Text>
                   {all24 ? (
-                    <Text style={s.hoursLine}>פתוח 24 שעות ביממה, 7 ימים בשבוע</Text>
+                    <Text style={s.hoursLine}>{t('pl.open247')}</Text>
                   ) : allSame ? (
                     <Text style={s.hoursLine}>כל ימות השבוע: {timesOnly[0]}</Text>
                   ) : (
@@ -140,15 +142,15 @@ export default function PlacePage() {
               {/* website link embedded in address above */}
               {isHotel && (
                 <TouchableOpacity style={[s.btn, { backgroundColor: '#FF6B00' }]} onPress={() => openInAppBrowser(hotellookSearch(title || data.name || ''))}>
-                  <Text style={s.btnTxt}>ראה מחיר וזמינות</Text>
+                  <Text style={s.btnTxt}>{t('pl.priceAvail')}</Text>
                 </TouchableOpacity>
               )}
               {isAttraction && (() => {
                 const config: Record<string, { color: string; label: string; clickable: boolean }> = {
-                  online: { color: '#f97316', label: 'רכישת כרטיס', clickable: true },
-                  onsite: { color: '#64748b', label: 'תשלום בכניסה', clickable: false },
-                  free: { color: '#10b981', label: 'חינם', clickable: false },
-                  appointment: { color: '#3DA5C4', label: 'בתיאום מראש', clickable: false },
+                  online: { color: '#f97316', label: t('tk.buy'), clickable: true },
+                  onsite: { color: '#64748b', label: t('tk.onsite'), clickable: false },
+                  free: { color: '#10b981', label: t('tk.free'), clickable: false },
+                  appointment: { color: '#3DA5C4', label: t('tk.appt'), clickable: false },
                 };
                 const c = ticketType ? config[ticketType] : null;
                 if (!c || ticketType === 'skip') return null;

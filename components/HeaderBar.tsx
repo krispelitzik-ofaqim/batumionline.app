@@ -5,6 +5,7 @@ import { router, usePathname } from 'expo-router';
 import { Colors } from '../constants/colors';
 import { ThemeContext } from '../constants/theme';
 import { useAccessibility } from '../constants/accessibilityContext';
+import { useI18n } from '../constants/i18n';
 
 function useBatumiClock() {
   const [time, setTime] = useState('');
@@ -27,6 +28,7 @@ function useBatumiClock() {
 
 export default function HeaderBar() {
   const { dark, toggle } = useContext(ThemeContext);
+  const { lang, toggle: toggleLang } = useI18n();
   const time = useBatumiClock();
   const pathname = usePathname();
   const isHome = pathname === '/' || pathname === '/index';
@@ -50,6 +52,11 @@ export default function HeaderBar() {
 
       {/* CENTER — clock */}
       <Text style={[styles.clock, { color: fg }]}>{time}</Text>
+
+      {/* RIGHT — language toggle he/en */}
+      <TouchableOpacity style={styles.langBtn} onPress={toggleLang} activeOpacity={0.7}>
+        <Text style={[styles.langTxt, { color: dark ? Colors.ACCENT : Colors.PRIMARY }]}>{lang === 'he' ? 'EN' : 'עב'}</Text>
+      </TouchableOpacity>
 
       {/* RIGHT — toggle light/dark */}
       <TouchableOpacity style={styles.btn} onPress={toggle}>
@@ -133,6 +140,20 @@ const styles = StyleSheet.create({
   clock: {
     fontSize: 18,
     fontWeight: '800',
+  },
+  langBtn: {
+    minWidth: 34,
+    height: 30,
+    paddingHorizontal: 8,
+    borderRadius: 15,
+    borderWidth: 1.5,
+    borderColor: Colors.SECONDARY + '80',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  langTxt: {
+    fontSize: 13,
+    fontWeight: '900',
   },
   logo: {
     width: 24,

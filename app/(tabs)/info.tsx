@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, Linkin
 import { LinearGradient } from 'expo-linear-gradient';
 import { Colors } from '../../constants/colors';
 import { ThemeContext } from '../../constants/theme';
+import { useI18n } from '../../constants/i18n';
 import { fetchContent, API_BASE } from '../../constants/api';
 import HtmlContent from '../../components/HtmlContent';
 
@@ -21,6 +22,7 @@ const WHATSAPP = '972502844867';
 const SITE = 'https://www.batumionline.app';
 
 export default function InfoScreen() {
+  const { t } = useI18n();
   const { dark } = useContext(ThemeContext);
   const [active, setActive] = useState<TabId>('about');
   const [tabs, setTabs] = useState<Tab[]>(DEFAULTS);
@@ -48,7 +50,7 @@ export default function InfoScreen() {
 
   const sendContact = async () => {
     if (!name.trim() || !message.trim()) {
-      Alert.alert('חסרים פרטים', 'אנא מלאו שם והודעה');
+      Alert.alert(t('c.missing'), t('c.missingMsg'));
       return;
     }
     try {
@@ -58,11 +60,11 @@ export default function InfoScreen() {
         body: JSON.stringify({ name: name.trim(), email: email.trim(), message: message.trim() }),
       });
       const j = await res.json();
-      if (!j.success) throw new Error(j.error || 'שגיאה');
+      if (!j.success) throw new Error(j.error || t('c.error'));
       setName(''); setEmail(''); setMessage('');
       setSent(true);
     } catch (e: any) {
-      Alert.alert('שגיאה', e?.message || 'לא ניתן לשלוח כרגע');
+      Alert.alert(t('c.error'), e?.message || t('c.cantSend'));
     }
   };
 
@@ -95,42 +97,42 @@ export default function InfoScreen() {
             <LinearGradient colors={['#10b981', '#059669']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={{ width: 120, height: 120, borderRadius: 60, alignItems: 'center', justifyContent: 'center', marginBottom: 24, shadowColor: '#10b981', shadowOpacity: 0.4, shadowRadius: 20, shadowOffset: { width: 0, height: 10 } }}>
               <Text style={{ fontSize: 60 }}>🎉</Text>
             </LinearGradient>
-            <Text style={{ fontSize: 26, fontWeight: '900', color: '#1C2B35', marginBottom: 12, writingDirection: 'rtl', textAlign: 'center' }}>ההודעה נשלחה בהצלחה!</Text>
+            <Text style={{ fontSize: 26, fontWeight: '900', color: '#1C2B35', marginBottom: 12, writingDirection: 'rtl', textAlign: 'center' }}>{t('ct.sentTitle')}</Text>
             <Text style={{ fontSize: 16, color: '#64748b', writingDirection: 'rtl', textAlign: 'center', lineHeight: 24, marginBottom: 32, paddingHorizontal: 20 }}>
-              תודה על פנייתך 🙏{'\n'}נחזור אליך בהקדם האפשרי
+              {t('ct.sentSub')}
             </Text>
             <TouchableOpacity onPress={() => setSent(false)} style={{ backgroundColor: '#1A6B8A', paddingHorizontal: 32, paddingVertical: 14, borderRadius: 12, marginBottom: 12 }} activeOpacity={0.85}>
-              <Text style={{ color: '#fff', fontWeight: '800', fontSize: 15 }}>הודעה</Text>
+              <Text style={{ color: '#fff', fontWeight: '800', fontSize: 15 }}>{t('c.message')}</Text>
             </TouchableOpacity>
           </View>
         ) : active === 'contact' ? (
           <View>
             <LinearGradient colors={['#1A6B8A', '#3DA5C4']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.hero}>
               <Text style={styles.heroIcon}>✉️</Text>
-              <Text style={styles.heroTitle}>נשמח לשמוע מכם</Text>
-              <Text style={styles.heroSub}>שאלה, הצעה או שיתוף פעולה — דברו איתנו</Text>
+              <Text style={styles.heroTitle}>{t('ct.heroTitle')}</Text>
+              <Text style={styles.heroSub}>{t('ct.heroSub')}</Text>
             </LinearGradient>
             <View style={styles.quickRow}>
               <TouchableOpacity style={styles.quickBtn} onPress={() => Linking.openURL(`https://wa.me/${WHATSAPP}`)}>
                 <Text style={styles.quickIcon}>💬</Text>
-                <Text style={styles.quickTxt}>וואטסאפ</Text>
+                <Text style={styles.quickTxt}>{t('c.whatsapp')}</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.quickBtn} onPress={() => Linking.openURL(`mailto:${EMAIL}`)}>
                 <Text style={styles.quickIcon}>📧</Text>
-                <Text style={styles.quickTxt}>אימייל</Text>
+                <Text style={styles.quickTxt}>{t('c.email')}</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.quickBtn} onPress={() => Linking.openURL(SITE)}>
                 <Text style={styles.quickIcon}>🌐</Text>
-                <Text style={styles.quickTxt}>האתר</Text>
+                <Text style={styles.quickTxt}>{t('c.website')}</Text>
               </TouchableOpacity>
             </View>
             <View style={styles.formCard}>
-              <Text style={styles.formTitle}>שליחת הודעה</Text>
-              <TextInput style={styles.input} placeholder="שם מלא" placeholderTextColor="#999" value={name} onChangeText={setName} textAlign="right" />
-              <TextInput style={styles.input} placeholder="אימייל" placeholderTextColor="#999" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" textAlign="right" />
-              <TextInput style={[styles.input, styles.textarea]} placeholder="ההודעה שלכם" placeholderTextColor="#999" value={message} onChangeText={setMessage} multiline numberOfLines={5} textAlign="right" textAlignVertical="top" />
+              <Text style={styles.formTitle}>{t('ct.formTitle')}</Text>
+              <TextInput style={styles.input} placeholder={t('c.fullName')} placeholderTextColor="#999" value={name} onChangeText={setName} textAlign="right" />
+              <TextInput style={styles.input} placeholder={t('c.email')} placeholderTextColor="#999" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" textAlign="right" />
+              <TextInput style={[styles.input, styles.textarea]} placeholder={t('ct.msgPh')} placeholderTextColor="#999" value={message} onChangeText={setMessage} multiline numberOfLines={5} textAlign="right" textAlignVertical="top" />
               <TouchableOpacity style={styles.sendBtn} onPress={sendContact} activeOpacity={0.85}>
-                <Text style={styles.sendBtnTxt}>שליחה</Text>
+                <Text style={styles.sendBtnTxt}>{t('c.send')}</Text>
               </TouchableOpacity>
             </View>
           </View>

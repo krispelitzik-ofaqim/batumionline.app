@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Audio, AVPlaybackStatus } from 'expo-av';
 import { Colors } from '../constants/colors';
 import { resolveUri } from '../constants/api';
+import { useI18n } from '../constants/i18n';
 
 function formatTime(ms: number): string {
   const total = Math.max(0, Math.floor(ms / 1000));
@@ -18,6 +19,7 @@ export default function MiniAudioPlayer({
   source: any;
   label?: string;
 }) {
+  const { lang } = useI18n();
   const soundRef = useRef<Audio.Sound | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [durationMs, setDurationMs] = useState(0);
@@ -68,6 +70,8 @@ export default function MiniAudioPlayer({
   };
 
   const remainingMs = Math.max(0, durationMs - positionMs);
+
+  if (lang === 'en') return null; // Hebrew narration — hidden in English
 
   return (
     <View style={styles.wrap}>

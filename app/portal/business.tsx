@@ -3,6 +3,7 @@ import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Image, Modal, Lin
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '../../constants/colors';
+import { useI18n } from '../../constants/i18n';
 import { fetchContent, resolveUri } from '../../constants/api';
 import BottomTabBar from '../../components/BottomTabBar';
 import BusinessServicesSlider from '../../components/BusinessServicesSlider';
@@ -20,6 +21,7 @@ type BusinessItem = {
 type BusinessCategory = { id: string; title: string; icon: string };
 
 export default function BusinessPortal() {
+  const { t } = useI18n();
   const { width } = useWindowDimensions();
   const [items, setItems] = useState<BusinessItem[]>([]);
   const [cats, setCats] = useState<BusinessCategory[]>([]);
@@ -44,13 +46,13 @@ export default function BusinessPortal() {
         <TouchableOpacity onPress={() => router.canGoBack() ? router.back() : router.replace('/')} style={s.backBtn}>
           <Text style={s.backTxt}>‹</Text>
         </TouchableOpacity>
-        <Text style={s.title}>פורטל העסקים</Text>
+        <Text style={s.title}>{t('po.businessTitle')}</Text>
       </View>
 
       {cats.length > 0 && (
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ maxHeight: 50 }} contentContainerStyle={{ paddingHorizontal: 12, gap: 8, alignItems: 'center' }}>
           <TouchableOpacity onPress={() => setActiveCat(null)} style={[s.chip, !activeCat && s.chipActive]}>
-            <Text style={[s.chipTxt, !activeCat && s.chipTxtActive]}>הכל</Text>
+            <Text style={[s.chipTxt, !activeCat && s.chipTxtActive]}>{t('c.all')}</Text>
           </TouchableOpacity>
           {cats.map(c => (
             <TouchableOpacity key={c.id} onPress={() => setActiveCat(c.id)} style={[s.chip, activeCat === c.id && s.chipActive]}>
@@ -81,7 +83,7 @@ export default function BusinessPortal() {
           </View>
         )}
         {items.length === 0 && (
-          <Text style={{ textAlign: 'center', color: '#94a3b8', marginTop: 40, writingDirection: 'rtl', fontSize: 14 }}>אין פריטים עדיין</Text>
+          <Text style={{ textAlign: 'center', color: '#94a3b8', marginTop: 40, writingDirection: 'rtl', fontSize: 14 }}>{t('po.noItems')}</Text>
         )}
         <View style={{ height: 24 }} />
       </ScrollView>
@@ -104,13 +106,13 @@ export default function BusinessPortal() {
                   <TouchableOpacity
                     onPress={() => Linking.openURL('https://www.batumionline.biz')}
                     style={{ marginTop: 18, backgroundColor: Colors.PRIMARY, borderRadius: 12, paddingVertical: 13, alignItems: 'center' }}>
-                    <Text style={{ color: '#fff', fontSize: 15, fontWeight: '800', writingDirection: 'rtl' }}>לפתיחת חשבון בנק ←</Text>
+                    <Text style={{ color: '#fff', fontSize: 15, fontWeight: '800', writingDirection: 'rtl' }}>{t('po.openBank')} ←</Text>
                   </TouchableOpacity>
                 ) : (
                   <TouchableOpacity
                     onPress={() => { setOpen(null); router.push('/contact'); }}
                     style={{ marginTop: 18, backgroundColor: Colors.PRIMARY, borderRadius: 12, paddingVertical: 13, alignItems: 'center' }}>
-                    <Text style={{ color: '#fff', fontSize: 15, fontWeight: '800', writingDirection: 'rtl' }}>צור קשר ←</Text>
+                    <Text style={{ color: '#fff', fontSize: 15, fontWeight: '800', writingDirection: 'rtl' }}>{t('po.contact')} ←</Text>
                   </TouchableOpacity>
                 )}
               </View>

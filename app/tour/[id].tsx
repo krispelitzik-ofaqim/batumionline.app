@@ -4,6 +4,7 @@ import { useLocalSearchParams, Stack } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '../../constants/colors';
+import { useI18n } from '../../constants/i18n';
 import { fetchContent } from '../../constants/api';
 import AudioPlayer from '../../components/AudioPlayer';
 import MapEmbed from '../../components/MapEmbed';
@@ -14,6 +15,7 @@ type Tour = {
 };
 
 export default function TourScreen() {
+  const { t } = useI18n();
   const { id } = useLocalSearchParams<{ id: string }>();
   const [tour, setTour] = useState<Tour | null>(null);
 
@@ -31,7 +33,7 @@ export default function TourScreen() {
     return (
       <SafeAreaView style={styles.safe}>
         <Stack.Screen options={{ headerShown: true, title: 'סיור', headerBackTitle: 'חזרה' }} />
-        <View style={styles.center}><Text style={styles.loadTxt}>טוען...</Text></View>
+        <View style={styles.center}><Text style={styles.loadTxt}>{t('c.loading')}</Text></View>
       </SafeAreaView>
     );
   }
@@ -59,27 +61,27 @@ export default function TourScreen() {
           </View>
         )}
 
-        <Text style={styles.sectionTitle}>מפת המסלול</Text>
+        <Text style={styles.sectionTitle}>{t('tr.routeMap')}</Text>
         <View style={styles.mapCard}>
           <MapEmbed src={`https://www.google.com/maps?q=${encodeURIComponent(tour.title + ' Batumi')}&hl=iw&z=14&output=embed`} style={{ width: '100%', height: 220 }} />
         </View>
 
         {tour.audios && tour.audios.length > 0 && (
           <>
-            <Text style={styles.sectionTitle}>תחנות הסיור</Text>
+            <Text style={styles.sectionTitle}>{t('tr.stops')}</Text>
             <AudioPlayer tracks={tour.audios} />
           </>
         )}
 
         {(!tour.audios || tour.audios.length === 0) && (
           <View style={[styles.card, { marginTop: 12 }]}>
-            <Text style={styles.cardBody}>קבצי אודיו יתווספו בקרוב</Text>
+            <Text style={styles.cardBody}>{t('tr.audioSoon')}</Text>
           </View>
         )}
 
         <Text style={styles.sectionTitle}>גלריית הסיור — {tour.title}</Text>
         <View style={styles.galleryWrap}>
-          <Text style={styles.galleryPlaceholder}>תמונות יתווספו בקרוב</Text>
+          <Text style={styles.galleryPlaceholder}>{t('tr.photosSoon')}</Text>
         </View>
       </ScrollView>
     </SafeAreaView>

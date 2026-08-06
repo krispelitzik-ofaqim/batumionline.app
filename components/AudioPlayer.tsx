@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native
 import { Audio } from 'expo-av';
 import { Colors } from '../constants/colors';
 import { resolveUri } from '../constants/api';
+import { useI18n } from '../constants/i18n';
 
 type Track = { title?: string; url: string; coords?: { lat: number; lng: number } };
 type Props = { tracks: Track[]; title?: string; compact?: boolean; onNavigate?: (coords: { lat: number; lng: number }) => void; tint?: string; onActiveChange?: (idx: number, track: Track) => void; onTimeReached?: { seconds: number; callback: () => void }; playOnLeft?: boolean; textLight?: boolean; ringPlay?: boolean };
@@ -26,6 +27,7 @@ function darken(hex: string, amount = 0.45): string {
 const SPEEDS = [1, 1.5, 2];
 
 export default function AudioPlayer({ tracks: initialTracks, title, compact, onNavigate, tint, onActiveChange, onTimeReached, playOnLeft, textLight, ringPlay }: Props) {
+  const { lang } = useI18n();
   const [tracks, setTracks] = useState(initialTracks);
   const [activeIdx, setActiveIdx] = useState(0);
   const [playing, setPlaying] = useState(false);
@@ -173,6 +175,7 @@ export default function AudioPlayer({ tracks: initialTracks, title, compact, onN
   const pct = dur > 0 ? (pos / dur) * 100 : 0;
 
   if (!tracks || tracks.length === 0) return null;
+  if (lang === 'en') return null; // Hebrew narration — hidden in English
 
   return (
     <View style={[styles.card, compact && styles.cardCompact, tint && { backgroundColor: tint, borderColor: 'rgba(255,255,255,0.4)', borderWidth: 1.5, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8 }]}>
