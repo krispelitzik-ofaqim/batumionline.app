@@ -39,29 +39,27 @@ export default function HeaderBar() {
 
   return (
     <View style={[styles.bar, { backgroundColor: bg, borderBottomColor: dark ? Colors.PRIMARY : Colors.SECONDARY + '30' }]}>
-      {/* LEFT — back arrow ‹ (or logo on home) */}
-      {isHome ? (
-        <View style={styles.btn}>
-          <Image source={require('../assets/images/batumi_icon.png')} style={styles.logo} resizeMode="contain" />
-        </View>
-      ) : (
-        <TouchableOpacity style={styles.btn} onPress={() => router.replace('/')}>
-          <Text style={{ fontSize: 28, color: fg, fontWeight: '300' }}>‹</Text>
-        </TouchableOpacity>
-      )}
+      {/* LEFT — back arrow ‹ (when not home) + clock */}
+      <View style={styles.sideLeft}>
+        {!isHome && (
+          <TouchableOpacity style={styles.btn} onPress={() => router.replace('/')}>
+            <Text style={{ fontSize: 28, color: fg, fontWeight: '300' }}>‹</Text>
+          </TouchableOpacity>
+        )}
+        <Text style={[styles.clock, { color: fg }]}>{time}</Text>
+      </View>
 
-      {/* CENTER — clock */}
-      <Text style={[styles.clock, { color: fg }]}>{time}</Text>
-
-      {/* RIGHT — language toggle he/en */}
+      {/* CENTER — language toggle (3 languages: עב / EN / فا) */}
       <TouchableOpacity style={styles.langBtn} onPress={toggleLang} activeOpacity={0.7}>
-        <Text style={[styles.langTxt, { color: dark ? Colors.ACCENT : Colors.PRIMARY }]}>{lang === 'he' ? 'EN' : 'עב'}</Text>
+        <Text style={[styles.langTxt, { color: dark ? Colors.ACCENT : Colors.PRIMARY }]}>🌐 {lang === 'he' ? 'עב' : lang === 'en' ? 'EN' : 'فا'}</Text>
       </TouchableOpacity>
 
       {/* RIGHT — toggle light/dark */}
-      <TouchableOpacity style={styles.btn} onPress={toggle}>
-        <Ionicons name={dark ? 'sunny' : 'moon'} size={22} color={dark ? Colors.ACCENT : Colors.PRIMARY} />
-      </TouchableOpacity>
+      <View style={styles.sideRight}>
+        <TouchableOpacity style={styles.btn} onPress={toggle}>
+          <Ionicons name={dark ? 'sunny' : 'moon'} size={22} color={dark ? Colors.ACCENT : Colors.PRIMARY} />
+        </TouchableOpacity>
+      </View>
 
       <Modal visible={a11yOpen} transparent animationType="slide" onRequestClose={() => setA11yOpen(false)}>
         <View style={ms.backdrop}>
@@ -130,6 +128,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderBottomWidth: 1,
+  },
+  sideLeft: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  sideRight: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
   },
   btn: {
     width: 40,

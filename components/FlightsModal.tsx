@@ -64,7 +64,7 @@ const AIRLINE_LOGOS: Record<string, any> = {
 
 export default function FlightsModal({ visible, onClose, bgColor }: { visible: boolean; onClose: () => void; bgColor: string }) {
   const { t, lang } = useI18n();
-  const allFlights = lang === 'en'; // English edition: show ALL Batumi flights, not only Israel routes
+  const allFlights = lang !== 'he'; // Non-Hebrew editions (en/fa): show ALL Batumi flights, not only Israel routes
   const [flights, setFlights] = useState<Flight[]>([]);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<'arrival' | 'departure'>('arrival');

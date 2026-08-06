@@ -175,7 +175,7 @@ export default function AudioPlayer({ tracks: initialTracks, title, compact, onN
   const pct = dur > 0 ? (pos / dur) * 100 : 0;
 
   if (!tracks || tracks.length === 0) return null;
-  if (lang === 'en') return null; // Hebrew narration — hidden in English
+  if (lang !== 'he') return null; // Hebrew narration — hidden in non-Hebrew (en/fa)
 
   return (
     <View style={[styles.card, compact && styles.cardCompact, tint && { backgroundColor: tint, borderColor: 'rgba(255,255,255,0.4)', borderWidth: 1.5, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8 }]}>

@@ -71,7 +71,7 @@ export default function MiniAudioPlayer({
 
   const remainingMs = Math.max(0, durationMs - positionMs);
 
-  if (lang === 'en') return null; // Hebrew narration — hidden in English
+  if (lang !== 'he') return null; // Hebrew narration — hidden in non-Hebrew (en/fa)
 
   return (
     <View style={styles.wrap}>
