@@ -20,9 +20,26 @@ function deepLocalize(v: any, lang: 'en' | 'fa'): any {
   }
   return v;
 }
+// Items to hide from the non-Hebrew (English / Persian) editions — Israel-specific
+// content that isn't relevant to English-speaking / Iranian visitors.
+const HIDE_NON_HE: Record<string, string[]> = {
+  welcome: ['4', '5'],          // "ישראלים בבטומי", "חוזרים הביתה"
+  mainCategories: ['3'],        // "סיורים קוליים" (Hebrew audio tours)
+  bottomBanners: ['news'],      // "חדשות בעברית"
+  sideBanners: ['realestate'],  // "פורטל הנדל״ן"
+};
+
 export function localizeContent(data: any, lang: ContentLang = _contentLang): any {
   if (lang === 'he' || !data) return data;
-  return deepLocalize(data, lang);
+  const localized = deepLocalize(data, lang);
+  if (localized && typeof localized === 'object') {
+    for (const key in HIDE_NON_HE) {
+      if (Array.isArray(localized[key])) {
+        localized[key] = localized[key].filter((it: any) => !(it && HIDE_NON_HE[key].includes(it.id)));
+      }
+    }
+  }
+  return localized;
 }
 
 // On a physical device "localhost" is the phone itself, so dev native builds
