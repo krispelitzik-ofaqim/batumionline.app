@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, Modal, TextInput, ScrollView, Alert, Styl
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_BASE } from '../constants/api';
 import { Colors } from '../constants/colors';
+import { useI18n } from '../constants/i18n';
 
 export const MY_SUBMISSION_FLAG = '@bo:my_submission';
 export const markSubmitted = async (phone: string) => {
@@ -12,6 +13,7 @@ export const markSubmitted = async (phone: string) => {
 type Item = { id: string; categoryId?: string; mode?: string; name?: string; phone?: string; languages?: string; createdAt?: string };
 
 export default function DeleteMySubmission({ accentColor = Colors.PRIMARY }: { accentColor?: string }) {
+  const { t } = useI18n();
   const [hasFlag, setHasFlag] = useState<boolean | null>(null);
   const [open, setOpen] = useState(false);
   const [phone, setPhone] = useState('');
@@ -32,7 +34,7 @@ export default function DeleteMySubmission({ accentColor = Colors.PRIMARY }: { a
 
   const lookup = async () => {
     const p = phone.replace(/[^\d+]/g, '');
-    if (!p) { Alert.alert('הזן טלפון'); return; }
+    if (!p) { Alert.alert(t('fm.enterPhone')); return; }
     setLoading(true);
     try {
       const r = await fetch(`${API_BASE}/api/guide-recommend/by-phone?phone=${encodeURIComponent(p)}`);
@@ -55,43 +57,43 @@ export default function DeleteMySubmission({ accentColor = Colors.PRIMARY }: { a
           setHasFlag(false);
           setOpen(false);
         }
-        Alert.alert('נמחק');
+        Alert.alert(t('fm.deleted'));
       } else {
-        Alert.alert('שגיאה', j.error || 'מחיקה נכשלה');
+        Alert.alert(t('c.error'), j.error || t('fm.deleteFailed'));
       }
-    } catch { Alert.alert('שגיאה', 'מחיקה נכשלה'); }
+    } catch { Alert.alert(t('c.error'), t('fm.deleteFailed')); }
   };
 
   return (
     <>
       <TouchableOpacity onPress={() => setOpen(true)} activeOpacity={0.7} style={s.link}>
-        <Text style={[s.linkTxt, { color: accentColor }]}>המודעות שלי / מחיקה</Text>
+        <Text style={[s.linkTxt, { color: accentColor }]}>{t('fm.myListingsDelete')}</Text>
       </TouchableOpacity>
       <Modal visible={open} transparent animationType="slide" onRequestClose={() => setOpen(false)}>
         <View style={s.overlay}>
           <View style={s.sheet}>
             <View style={s.header}>
               <TouchableOpacity onPress={() => setOpen(false)}><Text style={s.closeX}>✕</Text></TouchableOpacity>
-              <Text style={s.title}>המודעות שלי</Text>
+              <Text style={s.title}>{t('fm.myListings')}</Text>
             </View>
             <View style={{ padding: 14, gap: 10 }}>
               <TextInput
                 style={s.input}
                 value={phone}
                 onChangeText={setPhone}
-                placeholder="טלפון שמילאת בהמלצה"
+                placeholder={t('fm.phoneUsedInRec')}
                 placeholderTextColor="#94a3b8"
                 textAlign="right"
                 keyboardType="phone-pad"
               />
               <TouchableOpacity onPress={lookup} disabled={loading} style={[s.lookupBtn, { backgroundColor: accentColor }]}>
-                <Text style={s.lookupTxt}>{loading ? 'טוען…' : 'הצג את שלי'}</Text>
+                <Text style={s.lookupTxt}>{loading ? t('c.loadingE') : t('fm.showMine')}</Text>
               </TouchableOpacity>
             </View>
             {items !== null && (
               <ScrollView style={{ maxHeight: 340 }} contentContainerStyle={{ padding: 14, gap: 8 }}>
                 {items.length === 0 ? (
-                  <Text style={s.empty}>לא נמצאו עם הטלפון הזה</Text>
+                  <Text style={s.empty}>{t('fm.noneWithThisPhone')}</Text>
                 ) : (
                   items.map(it => (
                     <View key={it.id} style={s.row}>
@@ -100,7 +102,7 @@ export default function DeleteMySubmission({ accentColor = Colors.PRIMARY }: { a
                         <Text style={s.rowMeta}>{it.mode || '—'} · {it.categoryId || '—'} · {it.languages || ''}</Text>
                       </View>
                       <TouchableOpacity onPress={() => del(it.id)} style={s.delBtn}>
-                        <Text style={s.delTxt}>מחק</Text>
+                        <Text style={s.delTxt}>{t('c.delete')}</Text>
                       </TouchableOpacity>
                     </View>
                   ))

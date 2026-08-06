@@ -88,8 +88,8 @@ export default function MyToursScreen() {
       const asset = r.assets?.[0];
       if (!asset) return;
       if (tours.length === 0) {
-        const t: Tour = { id: 't_' + Date.now(), name: 'הזכרונות שלי', createdAt: new Date().toISOString(), stops: [{ id: 'p_' + Date.now(), title: 'צילום שלי', image: asset.uri }] };
-        saveTours([t, ...tours]);
+        const newTour: Tour = { id: 't_' + Date.now(), name: 'הזכרונות שלי', createdAt: new Date().toISOString(), stops: [{ id: 'p_' + Date.now(), title: 'צילום שלי', image: asset.uri }] };
+        saveTours([newTour, ...tours]);
         Alert.alert(t('mt.savedTitle'), t('mt.savedMsg'));
       } else {
         const list = [...tours];

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, Modal, TextInput, TouchableOpacity, ScrollView, StyleSheet, Image, Platform } from 'react-native';
 import { Colors } from '../constants/colors';
 import { API_BASE } from '../constants/api';
+import { useI18n } from '../constants/i18n';
 
 type Props = {
   visible: boolean;
@@ -21,12 +22,12 @@ type Unit = {
 import { FEATURES } from '../constants/features';
 
 const PACKAGES_PAID = [
-  { key: 'basic', label: 'Basic', units: 5, price: '$100/חודש' },
-  { key: 'premium', label: 'Premium', units: 10, price: '$180/חודש' },
+  { key: 'basic', label: 'Basic', units: 5, price: 'fm.price100mo' },
+  { key: 'premium', label: 'Premium', units: 10, price: 'fm.price180mo' },
 ] as const;
 const PACKAGES_FREE = [
-  { key: 'basic', label: 'Basic', units: 5, price: 'חינם' },
-  { key: 'premium', label: 'Premium', units: 10, price: 'חינם' },
+  { key: 'basic', label: 'Basic', units: 5, price: 'tk.free' },
+  { key: 'premium', label: 'Premium', units: 10, price: 'tk.free' },
 ] as const;
 const PACKAGES = FEATURES.PAID_LISTING_OPTIONS ? PACKAGES_PAID : PACKAGES_FREE;
 
@@ -37,6 +38,7 @@ function newUnit(): Unit {
 }
 
 export default function DeveloperForm({ visible, onClose, onSubmitted }: Props) {
+  const { t } = useI18n();
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [pkg, setPkg] = useState<'basic' | 'premium'>('basic');
   const [company, setCompany] = useState('');
@@ -129,36 +131,36 @@ export default function DeveloperForm({ visible, onClose, onSubmitted }: Props) 
             <TouchableOpacity onPress={() => { reset(); onClose(); }}>
               <Text style={s.closeX}>✕</Text>
             </TouchableOpacity>
-            <Text style={s.title}>פרסום יזם · שלב {step}/3</Text>
+            <Text style={s.title}>{t('fm.developerStepTitle')} {step}/3</Text>
           </View>
 
           {done ? (
             <View style={{ padding: 40, alignItems: 'center', gap: 10 }}>
               <Text style={{ fontSize: 40 }}>✅</Text>
-              <Text style={{ fontSize: 16, fontWeight: '800', color: Colors.TEXT, textAlign: 'center', writingDirection: 'rtl' }}>הפרופיל נשלח לאישור!</Text>
-              <Text style={{ fontSize: 12, color: '#64748b', textAlign: 'center', writingDirection: 'rtl' }}>{FEATURES.PAID_LISTING_OPTIONS ? `נחזור אליך לתיאום תשלום (${pkg === 'premium' ? '$180' : '$100'}/חודש)` : 'נחזור אליך עם פרטי הפרסום'}</Text>
+              <Text style={{ fontSize: 16, fontWeight: '800', color: Colors.TEXT, textAlign: 'center', writingDirection: 'rtl' }}>{t('fm.profileSentApproval')}</Text>
+              <Text style={{ fontSize: 12, color: '#64748b', textAlign: 'center', writingDirection: 'rtl' }}>{FEATURES.PAID_LISTING_OPTIONS ? `${t('fm.contactPayment')} (${pkg === 'premium' ? '$180' : '$100'}/${t('fm.monthWord')})` : t('fm.contactWithListingDetails')}</Text>
               <TouchableOpacity onPress={() => { reset(); onClose(); }} style={s.primaryBtn}>
-                <Text style={s.primaryTxt}>סגור</Text>
+                <Text style={s.primaryTxt}>{t('c.close')}</Text>
               </TouchableOpacity>
             </View>
           ) : (
             <ScrollView contentContainerStyle={{ padding: 14, gap: 12 }}>
               {step === 1 && (
                 <View style={{ gap: 10 }}>
-                  <Text style={s.sectionLabel}>בחר חבילה</Text>
+                  <Text style={s.sectionLabel}>{t('fm.choosePackage')}</Text>
                   {PACKAGES.map(p => (
                     <TouchableOpacity key={p.key} onPress={() => setPkg(p.key)} style={[s.pkgCard, pkg === p.key && s.pkgCardActive]}>
                       <View style={{ flex: 1 }}>
                         <Text style={[s.pkgLabel, pkg === p.key && { color: '#fff' }]}>{p.label}</Text>
-                        <Text style={[s.pkgSub, pkg === p.key && { color: '#e0f2fe' }]}>עד {p.units} יחידות דיור</Text>
+                        <Text style={[s.pkgSub, pkg === p.key && { color: '#e0f2fe' }]}>{t('fm.upTo')} {p.units} {t('fm.housingUnits')}</Text>
                       </View>
-                      <Text style={[s.pkgPrice, pkg === p.key && { color: '#fff' }]}>{p.price}</Text>
+                      <Text style={[s.pkgPrice, pkg === p.key && { color: '#fff' }]}>{t(p.price)}</Text>
                     </TouchableOpacity>
                   ))}
                   <View style={s.infoBox}>
                     <Text style={s.infoTxt}>
-                      • תקופת פרסום: חודשי{'\n'}
-                      • סדר ברירת מחדל: Premium מעל Basic, ובתוך כל רמה לפי תאריך{FEATURES.PAID_LISTING_OPTIONS ? '\n                      • הקפצה: $10/חודש – קפיצה לראש הרמה שלך' : ''}
+                      {t('fm.devInfoLine1')}{'\n'}
+                      {t('fm.devInfoLine2')}{FEATURES.PAID_LISTING_OPTIONS ? '\n' + t('fm.devInfoBump') : ''}
                     </Text>
                   </View>
                 </View>
@@ -166,12 +168,12 @@ export default function DeveloperForm({ visible, onClose, onSubmitted }: Props) 
 
               {step === 2 && (
                 <View style={{ gap: 10 }}>
-                  <Text style={s.sectionLabel}>פרטי החברה והפרויקט</Text>
-                  <TextInput style={s.input} placeholder="שם החברה" value={company} onChangeText={setCompany} textAlign="right" placeholderTextColor="#94a3b8" />
-                  <TextInput style={s.input} placeholder="שם הפרויקט" value={projectName} onChangeText={setProjectName} textAlign="right" placeholderTextColor="#94a3b8" />
+                  <Text style={s.sectionLabel}>{t('fm.companyProjectDetails')}</Text>
+                  <TextInput style={s.input} placeholder={t('fm.companyName')} value={company} onChangeText={setCompany} textAlign="right" placeholderTextColor="#94a3b8" />
+                  <TextInput style={s.input} placeholder={t('fm.projectName')} value={projectName} onChangeText={setProjectName} textAlign="right" placeholderTextColor="#94a3b8" />
 
                   <View>
-                    <Text style={s.sectionLabel}>לוגו</Text>
+                    <Text style={s.sectionLabel}>{t('fm.logo')}</Text>
                     <TouchableOpacity onPress={pickLogo} disabled={uploading} style={s.logoPick}>
                       {logo ? (
                         <Image source={{ uri: logo }} style={{ width: 60, height: 60, borderRadius: 8 }} />
@@ -182,7 +184,7 @@ export default function DeveloperForm({ visible, onClose, onSubmitted }: Props) 
                   </View>
 
                   <View>
-                    <Text style={s.sectionLabel}>צבע מותג</Text>
+                    <Text style={s.sectionLabel}>{t('fm.brandColor')}</Text>
                     <View style={{ flexDirection: 'row-reverse', gap: 6, flexWrap: 'wrap' }}>
                       {BRAND_COLORS.map(c => (
                         <TouchableOpacity key={c} onPress={() => setBrandColor(c)} style={[s.colorSwatch, { backgroundColor: c }, brandColor === c && s.colorSwatchActive]} />
@@ -191,26 +193,26 @@ export default function DeveloperForm({ visible, onClose, onSubmitted }: Props) 
                   </View>
 
                   <View style={{ flexDirection: 'row-reverse', gap: 8 }}>
-                    <TextInput style={[s.input, { flex: 1 }]} placeholder="מיקום" value={location} onChangeText={setLocation} textAlign="right" placeholderTextColor="#94a3b8" />
-                    <TextInput style={[s.input, { flex: 1 }]} placeholder="תאריך מסירה" value={deliveryDate} onChangeText={setDeliveryDate} textAlign="right" placeholderTextColor="#94a3b8" />
+                    <TextInput style={[s.input, { flex: 1 }]} placeholder={t('fm.location')} value={location} onChangeText={setLocation} textAlign="right" placeholderTextColor="#94a3b8" />
+                    <TextInput style={[s.input, { flex: 1 }]} placeholder={t('fm.deliveryDate')} value={deliveryDate} onChangeText={setDeliveryDate} textAlign="right" placeholderTextColor="#94a3b8" />
                   </View>
-                  <TextInput style={[s.input, { minHeight: 70, textAlignVertical: 'top' }]} placeholder="תיאור הפרויקט" value={description} onChangeText={setDescription} textAlign="right" multiline placeholderTextColor="#94a3b8" />
-                  <TextInput style={s.input} placeholder="טלפון" value={phone} onChangeText={setPhone} textAlign="right" keyboardType="phone-pad" placeholderTextColor="#94a3b8" />
-                  <TextInput style={s.input} placeholder="WhatsApp (אם שונה)" value={whatsapp} onChangeText={setWhatsapp} textAlign="right" keyboardType="phone-pad" placeholderTextColor="#94a3b8" />
-                  <TextInput style={s.input} placeholder="אתר (https://...)" value={website} onChangeText={setWebsite} textAlign="right" autoCapitalize="none" placeholderTextColor="#94a3b8" />
+                  <TextInput style={[s.input, { minHeight: 70, textAlignVertical: 'top' }]} placeholder={t('fm.projectDescription')} value={description} onChangeText={setDescription} textAlign="right" multiline placeholderTextColor="#94a3b8" />
+                  <TextInput style={s.input} placeholder={t('c.phone')} value={phone} onChangeText={setPhone} textAlign="right" keyboardType="phone-pad" placeholderTextColor="#94a3b8" />
+                  <TextInput style={s.input} placeholder={t('fm.whatsappIfDifferent')} value={whatsapp} onChangeText={setWhatsapp} textAlign="right" keyboardType="phone-pad" placeholderTextColor="#94a3b8" />
+                  <TextInput style={s.input} placeholder={t('fm.websiteUrlPh')} value={website} onChangeText={setWebsite} textAlign="right" autoCapitalize="none" placeholderTextColor="#94a3b8" />
                 </View>
               )}
 
               {step === 3 && (
                 <View style={{ gap: 10 }}>
-                  <Text style={s.sectionLabel}>יחידות דיור ({units.length}/{maxUnits})</Text>
+                  <Text style={s.sectionLabel}>{t('fm.housingUnitsHdr')} ({units.length}/{maxUnits})</Text>
                   {units.map((u, idx) => (
                     <View key={u.id} style={s.unitCard}>
                       <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-                        <Text style={{ fontWeight: '800', color: Colors.TEXT }}>יחידה {idx + 1}</Text>
+                        <Text style={{ fontWeight: '800', color: Colors.TEXT }}>{t('fm.unit')} {idx + 1}</Text>
                         {units.length > 1 && (
                           <TouchableOpacity onPress={() => removeUnit(idx)}>
-                            <Text style={{ color: '#dc2626', fontWeight: '800' }}>מחק</Text>
+                            <Text style={{ color: '#dc2626', fontWeight: '800' }}>{t('c.delete')}</Text>
                           </TouchableOpacity>
                         )}
                       </View>
@@ -219,19 +221,19 @@ export default function DeveloperForm({ visible, onClose, onSubmitted }: Props) 
                           {u.image ? <Image source={{ uri: u.image }} style={{ width: 70, height: 70, borderRadius: 6 }} /> : <Text style={{ fontSize: 22, color: '#94a3b8' }}>{uploading ? '…' : '+'}</Text>}
                         </TouchableOpacity>
                         <View style={{ flex: 1, gap: 6 }}>
-                          <TextInput style={s.inputSm} placeholder="כותרת (לדוגמה: 2 חדרים קומה 5)" value={u.title} onChangeText={t => updateUnit(idx, { title: t })} textAlign="right" placeholderTextColor="#94a3b8" />
+                          <TextInput style={s.inputSm} placeholder={t('fm.unitTitlePh')} value={u.title} onChangeText={val => updateUnit(idx, { title: val })} textAlign="right" placeholderTextColor="#94a3b8" />
                           <View style={{ flexDirection: 'row-reverse', gap: 6 }}>
-                            <TextInput style={[s.inputSm, { flex: 1 }]} placeholder="מחיר" value={u.price} onChangeText={t => updateUnit(idx, { price: t })} textAlign="right" placeholderTextColor="#94a3b8" />
-                            <TextInput style={[s.inputSm, { flex: 1 }]} placeholder="גודל (מ״ר)" value={u.size} onChangeText={t => updateUnit(idx, { size: t })} textAlign="right" placeholderTextColor="#94a3b8" />
+                            <TextInput style={[s.inputSm, { flex: 1 }]} placeholder={t('fm.price')} value={u.price} onChangeText={val => updateUnit(idx, { price: val })} textAlign="right" placeholderTextColor="#94a3b8" />
+                            <TextInput style={[s.inputSm, { flex: 1 }]} placeholder={t('fm.sizeSqm')} value={u.size} onChangeText={val => updateUnit(idx, { size: val })} textAlign="right" placeholderTextColor="#94a3b8" />
                           </View>
                         </View>
                       </View>
-                      <TextInput style={[s.inputSm, { marginTop: 6, minHeight: 50, textAlignVertical: 'top' }]} placeholder="תיאור קצר" value={u.description} onChangeText={t => updateUnit(idx, { description: t })} textAlign="right" multiline placeholderTextColor="#94a3b8" />
+                      <TextInput style={[s.inputSm, { marginTop: 6, minHeight: 50, textAlignVertical: 'top' }]} placeholder={t('fm.shortDescription')} value={u.description} onChangeText={val => updateUnit(idx, { description: val })} textAlign="right" multiline placeholderTextColor="#94a3b8" />
                     </View>
                   ))}
                   {units.length < maxUnits && (
                     <TouchableOpacity onPress={addUnit} style={s.addUnitBtn}>
-                      <Text style={s.addUnitTxt}>+ הוסף יחידה</Text>
+                      <Text style={s.addUnitTxt}>{t('fm.addUnit')}</Text>
                     </TouchableOpacity>
                   )}
                 </View>
@@ -240,7 +242,7 @@ export default function DeveloperForm({ visible, onClose, onSubmitted }: Props) 
               <View style={{ flexDirection: 'row-reverse', gap: 8, marginTop: 10 }}>
                 {step > 1 && (
                   <TouchableOpacity onPress={() => setStep(prev => (prev - 1) as 1 | 2 | 3)} style={s.secondaryBtn}>
-                    <Text style={s.secondaryTxt}>הקודם</Text>
+                    <Text style={s.secondaryTxt}>{t('fm.prev')}</Text>
                   </TouchableOpacity>
                 )}
                 {step < 3 && (
@@ -249,7 +251,7 @@ export default function DeveloperForm({ visible, onClose, onSubmitted }: Props) 
                     disabled={(step === 1 && !canGoStep2) || (step === 2 && !canGoStep3)}
                     style={[s.primaryBtn, { flex: 1 }, ((step === 1 && !canGoStep2) || (step === 2 && !canGoStep3)) && { opacity: 0.5 }]}
                   >
-                    <Text style={s.primaryTxt}>הבא ›</Text>
+                    <Text style={s.primaryTxt}>{t('fm.next')}</Text>
                   </TouchableOpacity>
                 )}
                 {step === 3 && (
@@ -258,7 +260,7 @@ export default function DeveloperForm({ visible, onClose, onSubmitted }: Props) 
                     disabled={!canSubmit || submitting}
                     style={[s.primaryBtn, { flex: 1 }, (!canSubmit || submitting) && { opacity: 0.5 }]}
                   >
-                    <Text style={s.primaryTxt}>{submitting ? 'שולח…' : 'שלח לאישור'}</Text>
+                    <Text style={s.primaryTxt}>{submitting ? t('fm.sending') : t('fm.submitForApproval')}</Text>
                   </TouchableOpacity>
                 )}
               </View>

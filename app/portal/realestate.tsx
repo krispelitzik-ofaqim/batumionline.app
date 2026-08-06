@@ -22,6 +22,7 @@ import DeveloperForm from '../../components/DeveloperForm';
 import { Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import HtmlContent from '../../components/HtmlContent';
+import { useI18n } from '../../constants/i18n';
 
 const DEMO_DEVELOPERS: Developer[] = [
   {
@@ -103,6 +104,7 @@ const FALLBACK_TIPS: Article[] = [
 ];
 
 export default function RealEstatePortal() {
+  const { t } = useI18n();
   const [topButtons, setTopButtons] = useState<TopButton[]>(DEFAULT_TOP_BUTTONS);
   const [activeTop, setActiveTop] = useState<string | null>(null);
   const [rentPeriod, setRentPeriod] = useState<'daily' | 'yearly'>('daily');
@@ -213,7 +215,7 @@ export default function RealEstatePortal() {
 
   return (
     <SafeAreaView edges={['top']} style={s.container}>
-      <AppHeader crumbs={[{ title: 'פורטל הנדל״ן' }]} />
+      <AppHeader crumbs={[{ title: t('po.reTitle') }]} />
       <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
         {/* Hero */}
         <ImageBackground
@@ -232,8 +234,8 @@ export default function RealEstatePortal() {
               <Ionicons name="arrow-back" size={22} color={Colors.WHITE} />
             </TouchableOpacity>
             <Text style={s.heroKicker}>BATUMI REAL ESTATE</Text>
-            <Text style={s.heroTitle}>פורטל הנדל״ן</Text>
-            <Text style={s.heroSub}>כל העסקאות, הפרויקטים והמידע במקום אחד</Text>
+            <Text style={s.heroTitle}>{t('po.reTitle')}</Text>
+            <Text style={s.heroSub}>{t('po.reSub')}</Text>
           </LinearGradient>
         </ImageBackground>
 
@@ -243,7 +245,7 @@ export default function RealEstatePortal() {
             style={[s.topBtnRect, s.homeBtn, activeTop === null && s.topBtnActive]}
             onPress={() => setActiveTop(null)}
           >
-            <Text style={[s.topBtnTxt, activeTop === null && s.topBtnTxtActive]} numberOfLines={2}>🏠 פורטל{'\n'}הנדל"ן</Text>
+            <Text style={[s.topBtnTxt, activeTop === null && s.topBtnTxtActive]} numberOfLines={2}>{t('re.homeBtn')}</Text>
           </TouchableOpacity>
           {topButtons.map(b => (
             <TouchableOpacity
@@ -271,13 +273,13 @@ export default function RealEstatePortal() {
                     <Text style={{ fontSize: 16, color: '#fff', fontWeight: '900' }}>+</Text>
                   </View>
                   <View style={{ flex: 1 }}>
-                    <Text style={{ fontSize: 13, fontWeight: '900', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl' }}>פרסם {activeTop === 'sale' ? 'למכירה' : activeTop === 'rent' ? 'להשכרה' : 'פרויקט'}</Text>
-                    <Text style={{ fontSize: 10, color: '#64748b', textAlign: 'right', writingDirection: 'rtl', marginTop: 1 }}>חינם · חשיפה לישראלים בבטומי</Text>
+                    <Text style={{ fontSize: 13, fontWeight: '900', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl' }}>{activeTop === 'sale' ? t('re.postSale') : activeTop === 'rent' ? t('re.postRent') : t('re.postProject')}</Text>
+                    <Text style={{ fontSize: 10, color: '#64748b', textAlign: 'right', writingDirection: 'rtl', marginTop: 1 }}>{t('re.freeExposure')}</Text>
                   </View>
                   <Text style={{ fontSize: 16, color: Colors.PRIMARY, fontWeight: '300' }}>‹</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => setMyListingsOpen(true)} activeOpacity={0.7} style={{ paddingVertical: 6, alignItems: 'center' }}>
-                  <Text style={{ fontSize: 12, color: Colors.PRIMARY, fontWeight: '700', textDecorationLine: 'underline' }}>המודעות שלי / מחיקה</Text>
+                  <Text style={{ fontSize: 12, color: Colors.PRIMARY, fontWeight: '700', textDecorationLine: 'underline' }}>{t('re.myListings')}</Text>
                 </TouchableOpacity>
               </View>
             )}
@@ -316,7 +318,7 @@ export default function RealEstatePortal() {
                               <Text style={[s.listingFeatureTxt, { color: subColor }]} numberOfLines={1}>{f}</Text>
                             </View>
                           ))}
-                          <Text style={{ fontSize: 11, color: isBlue ? '#F4A94E' : Colors.PRIMARY, fontWeight: '700', textAlign: 'left', marginTop: 8 }}>פרטים נוספים ›</Text>
+                          <Text style={{ fontSize: 11, color: isBlue ? '#F4A94E' : Colors.PRIMARY, fontWeight: '700', textAlign: 'left', marginTop: 8 }}>{t('re.moreDetails')}</Text>
                         </>
                       ) : (
                         <>
@@ -330,7 +332,7 @@ export default function RealEstatePortal() {
                           ))}
                           <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginTop: 6 }}>
                             <Text style={[s.listingPrice, { color: priceColor, marginTop: 0 }, isBanner && { fontSize: 16 }]}>{lst.price}</Text>
-                            <Text style={{ fontSize: 11, color: isBlue ? '#F4A94E' : Colors.PRIMARY, fontWeight: '700' }}>פרטים ›</Text>
+                            <Text style={{ fontSize: 11, color: isBlue ? '#F4A94E' : Colors.PRIMARY, fontWeight: '700' }}>{t('re.details')}</Text>
                           </View>
                         </>
                       )}
@@ -371,7 +373,7 @@ export default function RealEstatePortal() {
                               <Text style={{ color: '#fff', fontSize: 13, fontWeight: '900' }}>💬 WhatsApp</Text>
                             </TouchableOpacity>
                             <TouchableOpacity onPress={() => Linking.openURL(`tel:${(lst as any).phone}`)} style={{ flex: 1, paddingVertical: 10, backgroundColor: '#10b981', borderRadius: 8, alignItems: 'center' }}>
-                              <Text style={{ color: '#fff', fontSize: 13, fontWeight: '900' }}>📞 חייג · {'⁦'}{(lst as any).phone}{'⁩'}</Text>
+                              <Text style={{ color: '#fff', fontSize: 13, fontWeight: '900' }}>{t('c.call')} · {'⁦'}{(lst as any).phone}{'⁩'}</Text>
                             </TouchableOpacity>
                           </View>
                         )}
@@ -417,7 +419,7 @@ export default function RealEstatePortal() {
         ) : (
           <>
             {/* Section 1 — News slider */}
-            <Section title="חדשות נדל״ן" icon="">
+            <Section title={t('re.newsTitle')} icon="">
               <NewsSliderArrows news={news} />
             </Section>
 
@@ -437,7 +439,7 @@ export default function RealEstatePortal() {
             <ArticlesAt loc="after_business_services" articles={articles} onOpen={setOpenArticle} />
 
             {/* Section - Future real estate (between services and currency) */}
-            <Section title="עתיד הנדל״ן" icon="">
+            <Section title={t('re.futureTitle')} icon="">
               <FutureSlider projects={futureProjects} />
             </Section>
 
@@ -492,11 +494,11 @@ export default function RealEstatePortal() {
                   ? <View style={{ marginTop: 12 }}><HtmlContent html={openServiceArticle.body} /></View>
                   : <Text style={{ fontSize: 14, color: '#1C2B35', textAlign: 'right', writingDirection: 'rtl', marginTop: 12, lineHeight: 22 }}>{openServiceArticle.body}</Text>
               ) : (
-                <Text style={{ fontSize: 13, color: '#94a3b8', textAlign: 'right', writingDirection: 'rtl', marginTop: 14 }}>תוכן יתווסף בקרוב</Text>
+                <Text style={{ fontSize: 13, color: '#94a3b8', textAlign: 'right', writingDirection: 'rtl', marginTop: 14 }}>{t('re.contentSoon')}</Text>
               )}
               {openServiceArticle?.url ? (
                 <TouchableOpacity onPress={() => Linking.openURL(openServiceArticle.url)} style={{ marginTop: 16, backgroundColor: Colors.PRIMARY, borderRadius: 10, paddingVertical: 12, alignItems: 'center' }}>
-                  <Text style={{ color: '#fff', fontWeight: '900', fontSize: 14 }}>↗ למידע נוסף</Text>
+                  <Text style={{ color: '#fff', fontWeight: '900', fontSize: 14 }}>{t('po.moreInfo')}</Text>
                 </TouchableOpacity>
               ) : null}
             </ScrollView>
@@ -521,7 +523,7 @@ export default function RealEstatePortal() {
           <View style={s.choiceSheet}>
             <View style={s.choiceHeader}>
               <TouchableOpacity onPress={() => setChoiceOpen(false)}><Text style={s.choiceClose}>✕</Text></TouchableOpacity>
-              <Text style={s.choiceTitle}>מי אתה?</Text>
+              <Text style={s.choiceTitle}>{t('po.whoAreYou')}</Text>
             </View>
             <TouchableOpacity
               onPress={() => { setChoiceOpen(false); setFormOpen(true); }}
@@ -529,8 +531,8 @@ export default function RealEstatePortal() {
             >
               <Text style={s.choiceBtnIcon}>👤</Text>
               <View style={{ flex: 1 }}>
-                <Text style={s.choiceBtnTitle}>לקוח פרטי</Text>
-                <Text style={s.choiceBtnSub}>{FEATURES.PAID_LISTING_OPTIONS ? 'מודעה בודדת · קטן חינם / גדול $10/חודש' : 'מודעה בודדת · חינם'}</Text>
+                <Text style={s.choiceBtnTitle}>{t('po.privateClient')}</Text>
+                <Text style={s.choiceBtnSub}>{FEATURES.PAID_LISTING_OPTIONS ? t('re.privatePaidSub') : t('re.privateFreeSub')}</Text>
               </View>
               <Text style={s.choiceArrow}>‹</Text>
             </TouchableOpacity>
@@ -540,8 +542,8 @@ export default function RealEstatePortal() {
             >
               <Text style={s.choiceBtnIcon}>🏗️</Text>
               <View style={{ flex: 1 }}>
-                <Text style={s.choiceBtnTitle}>יזם / מתווך</Text>
-                <Text style={s.choiceBtnSub}>{FEATURES.PAID_LISTING_OPTIONS ? 'מיני-פורטל · Basic $100 / Premium $180 לחודש' : 'מיני-פורטל · חינם'}</Text>
+                <Text style={s.choiceBtnTitle}>{t('po.developerBroker')}</Text>
+                <Text style={s.choiceBtnSub}>{FEATURES.PAID_LISTING_OPTIONS ? t('re.devPaidSub') : t('re.devFreeSub')}</Text>
               </View>
               <Text style={s.choiceArrow}>‹</Text>
             </TouchableOpacity>
@@ -553,10 +555,11 @@ export default function RealEstatePortal() {
 }
 
 function IndicesTabs() {
+  const { t } = useI18n();
   const tabs = [
-    { id: 'money', label: 'מדד הכסף', icon: '💰', bg: undefined as string | undefined },
-    { id: 'realEstate', label: 'מדד הנדל״ן', icon: '🏠', bg: '#C8E6C9' },
-    { id: 'tourism', label: 'מדד התיירים', icon: '🧳', bg: '#FFE0B2' },
+    { id: 'money', label: t('re.indexMoney'), icon: '💰', bg: undefined as string | undefined },
+    { id: 'realEstate', label: t('re.indexRealEstate'), icon: '🏠', bg: '#C8E6C9' },
+    { id: 'tourism', label: t('re.indexTourism'), icon: '🧳', bg: '#FFE0B2' },
   ];
   const [active, setActive] = useState(tabs[0].id);
   const current = tabs.find(t => t.id === active)!;
@@ -622,6 +625,7 @@ const BROKER_FALLBACK_IMAGES = [
 ];
 
 function BrokerBannerSmall() {
+  const { t } = useI18n();
   const [brokers, setBrokers] = useState<any[]>(BROKER_FALLBACK_IMAGES.map((img, i) => ({ id: `b${i+1}`, name: 'דודי ספיר', title: 'מתווך נדל״ן מומלץ', phone: '+995-555-123-456', image: img })));
   const [idx, setIdx] = useState(0);
 
@@ -645,7 +649,7 @@ function BrokerBannerSmall() {
 
   return (
     <View style={{ paddingHorizontal: 16, marginTop: 14 }}>
-      <Text style={{ fontSize: 12, fontWeight: '700', color: '#888', textAlign: 'right', writingDirection: 'rtl', marginBottom: 6 }}>סוכני נדל״ן מומלצים בבטומי</Text>
+      <Text style={{ fontSize: 12, fontWeight: '700', color: '#888', textAlign: 'right', writingDirection: 'rtl', marginBottom: 6 }}>{t('re.recommendedAgents')}</Text>
       <TouchableOpacity activeOpacity={0.85} onPress={() => router.push('/portal/brokers' as any)} style={{ flexDirection: 'row-reverse', backgroundColor: '#fff', borderRadius: 10, overflow: 'hidden', borderWidth: 1.5, borderColor: '#92400e', minHeight: 55 }}>
         <Image source={{ uri: resolveUri(broker.image) }} style={{ width: 55, height: 55 }} resizeMode="cover" />
         <View style={{ flex: 1, paddingHorizontal: 10, paddingVertical: 6, justifyContent: 'center' }}>
@@ -663,6 +667,7 @@ function BrokerBannerSmall() {
 }
 
 function BrokerBanner() {
+  const { t } = useI18n();
   const [brokers, setBrokers] = useState<any[]>(BROKER_FALLBACK_IMAGES.map((img, i) => ({ id: `b${i+1}`, name: 'דודי ספיר', title: 'מתווך נדל״ן מומלץ בבטומי', phone: '+995-555-123-456', image: img })));
   const [idx, setIdx] = useState(0);
 
@@ -686,7 +691,7 @@ function BrokerBanner() {
 
   return (
     <View style={{ paddingHorizontal: 16, marginTop: 16 }}>
-      <Text style={{ fontSize: 14, fontWeight: '700', color: '#888', textAlign: 'right', writingDirection: 'rtl', marginBottom: 8 }}>סוכני נדל״ן מומלצים בבטומי</Text>
+      <Text style={{ fontSize: 14, fontWeight: '700', color: '#888', textAlign: 'right', writingDirection: 'rtl', marginBottom: 8 }}>{t('re.recommendedAgents')}</Text>
       <TouchableOpacity activeOpacity={0.85} onPress={() => router.push('/portal/brokers' as any)} style={{ flexDirection: 'row-reverse', backgroundColor: '#fff', borderRadius: 14, overflow: 'hidden', borderWidth: 1.5, borderColor: '#92400e', minHeight: 110 }}>
         <Image source={{ uri: resolveUri(broker.image) }} style={{ width: 110, height: 'auto', minHeight: 110 }} resizeMode="cover" />
         <View style={{ flex: 1, padding: 10, justifyContent: 'space-between' }}>
@@ -696,7 +701,7 @@ function BrokerBanner() {
             <Text style={{ fontSize: 11, color: '#475569', textAlign: 'right', writingDirection: 'rtl', marginTop: 2 }} numberOfLines={1}>📞 {broker.phone}</Text>
           </View>
           <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginTop: 6 }}>
-            <Text style={{ fontSize: 10, color: '#64748b' }}>לכל המתווכים ›</Text>
+            <Text style={{ fontSize: 10, color: '#64748b' }}>{t('po.allBrokers')}</Text>
             <View style={{ flexDirection: 'row', gap: 3 }}>
               {brokers.map((_, i) => <View key={i} style={{ width: 5, height: 5, borderRadius: 3, backgroundColor: i === idx ? Colors.PRIMARY : '#cbd5e1' }} />)}
             </View>
@@ -736,6 +741,7 @@ function ExpandedGallery({ images }: { images: string[] }) {
 }
 
 function ArticlesAt({ loc, articles, onOpen }: { loc: string; articles: any[]; onOpen: (a: any) => void }) {
+  const { t } = useI18n();
   const items = articles.filter(a => a.location === loc && a.visible !== false);
   if (items.length === 0) return null;
   return (
@@ -746,7 +752,7 @@ function ArticlesAt({ loc, articles, onOpen }: { loc: string; articles: any[]; o
           <View style={{ padding: 12 }}>
             <Text style={{ fontSize: 15, fontWeight: '900', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl' }}>💡 {a.title}</Text>
             {!!a.summary && <Text style={{ fontSize: 12, color: '#475569', textAlign: 'right', writingDirection: 'rtl', marginTop: 4, lineHeight: 18 }}>{a.summary}</Text>}
-            {!!a.article && <Text style={{ fontSize: 11, color: Colors.PRIMARY, textAlign: 'right', writingDirection: 'rtl', marginTop: 6, fontWeight: '700' }}>קרא עוד ›</Text>}
+            {!!a.article && <Text style={{ fontSize: 11, color: Colors.PRIMARY, textAlign: 'right', writingDirection: 'rtl', marginTop: 6, fontWeight: '700' }}>{t('po.readMore')} ›</Text>}
           </View>
         </TouchableOpacity>
       ))}
@@ -870,6 +876,7 @@ function FutureSlider({ projects }: { projects: Listing[] }) {
 }
 
 function NewsSliderArrows({ news }: { news: Article[] }) {
+  const { t } = useI18n();
   const { width } = useWindowDimensions();
   const SLIDE_W = width - 32;
   const GAP = 12;
@@ -912,7 +919,7 @@ function NewsSliderArrows({ news }: { news: Article[] }) {
                 <Text style={{ fontSize: 12, color: 'rgba(255,255,255,0.92)', textAlign: 'right', writingDirection: 'rtl', lineHeight: 16, marginBottom: 6 }} numberOfLines={2}>{n.summary}</Text>
               ) : null}
               <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
-                <Text style={{ fontSize: 12, fontWeight: '900', color: '#F4A94E' }}>‹ קרא עוד</Text>
+                <Text style={{ fontSize: 12, fontWeight: '900', color: '#F4A94E' }}>‹ {t('po.readMore')}</Text>
               </View>
             </LinearGradient>
           </TouchableOpacity>
@@ -957,7 +964,7 @@ function NewsSliderArrows({ news }: { news: Article[] }) {
               ) : null}
               {openNews?.link ? (
                 <TouchableOpacity onPress={() => { const u = openNews.link; setOpenNews(null); setWebViewUrl(u || null); }} style={{ marginTop: 14, backgroundColor: Colors.PRIMARY, borderRadius: 10, paddingVertical: 12, alignItems: 'center' }}>
-                  <Text style={{ color: '#fff', fontWeight: '900', fontSize: 14 }}>↗ למקור המלא</Text>
+                  <Text style={{ color: '#fff', fontWeight: '900', fontSize: 14 }}>{t('po.fullSource')}</Text>
                 </TouchableOpacity>
               ) : null}
             </ScrollView>
@@ -969,7 +976,7 @@ function NewsSliderArrows({ news }: { news: Article[] }) {
         <View style={{ flex: 1, backgroundColor: '#fff' }}>
           <View style={{ flexDirection: 'row-reverse', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 10, backgroundColor: Colors.PRIMARY, borderBottomWidth: 1, borderBottomColor: '#0e4256' }}>
             <TouchableOpacity onPress={() => setWebViewUrl(null)} style={{ paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8, backgroundColor: 'rgba(255,255,255,0.2)' }}>
-              <Text style={{ color: '#fff', fontWeight: '900', fontSize: 14 }}>✕ סגור</Text>
+              <Text style={{ color: '#fff', fontWeight: '900', fontSize: 14 }}>✕ {t('c.close')}</Text>
             </TouchableOpacity>
             <Text style={{ flex: 1, color: '#fff', fontWeight: '800', fontSize: 13, textAlign: 'right', writingDirection: 'rtl', marginLeft: 12 }} numberOfLines={1}>{webViewUrl || ''}</Text>
           </View>

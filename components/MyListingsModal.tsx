@@ -3,6 +3,7 @@ import { View, Text, Modal, TouchableOpacity, ScrollView, StyleSheet, TextInput,
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Colors } from '../constants/colors';
 import { API_BASE, resolveUri } from '../constants/api';
+import { useI18n } from '../constants/i18n';
 
 type Listing = {
   id: string;
@@ -23,6 +24,7 @@ async function getDeviceId(): Promise<string> {
 }
 
 export default function MyListingsModal({ visible, onClose }: { visible: boolean; onClose: () => void }) {
+  const { t } = useI18n();
   const [listings, setListings] = useState<Listing[]>([]);
   const [loading, setLoading] = useState(false);
   const [phoneRecover, setPhoneRecover] = useState('');
@@ -58,9 +60,9 @@ export default function MyListingsModal({ visible, onClose }: { visible: boolean
 
   const deleteListing = async (l: Listing) => {
     const confirm = () => new Promise<boolean>(resolve => {
-      Alert.alert('מחיקת מודעה', `למחוק "${l.title}"?`, [
-        { text: 'ביטול', style: 'cancel', onPress: () => resolve(false) },
-        { text: 'מחק', style: 'destructive', onPress: () => resolve(true) },
+      Alert.alert(t('fm.deleteListing'), `${t('fm.deletePrefix')} "${l.title}"?`, [
+        { text: t('c.cancel'), style: 'cancel', onPress: () => resolve(false) },
+        { text: t('c.delete'), style: 'destructive', onPress: () => resolve(true) },
       ]);
     });
     if (!(await confirm())) return;
@@ -76,9 +78,9 @@ export default function MyListingsModal({ visible, onClose }: { visible: boolean
       if (j.success) {
         setListings(prev => prev.filter(x => x.id !== l.id));
       } else {
-        Alert.alert('שגיאה', j.error || 'מחיקה נכשלה');
+        Alert.alert(t('c.error'), j.error || t('fm.deleteFailed'));
       }
-    } catch { Alert.alert('שגיאה', 'בעיית רשת'); }
+    } catch { Alert.alert(t('c.error'), t('fm.networkError')); }
   };
 
   return (
@@ -87,18 +89,18 @@ export default function MyListingsModal({ visible, onClose }: { visible: boolean
         <View style={s.sheet}>
           <View style={s.header}>
             <TouchableOpacity onPress={onClose}><Text style={s.closeX}>✕</Text></TouchableOpacity>
-            <Text style={s.title}>המודעות שלי</Text>
+            <Text style={s.title}>{t('fm.myListings')}</Text>
           </View>
           <ScrollView contentContainerStyle={{ padding: 14, gap: 10, paddingBottom: 60 }}>
             {loading ? (
-              <Text style={{ textAlign: 'center', color: '#64748b', padding: 30 }}>טוען...</Text>
+              <Text style={{ textAlign: 'center', color: '#64748b', padding: 30 }}>{t('c.loading')}</Text>
             ) : listings.length === 0 ? (
               <View style={{ alignItems: 'center', padding: 24, gap: 12 }}>
                 <Text style={{ fontSize: 36 }}>📭</Text>
-                <Text style={{ fontSize: 14, fontWeight: '700', color: Colors.TEXT, textAlign: 'center' }}>לא נמצאו מודעות במכשיר זה</Text>
+                <Text style={{ fontSize: 14, fontWeight: '700', color: Colors.TEXT, textAlign: 'center' }}>{t('fm.noListingsOnDevice')}</Text>
                 {!showPhoneInput && (
                   <TouchableOpacity onPress={() => setShowPhoneInput(true)} style={s.linkBtn}>
-                    <Text style={s.linkBtnTxt}>פרסמת ממכשיר אחר? חפש לפי טלפון</Text>
+                    <Text style={s.linkBtnTxt}>{t('fm.postedFromAnotherDevice')}</Text>
                   </TouchableOpacity>
                 )}
               </View>
@@ -112,13 +114,13 @@ export default function MyListingsModal({ visible, onClose }: { visible: boolean
                     <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', gap: 6 }}>
                       <Text style={s.cardTitle} numberOfLines={2}>{l.title}</Text>
                       <View style={[s.badge, { backgroundColor: l.approved ? '#10b981' : '#f59e0b' }]}>
-                        <Text style={s.badgeTxt}>{l.approved ? '✓ מאושר' : '⏱ ממתין'}</Text>
+                        <Text style={s.badgeTxt}>{l.approved ? t('fm.approved') : t('fm.pending')}</Text>
                       </View>
                     </View>
                     {!!l.price && <Text style={s.cardPrice}>{l.price}</Text>}
                     {!!l.location && <Text style={s.cardSub}>📍 {l.location}</Text>}
                     <TouchableOpacity onPress={() => deleteListing(l)} style={s.deleteBtn}>
-                      <Text style={s.deleteTxt}>🗑️ מחק מודעה</Text>
+                      <Text style={s.deleteTxt}>{t('fm.deleteListingBtn')}</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -126,18 +128,18 @@ export default function MyListingsModal({ visible, onClose }: { visible: boolean
             )}
             {showPhoneInput && (
               <View style={{ padding: 12, backgroundColor: '#fff7ed', borderRadius: 10, gap: 8 }}>
-                <Text style={{ fontSize: 12, color: Colors.TEXT, textAlign: 'right' }}>הקלד את הטלפון בו פרסמת:</Text>
+                <Text style={{ fontSize: 12, color: Colors.TEXT, textAlign: 'right' }}>{t('fm.enterPostingPhone')}</Text>
                 <TextInput
                   style={s.input}
                   value={phoneRecover}
                   onChangeText={setPhoneRecover}
-                  placeholder="טלפון"
+                  placeholder={t('c.phone')}
                   keyboardType="phone-pad"
                   textAlign="right"
                   placeholderTextColor="#94a3b8"
                 />
                 <TouchableOpacity onPress={() => loadByPhone(phoneRecover)} style={s.primaryBtn}>
-                  <Text style={s.primaryTxt}>חפש</Text>
+                  <Text style={s.primaryTxt}>{t('c.search')}</Text>
                 </TouchableOpacity>
               </View>
             )}

@@ -4,10 +4,12 @@ import * as ImagePicker from 'expo-image-picker';
 import { API_BASE } from '../constants/api';
 import { Colors } from '../constants/colors';
 import { markSubmitted } from './DeleteMySubmission';
+import { useI18n } from '../constants/i18n';
 
 type Props = { categoryId: string; mode: 'israeli' | 'local' };
 
 export default function RecommendGuideButton({ categoryId, mode }: Props) {
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
@@ -34,7 +36,7 @@ export default function RecommendGuideButton({ categoryId, mode }: Props) {
   };
 
   const submit = async () => {
-    if (!name.trim() || !phone.trim()) { Alert.alert('חסר מידע', 'שם וטלפון חובה'); return; }
+    if (!name.trim() || !phone.trim()) { Alert.alert(t('fm.missingInfo'), t('fm.nameAndPhoneRequired')); return; }
     setSending(true);
     try {
       await fetch(`${API_BASE}/api/guide-recommend`, {
@@ -42,11 +44,11 @@ export default function RecommendGuideButton({ categoryId, mode }: Props) {
         body: JSON.stringify({ categoryId, mode, name, phone, languages, whatsapp, facebook, website, note, photo }),
       });
       await markSubmitted(phone);
-      Alert.alert('תודה!', 'הפנייה שלך התקבלה. נחזור אליך בקרוב.');
+      Alert.alert(t('c.thanks'), t('fm.recRequestReceived'));
       setOpen(false);
       setName(''); setPhone(''); setLanguages(''); setWhatsapp(''); setFacebook(''); setWebsite(''); setNote(''); setPhoto(null);
     } catch {
-      Alert.alert('שגיאה', 'לא הצלחנו לשלוח. נסה שוב.');
+      Alert.alert(t('c.error'), t('fm.sendFailedRetry'));
     }
     setSending(false);
   };
@@ -56,8 +58,8 @@ export default function RecommendGuideButton({ categoryId, mode }: Props) {
       <TouchableOpacity onPress={() => setOpen(true)} activeOpacity={0.85} style={s.btn}>
         <Text style={s.btnIcon}>➕</Text>
         <View style={{ flex: 1 }}>
-          <Text style={s.btnTitle}>המלץ על מדריך / הוסף את עצמך</Text>
-          <Text style={s.btnSub}>{mode === 'israeli' ? 'ישראלי דובר עברית' : 'מקומי שמכיר את האזור'}</Text>
+          <Text style={s.btnTitle}>{t('fm.recommendGuide')}</Text>
+          <Text style={s.btnSub}>{mode === 'israeli' ? t('fm.guideModeIsraeli') : t('fm.guideModeLocal')}</Text>
         </View>
       </TouchableOpacity>
 
@@ -66,16 +68,16 @@ export default function RecommendGuideButton({ categoryId, mode }: Props) {
           <View style={s.sheet}>
             <View style={s.header}>
               <TouchableOpacity onPress={() => setOpen(false)}><Text style={s.closeX}>✕</Text></TouchableOpacity>
-              <Text style={s.title}>המלצה / הוספת מדריך</Text>
+              <Text style={s.title}>{t('fm.recommendGuideTitle')}</Text>
             </View>
             <ScrollView contentContainerStyle={{ padding: 14, gap: 10 }} keyboardShouldPersistTaps="handled">
-              <TextInput style={s.input} value={name} onChangeText={setName} placeholder="שם מלא *" placeholderTextColor="#94a3b8" textAlign="right" />
-              <TextInput style={s.input} value={phone} onChangeText={setPhone} placeholder="טלפון / WhatsApp *" placeholderTextColor="#94a3b8" textAlign="right" keyboardType="phone-pad" />
-              <TextInput style={s.input} value={languages} onChangeText={setLanguages} placeholder="שפות (עברית, אנגלית, רוסית...)" placeholderTextColor="#94a3b8" textAlign="right" />
-              <TextInput style={s.input} value={whatsapp} onChangeText={setWhatsapp} placeholder="קישור WhatsApp (אופציונלי)" placeholderTextColor="#94a3b8" textAlign="right" />
-              <TextInput style={s.input} value={facebook} onChangeText={setFacebook} placeholder="עמוד פייסבוק (אופציונלי)" placeholderTextColor="#94a3b8" textAlign="right" />
-              <TextInput style={s.input} value={website} onChangeText={setWebsite} placeholder="אתר (אופציונלי)" placeholderTextColor="#94a3b8" textAlign="right" />
-              <TextInput style={[s.input, { height: 80 }]} value={note} onChangeText={setNote} placeholder="התמחות והערות..." placeholderTextColor="#94a3b8" textAlign="right" multiline />
+              <TextInput style={s.input} value={name} onChangeText={setName} placeholder={t('fm.fullNameStar')} placeholderTextColor="#94a3b8" textAlign="right" />
+              <TextInput style={s.input} value={phone} onChangeText={setPhone} placeholder={t('fm.phoneWhatsappStar')} placeholderTextColor="#94a3b8" textAlign="right" keyboardType="phone-pad" />
+              <TextInput style={s.input} value={languages} onChangeText={setLanguages} placeholder={t('fm.languagesPh')} placeholderTextColor="#94a3b8" textAlign="right" />
+              <TextInput style={s.input} value={whatsapp} onChangeText={setWhatsapp} placeholder={t('fm.whatsappLinkOpt')} placeholderTextColor="#94a3b8" textAlign="right" />
+              <TextInput style={s.input} value={facebook} onChangeText={setFacebook} placeholder={t('fm.facebookOpt')} placeholderTextColor="#94a3b8" textAlign="right" />
+              <TextInput style={s.input} value={website} onChangeText={setWebsite} placeholder={t('fm.websiteOpt')} placeholderTextColor="#94a3b8" textAlign="right" />
+              <TextInput style={[s.input, { height: 80 }]} value={note} onChangeText={setNote} placeholder={t('fm.guideNotePh')} placeholderTextColor="#94a3b8" textAlign="right" multiline />
 
               <TouchableOpacity onPress={pickPhoto} style={s.photoBtn} activeOpacity={0.85}>
                 {photo ? (
@@ -83,13 +85,13 @@ export default function RecommendGuideButton({ categoryId, mode }: Props) {
                 ) : (
                   <>
                     <Text style={{ fontSize: 26 }}>📷</Text>
-                    <Text style={{ fontSize: 13, color: '#475569', fontWeight: '700', marginTop: 6 }}>הוסף תמונה</Text>
+                    <Text style={{ fontSize: 13, color: '#475569', fontWeight: '700', marginTop: 6 }}>{t('fm.addPhoto')}</Text>
                   </>
                 )}
               </TouchableOpacity>
 
               <TouchableOpacity onPress={submit} disabled={sending} style={[s.submit, sending && { opacity: 0.5 }]} activeOpacity={0.85}>
-                <Text style={s.submitTxt}>{sending ? 'שולח…' : 'שלח'}</Text>
+                <Text style={s.submitTxt}>{sending ? t('fm.sending') : t('fm.send')}</Text>
               </TouchableOpacity>
             </ScrollView>
           </View>

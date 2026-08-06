@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, Image, TouchableOpacity, Linking, StyleSheet, ScrollView } from 'react-native';
 import { Colors } from '../constants/colors';
 import { resolveUri } from '../constants/api';
+import { useI18n } from '../constants/i18n';
 
 export type DevUnit = {
   id: string;
@@ -32,6 +33,7 @@ export type Developer = {
 };
 
 export default function DeveloperCard({ d }: { d: Developer }) {
+  const { t } = useI18n();
   const [selectedUnit, setSelectedUnit] = useState<DevUnit | null>(null);
   const premium = d.package === 'premium';
   const brand = d.brandColor || Colors.PRIMARY;
@@ -62,7 +64,7 @@ export default function DeveloperCard({ d }: { d: Developer }) {
       {featured && (
         <TouchableOpacity activeOpacity={0.9} onPress={() => setSelectedUnit(featured)} style={s.featured}>
           {featured.image && <Image source={{ uri: resolveUri(featured.image) }} style={s.featuredImg} />}
-          {featured.sold && <View style={s.soldStamp}><Text style={s.soldStampTxt}>נמכר</Text></View>}
+          {featured.sold && <View style={s.soldStamp}><Text style={s.soldStampTxt}>{t('fm.sold')}</Text></View>}
           <View style={[s.unitOverlay, { backgroundColor: brand + 'DD' }]}>
             <Text style={s.unitTitleBig}>{featured.title}</Text>
             <Text style={s.unitPriceBig}>{featured.price}</Text>
@@ -76,7 +78,7 @@ export default function DeveloperCard({ d }: { d: Developer }) {
             <TouchableOpacity key={u.id} activeOpacity={0.85} onPress={() => setSelectedUnit(u)} style={[s.smallUnit, { borderColor: brand + '30' }]}>
               <View style={{ position: 'relative' }}>
                 {u.image && <Image source={{ uri: resolveUri(u.image) }} style={s.smallUnitImg} />}
-                {u.sold && <View style={s.soldStampSmall}><Text style={s.soldStampTxtSmall}>נמכר</Text></View>}
+                {u.sold && <View style={s.soldStampSmall}><Text style={s.soldStampTxtSmall}>{t('fm.sold')}</Text></View>}
               </View>
               <View style={{ padding: 6 }}>
                 <Text style={s.smallTitle} numberOfLines={1}>{u.title}</Text>
@@ -95,12 +97,12 @@ export default function DeveloperCard({ d }: { d: Developer }) {
         )}
         {d.phone && !d.whatsapp && (
           <TouchableOpacity onPress={() => Linking.openURL(`tel:${d.phone}`)} style={s.waBtn}>
-            <Text style={s.waBtnTxt}>📞 חיוג</Text>
+            <Text style={s.waBtnTxt}>{t('fm.call')}</Text>
           </TouchableOpacity>
         )}
         {d.website && (
           <TouchableOpacity onPress={() => Linking.openURL(d.website!)} style={[s.siteBtn, { backgroundColor: brand }]}>
-            <Text style={s.siteBtnTxt}>🌐 אתר החברה</Text>
+            <Text style={s.siteBtnTxt}>{t('fm.companyWebsite')}</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -120,8 +122,8 @@ export default function DeveloperCard({ d }: { d: Developer }) {
             <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginTop: 10 }}>
               <Text style={s.unitModalPrice}>{selectedUnit.price}</Text>
               {d.whatsapp && (
-                <TouchableOpacity onPress={() => Linking.openURL(`https://wa.me/${d.whatsapp}?text=${encodeURIComponent('מתעניין ב' + selectedUnit.title)}`)} style={s.waBtn}>
-                  <Text style={s.waBtnTxt}>💬 בירור</Text>
+                <TouchableOpacity onPress={() => Linking.openURL(`https://wa.me/${d.whatsapp}?text=${encodeURIComponent(t('fm.interestedIn') + selectedUnit.title)}`)} style={s.waBtn}>
+                  <Text style={s.waBtnTxt}>{t('fm.inquiry')}</Text>
                 </TouchableOpacity>
               )}
             </View>

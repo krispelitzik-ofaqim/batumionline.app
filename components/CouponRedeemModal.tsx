@@ -2,14 +2,16 @@ import React, { useState } from 'react';
 import { Modal, View, Text, TextInput, TouchableOpacity, StyleSheet, Platform } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { API_BASE } from '../constants/api';
+import { useI18n } from '../constants/i18n';
 
 export default function CouponRedeemModal({ visible, onClose }: { visible: boolean; onClose: () => void }) {
+  const { t } = useI18n();
   const [code, setCode] = useState('');
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<{ ok: boolean; msg: string; discount?: string } | null>(null);
 
   const validate = async () => {
-    if (!code.trim()) { setResult({ ok: false, msg: 'הזן קוד' }); return; }
+    if (!code.trim()) { setResult({ ok: false, msg: t('fm.enterCode') }); return; }
     setBusy(true); setResult(null);
     try {
       const r = await fetch(`${API_BASE}/api/coupons/validate`, {
@@ -19,13 +21,13 @@ export default function CouponRedeemModal({ visible, onClose }: { visible: boole
       const j = await r.json();
       if (j.success && j.coupon) {
         const c = j.coupon;
-        const discount = c.type === 'percent' ? `${c.value}% הנחה` : `הנחה של ₪${c.value}`;
-        setResult({ ok: true, msg: c.label || 'הקוד תקף!', discount });
+        const discount = c.type === 'percent' ? `${c.value}% ${t('fm.discount')}` : `${t('fm.discountOf')} ₪${c.value}`;
+        setResult({ ok: true, msg: c.label || t('fm.codeValid'), discount });
       } else {
-        setResult({ ok: false, msg: j.error || 'קוד לא תקף' });
+        setResult({ ok: false, msg: j.error || t('fm.codeInvalid') });
       }
     } catch {
-      setResult({ ok: false, msg: 'שגיאת תקשורת' });
+      setResult({ ok: false, msg: t('fm.commError') });
     }
     setBusy(false);
   };
@@ -38,22 +40,22 @@ export default function CouponRedeemModal({ visible, onClose }: { visible: boole
         <View style={s.card}>
           <LinearGradient colors={['#16a34a', '#059669']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={s.header}>
             <Text style={s.headerIcon}>🎟️</Text>
-            <Text style={s.headerTitle}>מימוש קוד קופון</Text>
+            <Text style={s.headerTitle}>{t('fm.redeemCoupon')}</Text>
           </LinearGradient>
           <View style={s.body}>
             {result?.ok ? (
               <View style={{ alignItems: 'center', gap: 14 }}>
                 <Text style={{ fontSize: 52 }}>🎉</Text>
-                <Text style={s.successTitle}>הקוד תקף!</Text>
+                <Text style={s.successTitle}>{t('fm.codeValid')}</Text>
                 <Text style={s.successDiscount}>{result.discount}</Text>
-                {!!result.msg && result.msg !== 'הקוד תקף!' && <Text style={s.successMsg}>{result.msg}</Text>}
+                {!!result.msg && result.msg !== t('fm.codeValid') && <Text style={s.successMsg}>{result.msg}</Text>}
                 <TouchableOpacity onPress={close} style={s.closeBtn}>
-                  <Text style={s.closeBtnTxt}>סגור</Text>
+                  <Text style={s.closeBtnTxt}>{t('c.close')}</Text>
                 </TouchableOpacity>
               </View>
             ) : (
               <>
-                <Text style={s.label}>הזן את קוד הקופון:</Text>
+                <Text style={s.label}>{t('fm.enterCouponCode')}</Text>
                 <TextInput
                   value={code}
                   onChangeText={(v) => setCode(v.toUpperCase())}
@@ -66,10 +68,10 @@ export default function CouponRedeemModal({ visible, onClose }: { visible: boole
                 />
                 {!!result && !result.ok && <Text style={s.errMsg}>❌ {result.msg}</Text>}
                 <TouchableOpacity onPress={validate} disabled={busy} style={[s.submitBtn, busy && { opacity: 0.5 }]}>
-                  <Text style={s.submitTxt}>{busy ? '⏳ בודק…' : '🎁 בדוק קוד'}</Text>
+                  <Text style={s.submitTxt}>{busy ? t('fm.checking') : t('fm.checkCode')}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={close} style={s.cancelBtn}>
-                  <Text style={s.cancelTxt}>ביטול</Text>
+                  <Text style={s.cancelTxt}>{t('c.cancel')}</Text>
                 </TouchableOpacity>
               </>
             )}

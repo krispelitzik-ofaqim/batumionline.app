@@ -11,6 +11,7 @@ import { AdminContext } from '../../constants/adminContext';
 import DevicePreviewBar from '../../components/DevicePreviewBar';
 import { fetchContent, getCachedContent, fetchRatings, submitRating, API_BASE, resolveUri } from '../../constants/api';
 import { openLocation, openDirections, openMapUrl } from '../../constants/maps';
+import { useI18n } from '../../constants/i18n';
 
 type MapPoint = { name: string; lat: number; lng: number; description?: string };
 import AudioPlayer from '../../components/AudioPlayer';
@@ -52,8 +53,9 @@ type Item = {
 const CARD_BGS = ['#FFFFFF', '#FFF7ED', '#F0F9FF', '#F0FDF4', '#FEF2F2', '#FAF5FF'];
 
 function FoodieCard({ h, isLast }: { h: Hotel; isLast?: boolean }) {
+  const { t } = useI18n();
   const [imgFailed, setImgFailed] = useState(!h.image || h.image.includes('city.jpg'));
-  const badge = h.amenities?.[0] || '🔥 חובה לטעום';
+  const badge = h.amenities?.[0] || t('cat.mustTaste');
   return (
     <TouchableOpacity activeOpacity={0.85} onPress={() => h.mapUrl && openMapUrl(h.mapUrl, h.title)}
       style={{ paddingVertical: 12, borderBottomWidth: isLast ? 0 : 1, borderBottomColor: '#e0e0e0' }}>
@@ -78,7 +80,7 @@ function FoodieCard({ h, isLast }: { h: Hotel; isLast?: boolean }) {
             <View style={{ backgroundColor: '#ff6b35', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6 }}>
               <Text style={{ fontSize: 9, fontWeight: '900', color: '#fff' }}>{badge}</Text>
             </View>
-            <Text style={{ fontSize: 9, color: '#ff6b35', fontWeight: '700' }}>📍 לחץ לנווט</Text>
+            <Text style={{ fontSize: 9, color: '#ff6b35', fontWeight: '700' }}>📍 {t('cat.tapNavigate')}</Text>
           </View>
         </View>
       </View>
@@ -87,12 +89,13 @@ function FoodieCard({ h, isLast }: { h: Hotel; isLast?: boolean }) {
 }
 
 function PassportCard({ h, pageBtnLabel }: { h: Hotel; pageBtnLabel: string }) {
+  const { t } = useI18n();
   const [imgFailed, setImgFailed] = useState(false);
   return (
     <View style={passSt.card}>
       <View style={passSt.header}>
         <Text style={passSt.headerIcon}>🛂</Text>
-        <Text style={passSt.headerTxt}>כרטיס מדריך</Text>
+        <Text style={passSt.headerTxt}>{t('cat.guideCard')}</Text>
         <Text style={passSt.headerTxt}>GUIDE CARD</Text>
       </View>
       <View style={passSt.body}>
@@ -215,6 +218,7 @@ function HotelImage({ uri, titleEn, placesQuery, hideBadge, badgeText }: { uri?:
 }
 
 function FoodRecGps({ restaurants }: { restaurants: { name: string; lat: number; lng: number; mapUrl?: string; category?: string }[] }) {
+  const { t } = useI18n();
   const [nearby, setNearby] = useState<{ name: string; dist: number; mapUrl?: string; category?: string }[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -241,7 +245,7 @@ function FoodRecGps({ restaurants }: { restaurants: { name: string; lat: number;
     }
   }, []);
 
-  if (loading) return <Text style={{ fontSize: 9, color: '#888', textAlign: 'center', marginTop: 4 }}>📍 מחפש מסעדות בקרבתך...</Text>;
+  if (loading) return <Text style={{ fontSize: 9, color: '#888', textAlign: 'center', marginTop: 4 }}>📍 {t('cat.searchingNearby')}</Text>;
   if (nearby.length === 0) return null;
 
   return (
@@ -251,7 +255,7 @@ function FoodRecGps({ restaurants }: { restaurants: { name: string; lat: number;
           <Text style={{ fontSize: 14 }}>{r.category?.includes('קפה') ? '☕' : r.category?.includes('רחוב') ? '🔥' : r.category?.includes('מקומי') ? '🥙' : '🍽️'}</Text>
           <View style={{ flex: 1 }}>
             <Text style={{ fontSize: 11, fontWeight: '800', color: '#1C2B35', writingDirection: 'rtl' }}>{r.name}</Text>
-            <Text style={{ fontSize: 9, color: '#888', writingDirection: 'rtl' }}>{r.category} · {r.dist} מטר · לחץ לנווט</Text>
+            <Text style={{ fontSize: 9, color: '#888', writingDirection: 'rtl' }}>{r.category} · {r.dist} {t('cat.metersNavigate')}</Text>
           </View>
           <Text style={{ fontSize: 12 }}>📍</Text>
         </TouchableOpacity>
@@ -286,6 +290,7 @@ function TourStations({ audios, color, onNavigate, onActiveChange, nearbyRestaur
   nearbyRestaurants?: { name: string; lat: number; lng: number; mapUrl?: string; category?: string }[];
   foodRecEnabled?: boolean;
 }) {
+  const { t } = useI18n();
   const [tracks, setTracks] = useState(audios);
   const [playingIdx, setPlayingIdx] = useState<number>(-1);
   const [pos, setPos] = useState(0);
@@ -347,7 +352,7 @@ function TourStations({ audios, color, onNavigate, onActiveChange, nearbyRestaur
 
   return (
     <View style={{ gap: 6 }}>
-      <Text style={{ fontSize: 11, color: '#555', textAlign: 'center', writingDirection: 'rtl', paddingVertical: 2 }}>▶ לחץ להאזנה | ≡ לשינוי הסדר</Text>
+      <Text style={{ fontSize: 11, color: '#555', textAlign: 'center', writingDirection: 'rtl', paddingVertical: 2 }}>{t('cat.listen')}</Text>
       {tracks.map((au, i) => {
         const isPlaying = playingIdx === i;
         const pct = isPlaying && dur > 0 ? (pos / dur) * 100 : 0;
@@ -359,7 +364,7 @@ function TourStations({ audios, color, onNavigate, onActiveChange, nearbyRestaur
                 <Text style={{ color: '#fff', fontSize: 14, fontWeight: '900' }}>{isPlaying ? '❚❚' : '▶'}</Text>
               </TouchableOpacity>
               <View style={{ flex: 1 }}>
-                <Text style={{ fontSize: 14, fontWeight: isPlaying ? '900' : '700', color: '#1C2B35', textAlign: 'right', writingDirection: 'rtl' }} numberOfLines={1}>{au.title || `תחנה ${i + 1}`}</Text>
+                <Text style={{ fontSize: 14, fontWeight: isPlaying ? '900' : '700', color: '#1C2B35', textAlign: 'right', writingDirection: 'rtl' }} numberOfLines={1}>{au.title || `${t('cat.station')} ${i + 1}`}</Text>
                 {isPlaying && <Text style={{ fontSize: 10, color: '#888', textAlign: 'right' }}>{fmt(pos)} / {fmt(dur)}</Text>}
               </View>
             </View>
@@ -383,7 +388,7 @@ function TourStations({ audios, color, onNavigate, onActiveChange, nearbyRestaur
                       <Text style={{ fontSize: 14 }}>{r.category?.includes('קפה') ? '☕' : r.category?.includes('רחוב') ? '🔥' : r.category?.includes('מקומי') ? '🥙' : '🍽️'}</Text>
                       <View style={{ flex: 1 }}>
                         <Text style={{ fontSize: 11, fontWeight: '800', color: '#1C2B35', writingDirection: 'rtl' }}>{r.name}</Text>
-                        <Text style={{ fontSize: 9, color: '#888', writingDirection: 'rtl' }}>{r.category} · {r.dist} מטר · לחץ לנווט</Text>
+                        <Text style={{ fontSize: 9, color: '#888', writingDirection: 'rtl' }}>{r.category} · {r.dist} {t('cat.metersNavigate')}</Text>
                       </View>
                       <Text style={{ fontSize: 12 }}>📍</Text>
                     </TouchableOpacity>
@@ -419,6 +424,7 @@ function buildTourRouteUrl(audios: { title?: string; url: string; coords?: { lat
 }
 
 function TourAlbum({ tourId, color, refreshKey }: { tourId: string; color: string; refreshKey?: number }) {
+  const { t } = useI18n();
   const [photos, setPhotos] = useState<any[]>([]);
   const [previewPhoto, setPreviewPhoto] = useState<any>(null);
   const [visibleCount, setVisibleCount] = useState(20);
@@ -433,7 +439,7 @@ function TourAlbum({ tourId, color, refreshKey }: { tourId: string; color: strin
   return (
     <View>
       <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8, marginHorizontal: 12, marginTop: 8 }}>
-        <Text style={{ fontSize: 14, fontWeight: '900', color: '#1C2B35', writingDirection: 'rtl' }}>📸 אלבום גולשים</Text>
+        <Text style={{ fontSize: 14, fontWeight: '900', color: '#1C2B35', writingDirection: 'rtl' }}>📸 {t('cat.album')}</Text>
         {photos.length > 0 && <Text style={{ fontSize: 11, color: '#64748b' }}>{photos.length}/100</Text>}
       </View>
 
@@ -454,17 +460,17 @@ function TourAlbum({ tourId, color, refreshKey }: { tourId: string; color: strin
           </View>
           {hasMore && (
             <TouchableOpacity onPress={() => setVisibleCount(c => Math.min(c + PHOTOS_PER_FAN, photos.length))} style={{ marginHorizontal: 12, marginVertical: 6, paddingVertical: 10, borderRadius: 10, backgroundColor: color, alignItems: 'center', flexDirection: 'row-reverse', justifyContent: 'center', gap: 8 }}>
-              <Text style={{ fontSize: 14, fontWeight: '900', color: '#fff' }}>פתח עוד {Math.min(PHOTOS_PER_FAN, photos.length - visibleCount)} תמונות ▼</Text>
+              <Text style={{ fontSize: 14, fontWeight: '900', color: '#fff' }}>{t('cat.openMore')} {Math.min(PHOTOS_PER_FAN, photos.length - visibleCount)} {t('cat.photos')} ▼</Text>
             </TouchableOpacity>
           )}
           {visibleCount > PHOTOS_PER_FAN && (
             <TouchableOpacity onPress={() => setVisibleCount(PHOTOS_PER_FAN)} style={{ marginHorizontal: 12, marginVertical: 6, paddingVertical: 10, borderRadius: 10, backgroundColor: '#94a3b8', alignItems: 'center' }}>
-              <Text style={{ fontSize: 13, fontWeight: '800', color: '#fff' }}>סגור ▲</Text>
+              <Text style={{ fontSize: 13, fontWeight: '800', color: '#fff' }}>{t('c.close')} ▲</Text>
             </TouchableOpacity>
           )}
         </>
       ) : (
-        <Text style={{ fontSize: 12, color: '#888', textAlign: 'center', marginBottom: 12, writingDirection: 'rtl' }}>עדיין אין תמונות. היו הראשונים!</Text>
+        <Text style={{ fontSize: 12, color: '#888', textAlign: 'center', marginBottom: 12, writingDirection: 'rtl' }}>{t('cat.noPhotos')}</Text>
       )}
 
       <Modal visible={!!previewPhoto} transparent animationType="fade" onRequestClose={() => setPreviewPhoto(null)}>
@@ -489,6 +495,7 @@ function TourAlbum({ tourId, color, refreshKey }: { tourId: string; color: strin
 }
 
 function TourAlbumUpload({ tourId, color, onUploaded }: { tourId: string; color: string; onUploaded?: () => void }) {
+  const { t } = useI18n();
   const [name, setName] = useState('');
   const [city, setCity] = useState('');
   const [uploadedSlots, setUploadedSlots] = useState<string[]>([]);
@@ -499,7 +506,7 @@ function TourAlbumUpload({ tourId, color, onUploaded }: { tourId: string; color:
   return (
     <View style={{ margin: 12, backgroundColor: '#fff', borderRadius: 14, padding: 12, borderWidth: 1, borderColor: '#e0e0e0' }}>
       <TouchableOpacity onPress={() => setOpen(o => !o)} style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: open ? 10 : 0, paddingVertical: 4 }}>
-        <Text style={{ fontSize: 11, fontWeight: '900', color: '#1C2B35', writingDirection: 'rtl' }}>העלאת תמונות לאלבום</Text>
+        <Text style={{ fontSize: 11, fontWeight: '900', color: '#1C2B35', writingDirection: 'rtl' }}>{t('cat.uploadPhotos')}</Text>
         <View style={{ flexDirection: 'row', gap: 2, alignItems: 'center' }}>
           <Text style={{ fontSize: 9, color: open ? '#cbd5e1' : '#1A6B8A', fontWeight: '900' }}>▼</Text>
           <Text style={{ fontSize: 9, color: open ? '#1A6B8A' : '#cbd5e1', fontWeight: '900' }}>▲</Text>
@@ -507,13 +514,13 @@ function TourAlbumUpload({ tourId, color, onUploaded }: { tourId: string; color:
       </TouchableOpacity>
       {open && (uploaded ? (
         <View style={{ padding: 10, backgroundColor: '#dcfce7', borderRadius: 8, alignItems: 'center' }}>
-          <Text style={{ fontSize: 13, fontWeight: '800', color: '#16a34a' }}>✓ העלת {MAX_UPLOADS} תמונות. תודה!</Text>
+          <Text style={{ fontSize: 13, fontWeight: '800', color: '#16a34a' }}>✓ {t('cat.youUploaded')} {MAX_UPLOADS} {t('cat.photos')}. {t('c.thanks')}</Text>
         </View>
       ) : (
         <View style={{ gap: 6 }}>
-          <RNTextInput value={name} onChangeText={setName} placeholder="✏️ השם שלך" placeholderTextColor="#888" style={{ backgroundColor: '#f8f8f8', borderRadius: 8, padding: 8, fontSize: 13, textAlign: 'right', writingDirection: 'rtl', borderWidth: 1, borderColor: '#e0e0e0' }} />
-          <RNTextInput value={city} onChangeText={setCity} placeholder="🏙️ מאיפה את/ה?" placeholderTextColor="#888" style={{ backgroundColor: '#f8f8f8', borderRadius: 8, padding: 8, fontSize: 13, textAlign: 'right', writingDirection: 'rtl', borderWidth: 1, borderColor: '#e0e0e0' }} />
-          <Text style={{ fontSize: 11, color: '#64748b', textAlign: 'center', writingDirection: 'rtl' }}>📷 ניתן להעלות עד {MAX_UPLOADS} תמונות ({uploadedSlots.length}/{MAX_UPLOADS})</Text>
+          <RNTextInput value={name} onChangeText={setName} placeholder={`✏️ ${t('cat.yourName')}`} placeholderTextColor="#888" style={{ backgroundColor: '#f8f8f8', borderRadius: 8, padding: 8, fontSize: 13, textAlign: 'right', writingDirection: 'rtl', borderWidth: 1, borderColor: '#e0e0e0' }} />
+          <RNTextInput value={city} onChangeText={setCity} placeholder={`🏙️ ${t('cat.whereFrom')}`} placeholderTextColor="#888" style={{ backgroundColor: '#f8f8f8', borderRadius: 8, padding: 8, fontSize: 13, textAlign: 'right', writingDirection: 'rtl', borderWidth: 1, borderColor: '#e0e0e0' }} />
+          <Text style={{ fontSize: 11, color: '#64748b', textAlign: 'center', writingDirection: 'rtl' }}>📷 {t('cat.canUploadUpTo')} {MAX_UPLOADS} {t('cat.photos')} ({uploadedSlots.length}/{MAX_UPLOADS})</Text>
           <View style={{ flexDirection: 'row-reverse', gap: 5, justifyContent: 'center', marginVertical: 4 }}>
             {Array.from({ length: MAX_UPLOADS }).map((_, i) => {
               const filled = i < uploadedSlots.length;
@@ -540,7 +547,7 @@ function TourAlbumUpload({ tourId, color, onUploaded }: { tourId: string; color:
                 }
               },
             }),
-            React.createElement('span', { key: 'txt', style: { color: '#fff', fontSize: 16, fontWeight: 900, letterSpacing: 0.3 } }, '📸 העלה תמונה'),
+            React.createElement('span', { key: 'txt', style: { color: '#fff', fontSize: 16, fontWeight: 900, letterSpacing: 0.3 } }, `📸 ${t('cat.uploadPhoto')}`),
           ]) : (
             <TouchableOpacity
               onPress={async () => {
@@ -563,7 +570,7 @@ function TourAlbumUpload({ tourId, color, onUploaded }: { tourId: string; color:
               }}
               style={{ backgroundColor: '#1A6B8A', borderRadius: 10, padding: 14, alignItems: 'center', borderWidth: 2, borderColor: '#fff', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.2, shadowRadius: 6, elevation: 3 }}
             >
-              <Text style={{ color: '#fff', fontSize: 16, fontWeight: '900', letterSpacing: 0.3 }}>📸 העלה תמונה</Text>
+              <Text style={{ color: '#fff', fontSize: 16, fontWeight: '900', letterSpacing: 0.3 }}>📸 {t('cat.uploadPhoto')}</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -573,11 +580,12 @@ function TourAlbumUpload({ tourId, color, onUploaded }: { tourId: string; color:
 }
 
 function TourLegendDropdown({ tours, onSelect }: { tours: TourBlock[]; onSelect: (t: TourBlock) => void }) {
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
   return (
     <View style={{ marginTop: 8, backgroundColor: '#fff', borderRadius: 12, borderWidth: 1, borderColor: '#e2e8f0', overflow: 'hidden' }}>
       <TouchableOpacity onPress={() => setOpen(o => !o)} style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', padding: 12 }}>
-        <Text style={{ fontSize: 13, fontWeight: '900', color: '#1C2B35', writingDirection: 'rtl' }}>📍 מקרא הסיורים</Text>
+        <Text style={{ fontSize: 13, fontWeight: '900', color: '#1C2B35', writingDirection: 'rtl' }}>📍 {t('cat.tourLegend')}</Text>
         <Text style={{ fontSize: 14, color: '#1A6B8A', fontWeight: '900' }}>{open ? '▲' : '▼'}</Text>
       </TouchableOpacity>
       {open && (
@@ -596,6 +604,7 @@ function TourLegendDropdown({ tours, onSelect }: { tours: TourBlock[]; onSelect:
 }
 
 function TourCard({ t, onRate, nearbyRestaurants }: { t: TourBlock; onRate: (id: string, score: number) => void; nearbyRestaurants?: { name: string; lat: number; lng: number; mapUrl?: string }[] }) {
+  const { t: tr } = useI18n();
   const [imgIdx, setImgIdx] = useState(0);
   const [mapBig, setMapBig] = useState(false);
   const [navCoords, setNavCoords] = useState<{ lat: number; lng: number } | null>(null);
@@ -646,7 +655,7 @@ function TourCard({ t, onRate, nearbyRestaurants }: { t: TourBlock; onRate: (id:
           </View>
         )}
       </View>
-      <Text style={tourSt.title} numberOfLines={2}>{t.title || 'ללא כותרת'}</Text>
+      <Text style={tourSt.title} numberOfLines={2}>{t.title || tr('cat.untitled')}</Text>
       <Text style={[tourSt.text, !t.text && { fontStyle: 'italic', color: '#777' }]}>
         {t.text || 'תיאור הסיור יופיע כאן — ערוך דרך פאנל הניהול'}
       </Text>
@@ -667,7 +676,7 @@ function TourCard({ t, onRate, nearbyRestaurants }: { t: TourBlock; onRate: (id:
         )}
         {!mapBig && (
           <View style={tourSt.mapHint} pointerEvents="none">
-            <Text style={tourSt.mapHintTxt}>🔍 הגדל מפה</Text>
+            <Text style={tourSt.mapHintTxt}>🔍 {tr('cat.enlargeMap')}</Text>
           </View>
         )}
       </View>
@@ -676,7 +685,7 @@ function TourCard({ t, onRate, nearbyRestaurants }: { t: TourBlock; onRate: (id:
         <View style={{ width: 36, height: 20, borderRadius: 10, backgroundColor: foodRec ? '#00c853' : '#f48fb1', justifyContent: 'center', padding: 2 }}>
           <View style={{ width: 16, height: 16, borderRadius: 8, backgroundColor: '#fff', alignSelf: foodRec ? 'flex-end' : 'flex-start' }} />
         </View>
-        <Text style={{ fontSize: 10, color: foodRec ? '#00c853' : '#e91e63', fontWeight: '700', writingDirection: 'rtl' }}>{foodRec ? '🍽️ המלצה למסעדות בקרבתך - פעיל' : 'הפעל המלצות מסעדות בקרבתך'}</Text>
+        <Text style={{ fontSize: 10, color: foodRec ? '#00c853' : '#e91e63', fontWeight: '700', writingDirection: 'rtl' }}>{foodRec ? tr('cat.foodRecOn') : tr('cat.foodRecOff')}</Text>
       </TouchableOpacity>
 
       <View style={tourSt.audioWrap}>
@@ -700,7 +709,7 @@ function TourCard({ t, onRate, nearbyRestaurants }: { t: TourBlock; onRate: (id:
       </View>
 
       <View style={[tourSt.ratingRow, { flexDirection: 'column', gap: 6, alignItems: 'center' }]}>
-        <Text style={[tourSt.ratingLabel, { fontSize: 10 }]}>דרג את הסיור</Text>
+        <Text style={[tourSt.ratingLabel, { fontSize: 10 }]}>{tr('cat.rateTour')}</Text>
         <View style={tourSt.stars}>
           {[1, 2, 3, 4, 5].map(n => (
             <TouchableOpacity key={n} onPress={() => !ratingSubmitted && setRating(n)} disabled={ratingSubmitted}>
@@ -713,7 +722,7 @@ function TourCard({ t, onRate, nearbyRestaurants }: { t: TourBlock; onRate: (id:
           onPress={() => { if (rating > 0) { setRatingSubmitted(true); onRate(t.id, rating); } }}
           disabled={rating === 0 || ratingSubmitted}
         >
-          <Text style={tourSt.submitTxt}>{ratingSubmitted ? '✓ תודה' : 'בחר'}</Text>
+          <Text style={tourSt.submitTxt}>{ratingSubmitted ? `✓ ${tr('cat.thanks')}` : tr('cat.choose')}</Text>
         </TouchableOpacity>
       </View>
 
@@ -728,6 +737,7 @@ function CategoryNativeMap({ points, focus, setFocus, color, mapSrc }: { points:
 }
 
 function CategoryMapModal({ visible, points, focusName, focusCoords, layerColor, onClose }: { visible: boolean; points: MapPoint[]; focusName: string; focusCoords?: { lat: number; lng: number }; layerColor?: string; onClose: () => void }) {
+  const { t } = useI18n();
   const [focus, setFocus] = useState<MapPoint | null>(null);
   const [listOpen, setListOpen] = useState(false);
 
@@ -821,7 +831,7 @@ function CategoryMapModal({ visible, points, focusName, focusCoords, layerColor,
                 style={{ marginTop: 8, backgroundColor: color, paddingVertical: 10, borderRadius: 10, alignItems: 'center' }}
                 onPress={() => openDirections(focus.lat, focus.lng, focus.name)}
               >
-                <Text style={{ color: '#fff', fontWeight: '800', fontSize: 14 }}>🧭 נווט למקום</Text>
+                <Text style={{ color: '#fff', fontWeight: '800', fontSize: 14 }}>🧭 {t('cat.navigateThere')}</Text>
               </TouchableOpacity>
             </View>
           )}
@@ -832,6 +842,7 @@ function CategoryMapModal({ visible, points, focusName, focusCoords, layerColor,
 }
 
 function HotelCard({ h, dark, cardBg, pageBtnLabel, mapPoints, layerColor, placesQuery, isHotel, isAttraction, isRestaurant, isNightlife, sourcePath }: { h: Hotel; dark: boolean; cardBg?: string; pageBtnLabel: string; mapPoints?: MapPoint[]; layerColor?: string; placesQuery?: string; isHotel?: boolean; isAttraction?: boolean; isRestaurant?: boolean; isNightlife?: boolean; sourcePath?: string }) {
+  const { t: tr } = useI18n();
   const [showMap, setShowMap] = useState(false);
   const [showGallery, setShowGallery] = useState(false);
   const [showCatMapModal, setShowCatMapModal] = useState(false);
@@ -911,7 +922,7 @@ function HotelCard({ h, dark, cardBg, pageBtnLabel, mapPoints, layerColor, place
             }}
             disabled={!h.coords && !(mapPoints && mapPoints.length > 0)}
           >
-            <Text style={[st.hotelBtnTxt, !h.coords && !(mapPoints && mapPoints.length > 0) && st.hotelBtnTxtDisabled]}>{showMap ? 'הסתר מפה' : 'איפה זה'}</Text>
+            <Text style={[st.hotelBtnTxt, !h.coords && !(mapPoints && mapPoints.length > 0) && st.hotelBtnTxtDisabled]}>{showMap ? tr('cat.hideMap') : tr('cat.whereIsIt')}</Text>
           </TouchableOpacity>
           <CategoryMapModal visible={showCatMapModal} points={mapPoints || []} focusName={h.title} focusCoords={h.coords} layerColor={layerColor} onClose={() => setShowCatMapModal(false)} />
           <TouchableOpacity
@@ -928,7 +939,7 @@ function HotelCard({ h, dark, cardBg, pageBtnLabel, mapPoints, layerColor, place
             }}
             disabled={!placesQuery && !btnEnabled}
           >
-            <Text style={[st.hotelBtnTxt, !placesQuery && !btnEnabled && st.hotelBtnTxtDisabled]}>{placesQuery ? 'מידע' : pageBtnLabel}</Text>
+            <Text style={[st.hotelBtnTxt, !placesQuery && !btnEnabled && st.hotelBtnTxtDisabled]}>{placesQuery ? tr('tab.info') : pageBtnLabel}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[st.hotelBtn, st.hotelBtnSecondary, !h.mapUrl && st.hotelBtnDisabled]}
@@ -936,7 +947,7 @@ function HotelCard({ h, dark, cardBg, pageBtnLabel, mapPoints, layerColor, place
             onPress={() => h.mapUrl && openMapUrl(h.mapUrl, h.title)}
             disabled={!h.mapUrl}
           >
-            <Text style={[st.hotelBtnTxt, !h.mapUrl && st.hotelBtnTxtDisabled]}>{h.mapUrl && h.mapUrl.includes('wa.me') ? 'WhatsApp' : 'נווט למקום'}</Text>
+            <Text style={[st.hotelBtnTxt, !h.mapUrl && st.hotelBtnTxtDisabled]}>{h.mapUrl && h.mapUrl.includes('wa.me') ? 'WhatsApp' : tr('cat.navigateThere')}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -1012,6 +1023,7 @@ function SubBanner({ item, width, onPress }: { item: Item; width: number; onPres
 }
 
 export default function CategoryScreen() {
+  const { t: tr } = useI18n();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { dark } = useContext(ThemeContext);
   const { simulatedWidth } = useContext(PreviewContext);
@@ -1163,9 +1175,9 @@ export default function CategoryScreen() {
   if (!cat) {
     return (
       <SafeAreaView style={st.safe}>
-        <Stack.Screen options={{ headerShown: true, title: 'קטגוריה', headerBackTitle: 'חזרה' }} />
+        <Stack.Screen options={{ headerShown: true, title: tr('cat.category'), headerBackTitle: tr('cat.back') }} />
         <View style={st.emptyWrap}>
-          <Text style={st.emptyTxt}>טוען…</Text>
+          <Text style={st.emptyTxt}>{tr('c.loadingE')}</Text>
         </View>
       </SafeAreaView>
     );
@@ -1181,16 +1193,16 @@ export default function CategoryScreen() {
       })}
       <View style={{ backgroundColor: '#fff', borderRadius: 14, padding: 16, alignItems: 'center', maxWidth: 220, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 12, elevation: 8 }}>
         <Text style={{ fontSize: 24 }}>🔒</Text>
-        <Text style={{ fontSize: 14, fontWeight: '900', color: '#1C2B35', textAlign: 'center', writingDirection: 'rtl', marginTop: 6 }}>תוכן פרימיום</Text>
-        <Text style={{ fontSize: 11, color: '#888', textAlign: 'center', writingDirection: 'rtl', marginTop: 4 }}>שדרג למנוי לגישה מלאה</Text>
+        <Text style={{ fontSize: 14, fontWeight: '900', color: '#1C2B35', textAlign: 'center', writingDirection: 'rtl', marginTop: 6 }}>{tr('cat.premiumContent')}</Text>
+        <Text style={{ fontSize: 11, color: '#888', textAlign: 'center', writingDirection: 'rtl', marginTop: 4 }}>{tr('cat.upgradeForAccess')}</Text>
         <TouchableOpacity
           onPress={() => router.push('/welcome/6' as any)}
           style={{ marginTop: 10, backgroundColor: '#F4A94E', paddingVertical: 8, paddingHorizontal: 24, borderRadius: 10 }}
         >
-          <Text style={{ fontSize: 12, fontWeight: '900', color: '#fff' }}>שדרג עכשיו</Text>
+          <Text style={{ fontSize: 12, fontWeight: '900', color: '#fff' }}>{tr('cat.upgradeNow')}</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => (router.canGoBack() ? router.back() : router.replace("/"))} style={{ marginTop: 6 }}>
-          <Text style={{ fontSize: 10, color: '#888' }}>חזרה</Text>
+          <Text style={{ fontSize: 10, color: '#888' }}>{tr('cat.back')}</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -1266,7 +1278,7 @@ export default function CategoryScreen() {
         {isAdmin && trialHoursLeft !== null && trialHoursLeft > 0 && !isLocked && paywall.mode === 'premium' && paywall.lockedCategories.includes(id as string) && (
           <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: '#fff8e1', paddingVertical: 8, paddingHorizontal: 12, marginHorizontal: 16, marginTop: 8, borderRadius: 10, borderWidth: 1, borderColor: '#f4a94e' }}>
             <Text style={{ fontSize: 16 }}>⏳</Text>
-            <Text style={{ fontSize: 11, fontWeight: '700', color: '#92400e', writingDirection: 'rtl' }}>תקופת ניסיון חינם - נותרו {trialHoursLeft} שעות</Text>
+            <Text style={{ fontSize: 11, fontWeight: '700', color: '#92400e', writingDirection: 'rtl' }}>{tr('cat.freeTrialLeft')} {trialHoursLeft} {tr('cat.hours')}</Text>
           </View>
         )}
 
@@ -1282,12 +1294,12 @@ export default function CategoryScreen() {
                 <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 10, flex: 1 }}>
                   <Text style={{ fontSize: 26 }}>✈️</Text>
                   <View style={{ flex: 1 }}>
-                    <Text style={{ fontSize: 15, fontWeight: '900', color: '#fff', writingDirection: 'rtl' }}>חפש טיסה לבטומי</Text>
-                    <Text style={{ fontSize: 12, color: '#fff', writingDirection: 'rtl', opacity: 0.85 }}>טיסות מתל-אביב במחיר הטוב ביותר</Text>
+                    <Text style={{ fontSize: 15, fontWeight: '900', color: '#fff', writingDirection: 'rtl' }}>{tr('cat.searchFlightToBatumi')}</Text>
+                    <Text style={{ fontSize: 12, color: '#fff', writingDirection: 'rtl', opacity: 0.85 }}>{tr('cat.flightsFromTLV')}</Text>
                   </View>
                 </View>
                 <View style={{ backgroundColor: '#F4A94E', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 18 }}>
-                  <Text style={{ color: '#1C2B35', fontSize: 13, fontWeight: '900' }}>חפש</Text>
+                  <Text style={{ color: '#1C2B35', fontSize: 13, fontWeight: '900' }}>{tr('c.search')}</Text>
                 </View>
               </TouchableOpacity>
             </View>
@@ -1300,7 +1312,7 @@ export default function CategoryScreen() {
             .map(h => ({ name: h.title, lat: h.coords!.lat, lng: h.coords!.lng }));
           const pts = mapPoints.length ? mapPoints : fallback;
           if (pts.length === 0) return null;
-          const bannerText = rootId === '2' ? 'איזו אטרקציה קרובה למיקום שלי עכשיו?' : rootId === '6' ? 'איזו מסעדה מומלצת קרובה למיקום שלי עכשיו?' : 'איזו חנות קרובה למיקום שלי עכשיו?';
+          const bannerText = rootId === '2' ? tr('cat.nearAttraction') : rootId === '6' ? tr('cat.nearRestaurant') : tr('cat.nearShop');
           const filterParam = rootId === '2' ? 'אטרקצי' : rootId === '6' ? 'מסעד' : 'קני';
           const expandToTab = () => router.push('/(tabs)/map' as any);
           return (
@@ -1335,7 +1347,7 @@ export default function CategoryScreen() {
           selectedTour ? (
             <View style={st.hotelList}>
               <TouchableOpacity onPress={() => setSelectedTour(null)} style={st.tourBack}>
-                <Text style={st.tourBackTxt}>‹ חזרה לבחירת סיור</Text>
+                <Text style={st.tourBackTxt}>‹ {tr('cat.backToTours')}</Text>
               </TouchableOpacity>
               <TourCard t={selectedTour} onRate={handleRatingSubmit} nearbyRestaurants={allRestaurants} />
             </View>
@@ -1348,7 +1360,7 @@ export default function CategoryScreen() {
               >
                 <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'center', gap: 10, paddingVertical: 14, paddingTop: 30, borderBottomLeftRadius: 38, borderBottomRightRadius: 38, borderLeftWidth: 0.8, borderRightWidth: 0.8, borderBottomWidth: 0.8, borderColor: 'rgba(255,255,255,0.75)' }}>
                   <View style={{ position: 'absolute', top: 18, left: 8, right: 8, height: 0.8, backgroundColor: 'rgba(255,255,255,0.75)' }} />
-                  <Text style={{ fontSize: 15, fontWeight: '900', color: '#fff', letterSpacing: 0.5, textShadowColor: 'rgba(0,0,0,0.4)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 2 }}>⌬ מפת כל המסלולים</Text>
+                  <Text style={{ fontSize: 15, fontWeight: '900', color: '#fff', letterSpacing: 0.5, textShadowColor: 'rgba(0,0,0,0.4)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 2 }}>⌬ {tr('cat.allRoutesMap')}</Text>
                   <View style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: 'rgba(255,255,255,0.2)', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.4)' }}>
                     <Text style={{ fontSize: 11, color: '#fff', fontWeight: '900', lineHeight: 14 }}>{tourMapOpen ? '▲' : '▼'}</Text>
                   </View>
@@ -1378,7 +1390,7 @@ export default function CategoryScreen() {
                       ))}
                       {r && r.count > 0 && <Text style={{ fontSize: 9, color: 'rgba(0,0,0,0.5)', marginRight: 3 }}>({r.count})</Text>}
                     </View>
-                    <Text style={st.tourGridTitle} numberOfLines={3}>{t.title || 'ללא כותרת'}</Text>
+                    <Text style={st.tourGridTitle} numberOfLines={3}>{t.title || tr('cat.untitled')}</Text>
                   </TouchableOpacity>
                 );
               })}
@@ -1424,7 +1436,7 @@ export default function CategoryScreen() {
                     ))}
                     {(cat.id === '2' || (cat.title || '').includes('אטרקציות')) && (
                       <SubCard
-                        item={{ id: 'my-tours', title: 'הסיורים שלי', icon: '❤️', bg: '#FFD6E0', subtitle: 'סיורים שאתה מרכיב' } as any}
+                        item={{ id: 'my-tours', title: tr('mt.title'), icon: '❤️', bg: '#FFD6E0', subtitle: tr('cat.toursYouBuild') } as any}
                         width={cardW}
                         onPress={() => router.push('/my-tours' as any)}
                       />
@@ -1457,7 +1469,7 @@ export default function CategoryScreen() {
                       style={{ flex: 1, paddingVertical: 10, borderRadius: 18, backgroundColor: guideMode === m ? Colors.PRIMARY : 'transparent', alignItems: 'center' }}
                     >
                       <Text style={{ fontSize: 13, fontWeight: '900', color: guideMode === m ? '#fff' : '#475569', writingDirection: 'rtl' }}>
-                        {m === 'israeli' ? '🇮🇱 ישראלים' : '🇬🇪 מקומיים'}
+                        {m === 'israeli' ? `🇮🇱 ${tr('cat.israelis')}` : `🇬🇪 ${tr('cat.locals')}`}
                       </Text>
                     </TouchableOpacity>
                   ))}
@@ -1484,10 +1496,10 @@ export default function CategoryScreen() {
             )}
             {cat.hotels.filter(h => h.visible !== false && (cat.id !== '10' || Boolean((h as any).isLocal) === (guideMode === 'local'))).map((h, idx) => (
               cat.cardStyle === 'passport'
-                ? <PassportCard key={h.id} h={h} pageBtnLabel={cat.pageBtnLabel || 'אתר/פייסבוק'} />
+                ? <PassportCard key={h.id} h={h} pageBtnLabel={cat.pageBtnLabel || tr('cat.siteFacebook')} />
                 : cat.cardStyle === 'foodie'
                 ? <FoodieCard key={h.id} h={h} isLast={cat.hotels!.filter(x => x.visible !== false).indexOf(h) === cat.hotels!.filter(x => x.visible !== false).length - 1} />
-                : <HotelCard key={h.id} h={h} dark={darkCat} cardBg={CARD_BGS[idx % CARD_BGS.length]} pageBtnLabel={cat.pageBtnLabel || 'לדף המלון'} mapPoints={mapPoints} layerColor={mapLayerColor || (mapPoints.length > 0 ? Colors.PRIMARY : undefined)} placesQuery={extractEnNameFromMapUrl(h.mapUrl) || `${h.title} Batumi`} isHotel={rootId === '1'} isAttraction={rootId === '2'} isRestaurant={rootId === '6'} isNightlife={rootId === '4'} sourcePath={`/category/${cat.id}`} />
+                : <HotelCard key={h.id} h={h} dark={darkCat} cardBg={CARD_BGS[idx % CARD_BGS.length]} pageBtnLabel={cat.pageBtnLabel || tr('cat.hotelPage')} mapPoints={mapPoints} layerColor={mapLayerColor || (mapPoints.length > 0 ? Colors.PRIMARY : undefined)} placesQuery={extractEnNameFromMapUrl(h.mapUrl) || `${h.title} Batumi`} isHotel={rootId === '1'} isAttraction={rootId === '2'} isRestaurant={rootId === '6'} isNightlife={rootId === '4'} sourcePath={`/category/${cat.id}`} />
             ))}
             {cat.longText && cat.hotels.length > 10 && (
               <View style={{ width: '100%', alignSelf: 'stretch', paddingBottom: 16, paddingHorizontal: 16 }}>
@@ -1507,14 +1519,14 @@ export default function CategoryScreen() {
               >
                 <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 8, flex: 1 }}>
                   <Text style={{ fontSize: 24 }}>🚖</Text>
-                  <Text style={{ flex: 1, color: '#1C2B35', fontSize: 14, fontWeight: '800', writingDirection: 'rtl' }}>צריך נהג / טרנספר? עבור לנסיעות פרטיות</Text>
+                  <Text style={{ flex: 1, color: '#1C2B35', fontSize: 14, fontWeight: '800', writingDirection: 'rtl' }}>{tr('cat.needDriver')}</Text>
                 </View>
                 <Text style={{ color: '#1A6B8A', fontSize: 18, fontWeight: '900' }}>←</Text>
               </TouchableOpacity>
             )}
             {cat.cardStyle === 'foodie' && (
               <View style={{ backgroundColor: '#1e1e2a', borderRadius: 16, margin: 16, marginTop: 8, padding: 16 }}>
-                <Text style={{ fontSize: 16, fontWeight: '900', color: '#ff6b35', textAlign: 'center', writingDirection: 'rtl', marginBottom: 12 }}>💬 המלצות הגולשים</Text>
+                <Text style={{ fontSize: 16, fontWeight: '900', color: '#ff6b35', textAlign: 'center', writingDirection: 'rtl', marginBottom: 12 }}>💬 {tr('cat.visitorRecs')}</Text>
                 {recommendations.length > 0 ? recommendations.map((r: any, i: number) => (
                   <View key={r.id} style={{ paddingVertical: 10, borderBottomWidth: i < recommendations.length - 1 ? 1 : 0, borderBottomColor: '#333' }}>
                     <View style={{ flexDirection: 'row-reverse', gap: 10, alignItems: 'flex-start' }}>
@@ -1535,28 +1547,28 @@ export default function CategoryScreen() {
                     </View>
                   </View>
                 )) : (
-                  <Text style={{ fontSize: 12, color: '#666', textAlign: 'center', writingDirection: 'rtl' }}>עדיין אין המלצות. היו הראשונים!</Text>
+                  <Text style={{ fontSize: 12, color: '#666', textAlign: 'center', writingDirection: 'rtl' }}>{tr('cat.noRecs')}</Text>
                 )}
                 {!showRecForm ? (
                   <TouchableOpacity onPress={() => setShowRecForm(true)} style={{ marginTop: 14, paddingVertical: 10, borderRadius: 10, backgroundColor: '#ff6b35', alignItems: 'center' }}>
-                    <Text style={{ fontSize: 13, fontWeight: '800', color: '#fff' }}>✍️ הוסף המלצה</Text>
+                    <Text style={{ fontSize: 13, fontWeight: '800', color: '#fff' }}>✍️ {tr('cat.addRec')}</Text>
                   </TouchableOpacity>
                 ) : recSent ? (
                   <View style={{ marginTop: 14, padding: 14, backgroundColor: '#10b981', borderRadius: 10, alignItems: 'center' }}>
-                    <Text style={{ fontSize: 13, fontWeight: '800', color: '#fff' }}>✓ ההמלצה נשלחה לאישור. תודה!</Text>
+                    <Text style={{ fontSize: 13, fontWeight: '800', color: '#fff' }}>✓ {tr('cat.recSent')}</Text>
                   </View>
                 ) : (
                   <View style={{ marginTop: 14, gap: 8 }}>
-                    <RNTextInput value={recName} onChangeText={setRecName} placeholder="✏️ השם שלך" placeholderTextColor="#888" style={{ backgroundColor: '#2a2a3a', borderRadius: 8, padding: 10, color: '#fff', fontSize: 14, textAlign: 'right', writingDirection: 'rtl' }} />
-                    <RNTextInput value={recText} onChangeText={setRecText} placeholder="🍽️ מה אכלת ואיך היה?" placeholderTextColor="#888" multiline numberOfLines={3} style={{ backgroundColor: '#2a2a3a', borderRadius: 8, padding: 10, color: '#fff', fontSize: 14, textAlign: 'right', writingDirection: 'rtl', minHeight: 70 }} />
+                    <RNTextInput value={recName} onChangeText={setRecName} placeholder={`✏️ ${tr('cat.yourName')}`} placeholderTextColor="#888" style={{ backgroundColor: '#2a2a3a', borderRadius: 8, padding: 10, color: '#fff', fontSize: 14, textAlign: 'right', writingDirection: 'rtl' }} />
+                    <RNTextInput value={recText} onChangeText={setRecText} placeholder={`🍽️ ${tr('cat.whatAte')}`} placeholderTextColor="#888" multiline numberOfLines={3} style={{ backgroundColor: '#2a2a3a', borderRadius: 8, padding: 10, color: '#fff', fontSize: 14, textAlign: 'right', writingDirection: 'rtl', minHeight: 70 }} />
                     <View style={{ flexDirection: 'row-reverse', gap: 6 }}>
-                      <RNTextInput value={recLocation} onChangeText={setRecLocation} placeholder="📍 מיקום" placeholderTextColor="#888" style={{ flex: 1, backgroundColor: '#2a2a3a', borderRadius: 8, padding: 10, color: '#fff', fontSize: 14, textAlign: 'right', writingDirection: 'rtl' }} />
+                      <RNTextInput value={recLocation} onChangeText={setRecLocation} placeholder={`📍 ${tr('cat.location')}`} placeholderTextColor="#888" style={{ flex: 1, backgroundColor: '#2a2a3a', borderRadius: 8, padding: 10, color: '#fff', fontSize: 14, textAlign: 'right', writingDirection: 'rtl' }} />
                       <TouchableOpacity
                         onPress={() => {
                           if (Platform.OS === 'web' && navigator.geolocation) {
                             navigator.geolocation.getCurrentPosition(
                               (pos) => setRecLocation(`${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`),
-                              () => setRecLocation('לא הצלחתי לזהות מיקום')
+                              () => setRecLocation(tr('cat.locFailed'))
                             );
                           }
                         }}
@@ -1565,7 +1577,7 @@ export default function CategoryScreen() {
                         <Text style={{ fontSize: 16 }}>📍</Text>
                       </TouchableOpacity>
                     </View>
-                    <RNTextInput value={recPrice} onChangeText={setRecPrice} placeholder="💰 כמה עלה? (לדוגמה: 5 לארי)" placeholderTextColor="#888" style={{ backgroundColor: '#2a2a3a', borderRadius: 8, padding: 10, color: '#fff', fontSize: 14, textAlign: 'right', writingDirection: 'rtl' }} />
+                    <RNTextInput value={recPrice} onChangeText={setRecPrice} placeholder={`💰 ${tr('cat.howMuch')}`} placeholderTextColor="#888" style={{ backgroundColor: '#2a2a3a', borderRadius: 8, padding: 10, color: '#fff', fontSize: 14, textAlign: 'right', writingDirection: 'rtl' }} />
                     {Platform.OS === 'web' && React.createElement('label', {
                       style: { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: '#2a2a3a', borderRadius: 8, padding: 10, cursor: 'pointer' },
                     }, [
@@ -1583,7 +1595,7 @@ export default function CategoryScreen() {
                           }
                         },
                       }),
-                      React.createElement('span', { key: 'txt', style: { color: '#888', fontSize: 14 } }, '📸 הוסף תמונה'),
+                      React.createElement('span', { key: 'txt', style: { color: '#888', fontSize: 14 } }, `📸 ${tr('cat.addPhoto')}`),
                     ])}
                     <View style={{ flexDirection: 'row-reverse', gap: 8 }}>
                       <TouchableOpacity
@@ -1599,10 +1611,10 @@ export default function CategoryScreen() {
                         }}
                         style={{ flex: 1, paddingVertical: 12, borderRadius: 10, backgroundColor: '#ff6b35', alignItems: 'center' }}
                       >
-                        <Text style={{ fontSize: 14, fontWeight: '800', color: '#fff' }}>שלח המלצה</Text>
+                        <Text style={{ fontSize: 14, fontWeight: '800', color: '#fff' }}>{tr('cat.sendRec')}</Text>
                       </TouchableOpacity>
                       <TouchableOpacity onPress={() => setShowRecForm(false)} style={{ paddingVertical: 12, paddingHorizontal: 16, borderRadius: 10, backgroundColor: '#333' }}>
-                        <Text style={{ fontSize: 14, fontWeight: '800', color: '#999' }}>ביטול</Text>
+                        <Text style={{ fontSize: 14, fontWeight: '800', color: '#999' }}>{tr('c.cancel')}</Text>
                       </TouchableOpacity>
                     </View>
                   </View>
@@ -1619,7 +1631,7 @@ export default function CategoryScreen() {
         ) : (
           <View style={st.body}>
             <Text style={[st.content, darkCat && { color: Colors.BACKGROUND }]}>
-              {cat.description || 'אין תוכן עדיין'}
+              {cat.description || tr('cat.noContent')}
             </Text>
           </View>
         )}
@@ -1774,6 +1786,7 @@ const st = StyleSheet.create({
 });
 
 function TerminalClock({ light }: { light?: boolean }) {
+  const { t } = useI18n();
   const [time, setTime] = useState('');
   const [blink, setBlink] = useState(true);
   useEffect(() => {
@@ -1785,7 +1798,7 @@ function TerminalClock({ light }: { light?: boolean }) {
   }, []);
   return (
     <View style={termSt.clockWrap}>
-      <Text style={[termSt.clockLabel, light && { color: '#475569' }]}>🕐 זמן בטומי</Text>
+      <Text style={[termSt.clockLabel, light && { color: '#475569' }]}>🕐 {t('cat.batumiTime')}</Text>
       <Text style={[termSt.clock, light && { color: '#1C2B35' }]}>{time.replace(/:/g, blink ? ':' : ' ')}</Text>
     </View>
   );
@@ -1801,6 +1814,7 @@ function BlinkDot() {
 }
 
 function TimetableTabs({ timetable, color, terminal }: { timetable: { title?: string; source?: string; tabs: { label: string; icon: string; rows: { depart: string; arrive: string; duration: string; price: string; note?: string }[] }[] }; color?: string; terminal?: boolean }) {
+  const { t: tr } = useI18n();
   const [activeTab, setActiveTab] = useState(0);
   const [refreshKey, setRefreshKey] = useState(0);
   const [selectedDay, setSelectedDay] = useState(0);
@@ -1810,8 +1824,8 @@ function TimetableTabs({ timetable, color, terminal }: { timetable: { title?: st
   const days = Array.from({ length: 7 }, (_, i) => {
     const d = new Date();
     d.setDate(d.getDate() + i);
-    const dayNames = ['יום א׳', 'יום ב׳', 'יום ג׳', 'יום ד׳', 'יום ה׳', 'יום ו׳', 'שבת'];
-    const label = i === 0 ? 'היום' : i === 1 ? 'מחר' : dayNames[d.getDay()];
+    const dayNames = [tr('cat.daySun'), tr('cat.dayMon'), tr('cat.dayTue'), tr('cat.dayWed'), tr('cat.dayThu'), tr('cat.dayFri'), tr('cat.daySat')];
+    const label = i === 0 ? tr('cat.today') : i === 1 ? tr('cat.tomorrow') : dayNames[d.getDay()];
     const date = `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`;
     return { label, date };
   });
@@ -1825,14 +1839,14 @@ function TimetableTabs({ timetable, color, terminal }: { timetable: { title?: st
             <Text style={[termSt.liveText, !dark && { color: '#fff' }]}>LIVE</Text>
           </View>
           <TouchableOpacity onPress={() => setRefreshKey(k => k + 1)} style={[termSt.refreshBtn, !dark && { backgroundColor: '#fff', borderWidth: 1, borderColor: '#cbd5e1' }]}>
-            <Text style={[termSt.refreshTxt, !dark && { color: '#1C2B35' }]}>🔄 רענן</Text>
+            <Text style={[termSt.refreshTxt, !dark && { color: '#1C2B35' }]}>🔄 {tr('flt.refresh')}</Text>
           </TouchableOpacity>
         </View>
         <TerminalClock light={!dark} />
       </View>
       <View style={[artSt.cardHeader, dark && { marginBottom: 4 }]}>
         <Text style={[artSt.cardIcon, { fontSize: dark ? 22 : 28 }]}>{(timetable as any).emoji || (dark ? '🚆' : '🚌')}</Text>
-        <Text style={[artSt.cardTitle, dark && { color: '#4ade80' }]}>{timetable.title || 'לוח זמנים'}</Text>
+        <Text style={[artSt.cardTitle, dark && { color: '#4ade80' }]}>{timetable.title || tr('cat.timetable')}</Text>
       </View>
       {timetable.source ? (
         <Text style={{ fontSize: 11, color: dark ? '#6b7280' : '#888', textAlign: 'center', writingDirection: 'rtl', marginBottom: 10 }}>{timetable.source}</Text>
@@ -1891,10 +1905,10 @@ function TimetableTabs({ timetable, color, terminal }: { timetable: { title?: st
         })}
       </View>
       <View style={[artSt.tableHeader, dark && { borderBottomColor: '#334155' }]}>
-        <Text style={[artSt.tableCell, artSt.tableBold, dark && { color: '#94a3b8' }]}>יציאה</Text>
-        <Text style={[artSt.tableCell, artSt.tableBold, dark && { color: '#94a3b8' }]}>הגעה</Text>
-        <Text style={[artSt.tableCell, artSt.tableBold, dark && { color: '#94a3b8' }]}>משך</Text>
-        <Text style={[artSt.tableCell, artSt.tableBold, dark && { color: '#94a3b8' }]}>מחיר</Text>
+        <Text style={[artSt.tableCell, artSt.tableBold, dark && { color: '#94a3b8' }]}>{tr('cat.depart')}</Text>
+        <Text style={[artSt.tableCell, artSt.tableBold, dark && { color: '#94a3b8' }]}>{tr('cat.arrive')}</Text>
+        <Text style={[artSt.tableCell, artSt.tableBold, dark && { color: '#94a3b8' }]}>{tr('cat.duration')}</Text>
+        <Text style={[artSt.tableCell, artSt.tableBold, dark && { color: '#94a3b8' }]}>{tr('cat.price')}</Text>
       </View>
       {tab.rows.map((row, i) => (
         <View key={`${refreshKey}-${i}`}>
@@ -1909,7 +1923,7 @@ function TimetableTabs({ timetable, color, terminal }: { timetable: { title?: st
       ))}
       <View style={termSt.countRow}>
         <Text style={[termSt.countTxt, !dark && { color: Colors.PRIMARY }]}>
-          {(timetable as any).emoji || (dark ? '🚆' : '🚌')} {tab.rows.length} {(timetable as any).unit || (dark ? 'רכבות' : 'קווים')}{!(timetable as any).hideDays ? ` — ${days[selectedDay].label} (${days[selectedDay].date})` : ''} — {tab.label}
+          {(timetable as any).emoji || (dark ? '🚆' : '🚌')} {tab.rows.length} {(timetable as any).unit || (dark ? tr('cat.trains') : tr('cat.lines'))}{!(timetable as any).hideDays ? ` — ${days[selectedDay].label} (${days[selectedDay].date})` : ''} — {tab.label}
         </Text>
       </View>
     </View>
@@ -1940,6 +1954,7 @@ const termSt = StyleSheet.create({
 });
 
 function ArticleView({ cat, darkCat }: { cat: Item; darkCat: boolean }) {
+  const { t } = useI18n();
   const [showMap, setShowMap] = useState<{ lat: number; lng: number } | null>(null);
   const art = cat.article!;
   const termMode = !!art.terminal;
@@ -1994,7 +2009,7 @@ function ArticleView({ cat, darkCat }: { cat: Item; darkCat: boolean }) {
                 termMode
                   ? { color: btn.type === 'map' ? '#fbbf24' : btn.type === 'navigate' ? '#38bdf8' : btn.type === 'ticket' ? '#4ade80' : '#94a3b8' }
                   : { color: btn.type === 'map' ? '#D97706' : btn.type === 'navigate' ? '#0E7490' : btn.type === 'ticket' ? '#047857' : '#1A6B8A' }
-              ]}>{btn.type === 'map' && showMap ? 'סגור מפה' : btn.label}</Text>
+              ]}>{btn.type === 'map' && showMap ? t('cat.closeMap') : btn.label}</Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -2002,7 +2017,7 @@ function ArticleView({ cat, darkCat }: { cat: Item; darkCat: boolean }) {
 
       {art.apps && art.apps.length > 0 && (
         <View style={artSt.appsCard}>
-          <Text style={artSt.appsTitle}>📲 אפליקציות מומלצות להורדה</Text>
+          <Text style={artSt.appsTitle}>📲 {t('cat.recommendedApps')}</Text>
           {art.apps.map((app, i) => (
             <TouchableOpacity key={i} style={artSt.appRow} onPress={() => Linking.openURL(app.url)} activeOpacity={0.7}>
               <Image source={{ uri: resolveUri(app.logo) }} style={artSt.appLogo} resizeMode="contain" />

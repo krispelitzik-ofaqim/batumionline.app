@@ -3,14 +3,16 @@ import { View, Text, TouchableOpacity, Modal, ScrollView, StyleSheet, Linking, P
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../constants/colors';
 import { useAccessibility } from '../constants/accessibilityContext';
+import { useI18n } from '../constants/i18n';
 
 export default function AccessibilityButton() {
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const { settings, update, reset } = useAccessibility();
 
   return (
     <>
-      <TouchableOpacity onPress={() => setOpen(true)} style={st.btn} accessibilityLabel="פתח תפריט נגישות" accessibilityRole="button">
+      <TouchableOpacity onPress={() => setOpen(true)} style={st.btn} accessibilityLabel={t('fm.openA11yMenu')} accessibilityRole="button">
         <Ionicons name="accessibility" size={20} color="#fff" />
       </TouchableOpacity>
 
@@ -19,7 +21,7 @@ export default function AccessibilityButton() {
           <View style={st.sheet}>
             <View style={st.header}>
               <Ionicons name="accessibility" size={24} color={Colors.PRIMARY} />
-              <Text style={st.title}>תפריט נגישות</Text>
+              <Text style={st.title}>{t('fm.a11yMenu')}</Text>
               <TouchableOpacity onPress={() => setOpen(false)} style={st.close}>
                 <Text style={st.closeX}>✕</Text>
               </TouchableOpacity>
@@ -27,25 +29,24 @@ export default function AccessibilityButton() {
 
             <ScrollView contentContainerStyle={{ padding: 16, gap: 18 }}>
               <View>
-                <Text style={st.sectionTitle}>גודל טקסט</Text>
+                <Text style={st.sectionTitle}>{t('fm.textSize')}</Text>
                 <Text style={{ fontSize: 12, color: '#475569', writingDirection: 'rtl', textAlign: 'right', marginBottom: 8, lineHeight: 18 }}>
-                  גודל הטקסט נקבע לפי הגדרות המכשיר. ניתן להגדיל/להקטין דרך:
-                  {'\n'}הגדרות → תצוגה ובהירות → גודל טקסט
+                  {t('fm.textSizeInfo')}
                 </Text>
                 {Platform.OS === 'ios' && (
-                  <TouchableOpacity onPress={() => Linking.openURL('app-settings:').catch(() => Alert.alert('פתח ידנית: הגדרות → תצוגה ובהירות → גודל טקסט'))} style={[st.chip, { paddingVertical: 12 }]}>
-                    <Text style={{ fontSize: 14, fontWeight: '900', color: Colors.PRIMARY }}>⚙️ פתח הגדרות מכשיר</Text>
+                  <TouchableOpacity onPress={() => Linking.openURL('app-settings:').catch(() => Alert.alert(t('fm.openManually')))} style={[st.chip, { paddingVertical: 12 }]}>
+                    <Text style={{ fontSize: 14, fontWeight: '900', color: Colors.PRIMARY }}>{t('fm.openDeviceSettings')}</Text>
                   </TouchableOpacity>
                 )}
               </View>
 
-              <Toggle label="🌗 ניגודיות גבוהה" value={settings.highContrast} onChange={v => update({ highContrast: v })} />
+              <Toggle label={t('fm.highContrast')} value={settings.highContrast} onChange={v => update({ highContrast: v })} />
 
               <TouchableOpacity onPress={reset} style={st.reset}>
-                <Text style={st.resetTxt}>↻ אפס הגדרות</Text>
+                <Text style={st.resetTxt}>{t('fm.resetSettings')}</Text>
               </TouchableOpacity>
 
-              <Text style={st.note}>הגדרות אלו נשמרות ויחולו בכל האפליקציה.</Text>
+              <Text style={st.note}>{t('fm.settingsSavedNote')}</Text>
             </ScrollView>
           </View>
         </View>

@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image, Linking, ScrollView, TextInput } from 'react-native';
 import { Colors } from '../constants/colors';
 import { API_BASE, resolveUri } from '../constants/api';
+import { useI18n } from '../constants/i18n';
 
 type Listing = {
   id: string; type: string; title: string; description?: string;
@@ -10,7 +11,7 @@ type Listing = {
   highlighted?: boolean; bumped?: boolean;
 };
 
-const PERIOD_LABEL: Record<string, string> = { daily: 'יומי', monthly: 'חודשי', yearly: 'שנתי', other: 'אחר' };
+const PERIOD_KEY: Record<string, string> = { daily: 'fm.daily', monthly: 'fm.monthly', yearly: 'fm.yearly', other: 'fm.other' };
 const ADMIN_WA = '972350944067';
 const shortId = (id: string, createdAt?: string) => {
   // 4-digit numeric hash from id + "-" + 2-digit year
@@ -23,13 +24,14 @@ const shortId = (id: string, createdAt?: string) => {
 };
 
 function Expanded({ l, onClose }: { l: Listing; onClose: () => void }) {
+  const { t } = useI18n();
   const [idx, setIdx] = useState(0);
   const [removeMode, setRemoveMode] = useState(false);
   const [phoneInput, setPhoneInput] = useState('');
   const [removeError, setRemoveError] = useState('');
   const imgs = l.images || [];
   const openWa = () => l.phone && Linking.openURL(`https://wa.me/${l.phone}`);
-  const periodBadge = l.period ? PERIOD_LABEL[l.period] || l.period : null;
+  const periodBadge = l.period ? (PERIOD_KEY[l.period] ? t(PERIOD_KEY[l.period]) : l.period) : null;
   const normalizePhone = (p: string) => String(p || '').replace(/\D/g, '');
   const confirmRemove = () => {
     if (normalizePhone(phoneInput) === normalizePhone(l.phone || '') && phoneInput) {
@@ -39,7 +41,7 @@ function Expanded({ l, onClose }: { l: Listing; onClose: () => void }) {
       setPhoneInput('');
       setRemoveError('');
     } else {
-      setRemoveError('טלפון לא תואם למפרסם');
+      setRemoveError(t('fm.phoneNotMatchPublisher'));
     }
   };
   return (
@@ -82,33 +84,33 @@ function Expanded({ l, onClose }: { l: Listing; onClose: () => void }) {
         <View style={s.expandedFooter}>
           <Text style={s.expandedPrice}>{l.price ? `$${l.price}${periodBadge ? ' · ' + periodBadge : ''}` : (periodBadge || '')}</Text>
           <TouchableOpacity onPress={openWa} style={s.waBtn}>
-            <Text style={s.waBtnTxt}>📞 צור קשר בוואטסאפ</Text>
+            <Text style={s.waBtnTxt}>{t('fm.contactWhatsapp')}</Text>
           </TouchableOpacity>
         </View>
         {removeMode ? (
           <View style={{ marginTop: 10, backgroundColor: 'rgba(220,38,38,0.15)', borderRadius: 8, padding: 10 }}>
-            <Text style={{ fontSize: 12, color: '#fca5a5', writingDirection: 'rtl', textAlign: 'right', marginBottom: 6 }}>אמת את הטלפון שלך כמפרסם:</Text>
+            <Text style={{ fontSize: 12, color: '#fca5a5', writingDirection: 'rtl', textAlign: 'right', marginBottom: 6 }}>{t('fm.verifyPhonePublisher')}</Text>
             <TextInput
               style={{ backgroundColor: '#fff', borderRadius: 6, padding: 8, fontSize: 13, textAlign: 'right' }}
               value={phoneInput}
               onChangeText={setPhoneInput}
-              placeholder="הזן את הטלפון שהזנת בפרסום"
+              placeholder={t('fm.enterPostedPhone')}
               keyboardType="phone-pad"
               placeholderTextColor="#9ca3af"
             />
             {removeError ? <Text style={{ fontSize: 11, color: '#fca5a5', marginTop: 4 }}>{removeError}</Text> : null}
             <View style={{ flexDirection: 'row-reverse', gap: 6, marginTop: 8 }}>
               <TouchableOpacity style={{ flex: 1, backgroundColor: '#dc2626', borderRadius: 6, paddingVertical: 8, alignItems: 'center' }} onPress={confirmRemove}>
-                <Text style={{ color: '#fff', fontSize: 11, fontWeight: '800' }}>אמת ושלח בקשת הסרה</Text>
+                <Text style={{ color: '#fff', fontSize: 11, fontWeight: '800' }}>{t('fm.verifyAndSendRemoval')}</Text>
               </TouchableOpacity>
               <TouchableOpacity style={{ paddingHorizontal: 14, paddingVertical: 8, backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 6 }} onPress={() => { setRemoveMode(false); setPhoneInput(''); setRemoveError(''); }}>
-                <Text style={{ color: '#fff', fontSize: 11 }}>ביטול</Text>
+                <Text style={{ color: '#fff', fontSize: 11 }}>{t('c.cancel')}</Text>
               </TouchableOpacity>
             </View>
           </View>
         ) : (
           <TouchableOpacity onPress={() => setRemoveMode(true)} style={{ marginTop: 10, alignSelf: 'flex-start', paddingVertical: 4 }}>
-            <Text style={{ fontSize: 11, color: '#94a3b8', textDecorationLine: 'underline' }}>🗑️ אני המפרסם - הסר מודעה</Text>
+            <Text style={{ fontSize: 11, color: '#94a3b8', textDecorationLine: 'underline' }}>{t('fm.iAmPublisherRemove')}</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -131,10 +133,11 @@ function CardImage({ images, height }: { images: string[]; height: number }) {
 }
 
 function Card({ l, onPress }: { l: Listing; onPress: () => void }) {
+  const { t } = useI18n();
   const size = l.size || 'half';
   const imgs = l.images || [];
   const img = imgs[0];
-  const periodBadge = l.period ? PERIOD_LABEL[l.period] || l.period : null;
+  const periodBadge = l.period ? (PERIOD_KEY[l.period] ? t(PERIOD_KEY[l.period]) : l.period) : null;
   const verified = !!l.phone;
   const openWa = (e: any) => { e.stopPropagation?.(); if (l.phone) Linking.openURL(`https://wa.me/${String(l.phone).replace(/\D/g, '')}`); };
 
@@ -154,7 +157,7 @@ function Card({ l, onPress }: { l: Listing; onPress: () => void }) {
           </View>
           <View style={s.bannerBottom}>
             <Text style={[s.bannerPrice, { fontSize: 16 }]}>{l.price ? `$${l.price}${periodBadge ? ' · ' + periodBadge : ''}` : (periodBadge || '')}</Text>
-            <Text style={s.moreLink}>פרטים ‹</Text>
+            <Text style={s.moreLink}>{t('fm.details')}</Text>
           </View>
         </View>
       </TouchableOpacity>
@@ -174,7 +177,7 @@ function Card({ l, onPress }: { l: Listing; onPress: () => void }) {
           {l.description ? <Text style={s.cardDesc} numberOfLines={2}>{l.description}</Text> : null}
           <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginTop: 8 }}>
             <Text style={s.idBadge}>#{shortId(l.id, (l as any).createdAt)}</Text>
-            <Text style={s.moreLink}>פרטים נוספים ›</Text>
+            <Text style={s.moreLink}>{t('fm.moreDetails')}</Text>
           </View>
         </View>
       </TouchableOpacity>
@@ -192,7 +195,7 @@ function Card({ l, onPress }: { l: Listing; onPress: () => void }) {
         {l.location ? <Text style={s.cardSub} numberOfLines={1}>📍 {l.location}</Text> : null}
         <View style={[s.cardFooter, { marginTop: 4 }]}>
           <Text style={[s.cardPrice, { fontSize: 14 }]}>{l.price ? `$${l.price}` : (periodBadge || '')}</Text>
-          <Text style={[s.moreLink, { fontSize: 9 }]}>פרטים ‹</Text>
+          <Text style={[s.moreLink, { fontSize: 9 }]}>{t('fm.details')}</Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -200,6 +203,7 @@ function Card({ l, onPress }: { l: Listing; onPress: () => void }) {
 }
 
 export default function ListingsList({ type, reloadKey }: { type: string; reloadKey?: number }) {
+  const { t } = useI18n();
   const [items, setItems] = useState<Listing[]>([]);
   const [loading, setLoading] = useState(false);
   const [openId, setOpenId] = useState<string | null>(null);
@@ -219,7 +223,7 @@ export default function ListingsList({ type, reloadKey }: { type: string; reload
   if (items.length === 0) {
     return (
       <View style={{ padding: 20, alignItems: 'center' }}>
-        <Text style={{ fontSize: 12, color: '#94a3b8', writingDirection: 'rtl' }}>{loading ? 'טוען...' : 'אין מודעות עדיין - היה הראשון לפרסם'}</Text>
+        <Text style={{ fontSize: 12, color: '#94a3b8', writingDirection: 'rtl' }}>{loading ? t('c.loading') : t('fm.noListingsBeFirst')}</Text>
       </View>
     );
   }
