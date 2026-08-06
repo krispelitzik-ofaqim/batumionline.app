@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { setContentLang } from './api';
 
 export type Lang = 'he' | 'en' | 'fa';
 
@@ -821,9 +822,9 @@ const I18nCtx = createContext<Ctx>({ lang: 'he', setLang: () => {}, toggle: () =
 export function I18nProvider({ children }: { children: React.ReactNode }) {
   const [lang, setLangState] = useState<Lang>('he');
   useEffect(() => {
-    AsyncStorage.getItem('appLang').then(v => { if (v === 'en' || v === 'he' || v === 'fa') setLangState(v); }).catch(() => {});
+    AsyncStorage.getItem('appLang').then(v => { if (v === 'en' || v === 'he' || v === 'fa') { setLangState(v); setContentLang(v); } }).catch(() => {});
   }, []);
-  const setLang = (l: Lang) => { setLangState(l); AsyncStorage.setItem('appLang', l).catch(() => {}); };
+  const setLang = (l: Lang) => { setLangState(l); setContentLang(l); AsyncStorage.setItem('appLang', l).catch(() => {}); };
   const toggle = () => setLang(lang === 'he' ? 'en' : lang === 'en' ? 'fa' : 'he');
   const t = (k: string) => {
     if (lang === 'fa') return FA[k] ?? STRINGS[k]?.en ?? STRINGS[k]?.he ?? k;

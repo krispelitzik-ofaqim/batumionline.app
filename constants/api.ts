@@ -1,5 +1,29 @@
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { CONTENT_TR } from './contentTranslations';
+
+// ---- Content localization (server content is Hebrew; translate on read) ----
+type ContentLang = 'he' | 'en' | 'fa';
+let _contentLang: ContentLang = 'he';
+export function setContentLang(l: ContentLang) { _contentLang = l; }
+
+function deepLocalize(v: any, lang: 'en' | 'fa'): any {
+  if (typeof v === 'string') {
+    const tr = CONTENT_TR[v];
+    return tr && tr[lang] ? tr[lang] : v;
+  }
+  if (Array.isArray(v)) return v.map((x) => deepLocalize(x, lang));
+  if (v && typeof v === 'object') {
+    const o: any = {};
+    for (const k in v) o[k] = deepLocalize(v[k], lang);
+    return o;
+  }
+  return v;
+}
+export function localizeContent(data: any, lang: ContentLang = _contentLang): any {
+  if (lang === 'he' || !data) return data;
+  return deepLocalize(data, lang);
+}
 
 // On a physical device "localhost" is the phone itself, so dev native builds
 // can't reach a local backend — always load content from the live server.
@@ -51,22 +75,23 @@ async function saveCache(key: string, value: any) {
   try { await AsyncStorage.setItem(key, JSON.stringify(value)); } catch {}
 }
 
-export async function fetchContent() {
+export async function fetchContent(opts?: { raw?: boolean }) {
   try {
     const res = await fetchWithTimeout(`${API_BASE}/api/content?${bust()}`, { headers: noCacheHeaders, cache: 'no-store' as any });
     const json = await res.json();
     if (!json.success) throw new Error(json.error);
-    saveCache(CACHE_CONTENT, json.data);
-    return json.data;
+    saveCache(CACHE_CONTENT, json.data); // cache RAW Hebrew
+    return opts?.raw ? json.data : localizeContent(json.data);
   } catch (err) {
     const cached = await loadCache<any>(CACHE_CONTENT);
-    if (cached) return cached;
+    if (cached) return opts?.raw ? cached : localizeContent(cached);
     throw err;
   }
 }
 
-export async function getCachedContent() {
-  return loadCache<any>(CACHE_CONTENT);
+export async function getCachedContent(opts?: { raw?: boolean }) {
+  const cached = await loadCache<any>(CACHE_CONTENT);
+  return opts?.raw ? cached : localizeContent(cached);
 }
 export async function getCachedRatings() {
   return loadCache<Record<string, { sum: number; count: number }>>(CACHE_RATINGS);

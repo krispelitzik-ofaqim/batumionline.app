@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image, Modal, ScrollView, Linking, Platform, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Modal, ScrollView, Linking, Platform, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { router, usePathname } from 'expo-router';
 import { Colors } from '../constants/colors';
@@ -26,20 +26,27 @@ function useBatumiClock() {
   return time;
 }
 
+const LANGS: { code: 'he' | 'en' | 'fa'; label: string }[] = [
+  { code: 'he', label: 'עב' },
+  { code: 'en', label: 'EN' },
+  { code: 'fa', label: 'فا' },
+];
+
 export default function HeaderBar() {
   const { dark, toggle } = useContext(ThemeContext);
-  const { lang, toggle: toggleLang } = useI18n();
+  const { lang, setLang } = useI18n();
   const time = useBatumiClock();
   const pathname = usePathname();
   const isHome = pathname === '/' || pathname === '/index';
   const bg = dark ? Colors.TEXT : Colors.BACKGROUND;
   const fg = dark ? Colors.BACKGROUND : Colors.TEXT;
+  const accent = dark ? Colors.ACCENT : Colors.PRIMARY;
   const [a11yOpen, setA11yOpen] = useState(false);
   const { settings, update, reset } = useAccessibility();
 
   return (
     <View style={[styles.bar, { backgroundColor: bg, borderBottomColor: dark ? Colors.PRIMARY : Colors.SECONDARY + '30' }]}>
-      {/* LEFT — back arrow ‹ (when not home) + clock */}
+      {/* LEFT — back arrow (when not home) + clock */}
       <View style={styles.sideLeft}>
         {!isHome && (
           <TouchableOpacity style={styles.btn} onPress={() => router.replace('/')}>
@@ -49,15 +56,27 @@ export default function HeaderBar() {
         <Text style={[styles.clock, { color: fg }]}>{time}</Text>
       </View>
 
-      {/* CENTER — language toggle (3 languages: עב / EN / فا) */}
-      <TouchableOpacity style={styles.langBtn} onPress={toggleLang} activeOpacity={0.7}>
-        <Text style={[styles.langTxt, { color: dark ? Colors.ACCENT : Colors.PRIMARY }]}>🌐 {lang === 'he' ? 'עב' : lang === 'en' ? 'EN' : 'فا'}</Text>
-      </TouchableOpacity>
+      {/* CENTER — wide language segmented control */}
+      <View style={[styles.langSeg, { borderColor: accent + '55' }]}>
+        {LANGS.map((L) => {
+          const on = lang === L.code;
+          return (
+            <TouchableOpacity
+              key={L.code}
+              onPress={() => setLang(L.code)}
+              activeOpacity={0.7}
+              style={[styles.langSegBtn, on && { backgroundColor: accent }]}
+            >
+              <Text style={[styles.langSegTxt, { color: on ? (dark ? Colors.TEXT : '#fff') : fg }]}>{L.label}</Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
 
-      {/* RIGHT — toggle light/dark */}
+      {/* RIGHT — light/dark toggle */}
       <View style={styles.sideRight}>
         <TouchableOpacity style={styles.btn} onPress={toggle}>
-          <Ionicons name={dark ? 'sunny' : 'moon'} size={22} color={dark ? Colors.ACCENT : Colors.PRIMARY} />
+          <Ionicons name={dark ? 'sunny' : 'moon'} size={22} color={accent} />
         </TouchableOpacity>
       </View>
 
@@ -151,22 +170,21 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '800',
   },
-  langBtn: {
-    minWidth: 34,
-    height: 30,
-    paddingHorizontal: 8,
-    borderRadius: 15,
+  langSeg: {
+    flexDirection: 'row',
+    borderRadius: 16,
     borderWidth: 1.5,
-    borderColor: Colors.SECONDARY + '80',
+    overflow: 'hidden',
+  },
+  langSegBtn: {
+    minWidth: 46,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  langTxt: {
-    fontSize: 13,
+  langSegTxt: {
+    fontSize: 14,
     fontWeight: '900',
-  },
-  logo: {
-    width: 24,
-    height: 24,
   },
 });

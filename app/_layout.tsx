@@ -45,7 +45,29 @@ import { ThemeContext } from '../constants/theme';
 import { AdminContext } from '../constants/adminContext';
 import { PreviewContext, PreviewMode } from '../constants/previewContext';
 import { AccessibilityProvider, useAccessibility } from '../constants/accessibilityContext';
-import { I18nProvider } from '../constants/i18n';
+import { I18nProvider, useI18n } from '../constants/i18n';
+import { setContentLang } from '../constants/api';
+
+// Remounts the navigator when the language changes so every screen re-fetches
+// and re-localizes its server content. Admin mode always sees RAW Hebrew
+// content (so editing never saves a translated string back to the server).
+function LocalizedStack({ dark }: { dark: boolean }) {
+  const { lang } = useI18n();
+  const { isAdmin } = React.useContext(AdminContext);
+  const effLang = isAdmin ? 'he' : lang;
+  // Set during render (parents render before children mount) so each screen's
+  // content fetch localizes with the correct language, even after a remount.
+  setContentLang(effLang);
+  return (
+    <Stack
+      key={effLang}
+      screenOptions={{
+        headerShown: false,
+        contentStyle: { backgroundColor: dark ? Colors.TEXT : Colors.BACKGROUND },
+      }}
+    />
+  );
+}
 
 function AccessibilityToThemeBridge({ dark, setDark, children }: { dark: boolean; setDark: (v: boolean) => void; children: React.ReactNode }) {
   const { settings } = useAccessibility();
@@ -149,12 +171,7 @@ export default function RootLayout() {
           <AdminContext.Provider value={{ isAdmin, setAdmin }}>
             <AccessibilityToThemeBridge dark={dark} setDark={setDark}>
               <StatusBar style={dark ? 'light' : 'dark'} />
-              <Stack
-                screenOptions={{
-                  headerShown: false,
-                  contentStyle: { backgroundColor: dark ? Colors.TEXT : Colors.BACKGROUND },
-                }}
-              />
+              <LocalizedStack dark={dark} />
             </AccessibilityToThemeBridge>
           </AdminContext.Provider>
         </PreviewContext.Provider>
