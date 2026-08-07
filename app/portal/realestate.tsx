@@ -53,7 +53,8 @@ type Listing = { id: string; title: string; image: string; images?: string[]; pr
 const DEFAULT_TOP_BUTTONS: TopButton[] = [
   { id: 'sale', label: 'דירות למכירה' },
   { id: 'rent', label: 'דירות להשכרה' },
-  { id: 'hotels', label: 'פרויקטים מלונאיים' },
+  // Hidden 2026-08-07 — "פרויקטים מלונאיים" overloads the portal; restore later if needed.
+  // { id: 'hotels', label: 'פרויקטים מלונאיים' },
 ];
 
 const FALLBACK_NEWS: Article[] = [
@@ -247,7 +248,7 @@ export default function RealEstatePortal() {
           >
             <Text style={[s.topBtnTxt, activeTop === null && s.topBtnTxtActive]} numberOfLines={2}>{t('re.homeBtn')}</Text>
           </TouchableOpacity>
-          {topButtons.map(b => (
+          {topButtons.filter(b => b.id !== 'hotels').map(b => (
             <TouchableOpacity
               key={b.id}
               style={[s.topBtnRect, activeTop === b.id && s.topBtnActive]}
