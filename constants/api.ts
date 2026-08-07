@@ -173,3 +173,46 @@ export async function uploadFile(file: { uri: string; name: string; type: string
   if (!json.success) throw new Error(json.error);
   return json;
 }
+
+// ---- Public classifieds board (marketplace יד2 + real-estate) ----
+export async function fetchBoard(board?: 'market' | 'realestate') {
+  const url = `${API_BASE}/api/board?${board ? `board=${board}&` : ''}${bust()}`;
+  const res = await fetchWithTimeout(url, { headers: noCacheHeaders, cache: 'no-store' as any });
+  const json = await res.json();
+  if (!json.success) throw new Error(json.error);
+  return json.data as any[];
+}
+export async function createAd(rec: any) {
+  const res = await fetch(`${API_BASE}/api/board`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(rec) });
+  const json = await res.json();
+  if (!json.success) throw new Error(json.error);
+  return json.data;
+}
+export async function updateAd(id: string, rec: any) {
+  const res = await fetch(`${API_BASE}/api/board/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(rec) });
+  const json = await res.json();
+  if (!json.success) throw new Error(json.error);
+  return json.data;
+}
+export async function deleteAd(id: string, phone: string) {
+  const res = await fetch(`${API_BASE}/api/board/${id}?phone=${encodeURIComponent(phone)}`, { method: 'DELETE' });
+  const json = await res.json();
+  if (!json.success) throw new Error(json.error);
+  return true;
+}
+export async function payAd(adId: string): Promise<{ success: boolean; mode: 'auto' | 'manual'; url: string; orderId?: string }> {
+  const res = await fetch(`${API_BASE}/api/board/pay`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ adId }) });
+  const json = await res.json();
+  if (!json.success) throw new Error(json.error);
+  return json;
+}
+// Upload a local file URI and return a device-independent relative path (/uploads/..).
+export async function uploadLocalUri(uri: string, kind: 'image' | 'video' = 'image'): Promise<string> {
+  if (!uri || uri.startsWith('http') || uri.startsWith('/uploads')) return uri;
+  try {
+    const ext = kind === 'video' ? 'mp4' : 'jpg';
+    const name = `ad_${Date.now()}_${Math.floor(Math.random() * 1e6)}.${ext}`;
+    const j: any = await uploadFile({ uri, name, type: kind === 'video' ? 'video/mp4' : 'image/jpeg' });
+    return j?.filename ? `/uploads/${j.filename}` : (j?.url || uri);
+  } catch { return uri; }
+}

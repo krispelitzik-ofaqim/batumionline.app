@@ -1,24 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, ImageBackground, Image, Modal, TextInput, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'expo-image-picker';
 import { router, useLocalSearchParams } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Colors } from '../constants/colors';
 import { useI18n } from '../constants/i18n';
 import { openInAppBrowser } from '../constants/affiliates';
+import { fetchBoard, createAd, updateAd, deleteAd, payAd, uploadLocalUri, resolveUri } from '../constants/api';
 import BottomTabBar from '../components/BottomTabBar';
-
-// Featured Listing · 90 Days — $20 (PayPal hosted payment link)
-const PAYPAL_FEATURED = 'https://www.paypal.com/ncp/payment/K9845EKL6GPCY';
 
 // Trimmed, localized real-estate: For Sale + For Rent, plus a rich
 // "Post a listing" window (size + highlight incl. negative + photos) and
-// manage-by-phone (edit / delete). All content self-contained (4 languages).
+// manage-by-phone (edit / delete). Listings are shared via the server board.
 type Lang = 'he' | 'en' | 'fa' | 'ru';
 type HL = 'none' | 'yellow' | 'yellow-border' | 'negative';
-const STORE = '@re:listings/v2';
 const F = { x: 'Assistant_800ExtraBold', b: 'Assistant_700Bold', sb: 'Assistant_600SemiBold', m: 'Assistant_500Medium', r: 'Assistant_400Regular' };
 const NAVY = '#16222C', CREAM = '#F5F1EA', GOLD = '#4F8A6E';
 
@@ -73,7 +69,7 @@ const FEAT: Record<string, Record<Lang, string>> = {
 };
 
 type Unit = { id: string; img: string; price: string; rooms: number; sqm: number; area: 'center' | 'boardwalk'; feats: string[] };
-type Post = { id: string; mode: 'sale' | 'rent'; size: 'small' | 'large'; hl: HL; title: string; price: string; phone: string; images: string[] };
+type Post = { id: string; mode: 'sale' | 'rent'; hl: HL; title: string; price: string; phone: string; images: string[]; featured?: boolean };
 const ROOMS: Record<Lang, (n: number) => string> = {
   he: (n) => `דירת ${n} חד׳`, en: (n) => `${n}-room apartment`, fa: (n) => `آپارتمان ${n} خوابه`, ru: (n) => `${n}-комн. квартира`,
 };
@@ -113,8 +109,9 @@ export default function RealEstateScreen() {
   const wd = isRTL ? 'rtl' : 'ltr';
   const ta = isRTL ? 'right' : 'left';
 
-  useEffect(() => { AsyncStorage.getItem(STORE).then(r => { if (r) try { setPosts(JSON.parse(r)); } catch {} }); }, []);
-  const persist = (list: Post[]) => { setPosts(list); AsyncStorage.setItem(STORE, JSON.stringify(list)).catch(() => {}); };
+  const [busy, setBusy] = useState(false);
+  const load = async () => { try { setPosts(await fetchBoard('realestate') as Post[]); } catch {} };
+  useEffect(() => { load(); }, []);
 
   const pickImages = async () => {
     try {
@@ -124,27 +121,35 @@ export default function RealEstateScreen() {
   };
 
   const resetForm = () => { setPlan('free'); setHl('none'); setTitle(''); setPrice(''); setPhone(''); setImages([]); setEditId(null); };
-  const submit = () => {
+  const submit = async () => {
     if (!title.trim() || !phone.trim()) { alert(t.missing); return; }
-    const rec = { mode, size: (plan === 'paid' ? 'large' : 'small') as 'small' | 'large', hl: plan === 'paid' ? hl : 'none', title: title.trim(), price: price.trim(), phone: phone.trim(), images };
-    if (editId) persist(posts.map(p => p.id === editId ? { ...p, ...rec } : p));
-    else persist([{ id: `p_${posts.length}_${title.length}_${phone.slice(-4)}`, ...rec }, ...posts]);
-    if (plan === 'paid') openInAppBrowser(PAYPAL_FEATURED);
-    resetForm(); setDone(true);
+    if (busy) return;
+    setBusy(true);
+    try {
+      const imgs: string[] = [];
+      for (const u of images) imgs.push(await uploadLocalUri(u, 'image'));
+      const rec = { board: 'realestate', mode, hl: (plan === 'paid' ? hl : 'none') as HL, title: title.trim(), price: price.trim(), phone: phone.trim(), images: imgs };
+      const ad = editId ? await updateAd(editId, rec) : await createAd(rec);
+      if (plan === 'paid' && ad?.id) { const pay = await payAd(ad.id); if (pay?.url) openInAppBrowser(pay.url); }
+      await load();
+      resetForm(); setDone(true);
+    } catch { alert(t.missing); }
+    finally { setBusy(false); }
   };
   const closePost = () => { setPostOpen(false); setDone(false); resetForm(); };
-  const startEdit = (p: Post) => { setEditId(p.id); setPlan(p.hl !== 'none' || p.size === 'large' ? 'paid' : 'free'); setHl(p.hl); setTitle(p.title); setPrice(p.price); setPhone(p.phone); setImages(p.images || []); setManageOpen(false); setDone(false); setPostOpen(true); };
-  const remove = (id: string) => { const list = posts.filter(p => p.id !== id); persist(list); setMResult(list.filter(p => p.phone === mPhone.trim())); };
+  const startEdit = (p: Post) => { setEditId(p.id); setPlan(p.featured || p.hl !== 'none' ? 'paid' : 'free'); setHl(p.hl); setTitle(p.title); setPrice(p.price); setPhone(p.phone); setImages(p.images || []); setManageOpen(false); setDone(false); setPostOpen(true); };
+  const remove = async (id: string) => { try { await deleteAd(id, mPhone.trim()); } catch {} await load(); setMResult(posts.filter(p => p.phone === mPhone.trim() && p.id !== id)); };
   const find = () => setMResult(posts.filter(p => p.phone === mPhone.trim()));
 
   const units = mode === 'sale' ? SALE : RENT;
   const myPosts = posts.filter(p => p.mode === mode);
 
   const PostCard = ({ p }: { p: Post }) => {
-    const neg = p.hl === 'negative';
+    const effHl: HL = p.featured ? p.hl : 'none';
+    const neg = effHl === 'negative';
     return (
-      <View style={[s.card, { backgroundColor: hlBg(p.hl) }, hlBorder(p.hl)]}>
-        {p.images[0] ? <Image source={{ uri: p.images[0] }} style={s.cardImg} resizeMode="cover" /> : null}
+      <View style={[s.card, { backgroundColor: hlBg(effHl) }, hlBorder(effHl)]}>
+        {p.images[0] ? <Image source={{ uri: resolveUri(p.images[0]) }} style={s.cardImg} resizeMode="cover" /> : null}
         <View style={s.cardBody}>
           <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', justifyContent: 'space-between', alignItems: 'center' }}>
             <Text style={[{ fontSize: 16, fontWeight: '900', color: neg ? '#fff' : Colors.TEXT, flex: 1 }, { textAlign: ta, writingDirection: wd }]} numberOfLines={2}>{p.title}</Text>
@@ -203,9 +208,9 @@ export default function RealEstateScreen() {
         </ImageBackground>
 
         <View style={{ padding: 16 }}>
-          {myPosts.filter(p => p.size === 'large').map(p => <PostCard key={p.id} p={p} />)}
+          {myPosts.filter(p => p.featured).map(p => <PostCard key={p.id} p={p} />)}
           {units.map(u => <Card key={u.id} u={u} />)}
-          {myPosts.filter(p => p.size === 'small').map(p => <PostCard key={p.id} p={p} />)}
+          {myPosts.filter(p => !p.featured).map(p => <PostCard key={p.id} p={p} />)}
           <TouchableOpacity style={s.postBtn} activeOpacity={0.85} onPress={() => { setDone(false); resetForm(); setPostOpen(true); }}><Text style={s.postBtnTxt}>{t.postCta}</Text></TouchableOpacity>
           <TouchableOpacity style={s.manageBtn} activeOpacity={0.85} onPress={() => { setMResult(null); setMPhone(''); setManageOpen(true); }}><Text style={s.manageTxt}>{t.manageCta}</Text></TouchableOpacity>
         </View>
@@ -252,7 +257,7 @@ export default function RealEstateScreen() {
                 <TextInput value={title} onChangeText={setTitle} placeholder={t.fTitle} placeholderTextColor="#9aa5b1" style={[s.input, { textAlign: ta, writingDirection: wd }]} />
                 <TextInput value={price} onChangeText={setPrice} placeholder={t.fPrice} placeholderTextColor="#9aa5b1" style={[s.input, { textAlign: ta, writingDirection: wd }]} />
                 <TextInput value={phone} onChangeText={setPhone} placeholder={t.fPhone} placeholderTextColor="#9aa5b1" keyboardType="phone-pad" style={[s.input, { textAlign: ta, writingDirection: wd }]} />
-                <TouchableOpacity style={s.postBtn} onPress={submit}><Text style={s.postBtnTxt}>{editId ? t.save : t.submit}</Text></TouchableOpacity>
+                <TouchableOpacity style={[s.postBtn, busy && { opacity: 0.6 }]} disabled={busy} onPress={submit}><Text style={s.postBtnTxt}>{busy ? '…' : (editId ? t.save : t.submit)}</Text></TouchableOpacity>
                 <TouchableOpacity style={{ paddingVertical: 10, alignItems: 'center' }} onPress={closePost}><Text style={{ color: '#64748b', fontWeight: '700' }}>{t.close}</Text></TouchableOpacity>
               </ScrollView>
             )}

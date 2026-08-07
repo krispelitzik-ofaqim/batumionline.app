@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, TextInput, Linking, Image, Modal, ImageBackground } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'expo-image-picker';
 import { Video, ResizeMode } from 'expo-av';
 import { router } from 'expo-router';
@@ -9,17 +8,14 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Colors } from '../constants/colors';
 import { useI18n } from '../constants/i18n';
 import { openInAppBrowser } from '../constants/affiliates';
+import { fetchBoard, createAd, updateAd, deleteAd, payAd, uploadLocalUri, resolveUri } from '../constants/api';
 import BottomTabBar from '../components/BottomTabBar';
-
-// Featured Listing · 90 Days — $20 (PayPal hosted payment link)
-const PAYPAL_FEATURED = 'https://www.paypal.com/ncp/payment/K9845EKL6GPCY';
 
 type Lang = 'he' | 'en' | 'fa' | 'ru';
 type HL = 'none' | 'yellow-border' | 'negative';
-type Item = { id: string; title: string; price: string; phone: string; images: string[]; video?: string; hl?: HL };
+type Item = { id: string; title: string; price: string; phone: string; images: string[]; video?: string; hl?: HL; featured?: boolean };
 const hlBg = (hl?: HL) => hl === 'negative' ? '#0c1e3a' : '#fff';
 const hlBorder = (hl?: HL) => hl === 'yellow-border' ? { borderWidth: 2, borderColor: '#f59e0b' } : hl === 'negative' ? { borderWidth: 2, borderColor: '#1e3a8a' } : {};
-const STORE = '@market:items/v2';
 const HERO = 'https://images.unsplash.com/photo-1481437156560-3205f6a55735?w=1000&q=80';
 const F = { x: 'Assistant_800ExtraBold', b: 'Assistant_700Bold', sb: 'Assistant_600SemiBold', m: 'Assistant_500Medium', r: 'Assistant_400Regular' };
 const NAVY = '#16222C', CREAM = '#F5F1EA', GOLD = '#4F8A6E';
@@ -72,8 +68,8 @@ export default function MarketplaceScreen() {
   const [mPhone, setMPhone] = useState('');
   const [mResult, setMResult] = useState<Item[] | null>(null);
 
-  useEffect(() => { AsyncStorage.getItem(STORE).then((r) => { if (r) try { setItems(JSON.parse(r)); } catch {} }).catch(() => {}); }, []);
-  const persist = (list: Item[]) => { setItems(list); AsyncStorage.setItem(STORE, JSON.stringify(list)).catch(() => {}); };
+  const load = async () => { try { setItems(await fetchBoard('market') as Item[]); } catch {} };
+  useEffect(() => { load(); }, []);
 
   const pickImages = async () => {
     try { const r = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'] as any, allowsMultipleSelection: true, selectionLimit: 6, quality: 0.6 }); if (!r.canceled) setImages(r.assets.map(a => a.uri).slice(0, 6)); } catch {}
@@ -82,28 +78,38 @@ export default function MarketplaceScreen() {
     try { const r = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['videos'] as any, quality: 0.6 }); if (!r.canceled && r.assets[0]) setVideo(r.assets[0].uri); } catch {}
   };
 
+  const [busy, setBusy] = useState(false);
   const reset = () => { setPlan('free'); setHl('none'); setTitle(''); setPrice(''); setPhone(''); setImages([]); setVideo(undefined); setEditId(null); };
-  const submit = () => {
+  const submit = async () => {
     if (!title.trim() || !phone.trim()) { alert(t.missing); return; }
-    const rec = { title: title.trim(), price: price.trim(), phone: phone.trim(), images, video, hl: (plan === 'paid' ? hl : 'none') as HL };
-    if (editId) persist(items.map(x => x.id === editId ? { ...x, ...rec } : x));
-    else persist([{ id: `m_${items.length}_${title.length}_${phone.slice(-4)}`, ...rec }, ...items]);
-    if (plan === 'paid') openInAppBrowser(PAYPAL_FEATURED);
-    reset(); setDone(true);
+    if (busy) return;
+    setBusy(true);
+    try {
+      const imgs: string[] = [];
+      for (const u of images) imgs.push(await uploadLocalUri(u, 'image'));
+      const vid = video ? await uploadLocalUri(video, 'video') : null;
+      const rec = { board: 'market', title: title.trim(), price: price.trim(), phone: phone.trim(), images: imgs, video: vid, hl: (plan === 'paid' ? hl : 'none') as HL };
+      const ad = editId ? await updateAd(editId, rec) : await createAd(rec);
+      if (plan === 'paid' && ad?.id) { const pay = await payAd(ad.id); if (pay?.url) openInAppBrowser(pay.url); }
+      await load();
+      reset(); setDone(true);
+    } catch { alert(t.missing); }
+    finally { setBusy(false); }
   };
   const closePost = () => { setPostOpen(false); setDone(false); reset(); };
   const startEdit = (x: Item) => { setEditId(x.id); setPlan(x.hl && x.hl !== 'none' ? 'paid' : 'free'); setHl(x.hl || 'none'); setTitle(x.title); setPrice(x.price); setPhone(x.phone); setImages(x.images || []); setVideo(x.video); setManageOpen(false); setDone(false); setPostOpen(true); };
-  const remove = (id: string) => { const list = items.filter(x => x.id !== id); persist(list); setMResult(list.filter(x => x.phone === mPhone.trim())); };
+  const remove = async (id: string) => { try { await deleteAd(id, mPhone.trim()); } catch {} await load(); setMResult((items.filter(x => x.phone === mPhone.trim() && x.id !== id))); };
   const find = () => setMResult(items.filter(x => x.phone === mPhone.trim()));
 
   const ItemCard = ({ x }: { x: Item }) => {
-    const neg = x.hl === 'negative';
+    const effHl: HL = x.featured ? (x.hl || 'none') : 'none';
+    const neg = effHl === 'negative';
     return (
-    <View style={[s.card, { backgroundColor: hlBg(x.hl) }, hlBorder(x.hl)]}>
+    <View style={[s.card, { backgroundColor: hlBg(effHl) }, hlBorder(effHl)]}>
       {x.video ? (
-        <Video source={{ uri: x.video }} style={s.media} resizeMode={ResizeMode.COVER} useNativeControls isMuted />
+        <Video source={{ uri: resolveUri(x.video) }} style={s.media} resizeMode={ResizeMode.COVER} useNativeControls isMuted />
       ) : x.images?.[0] ? (
-        <Image source={{ uri: x.images[0] }} style={s.media} resizeMode="cover" />
+        <Image source={{ uri: resolveUri(x.images[0]) }} style={s.media} resizeMode="cover" />
       ) : null}
       <View style={s.cardBody}>
         <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -125,7 +131,7 @@ export default function MarketplaceScreen() {
     </TouchableOpacity>
   );
 
-  const shown = [...items].sort((a, b) => ((b.hl && b.hl !== 'none') ? 1 : 0) - ((a.hl && a.hl !== 'none') ? 1 : 0));
+  const shown = [...items].sort((a, b) => Number(!!b.featured) - Number(!!a.featured));
 
   return (
     <SafeAreaView style={s.safe}>
@@ -192,7 +198,7 @@ export default function MarketplaceScreen() {
                 <TextInput value={title} onChangeText={setTitle} placeholder={t.fTitle} placeholderTextColor="#9aa5b1" style={[s.input, { textAlign: ta, writingDirection: wd }]} />
                 <TextInput value={price} onChangeText={setPrice} placeholder={t.fPrice} placeholderTextColor="#9aa5b1" style={[s.input, { textAlign: ta, writingDirection: wd }]} />
                 <TextInput value={phone} onChangeText={setPhone} placeholder={t.fPhone} placeholderTextColor="#9aa5b1" keyboardType="phone-pad" style={[s.input, { textAlign: ta, writingDirection: wd }]} />
-                <TouchableOpacity style={s.postBtn} onPress={submit}><Text style={s.postBtnTxt}>{editId ? t.save : t.submit}</Text></TouchableOpacity>
+                <TouchableOpacity style={[s.postBtn, busy && { opacity: 0.6 }]} disabled={busy} onPress={submit}><Text style={s.postBtnTxt}>{busy ? '…' : (editId ? t.save : t.submit)}</Text></TouchableOpacity>
                 <TouchableOpacity style={{ paddingVertical: 10, alignItems: 'center' }} onPress={closePost}><Text style={{ color: '#64748b', fontWeight: '700' }}>{t.close}</Text></TouchableOpacity>
               </ScrollView>
             )}
