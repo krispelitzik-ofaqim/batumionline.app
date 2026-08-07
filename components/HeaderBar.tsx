@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   clock: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '800',
   },
   langSeg: {
@@ -178,14 +178,14 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   langSegBtn: {
-    minWidth: 34,
-    paddingHorizontal: 9,
+    minWidth: 28,
+    paddingHorizontal: 6,
     paddingVertical: 6,
     alignItems: 'center',
     justifyContent: 'center',
   },
   langSegTxt: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '900',
   },
 });
