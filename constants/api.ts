@@ -39,6 +39,20 @@ export function localizeContent(data: any, lang: ContentLang = _contentLang): an
         localized[key] = localized[key].filter((it: any) => !(it && HIDE_NON_HE[key].includes(it.id)));
       }
     }
+    // Audience-specific restaurant sub-groups (category '6'): the Russian group
+    // for ru and the Halal group for fa are pinned to the TOP of the restaurants
+    // page; both are hidden for the other languages.
+    const restCat = Array.isArray(localized.mainCategories) ? localized.mainCategories.find((c: any) => c && c.id === '6') : null;
+    if (restCat && Array.isArray(restCat.children)) {
+      const keepTop = lang === 'ru' ? 'r_russian' : lang === 'fa' ? 'r_halal' : null;
+      const drop = new Set(['r_russian', 'r_halal'].filter((id) => id !== keepTop));
+      const kids = restCat.children.filter((c: any) => !drop.has(c.id));
+      if (keepTop) {
+        const i = kids.findIndex((c: any) => c.id === keepTop);
+        if (i > 0) { const [g] = kids.splice(i, 1); kids.unshift(g); }
+      }
+      restCat.children = kids;
+    }
   }
   return localized;
 }
