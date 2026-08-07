@@ -38,6 +38,8 @@ function applyAudienceGroups(data: any, lang: ContentLang): any {
   if (!data || !Array.isArray(data.mainCategories)) return data;
   const keepTop = lang === 'ru' ? 'r_russian' : lang === 'fa' ? 'r_halal' : null;
   const drop = new Set(['r_russian', 'r_halal'].filter((id) => id !== keepTop));
+  // Iranian (fa) edition: also hide the kosher group (Star of David icon).
+  if (lang === 'fa') drop.add('r4');
   const mainCategories = data.mainCategories.map((c: any) => {
     if (!c || c.id !== '6' || !Array.isArray(c.children)) return c;
     const kids = c.children.filter((ch: any) => !drop.has(ch.id));

@@ -38,12 +38,16 @@ export default function AgentCouponScreen() {
   const [pct, setPct] = useState<number | null>(null);
 
   useEffect(() => {
-    fetchContent().then((data: any) => {
+    // Load the RAW content so the agent sees every restaurant, including the
+    // audience-only Russian/Halal groups that the localized editions hide.
+    fetchContent({ raw: true }).then((data: any) => {
       const cat = (data?.mainCategories || []).find((c: any) => c.id === '6' || /מסעד|restaurant/i.test(c.title || ''));
       if (!cat) return;
       const out: Rest[] = [];
+      // Prefer the Latin/English name so a non-Hebrew-speaking agent can read it.
       const walk = (arr: any[]) => (arr || []).forEach((x: any) => {
-        if (x && x.name && x.name.length > 2 && !/^מסעדות$|restaurants?$/i.test(x.name)) out.push({ name: x.name, image: x.image || x.icon });
+        const nm = x && (x.titleEn || x.name || x.title);
+        if (nm && nm.length > 2 && !/^מסעדות$|restaurants?$/i.test(nm)) out.push({ name: nm, image: x.image || x.icon });
         ['children', 'hotels', 'items', 'places'].forEach(k => Array.isArray(x?.[k]) && walk(x[k]));
       });
       walk(cat.children || cat.hotels || []);
