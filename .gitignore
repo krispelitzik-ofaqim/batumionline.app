@@ -43,3 +43,8 @@ yarn-error.*
 /ios
 /android
 marketing/
+
+# Android signing keystore (secret — never commit)
+my-release-key.p12
+my-release-key.jks
+credentials.json
