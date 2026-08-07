@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, StyleSheet, Linking, Image, Platform, StatusBar } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { API_BASE } from '../constants/api';
+import { API_BASE, fetchContent } from '../constants/api';
 import { Colors } from '../constants/colors';
 import { useI18n } from '../constants/i18n';
 import { openInAppBrowser, bookingSearch, hotellookSearch } from '../constants/affiliates';
@@ -31,6 +31,16 @@ export default function PlacePage() {
   const [loading, setLoading] = useState(true);
   const [photoIdx, setPhotoIdx] = useState(0);
   const [mapBig, setMapBig] = useState(false);
+  const [coupon, setCoupon] = useState<any>(null);
+
+  // Generic: any place that has an active coupon in shared content shows a "get coupon" button.
+  useEffect(() => {
+    fetchContent().then((c: any) => {
+      const nameKey = (title || '').trim();
+      const found = Array.isArray(c?.coupons) ? c.coupons.find((x: any) => (x.restaurant || x.id) === nameKey) : null;
+      setCoupon(found || null);
+    }).catch(() => {});
+  }, [title]);
 
   useEffect(() => {
     let cancelled = false;
@@ -134,6 +144,11 @@ export default function PlacePage() {
             })()}
 
             <View style={{ gap: 8, marginTop: 6 }}>
+              {coupon && (
+                <TouchableOpacity style={[s.btn, { backgroundColor: '#4F8A6E' }]} onPress={() => router.push(`/coupon?biz=${encodeURIComponent(title || data.name || '')}` as any)}>
+                  <Text style={s.btnTxt}>🎫 קבל קופון{coupon.type === 'fixed' && coupon.pct ? ` · ${coupon.pct}%` : ''}</Text>
+                </TouchableOpacity>
+              )}
               {!!data.phone && (
                 <TouchableOpacity style={[s.btn, { backgroundColor: '#10b981' }]} onPress={() => Linking.openURL(`tel:${data.phone}`)}>
                   <Text style={s.btnTxt}>{isRestaurant ? 'להזמנת שולחן' : 'חייג'} · {'⁦'}{data.phone}{'⁩'}</Text>

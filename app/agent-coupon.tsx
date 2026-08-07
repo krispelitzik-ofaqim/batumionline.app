@@ -3,7 +3,7 @@ import { View, Text, ScrollView, StyleSheet, TouchableOpacity, TextInput, Alert,
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { useI18n } from '../constants/i18n';
-import { fetchContent, resolveUri } from '../constants/api';
+import { fetchContent, resolveUri, updateSection } from '../constants/api';
 import { openInAppBrowser } from '../constants/affiliates';
 import BottomTabBar from '../components/BottomTabBar';
 
@@ -62,8 +62,16 @@ export default function AgentCouponScreen() {
   // List is hidden until searching (so an owner never sees other restaurants).
   const results = q.trim() ? restaurants.filter(r => r.name.toLowerCase().includes(q.trim().toLowerCase())).slice(0, 8) : [];
 
-  const pay = () => {
+  const pay = async () => {
     if (!biz || (type === 'fixed' && !pct)) { const m = t.missing; Platform.OS === 'web' ? alert(m) : Alert.alert(m); return; }
+    // Immediate activation: write the coupon to shared content so it appears at once
+    // on the Coupons page and the restaurant's page (for everyone).
+    try {
+      const data: any = await fetchContent({ raw: true });
+      const list = Array.isArray(data?.coupons) ? data.coupons : [];
+      const coupon = { id: biz.name, restaurant: biz.name, image: biz.image || '', cat: 'food', type, pct: type === 'fixed' ? pct : null, from: dates.from, to: dates.to };
+      await updateSection('coupons', [...list.filter((c: any) => c.id !== biz.name), coupon]);
+    } catch {}
     openInAppBrowser(PAYPAL_COUPONS);
   };
 

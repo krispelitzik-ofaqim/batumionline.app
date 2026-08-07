@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Image, Modal, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Colors } from '../constants/colors';
 import { useI18n } from '../constants/i18n';
+import { fetchContent, resolveUri } from '../constants/api';
 import BottomTabBar from '../components/BottomTabBar';
 
 const F = { x: 'Assistant_800ExtraBold', b: 'Assistant_700Bold', sb: 'Assistant_600SemiBold', m: 'Assistant_500Medium', r: 'Assistant_400Regular' };
@@ -32,7 +33,14 @@ export default function CouponsScreen() {
   const [err, setErr] = useState('');
   const wd = isRTL ? 'rtl' : 'ltr';
   const ta = isRTL ? 'right' : 'left';
-  const list = cat === 'food' ? FOOD : STAY;
+  const [live, setLive] = useState<Coupon[]>([]);
+  useEffect(() => {
+    fetchContent().then((data: any) => {
+      const cs = Array.isArray(data?.coupons) ? data.coupons : [];
+      setLive(cs.map((c: any) => ({ id: c.id, name: c.restaurant, img: c.image, off: (c.type === 'fixed' && c.pct) ? c.pct + '%' : '%', cat: c.cat || 'food' } as any)));
+    }).catch(() => {});
+  }, []);
+  const list = [...live.filter((c: any) => (c as any).cat === cat), ...(cat === 'food' ? FOOD : STAY)];
 
   const login = () => {
     const u = user.trim().toLowerCase();
@@ -65,7 +73,7 @@ export default function CouponsScreen() {
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 16, paddingBottom: 32 }} showsVerticalScrollIndicator={false}>
         {list.map(c => (
           <TouchableOpacity key={c.id} activeOpacity={0.85} style={s.card} onPress={() => router.push(`/coupon?cat=${cat}&biz=${encodeURIComponent(c.name)}` as any)}>
-            <Image source={{ uri: c.img }} style={s.cardImg} resizeMode="cover" />
+            <Image source={{ uri: resolveUri(c.img) }} style={s.cardImg} resizeMode="cover" />
             <View style={s.offBadge}><Text style={s.offTxt}>{c.off}</Text></View>
             <View style={s.cardBody}>
               <Text style={[s.cardName, { textAlign: ta, writingDirection: wd }]} numberOfLines={1}>{c.name}</Text>
