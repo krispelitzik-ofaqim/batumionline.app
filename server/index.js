@@ -1850,6 +1850,217 @@ app.delete('/api/subscribers/:phone', (req, res) => {
   res.json({ success: true, deleted: before - db.subscribers.length });
 });
 
+// ─── Public classifieds board (marketplace יד2 + real-estate buy/sell/rent) ──
+// NOTE: stored under `boardAds` — deliberately SEPARATE from `listings`
+// (which is the admin real-estate portal). Free ads go live immediately for
+// everyone. `featuredUntil` is set ONLY by a confirmed $20 PayPal payment
+// (capture/webhook below) — the client can never feature itself for free.
+const PAYPAL_ENV = (process.env.PAYPAL_ENV || 'live').toLowerCase();
+const PAYPAL_BASE = PAYPAL_ENV === 'sandbox' ? 'https://api-m.sandbox.paypal.com' : 'https://api-m.paypal.com';
+const FEATURED_PRICE = '20.00';
+const FEATURED_DAYS = 90;
+// Manual fallback used until PayPal REST credentials are configured on the server.
+const FEATURED_FALLBACK_LINK = 'https://www.paypal.com/ncp/payment/K9845EKL6GPCY';
+
+function getBoard(db) { return Array.isArray(db.boardAds) ? db.boardAds : []; }
+function withFeatured(x) { return { ...x, featured: !!(x.featuredUntil && new Date(x.featuredUntil).getTime() > Date.now()) }; }
+
+async function paypalToken() {
+  const id = process.env.PAYPAL_CLIENT_ID, secret = process.env.PAYPAL_SECRET;
+  if (!id || !secret) return null;
+  try {
+    const r = await fetch(`${PAYPAL_BASE}/v1/oauth2/token`, {
+      method: 'POST',
+      headers: { Authorization: 'Basic ' + Buffer.from(`${id}:${secret}`).toString('base64'), 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: 'grant_type=client_credentials',
+    });
+    const j = await r.json();
+    return j.access_token || null;
+  } catch { return null; }
+}
+
+function serverBase(req) {
+  const proto = req.headers['x-forwarded-proto'] || req.protocol || 'https';
+  const host = req.headers['x-forwarded-host'] || req.headers.host;
+  return `${proto}://${host}`;
+}
+
+function markFeatured(adId) {
+  const db = readDB();
+  const list = getBoard(db);
+  const it = list.find(x => x.id === adId);
+  if (!it) return false;
+  it.featuredUntil = new Date(Date.now() + FEATURED_DAYS * 86400000).toISOString();
+  it.paidAt = new Date().toISOString();
+  db.boardAds = list;
+  writeDB(db);
+  return true;
+}
+
+// GET /api/board?board=market|realestate  — public list (featured first)
+app.get('/api/board', (req, res) => {
+  try {
+    const db = readDB();
+    const board = req.query.board;
+    let list = getBoard(db).map(withFeatured);
+    if (board) list = list.filter(x => x.board === board);
+    list.sort((a, b) => (Number(b.featured) - Number(a.featured)) || String(b.createdAt).localeCompare(String(a.createdAt)));
+    res.json({ success: true, data: list });
+  } catch (e) { res.status(500).json({ success: false, error: 'read error' }); }
+});
+
+// POST /api/board  — create a free ad (goes live immediately)
+app.post('/api/board', (req, res) => {
+  try {
+    const b = req.body || {};
+    if (!b.board || !String(b.title || '').trim() || !String(b.phone || '').trim())
+      return res.status(400).json({ success: false, error: 'board, title, phone required' });
+    const db = readDB();
+    const list = getBoard(db);
+    const item = {
+      id: `ad_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+      board: String(b.board),                 // 'market' | 'realestate'
+      mode: b.mode || null,                    // realestate: 'sale' | 'rent'
+      title: String(b.title).trim(),
+      price: String(b.price || '').trim(),
+      phone: String(b.phone).trim(),
+      images: Array.isArray(b.images) ? b.images.slice(0, 6) : [],
+      video: b.video || null,
+      hl: b.hl || 'none',                      // requested highlight; applies only while featured
+      featuredUntil: null,                     // set only by paid capture/webhook
+      createdAt: new Date().toISOString(),
+    };
+    list.unshift(item);
+    db.boardAds = list;
+    writeDB(db);
+    res.json({ success: true, data: withFeatured(item) });
+  } catch (e) { res.status(500).json({ success: false, error: 'write error' }); }
+});
+
+// PUT /api/board/:id  — edit own ad (phone must match)
+app.put('/api/board/:id', (req, res) => {
+  try {
+    const db = readDB();
+    const list = getBoard(db);
+    const it = list.find(x => x.id === req.params.id);
+    if (!it) return res.status(404).json({ success: false, error: 'not found' });
+    const b = req.body || {};
+    if (String(b.phone || '').trim() !== it.phone) return res.status(403).json({ success: false, error: 'phone mismatch' });
+    if (b.title !== undefined) it.title = String(b.title).trim();
+    if (b.price !== undefined) it.price = String(b.price).trim();
+    if (b.mode !== undefined) it.mode = b.mode;
+    if (b.hl !== undefined) it.hl = b.hl;
+    if (Array.isArray(b.images)) it.images = b.images.slice(0, 6);
+    if (b.video !== undefined) it.video = b.video || null;
+    db.boardAds = list;
+    writeDB(db);
+    res.json({ success: true, data: withFeatured(it) });
+  } catch (e) { res.status(500).json({ success: false, error: 'write error' }); }
+});
+
+// DELETE /api/board/:id?phone=...  — delete own ad
+app.delete('/api/board/:id', (req, res) => {
+  try {
+    const phone = String((req.query.phone || (req.body && req.body.phone) || '')).trim();
+    const db = readDB();
+    const list = getBoard(db);
+    const it = list.find(x => x.id === req.params.id);
+    if (!it) return res.json({ success: true });
+    if (phone !== it.phone) return res.status(403).json({ success: false, error: 'phone mismatch' });
+    db.boardAds = list.filter(x => x.id !== req.params.id);
+    writeDB(db);
+    res.json({ success: true });
+  } catch (e) { res.status(500).json({ success: false, error: 'write error' }); }
+});
+
+// POST /api/board/pay {adId}  — start a $20 featured payment for an ad.
+// Returns an approve URL (auto) if PayPal REST creds are set, else the manual link.
+app.post('/api/board/pay', async (req, res) => {
+  try {
+    const adId = String((req.body && req.body.adId) || '').trim();
+    if (!adId) return res.status(400).json({ success: false, error: 'adId required' });
+    const db = readDB();
+    if (!getBoard(db).find(x => x.id === adId)) return res.status(404).json({ success: false, error: 'ad not found' });
+    const token = await paypalToken();
+    if (!token) return res.json({ success: true, mode: 'manual', url: FEATURED_FALLBACK_LINK });
+    const base = serverBase(req);
+    const orderRes = await fetch(`${PAYPAL_BASE}/v2/checkout/orders`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        intent: 'CAPTURE',
+        purchase_units: [{ custom_id: adId, description: 'Featured Listing · 90 Days', amount: { currency_code: 'USD', value: FEATURED_PRICE } }],
+        application_context: {
+          brand_name: 'Batumi Online',
+          user_action: 'PAY_NOW',
+          return_url: `${base}/api/board/return?ad=${encodeURIComponent(adId)}`,
+          cancel_url: `${base}/api/board/cancel`,
+        },
+      }),
+    });
+    const order = await orderRes.json();
+    const approve = (order.links || []).find(l => l.rel === 'approve');
+    if (!approve) return res.status(502).json({ success: false, error: 'paypal order failed' });
+    res.json({ success: true, mode: 'auto', url: approve.href, orderId: order.id });
+  } catch (e) { res.status(500).json({ success: false, error: String((e && e.message) || e) }); }
+});
+
+// GET /api/board/return  — PayPal redirect after approval: capture + feature the ad
+app.get('/api/board/return', async (req, res) => {
+  const adId = String(req.query.ad || '');
+  const orderId = String(req.query.token || '');
+  let ok = false;
+  try {
+    const tok = await paypalToken();
+    if (tok && orderId) {
+      const capRes = await fetch(`${PAYPAL_BASE}/v2/checkout/orders/${orderId}/capture`, {
+        method: 'POST', headers: { Authorization: `Bearer ${tok}`, 'Content-Type': 'application/json' },
+      });
+      const cap = await capRes.json();
+      if (cap.status === 'COMPLETED') ok = markFeatured(adId);
+    }
+  } catch (e) { console.warn('board capture error', e); }
+  res.set('Content-Type', 'text/html; charset=utf-8');
+  const mark = ok ? '✓' : '…';
+  const head = ok ? 'התשלום התקבל' : 'מעבד את התשלום';
+  const sub = ok ? 'המודעה שלך מודגשת ל-90 יום. אפשר לחזור לאפליקציה.' : 'אם שילמת, ההדגשה תופיע בעוד רגע. אפשר לחזור לאפליקציה.';
+  res.send(`<!doctype html><html dir="rtl" lang="he"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${head}</title><style>body{font-family:-apple-system,Segoe UI,Arial;background:#F5F1EA;color:#16222c;display:flex;min-height:100vh;align-items:center;justify-content:center;margin:0;text-align:center;padding:24px}.c{max-width:340px}.m{font-size:64px;color:#2E9E6B;line-height:1}h1{font-size:22px;margin:14px 0 6px}p{color:#7a7261;font-size:15px}</style></head><body><div class="c"><div class="m">${mark}</div><h1>${head}</h1><p>${sub}</p></div></body></html>`);
+});
+
+app.get('/api/board/cancel', (_req, res) => {
+  res.set('Content-Type', 'text/html; charset=utf-8');
+  res.send(`<!doctype html><html dir="rtl" lang="he"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>בוטל</title><style>body{font-family:-apple-system,Arial;background:#F5F1EA;color:#16222c;display:flex;min-height:100vh;align-items:center;justify-content:center;margin:0;text-align:center;padding:24px}</style></head><body><div><h1>התשלום בוטל</h1><p>אפשר לחזור לאפליקציה ולנסות שוב.</p></div></body></html>`);
+});
+
+// POST /api/board/webhook  — PayPal webhook backup (if buyer closes the browser)
+app.post('/api/board/webhook', async (req, res) => {
+  try {
+    const event = req.body || {};
+    const webhookId = process.env.PAYPAL_WEBHOOK_ID;
+    if (webhookId) {
+      const tok = await paypalToken();
+      const v = tok ? await fetch(`${PAYPAL_BASE}/v1/notifications/verify-webhook-signature`, {
+        method: 'POST', headers: { Authorization: `Bearer ${tok}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          auth_algo: req.headers['paypal-auth-algo'],
+          cert_url: req.headers['paypal-cert-url'],
+          transmission_id: req.headers['paypal-transmission-id'],
+          transmission_sig: req.headers['paypal-transmission-sig'],
+          transmission_time: req.headers['paypal-transmission-time'],
+          webhook_id: webhookId,
+          webhook_event: event,
+        }),
+      }).then(r => r.json()).catch(() => null) : null;
+      if (!v || v.verification_status !== 'SUCCESS') return res.status(400).json({ success: false });
+    }
+    if (event.event_type === 'PAYMENT.CAPTURE.COMPLETED') {
+      const adId = event.resource && event.resource.custom_id;
+      if (adId) markFeatured(adId);
+    }
+    res.json({ success: true });
+  } catch (e) { res.status(200).json({ success: true }); }
+});
+
 // ─── Serve Expo web (dev proxy if running, else static dist) ────
 const http = require('http');
 const WEB_DIST = path.join(__dirname, '..', 'dist');
