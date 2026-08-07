@@ -48,7 +48,7 @@ type WelcomeItem = {
 };
 
 export default function WelcomeScreen() {
-  const { t } = useI18n();
+  const { t, isRTL } = useI18n();
   const { id } = useLocalSearchParams<{ id: string }>();
   const [item, setItem] = useState<WelcomeItem | null>(null);
   const [sub, setSub] = useState<any>(null);
@@ -94,8 +94,8 @@ export default function WelcomeScreen() {
             </LinearGradient>
           )}
           <LinearGradient colors={['transparent', 'rgba(0,0,0,0.8)']} style={styles.heroOverlay}>
-            <Text style={styles.heroTitle}>{item.title}</Text>
-            {item.subtitle && <Text style={styles.heroSub}>{item.subtitle}</Text>}
+            <Text style={[styles.heroTitle, { textAlign: isRTL ? 'right' : 'left', writingDirection: isRTL ? 'rtl' : 'ltr' }]}>{item.title}</Text>
+            {item.subtitle && <Text style={[styles.heroSub, { textAlign: isRTL ? 'right' : 'left', writingDirection: isRTL ? 'rtl' : 'ltr' }]}>{item.subtitle}</Text>}
           </LinearGradient>
         </View>
 

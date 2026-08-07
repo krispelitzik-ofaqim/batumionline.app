@@ -25,7 +25,9 @@ const WHATSAPP = '972502844867';
 const SITE = 'https://www.batumionline.app';
 
 export default function InfoPage() {
-  const { t } = useI18n();
+  const { t, isRTL } = useI18n();
+  const A = (isRTL ? 'right' : 'left') as 'right' | 'left';
+  const D = (isRTL ? 'rtl' : 'ltr') as 'rtl' | 'ltr';
   const { id } = useLocalSearchParams<{ id: string }>();
   const [tabs, setTabs] = useState<Tab[]>(DEFAULTS);
   const [portalItem, setPortalItem] = useState<{ title: string; subtitle?: string; body: string; image?: string } | null>(null);
@@ -78,8 +80,8 @@ export default function InfoPage() {
               <LinearGradient colors={['#1A6B8A', '#3DA5C4']} style={{ height: 160 }} />
             )}
             <LinearGradient colors={['transparent', 'rgba(0,0,0,0.8)']} style={{ position: 'absolute', bottom: 0, left: 0, right: 0, paddingHorizontal: 20, paddingBottom: 24, paddingTop: 60 }}>
-              <Text style={{ fontSize: 26, fontWeight: '900', color: '#fff', textAlign: 'right', writingDirection: 'rtl' }}>{portalItem.title}</Text>
-              {portalItem.subtitle ? <Text style={{ fontSize: 14, color: 'rgba(255,255,255,0.85)', textAlign: 'right', writingDirection: 'rtl', marginTop: 4 }}>{portalItem.subtitle}</Text> : null}
+              <Text style={{ fontSize: 26, fontWeight: '900', color: '#fff', textAlign: A, writingDirection: D }}>{portalItem.title}</Text>
+              {portalItem.subtitle ? <Text style={{ fontSize: 14, color: 'rgba(255,255,255,0.85)', textAlign: A, writingDirection: D, marginTop: 4 }}>{portalItem.subtitle}</Text> : null}
             </LinearGradient>
           </View>
           <View style={{ marginTop: -20, borderTopLeftRadius: 24, borderTopRightRadius: 24, backgroundColor: Colors.BACKGROUND, paddingTop: 16, paddingHorizontal: 12, minHeight: 400, paddingBottom: 30 }}>
