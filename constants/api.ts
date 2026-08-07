@@ -230,12 +230,23 @@ export async function payAd(adId: string): Promise<{ success: boolean; mode: 'au
   return json;
 }
 // Upload a local file URI and return a device-independent relative path (/uploads/..).
+// Web needs a real Blob in the FormData; native accepts the { uri, name, type } shape.
 export async function uploadLocalUri(uri: string, kind: 'image' | 'video' = 'image'): Promise<string> {
   if (!uri || uri.startsWith('http') || uri.startsWith('/uploads')) return uri;
   try {
     const ext = kind === 'video' ? 'mp4' : 'jpg';
     const name = `ad_${Date.now()}_${Math.floor(Math.random() * 1e6)}.${ext}`;
-    const j: any = await uploadFile({ uri, name, type: kind === 'video' ? 'video/mp4' : 'image/jpeg' });
-    return j?.filename ? `/uploads/${j.filename}` : (j?.url || uri);
+    const type = kind === 'video' ? 'video/mp4' : 'image/jpeg';
+    const fd = new FormData();
+    if (Platform.OS === 'web') {
+      const blob = await (await fetch(uri)).blob();
+      fd.append('file', blob, name);
+    } else {
+      fd.append('file', { uri, name, type } as any);
+    }
+    const res = await fetch(`${API_BASE}/api/upload`, { method: 'POST', body: fd });
+    const j: any = await res.json();
+    if (!j.success) throw new Error(j.error);
+    return j.filename ? `/uploads/${j.filename}` : (j.url || uri);
   } catch { return uri; }
 }
