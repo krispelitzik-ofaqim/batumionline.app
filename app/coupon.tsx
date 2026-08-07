@@ -1,24 +1,27 @@
-import React, { useState, useRef, useMemo } from 'react';
+import React, { useState, useRef, useMemo, useEffect } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, TextInput, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import QRCode from 'qrcode';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Colors } from '../constants/colors';
-import { resolveUri } from '../constants/api';
+import { resolveUri, fetchContent } from '../constants/api';
 import BottomTabBar from '../components/BottomTabBar';
 
 const F = { x: 'Assistant_800ExtraBold', b: 'Assistant_700Bold', sb: 'Assistant_600SemiBold', m: 'Assistant_500Medium', r: 'Assistant_400Regular' };
 const NAVY = '#16222C', CREAM = '#F5F1EA', GOLD = '#4F8A6E';
 
-// ---- DEMO business (placement / which business = TBD) ----
-const BIZ = {
+// ---- Fallback business (used only when opened with no ?biz= param) ----
+const FALLBACK = {
   id: 'einhayam',
   name: 'עין הים · מסעדה ישראלית',
   address: 'שדרות רוסתוולי 24, בטומי',
   image: '/uploads/heart_batumi.png',
-  activeUntil: '2027-02-06', // set at activation time per the deal (e.g. 6 months / 1 year)
+  activeUntil: '2027-02-06',
+  type: 'variable' as 'variable' | 'fixed',
+  pct: null as number | null,
 };
+const slug = (s: string) => 'r' + Array.from(s).reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 0).toString(36);
 const fmtDate = (iso: string) => { const [y, m, d] = iso.split('-'); return `${d}/${m}/${y}`; };
 const DISCOUNTS = [3, 5, 7, 10];
 
@@ -26,7 +29,7 @@ function todayKey() {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
-const lockKey = (phone: string) => `@coupon:${BIZ.id}:${phone}:${todayKey()}`;
+const lockKey = (bizId: string, phone: string) => `@coupon:${bizId}:${phone}:${todayKey()}`;
 
 function bars(seed: string): number[] {
   const out: number[] = [];
@@ -61,6 +64,8 @@ function DiscountSelect({ value, onChange }: { value: number | null; onChange: (
 }
 
 export default function CouponScreen() {
+  const { biz: bizParam } = useLocalSearchParams<{ biz?: string }>();
+  const [biz, setBiz] = useState<typeof FALLBACK>(FALLBACK);
   const [done, setDone] = useState(false);
   const [date, setDate] = useState(todayKey());
   const [phone, setPhone] = useState('');
@@ -69,19 +74,32 @@ export default function CouponScreen() {
   const [redeemedAt, setRedeemedAt] = useState('');
   const [msg, setMsg] = useState('');
 
-  const valid = todayKey() <= BIZ.activeUntil; // coupon deal still active
-  const barSeed = `${BIZ.id}${phone}${date}`;
-  const code = `${BIZ.id.toUpperCase()}-${date}-${phone.slice(-4) || '0000'}`;
+  // Load the real coupon for the restaurant passed in ?biz=.
+  useEffect(() => {
+    if (!bizParam) return;
+    fetchContent().then((c: any) => {
+      const found = Array.isArray(c?.coupons) ? c.coupons.find((x: any) => (x.restaurant || x.id) === bizParam) : null;
+      if (found) {
+        setBiz({ id: slug(found.restaurant || bizParam), name: found.restaurant || bizParam, address: '', image: found.image || FALLBACK.image, activeUntil: found.to || FALLBACK.activeUntil, type: found.type || 'variable', pct: found.pct ?? null });
+      } else {
+        setBiz({ ...FALLBACK, id: slug(bizParam), name: bizParam, address: '' });
+      }
+    }).catch(() => {});
+  }, [bizParam]);
+
+  const isFixed = biz.type === 'fixed' && !!biz.pct;
+  const valid = todayKey() <= biz.activeUntil; // coupon deal still active
+  const code = `${biz.id.toUpperCase()}-${date}-${phone.slice(-4) || '0000'}`;
 
   const send = async () => {
     setMsg('');
-    if (todayKey() > BIZ.activeUntil) { setMsg('הקופון של בית העסק הסתיים ואינו פעיל'); return; }
+    if (todayKey() > biz.activeUntil) { setMsg('הקופון של בית העסק הסתיים ואינו פעיל'); return; }
     if (!date.trim() || !phone.trim()) { setMsg('נא למלא תאריך וטלפון'); return; }
-    const chosen = selPct;
-    if (!chosen || chosen < 3 || chosen > 10) { setMsg('נא לבחור אחוז הנחה בגלגל (3–10%)'); return; }
+    const chosen = isFixed ? biz.pct : selPct;
+    if (!chosen || chosen < 3 || chosen > 10) { setMsg('נא לבחור אחוז הנחה (3–10%)'); return; }
     // one redemption per phone per day
     try {
-      const raw = await AsyncStorage.getItem(lockKey(phone.trim()));
+      const raw = await AsyncStorage.getItem(lockKey(biz.id, phone.trim()));
       if (raw) {
         const saved = JSON.parse(raw);
         setPct(saved.pct); setRedeemedAt(saved.time); setDone(true);
@@ -92,11 +110,11 @@ export default function CouponScreen() {
     const now = new Date();
     const time = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
     setPct(chosen); setRedeemedAt(time); setDone(true);
-    try { await AsyncStorage.setItem(lockKey(phone.trim()), JSON.stringify({ pct: chosen, time })); } catch {}
+    try { await AsyncStorage.setItem(lockKey(biz.id, phone.trim()), JSON.stringify({ pct: chosen, time })); } catch {}
   };
 
   // QR encodes a deep link that opens this restaurant's page inside our app.
-  const deepLink = `batumionline://place/${BIZ.id}`;
+  const deepLink = `batumionline://place/${biz.id}`;
   const QR = () => {
     const modules = useMemo(() => { try { return QRCode.create(deepLink, { errorCorrectionLevel: 'M' }).modules; } catch { return null; } }, []);
     if (!modules) return null;
@@ -130,20 +148,24 @@ export default function CouponScreen() {
         <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 14, paddingBottom: 32 }}>
           <View style={s.sheet}>
             <View style={s.bizWrap}>
-              <Image source={{ uri: resolveUri(BIZ.image) }} style={s.bizImg} resizeMode="cover" />
+              <Image source={{ uri: resolveUri(biz.image) }} style={s.bizImg} resizeMode="cover" />
               {valid && <View style={s.ribbon}><Text style={s.ribbonTxt}>קבל הנחה מיוחדת</Text></View>}
               <View style={s.bizOverlay}>
-                <Text style={s.bizName}>{BIZ.name}</Text>
-                <Text style={s.bizAddr}>📍 {BIZ.address}</Text>
+                <Text style={s.bizName}>{biz.name}</Text>
+                {!!biz.address && <Text style={s.bizAddr}>📍 {biz.address}</Text>}
               </View>
             </View>
 
-            <Text style={s.bigPct}>עד 10% הנחה</Text>
+            <Text style={s.bigPct}>{isFixed ? `${biz.pct}% הנחה` : 'עד 10% הנחה'}</Text>
             <Text style={s.sub}>הצג את הקופון למלצר בעת התשלום</Text>
-            <Text style={s.validity}>בתוקף עד {fmtDate(BIZ.activeUntil)}</Text>
+            <Text style={s.validity}>בתוקף עד {fmtDate(biz.activeUntil)}</Text>
 
-            <Text style={s.wheelLabel}>גובה ההנחה היום</Text>
-            <DiscountSelect value={selPct} onChange={setSelPct} />
+            {!isFixed && (
+              <>
+                <Text style={s.wheelLabel}>גובה ההנחה היום</Text>
+                <DiscountSelect value={selPct} onChange={setSelPct} />
+              </>
+            )}
 
             <TextInput value={date} onChangeText={setDate} placeholder="תאריך (YYYY-MM-DD)" placeholderTextColor="#94a3b8" style={s.input} />
             <TextInput value={phone} onChangeText={setPhone} placeholder="טלפון" placeholderTextColor="#94a3b8" keyboardType="phone-pad" style={s.input} />
@@ -169,8 +191,8 @@ export default function CouponScreen() {
             <Text style={s.doneMark}>✓</Text>
             <Text style={s.doneTitle}>ההנחה התקבלה בהצלחה</Text>
             <Text style={s.donePct}>{pct}%</Text>
-            <Text style={s.bizName2}>{BIZ.name}</Text>
-            <Text style={s.bizAddr2}>📍 {BIZ.address}</Text>
+            <Text style={s.bizName2}>{biz.name}</Text>
+            {!!biz.address && <Text style={s.bizAddr2}>📍 {biz.address}</Text>}
             <Text style={s.doneTime}>נוצל היום בשעה {redeemedAt}</Text>
             <QR />
             <Text style={s.lockNote}>מימוש נוסף אפשרי מחר (בתאריך חדש). קופון אחד לחשבון משולם בלבד.</Text>

@@ -146,7 +146,7 @@ export default function PlacePage() {
             <View style={{ gap: 8, marginTop: 6 }}>
               {coupon && (
                 <TouchableOpacity style={[s.btn, { backgroundColor: '#4F8A6E' }]} onPress={() => router.push(`/coupon?biz=${encodeURIComponent(title || data.name || '')}` as any)}>
-                  <Text style={s.btnTxt}>🎫 קבל קופון{coupon.type === 'fixed' && coupon.pct ? ` · ${coupon.pct}%` : ''}</Text>
+                  <Text style={s.btnTxt}>🎫 קבל קופון הנחה{coupon.type === 'fixed' && coupon.pct ? ` · ${coupon.pct}%` : ''}</Text>
                 </TouchableOpacity>
               )}
               {!!data.phone && (
