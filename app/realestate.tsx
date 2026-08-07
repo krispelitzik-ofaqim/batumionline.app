@@ -69,7 +69,7 @@ const FEAT: Record<string, Record<Lang, string>> = {
 };
 
 type Unit = { id: string; img: string; price: string; rooms: number; sqm: number; area: 'center' | 'boardwalk'; feats: string[] };
-type Post = { id: string; mode: 'sale' | 'rent'; hl: HL; title: string; price: string; phone: string; images: string[]; featured?: boolean };
+type Post = { id: string; mode: 'sale' | 'rent'; hl: HL; title: string; description?: string; price: string; phone: string; images: string[]; featured?: boolean };
 const ROOMS: Record<Lang, (n: number) => string> = {
   he: (n) => `דירת ${n} חד׳`, en: (n) => `${n}-room apartment`, fa: (n) => `آپارتمان ${n} خوابه`, ru: (n) => `${n}-комн. квартира`,
 };
@@ -87,6 +87,11 @@ const RENT: Unit[] = [
 const hlBg = (hl: HL) => hl === 'yellow' ? '#fffbeb' : hl === 'negative' ? '#0c1e3a' : '#fff';
 const hlBorder = (hl: HL) => hl === 'yellow-border' ? { borderWidth: 2, borderColor: '#f59e0b' } : hl === 'negative' ? { borderWidth: 2, borderColor: '#1e3a8a' } : {};
 
+const PREVIEW_TXT: Record<Lang, string> = { he: 'כך המודעה תיראה', en: 'How your ad will look', fa: 'آگهی شما این‌گونه دیده می‌شود', ru: 'Как будет выглядеть объявление' };
+const SUMMARY_TXT: Record<Lang, string> = { he: 'סיכום', en: 'Summary', fa: 'خلاصه', ru: 'Итог' };
+const DESC_TXT: Record<Lang, string> = { he: 'תיאור המודעה (תוכן)', en: 'Description', fa: 'توضیحات آگهی', ru: 'Описание' };
+const TOP_TXT: Record<Lang, string> = { he: 'קפיצה לראש הרשימה', en: 'Bumped to the top', fa: 'انتقال به بالای فهرست', ru: 'Поднятие в топ' };
+
 export default function RealEstateScreen() {
   const { lang, isRTL } = useI18n();
   const L = (lang as Lang) in TR ? (lang as Lang) : 'en';
@@ -99,6 +104,7 @@ export default function RealEstateScreen() {
   const [plan, setPlan] = useState<'free' | 'paid'>('free');
   const [hl, setHl] = useState<HL>('none');
   const [title, setTitle] = useState('');
+  const [desc, setDesc] = useState('');
   const [price, setPrice] = useState('');
   const [phone, setPhone] = useState('');
   const [images, setImages] = useState<string[]>([]);
@@ -120,7 +126,7 @@ export default function RealEstateScreen() {
     } catch {}
   };
 
-  const resetForm = () => { setPlan('free'); setHl('none'); setTitle(''); setPrice(''); setPhone(''); setImages([]); setEditId(null); };
+  const resetForm = () => { setPlan('free'); setHl('none'); setTitle(''); setDesc(''); setPrice(''); setPhone(''); setImages([]); setEditId(null); };
   const submit = async () => {
     if (!title.trim() || !phone.trim()) { alert(t.missing); return; }
     if (busy) return;
@@ -128,7 +134,7 @@ export default function RealEstateScreen() {
     try {
       const imgs: string[] = [];
       for (const u of images) imgs.push(await uploadLocalUri(u, 'image'));
-      const rec = { board: 'realestate', mode, hl: (plan === 'paid' ? hl : 'none') as HL, title: title.trim(), price: price.trim(), phone: phone.trim(), images: imgs };
+      const rec = { board: 'realestate', mode, hl: (plan === 'paid' ? hl : 'none') as HL, title: title.trim(), description: desc.trim(), price: price.trim(), phone: phone.trim(), images: imgs };
       const ad = editId ? await updateAd(editId, rec) : await createAd(rec);
       if (plan === 'paid' && ad?.id) { const pay = await payAd(ad.id); if (pay?.url) openInAppBrowser(pay.url); }
       await load();
@@ -137,7 +143,7 @@ export default function RealEstateScreen() {
     finally { setBusy(false); }
   };
   const closePost = () => { setPostOpen(false); setDone(false); resetForm(); };
-  const startEdit = (p: Post) => { setEditId(p.id); setPlan(p.featured || p.hl !== 'none' ? 'paid' : 'free'); setHl(p.hl); setTitle(p.title); setPrice(p.price); setPhone(p.phone); setImages(p.images || []); setManageOpen(false); setDone(false); setPostOpen(true); };
+  const startEdit = (p: Post) => { setEditId(p.id); setPlan(p.featured || p.hl !== 'none' ? 'paid' : 'free'); setHl(p.hl); setTitle(p.title); setDesc(p.description || ''); setPrice(p.price); setPhone(p.phone); setImages(p.images || []); setManageOpen(false); setDone(false); setPostOpen(true); };
   const remove = async (id: string) => { try { await deleteAd(id, mPhone.trim()); } catch {} await load(); setMResult(posts.filter(p => p.phone === mPhone.trim() && p.id !== id)); };
   const find = () => setMResult(posts.filter(p => p.phone === mPhone.trim()));
 
@@ -155,6 +161,7 @@ export default function RealEstateScreen() {
             <Text style={[{ fontSize: 16, fontWeight: '900', color: neg ? '#fff' : Colors.TEXT, flex: 1 }, { textAlign: ta, writingDirection: wd }]} numberOfLines={2}>{p.title}</Text>
             {!!p.price && <Text style={{ fontSize: 16, fontWeight: '900', color: neg ? GOLD : '#10b981', marginHorizontal: 8 }}>{p.price}</Text>}
           </View>
+          {!!p.description && <Text style={[s.postDesc, { textAlign: ta, writingDirection: wd }, neg && { color: '#cbd5e1' }]}>{p.description}</Text>}
           {!!p.phone && (
             <View style={[s.contactRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
               <TouchableOpacity onPress={() => Linking.openURL(`https://wa.me/${p.phone.replace(/\D/g, '')}`)} style={[s.cBtn, { backgroundColor: '#25D366' }]}><Text style={s.cBtnTxt}>WhatsApp</Text></TouchableOpacity>
@@ -255,8 +262,27 @@ export default function RealEstateScreen() {
                 </View>
 
                 <TextInput value={title} onChangeText={setTitle} placeholder={t.fTitle} placeholderTextColor="#9aa5b1" style={[s.input, { textAlign: ta, writingDirection: wd }]} />
+                <TextInput value={desc} onChangeText={setDesc} placeholder={DESC_TXT[L]} placeholderTextColor="#9aa5b1" multiline style={[s.input, s.inputArea, { textAlign: ta, writingDirection: wd }]} />
                 <TextInput value={price} onChangeText={setPrice} placeholder={t.fPrice} placeholderTextColor="#9aa5b1" style={[s.input, { textAlign: ta, writingDirection: wd }]} />
                 <TextInput value={phone} onChangeText={setPhone} placeholder={t.fPhone} placeholderTextColor="#9aa5b1" keyboardType="phone-pad" style={[s.input, { textAlign: ta, writingDirection: wd }]} />
+
+                <Text style={[s.sheetLabel, { textAlign: ta, writingDirection: wd, marginTop: 14 }]}>👁 {PREVIEW_TXT[L]}</Text>
+                <PostCard p={{ id: 'preview', mode, hl: plan === 'paid' ? hl : 'none', title: title.trim() || t.fTitle, description: desc.trim(), price: price.trim(), phone: phone.trim() || '—', images, featured: plan === 'paid' }} />
+
+                <View style={s.summaryBox}>
+                  <Text style={[s.summaryLine, { textAlign: ta, writingDirection: wd }]}>{SUMMARY_TXT[L]}</Text>
+                  <View style={[s.summaryRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+                    <Text style={[s.summaryK, { textAlign: ta, writingDirection: wd }]}>{plan === 'paid' ? t.planPaid : t.planFree}</Text>
+                    <Text style={s.summaryV}>{plan === 'paid' ? t.priceTag : t.planFreeSub}</Text>
+                  </View>
+                  {plan === 'paid' && (
+                    <View style={[s.summaryRow, { flexDirection: isRTL ? 'row-reverse' : 'row', marginTop: 6 }]}>
+                      <Text style={[s.summarySub, { textAlign: ta, writingDirection: wd }]}>• {TOP_TXT[L]}</Text>
+                      <Text style={[s.summarySub, { textAlign: ta, writingDirection: wd }]}>• {hl === 'negative' ? t.hlNeg : t.hlYb}</Text>
+                    </View>
+                  )}
+                </View>
+
                 <TouchableOpacity style={[s.postBtn, busy && { opacity: 0.6 }]} disabled={busy} onPress={submit}><Text style={s.postBtnTxt}>{busy ? '…' : (editId ? t.save : t.submit)}</Text></TouchableOpacity>
                 <TouchableOpacity style={{ paddingVertical: 10, alignItems: 'center' }} onPress={closePost}><Text style={{ color: '#64748b', fontWeight: '700' }}>{t.close}</Text></TouchableOpacity>
               </ScrollView>
@@ -336,6 +362,14 @@ const s = StyleSheet.create({
   addThumb: { width: 60, height: 60, borderRadius: 4, borderWidth: 1.5, borderColor: NAVY, borderStyle: 'dashed', alignItems: 'center', justifyContent: 'center' },
   input: { borderWidth: 1.5, borderColor: '#e7e0d4', borderRadius: 4, paddingVertical: 12, paddingHorizontal: 14, fontSize: 15, marginTop: 10, color: '#16222c', fontFamily: F.r },
   doneTxt: { fontSize: 16, fontFamily: F.sb, color: '#16222c', marginTop: 12, marginBottom: 16 },
+  postDesc: { fontSize: 14, fontFamily: F.r, color: '#5c6b76', marginTop: 6, lineHeight: 20 },
+  summaryBox: { backgroundColor: '#f7f2e9', borderRadius: 4, borderWidth: 1, borderColor: '#e7e0d4', padding: 14, marginTop: 12 },
+  summaryLine: { fontSize: 13, fontFamily: F.sb, color: '#7a7261', marginBottom: 8 },
+  summaryRow: { justifyContent: 'space-between', alignItems: 'center' },
+  summaryK: { fontSize: 16, fontFamily: F.m, color: '#16222c', flex: 1 },
+  summaryV: { fontSize: 16, fontFamily: F.b, color: GOLD, marginHorizontal: 8 },
+  summarySub: { fontSize: 12.5, fontFamily: F.sb, color: '#7a7261', flex: 1 },
+  inputArea: { minHeight: 84, textAlignVertical: 'top', paddingTop: 12 },
   mineRow: { flexDirection: 'row', alignItems: 'center', gap: 8, borderTopWidth: 1, borderTopColor: '#efe9df', paddingVertical: 12 },
   miniBtn: { borderRadius: 4, paddingVertical: 7, paddingHorizontal: 12 },
   miniTxt: { color: '#fff', fontFamily: F.b, fontSize: 13 },

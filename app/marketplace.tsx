@@ -13,7 +13,7 @@ import BottomTabBar from '../components/BottomTabBar';
 
 type Lang = 'he' | 'en' | 'fa' | 'ru';
 type HL = 'none' | 'yellow-border' | 'negative';
-type Item = { id: string; title: string; price: string; phone: string; images: string[]; video?: string; hl?: HL; featured?: boolean };
+type Item = { id: string; title: string; description?: string; price: string; phone: string; images: string[]; video?: string; hl?: HL; featured?: boolean };
 const hlBg = (hl?: HL) => hl === 'negative' ? '#0c1e3a' : '#fff';
 const hlBorder = (hl?: HL) => hl === 'yellow-border' ? { borderWidth: 2, borderColor: '#f59e0b' } : hl === 'negative' ? { borderWidth: 2, borderColor: '#1e3a8a' } : {};
 const HERO = 'https://images.unsplash.com/photo-1481437156560-3205f6a55735?w=1000&q=80';
@@ -47,6 +47,11 @@ const TR: Record<Lang, Record<string, string>> = {
         managePrompt: 'Введите телефон, с которого разместили', find: 'Найти', none: 'Товаров нет', edit: 'Изменить', del: 'Удалить' },
 };
 
+const PREVIEW_TXT: Record<Lang, string> = { he: 'כך המודעה תיראה', en: 'How your ad will look', fa: 'آگهی شما این‌گونه دیده می‌شود', ru: 'Как будет выглядеть объявление' };
+const SUMMARY_TXT: Record<Lang, string> = { he: 'סיכום', en: 'Summary', fa: 'خلاصه', ru: 'Итог' };
+const DESC_TXT: Record<Lang, string> = { he: 'תיאור המודעה (תוכן)', en: 'Description', fa: 'توضیحات آگهی', ru: 'Описание' };
+const TOP_TXT: Record<Lang, string> = { he: 'קפיצה לראש הרשימה', en: 'Bumped to the top', fa: 'انتقال به بالای فهرست', ru: 'Поднятие в топ' };
+
 export default function MarketplaceScreen() {
   const { lang, isRTL } = useI18n();
   const L = (lang as Lang) in TR ? (lang as Lang) : 'en';
@@ -59,6 +64,7 @@ export default function MarketplaceScreen() {
   const [plan, setPlan] = useState<'free' | 'paid'>('free');
   const [hl, setHl] = useState<HL>('none');
   const [title, setTitle] = useState('');
+  const [desc, setDesc] = useState('');
   const [price, setPrice] = useState('');
   const [phone, setPhone] = useState('');
   const [images, setImages] = useState<string[]>([]);
@@ -79,7 +85,7 @@ export default function MarketplaceScreen() {
   };
 
   const [busy, setBusy] = useState(false);
-  const reset = () => { setPlan('free'); setHl('none'); setTitle(''); setPrice(''); setPhone(''); setImages([]); setVideo(undefined); setEditId(null); };
+  const reset = () => { setPlan('free'); setHl('none'); setTitle(''); setDesc(''); setPrice(''); setPhone(''); setImages([]); setVideo(undefined); setEditId(null); };
   const submit = async () => {
     if (!title.trim() || !phone.trim()) { alert(t.missing); return; }
     if (busy) return;
@@ -88,7 +94,7 @@ export default function MarketplaceScreen() {
       const imgs: string[] = [];
       for (const u of images) imgs.push(await uploadLocalUri(u, 'image'));
       const vid = video ? await uploadLocalUri(video, 'video') : null;
-      const rec = { board: 'market', title: title.trim(), price: price.trim(), phone: phone.trim(), images: imgs, video: vid, hl: (plan === 'paid' ? hl : 'none') as HL };
+      const rec = { board: 'market', title: title.trim(), description: desc.trim(), price: price.trim(), phone: phone.trim(), images: imgs, video: vid, hl: (plan === 'paid' ? hl : 'none') as HL };
       const ad = editId ? await updateAd(editId, rec) : await createAd(rec);
       if (plan === 'paid' && ad?.id) { const pay = await payAd(ad.id); if (pay?.url) openInAppBrowser(pay.url); }
       await load();
@@ -97,7 +103,7 @@ export default function MarketplaceScreen() {
     finally { setBusy(false); }
   };
   const closePost = () => { setPostOpen(false); setDone(false); reset(); };
-  const startEdit = (x: Item) => { setEditId(x.id); setPlan(x.hl && x.hl !== 'none' ? 'paid' : 'free'); setHl(x.hl || 'none'); setTitle(x.title); setPrice(x.price); setPhone(x.phone); setImages(x.images || []); setVideo(x.video); setManageOpen(false); setDone(false); setPostOpen(true); };
+  const startEdit = (x: Item) => { setEditId(x.id); setPlan(x.hl && x.hl !== 'none' ? 'paid' : 'free'); setHl(x.hl || 'none'); setTitle(x.title); setDesc(x.description || ''); setPrice(x.price); setPhone(x.phone); setImages(x.images || []); setVideo(x.video); setManageOpen(false); setDone(false); setPostOpen(true); };
   const remove = async (id: string) => { try { await deleteAd(id, mPhone.trim()); } catch {} await load(); setMResult((items.filter(x => x.phone === mPhone.trim() && x.id !== id))); };
   const find = () => setMResult(items.filter(x => x.phone === mPhone.trim()));
 
@@ -116,6 +122,7 @@ export default function MarketplaceScreen() {
           <Text style={[s.itemTitle, { textAlign: ta, writingDirection: wd, flex: 1 }, neg && { color: '#fff' }]} numberOfLines={2}>{x.title}</Text>
           {!!x.price && <Text style={[s.itemPrice, neg && { color: GOLD }]}>{x.price}</Text>}
         </View>
+        {!!x.description && <Text style={[s.itemDesc, { textAlign: ta, writingDirection: wd }, neg && { color: '#cbd5e1' }]}>{x.description}</Text>}
         <View style={[s.contactRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
           <TouchableOpacity onPress={() => Linking.openURL(`https://wa.me/${x.phone.replace(/\D/g, '')}`)} style={[s.cBtn, { backgroundColor: '#25D366' }]}><Text style={s.cBtnTxt}>WhatsApp</Text></TouchableOpacity>
           <TouchableOpacity onPress={() => Linking.openURL(`tel:${x.phone}`)} style={[s.cBtn, { backgroundColor: Colors.PRIMARY }]}><Text style={s.cBtnTxt}>{'☎'} {x.phone}</Text></TouchableOpacity>
@@ -196,8 +203,27 @@ export default function MarketplaceScreen() {
                 </View>
                 <TouchableOpacity onPress={pickVideo} style={s.videoBtn}><Text style={s.videoBtnTxt}>{video ? '🎥 ✓' : t.addVideo}</Text></TouchableOpacity>
                 <TextInput value={title} onChangeText={setTitle} placeholder={t.fTitle} placeholderTextColor="#9aa5b1" style={[s.input, { textAlign: ta, writingDirection: wd }]} />
+                <TextInput value={desc} onChangeText={setDesc} placeholder={DESC_TXT[L]} placeholderTextColor="#9aa5b1" multiline style={[s.input, s.inputArea, { textAlign: ta, writingDirection: wd }]} />
                 <TextInput value={price} onChangeText={setPrice} placeholder={t.fPrice} placeholderTextColor="#9aa5b1" style={[s.input, { textAlign: ta, writingDirection: wd }]} />
                 <TextInput value={phone} onChangeText={setPhone} placeholder={t.fPhone} placeholderTextColor="#9aa5b1" keyboardType="phone-pad" style={[s.input, { textAlign: ta, writingDirection: wd }]} />
+
+                <Text style={[s.sheetLabel, { textAlign: ta, writingDirection: wd, marginTop: 14 }]}>👁 {PREVIEW_TXT[L]}</Text>
+                <ItemCard x={{ id: 'preview', title: title.trim() || t.fTitle, description: desc.trim(), price: price.trim(), phone: phone.trim() || '—', images, video, hl: plan === 'paid' ? hl : 'none', featured: plan === 'paid' }} />
+
+                <View style={s.summaryBox}>
+                  <Text style={[s.summaryLine, { textAlign: ta, writingDirection: wd }]}>{SUMMARY_TXT[L]}</Text>
+                  <View style={[s.summaryRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+                    <Text style={[s.summaryK, { textAlign: ta, writingDirection: wd }]}>{plan === 'paid' ? t.planPaid : t.planFree}</Text>
+                    <Text style={s.summaryV}>{plan === 'paid' ? t.priceTag : t.planFreeSub}</Text>
+                  </View>
+                  {plan === 'paid' && (
+                    <View style={[s.summaryRow, { flexDirection: isRTL ? 'row-reverse' : 'row', marginTop: 6 }]}>
+                      <Text style={[s.summarySub, { textAlign: ta, writingDirection: wd }]}>• {TOP_TXT[L]}</Text>
+                      <Text style={[s.summarySub, { textAlign: ta, writingDirection: wd }]}>• {hl === 'negative' ? t.hlNeg : t.hlYb}</Text>
+                    </View>
+                  )}
+                </View>
+
                 <TouchableOpacity style={[s.postBtn, busy && { opacity: 0.6 }]} disabled={busy} onPress={submit}><Text style={s.postBtnTxt}>{busy ? '…' : (editId ? t.save : t.submit)}</Text></TouchableOpacity>
                 <TouchableOpacity style={{ paddingVertical: 10, alignItems: 'center' }} onPress={closePost}><Text style={{ color: '#64748b', fontWeight: '700' }}>{t.close}</Text></TouchableOpacity>
               </ScrollView>
@@ -248,6 +274,7 @@ const s = StyleSheet.create({
   cardBody: { padding: 14 },
   itemTitle: { fontSize: 19, fontFamily: F.m, color: '#16222c' },
   itemPrice: { fontSize: 18, fontFamily: F.b, color: '#2E9E6B', marginHorizontal: 8 },
+  itemDesc: { fontSize: 14, fontFamily: F.r, color: '#5c6b76', marginTop: 6, lineHeight: 20 },
   contactRow: { gap: 8, marginTop: 12 },
   cBtn: { flex: 1, paddingVertical: 11, borderRadius: 4, alignItems: 'center' },
   cBtnTxt: { color: '#fff', fontFamily: F.b, fontSize: 13 },
@@ -272,6 +299,13 @@ const s = StyleSheet.create({
   videoBtnTxt: { color: NAVY, fontFamily: F.sb, fontSize: 14 },
   input: { borderWidth: 1.5, borderColor: '#e7e0d4', borderRadius: 4, paddingVertical: 12, paddingHorizontal: 14, fontSize: 15, marginTop: 10, color: '#16222c', fontFamily: F.r },
   doneTxt: { fontSize: 16, fontFamily: F.sb, color: '#16222c', marginTop: 12, marginBottom: 16 },
+  summaryBox: { backgroundColor: '#f7f2e9', borderRadius: 4, borderWidth: 1, borderColor: '#e7e0d4', padding: 14, marginTop: 12 },
+  summaryLine: { fontSize: 13, fontFamily: F.sb, color: '#7a7261', marginBottom: 8 },
+  summaryRow: { justifyContent: 'space-between', alignItems: 'center' },
+  summaryK: { fontSize: 16, fontFamily: F.m, color: '#16222c', flex: 1 },
+  summaryV: { fontSize: 16, fontFamily: F.b, color: GOLD, marginHorizontal: 8 },
+  summarySub: { fontSize: 12.5, fontFamily: F.sb, color: '#7a7261', flex: 1 },
+  inputArea: { minHeight: 84, textAlignVertical: 'top', paddingTop: 12 },
   mineRow: { flexDirection: 'row', alignItems: 'center', gap: 8, borderTopWidth: 1, borderTopColor: '#efe9df', paddingVertical: 12 },
   miniBtn: { borderRadius: 4, paddingVertical: 7, paddingHorizontal: 12 },
   miniTxt: { color: '#fff', fontFamily: F.b, fontSize: 13 },

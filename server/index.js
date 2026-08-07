@@ -1922,6 +1922,7 @@ app.post('/api/board', (req, res) => {
       board: String(b.board),                 // 'market' | 'realestate'
       mode: b.mode || null,                    // realestate: 'sale' | 'rent'
       title: String(b.title).trim(),
+      description: String(b.description || '').trim(),
       price: String(b.price || '').trim(),
       phone: String(b.phone).trim(),
       images: Array.isArray(b.images) ? b.images.slice(0, 6) : [],
@@ -1947,6 +1948,7 @@ app.put('/api/board/:id', (req, res) => {
     const b = req.body || {};
     if (String(b.phone || '').trim() !== it.phone) return res.status(403).json({ success: false, error: 'phone mismatch' });
     if (b.title !== undefined) it.title = String(b.title).trim();
+    if (b.description !== undefined) it.description = String(b.description).trim();
     if (b.price !== undefined) it.price = String(b.price).trim();
     if (b.mode !== undefined) it.mode = b.mode;
     if (b.hl !== undefined) it.hl = b.hl;
