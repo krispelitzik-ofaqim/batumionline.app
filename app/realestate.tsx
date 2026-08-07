@@ -7,7 +7,11 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Colors } from '../constants/colors';
 import { useI18n } from '../constants/i18n';
+import { openInAppBrowser } from '../constants/affiliates';
 import BottomTabBar from '../components/BottomTabBar';
+
+// Featured Listing · 90 Days — $20 (PayPal hosted payment link)
+const PAYPAL_FEATURED = 'https://www.paypal.com/ncp/payment/K9845EKL6GPCY';
 
 // Trimmed, localized real-estate: For Sale + For Rent, plus a rich
 // "Post a listing" window (size + highlight incl. negative + photos) and
@@ -125,6 +129,7 @@ export default function RealEstateScreen() {
     const rec = { mode, size: (plan === 'paid' ? 'large' : 'small') as 'small' | 'large', hl: plan === 'paid' ? hl : 'none', title: title.trim(), price: price.trim(), phone: phone.trim(), images };
     if (editId) persist(posts.map(p => p.id === editId ? { ...p, ...rec } : p));
     else persist([{ id: `p_${posts.length}_${title.length}_${phone.slice(-4)}`, ...rec }, ...posts]);
+    if (plan === 'paid') openInAppBrowser(PAYPAL_FEATURED);
     resetForm(); setDone(true);
   };
   const closePost = () => { setPostOpen(false); setDone(false); resetForm(); };

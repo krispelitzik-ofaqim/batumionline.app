@@ -8,7 +8,11 @@ import { router } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Colors } from '../constants/colors';
 import { useI18n } from '../constants/i18n';
+import { openInAppBrowser } from '../constants/affiliates';
 import BottomTabBar from '../components/BottomTabBar';
+
+// Featured Listing · 90 Days — $20 (PayPal hosted payment link)
+const PAYPAL_FEATURED = 'https://www.paypal.com/ncp/payment/K9845EKL6GPCY';
 
 type Lang = 'he' | 'en' | 'fa' | 'ru';
 type HL = 'none' | 'yellow-border' | 'negative';
@@ -84,6 +88,7 @@ export default function MarketplaceScreen() {
     const rec = { title: title.trim(), price: price.trim(), phone: phone.trim(), images, video, hl: (plan === 'paid' ? hl : 'none') as HL };
     if (editId) persist(items.map(x => x.id === editId ? { ...x, ...rec } : x));
     else persist([{ id: `m_${items.length}_${title.length}_${phone.slice(-4)}`, ...rec }, ...items]);
+    if (plan === 'paid') openInAppBrowser(PAYPAL_FEATURED);
     reset(); setDone(true);
   };
   const closePost = () => { setPostOpen(false); setDone(false); reset(); };
