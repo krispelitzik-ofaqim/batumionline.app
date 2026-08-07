@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Image, Modal, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Colors } from '../constants/colors';
@@ -20,12 +20,29 @@ const STAY: Coupon[] = [
   { id: 's2', name: 'Boulevard Suites', img: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=800&q=80', off: '9%' },
 ];
 
+// Demo sales-agent credentials (managed from the admin panel later — internal, no server).
+const AGENTS: Record<string, string> = { ana: '0545370088' };
+
 export default function CouponsScreen() {
   const { t, isRTL } = useI18n();
   const [cat, setCat] = useState<'food' | 'stay'>('food');
+  const [agentOpen, setAgentOpen] = useState(false);
+  const [user, setUser] = useState('');
+  const [pass, setPass] = useState('');
+  const [err, setErr] = useState('');
   const wd = isRTL ? 'rtl' : 'ltr';
   const ta = isRTL ? 'right' : 'left';
   const list = cat === 'food' ? FOOD : STAY;
+
+  const login = () => {
+    const u = user.trim().toLowerCase();
+    if (AGENTS[u] && AGENTS[u] === pass.trim()) {
+      setErr(''); setAgentOpen(false); setUser(''); setPass('');
+      router.push('/agent-coupon' as any);
+    } else {
+      setErr('❌');
+    }
+  };
 
   return (
     <SafeAreaView style={s.safe} edges={['top']}>
@@ -57,7 +74,24 @@ export default function CouponsScreen() {
           </TouchableOpacity>
         ))}
         <Text style={[s.soon, { textAlign: 'center', writingDirection: wd }]}>{t('cp.soon')}</Text>
+        <TouchableOpacity style={s.agentBtn} activeOpacity={0.85} onPress={() => { setErr(''); setAgentOpen(true); }}>
+          <Text style={s.agentBtnTxt}>🔑 {t('cp.agents')}</Text>
+        </TouchableOpacity>
       </ScrollView>
+
+      <Modal visible={agentOpen} transparent animationType="slide" onRequestClose={() => setAgentOpen(false)}>
+        <View style={s.modalBg}>
+          <View style={s.sheet}>
+            <Text style={[s.sheetTitle, { textAlign: ta, writingDirection: wd }]}>🔑 {t('cp.agents')}</Text>
+            <TextInput value={user} onChangeText={setUser} placeholder={t('cp.user')} placeholderTextColor="#9aa5b1" autoCapitalize="none" style={[s.input, { textAlign: ta, writingDirection: wd }]} />
+            <TextInput value={pass} onChangeText={setPass} placeholder={t('cp.pass')} placeholderTextColor="#9aa5b1" secureTextEntry style={[s.input, { textAlign: ta, writingDirection: wd }]} />
+            {!!err && <Text style={{ color: '#dc2626', marginTop: 8, textAlign: 'center' }}>{err}</Text>}
+            <TouchableOpacity style={s.loginBtn} onPress={login}><Text style={s.loginTxt}>{t('cp.login')}</Text></TouchableOpacity>
+            <Text style={[s.agentNote, { textAlign: 'center', writingDirection: wd }]}>{t('cp.agentNote')}</Text>
+            <TouchableOpacity style={{ paddingVertical: 10, alignItems: 'center' }} onPress={() => setAgentOpen(false)}><Text style={{ color: '#64748b', fontFamily: F.sb }}>✕</Text></TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
       <BottomTabBar />
     </SafeAreaView>
   );
@@ -82,4 +116,13 @@ const s = StyleSheet.create({
   cardName: { fontSize: 21, fontFamily: F.m, color: '#16222c' },
   cardSub: { fontSize: 13, fontFamily: F.r, color: '#94a0ab', marginTop: 3 },
   soon: { color: '#a9b2ba', fontSize: 13, fontFamily: F.r, marginTop: 4 },
+  agentBtn: { marginTop: 18, alignSelf: 'center', borderWidth: 1.5, borderColor: NAVY, borderRadius: 4, paddingVertical: 11, paddingHorizontal: 22 },
+  agentBtnTxt: { color: NAVY, fontFamily: F.sb, fontSize: 14 },
+  modalBg: { flex: 1, backgroundColor: 'rgba(0,0,0,0.45)', justifyContent: 'flex-end' },
+  sheet: { backgroundColor: '#fff', borderTopLeftRadius: 12, borderTopRightRadius: 12, padding: 20 },
+  sheetTitle: { fontSize: 22, fontFamily: F.m, color: '#16222c', marginBottom: 14 },
+  input: { borderWidth: 1.5, borderColor: '#e7e0d4', borderRadius: 4, paddingVertical: 12, paddingHorizontal: 14, fontSize: 15, marginTop: 10, color: '#16222c', fontFamily: F.r },
+  loginBtn: { backgroundColor: NAVY, borderRadius: 4, paddingVertical: 14, alignItems: 'center', marginTop: 14 },
+  loginTxt: { color: '#fff', fontFamily: F.b, fontSize: 16 },
+  agentNote: { color: '#a9a291', fontSize: 12, fontFamily: F.r, marginTop: 12 },
 });

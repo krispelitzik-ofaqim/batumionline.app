@@ -22,7 +22,8 @@ const TR: Record<Lang, Record<string, string>> = {
   he: { title: 'נדל״ן בבטומי', kicker: 'BATUMI REAL ESTATE', sale: 'למכירה', rent: 'להשכרה', month: '/חודש',
         postCta: '📢 פרסם מודעת נדל״ן', manageCta: '⚙️ המודעות שלי', postTitle: 'העלאת מודעה', editTitle: 'עריכת מודעה',
         typeLbl: 'סוג תצוגה', small: 'מודעה קטנה', large: 'מודעה גדולה', free: 'חינם',
-        hlLbl: 'הדגשה', hlNone: 'ללא', hlYellow: 'צהוב', hlNeg: 'נגטיב', hlYb: 'צהוב + מסגרת',
+        hlLbl: 'הדגשה', hlNone: 'ללא', hlYellow: 'צהוב', hlNeg: 'נגטיב', hlYb: 'מסגרת כתומה',
+        planLbl: 'סוג מודעה', planFree: 'מודעה לבנה', planFreeSub: 'חינם', planPaid: 'מודעה מובלטת', priceTag: '$20 · 90 יום', styleLbl: 'סגנון הבלטה', payNote: 'התשלום בעת הפרסום · PayPal',
         photos: 'תמונות', addPhotos: '＋ הוסף תמונות',
         fTitle: 'כותרת המודעה', fPrice: 'מחיר', fPhone: 'טלפון ליצירת קשר', submit: 'פרסם מודעה', save: 'שמור שינויים',
         done: 'המודעה נשלחה! נחזור אליך בהקדם.', close: 'סגור', missing: 'נא למלא כותרת וטלפון',
@@ -30,7 +31,8 @@ const TR: Record<Lang, Record<string, string>> = {
   en: { title: 'Batumi Real Estate', kicker: 'BATUMI REAL ESTATE', sale: 'For sale', rent: 'For rent', month: '/mo',
         postCta: '📢 Post a property listing', manageCta: '⚙️ My listings', postTitle: 'Post a listing', editTitle: 'Edit listing',
         typeLbl: 'Display type', small: 'Small listing', large: 'Large listing', free: 'Free',
-        hlLbl: 'Highlight', hlNone: 'None', hlYellow: 'Yellow', hlNeg: 'Negative', hlYb: 'Yellow + border',
+        hlLbl: 'Highlight', hlNone: 'None', hlYellow: 'Yellow', hlNeg: 'Negative', hlYb: 'Orange border',
+        planLbl: 'Listing type', planFree: 'White listing', planFreeSub: 'Free', planPaid: 'Featured listing', priceTag: '$20 · 90 days', styleLbl: 'Highlight style', payNote: 'Paid on posting · PayPal',
         photos: 'Photos', addPhotos: '＋ Add photos',
         fTitle: 'Listing title', fPrice: 'Price', fPhone: 'Contact phone', submit: 'Post listing', save: 'Save changes',
         done: 'Listing submitted! We’ll get back to you soon.', close: 'Close', missing: 'Please fill in a title and phone',
@@ -38,7 +40,8 @@ const TR: Record<Lang, Record<string, string>> = {
   fa: { title: 'املاک در باتومی', kicker: 'BATUMI REAL ESTATE', sale: 'برای فروش', rent: 'برای اجاره', month: '/ماه',
         postCta: '📢 ثبت آگهی ملک', manageCta: '⚙️ آگهی‌های من', postTitle: 'ثبت آگهی', editTitle: 'ویرایش آگهی',
         typeLbl: 'نوع نمایش', small: 'آگهی کوچک', large: 'آگهی بزرگ', free: 'رایگان',
-        hlLbl: 'برجسته‌سازی', hlNone: 'بدون', hlYellow: 'زرد', hlNeg: 'نگاتیو', hlYb: 'زرد + قاب',
+        hlLbl: 'برجسته‌سازی', hlNone: 'بدون', hlYellow: 'زرد', hlNeg: 'نگاتیو', hlYb: 'قاب نارنجی',
+        planLbl: 'نوع آگهی', planFree: 'آگهی ساده', planFreeSub: 'رایگان', planPaid: 'آگهی ویژه', priceTag: '۲۰$ · ۹۰ روز', styleLbl: 'سبک برجسته‌سازی', payNote: 'پرداخت هنگام ثبت · PayPal',
         photos: 'عکس‌ها', addPhotos: '＋ افزودن عکس',
         fTitle: 'عنوان آگهی', fPrice: 'قیمت', fPhone: 'تلفن تماس', submit: 'ثبت آگهی', save: 'ذخیره تغییرات',
         done: 'آگهی ارسال شد! به‌زودی با شما تماس می‌گیریم.', close: 'بستن', missing: 'لطفاً عنوان و تلفن را وارد کنید',
@@ -46,7 +49,8 @@ const TR: Record<Lang, Record<string, string>> = {
   ru: { title: 'Недвижимость в Батуми', kicker: 'BATUMI REAL ESTATE', sale: 'Продажа', rent: 'Аренда', month: '/мес',
         postCta: '📢 Разместить объявление', manageCta: '⚙️ Мои объявления', postTitle: 'Разместить объявление', editTitle: 'Редактировать',
         typeLbl: 'Тип показа', small: 'Малое объявление', large: 'Большое объявление', free: 'Бесплатно',
-        hlLbl: 'Выделение', hlNone: 'Нет', hlYellow: 'Жёлтый', hlNeg: 'Негатив', hlYb: 'Жёлтый + рамка',
+        hlLbl: 'Выделение', hlNone: 'Нет', hlYellow: 'Жёлтый', hlNeg: 'Негатив', hlYb: 'Оранжевая рамка',
+        planLbl: 'Тип объявления', planFree: 'Обычное объявление', planFreeSub: 'Бесплатно', planPaid: 'Выделенное объявление', priceTag: '$20 · 90 дней', styleLbl: 'Стиль выделения', payNote: 'Оплата при публикации · PayPal',
         photos: 'Фото', addPhotos: '＋ Добавить фото',
         fTitle: 'Заголовок объявления', fPrice: 'Цена', fPhone: 'Телефон для связи', submit: 'Разместить', save: 'Сохранить',
         done: 'Объявление отправлено! Мы скоро свяжемся с вами.', close: 'Закрыть', missing: 'Заполните заголовок и телефон',
@@ -80,7 +84,7 @@ const RENT: Unit[] = [
   { id: 'r2', img: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80', price: '$1,200', rooms: 3, sqm: 90, area: 'boardwalk', feats: ['seaView', 'furnished', 'parking'] },
 ];
 
-const hlBg = (hl: HL) => (hl === 'yellow' || hl === 'yellow-border') ? '#fffbeb' : hl === 'negative' ? '#0c1e3a' : '#fff';
+const hlBg = (hl: HL) => hl === 'yellow' ? '#fffbeb' : hl === 'negative' ? '#0c1e3a' : '#fff';
 const hlBorder = (hl: HL) => hl === 'yellow-border' ? { borderWidth: 2, borderColor: '#f59e0b' } : hl === 'negative' ? { borderWidth: 2, borderColor: '#1e3a8a' } : {};
 
 export default function RealEstateScreen() {
@@ -92,7 +96,7 @@ export default function RealEstateScreen() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [postOpen, setPostOpen] = useState(false);
   const [manageOpen, setManageOpen] = useState(false);
-  const [size, setSize] = useState<'small' | 'large'>('small');
+  const [plan, setPlan] = useState<'free' | 'paid'>('free');
   const [hl, setHl] = useState<HL>('none');
   const [title, setTitle] = useState('');
   const [price, setPrice] = useState('');
@@ -115,16 +119,16 @@ export default function RealEstateScreen() {
     } catch {}
   };
 
-  const resetForm = () => { setSize('small'); setHl('none'); setTitle(''); setPrice(''); setPhone(''); setImages([]); setEditId(null); };
+  const resetForm = () => { setPlan('free'); setHl('none'); setTitle(''); setPrice(''); setPhone(''); setImages([]); setEditId(null); };
   const submit = () => {
     if (!title.trim() || !phone.trim()) { alert(t.missing); return; }
-    const rec = { mode, size, hl, title: title.trim(), price: price.trim(), phone: phone.trim(), images };
+    const rec = { mode, size: (plan === 'paid' ? 'large' : 'small') as 'small' | 'large', hl: plan === 'paid' ? hl : 'none', title: title.trim(), price: price.trim(), phone: phone.trim(), images };
     if (editId) persist(posts.map(p => p.id === editId ? { ...p, ...rec } : p));
     else persist([{ id: `p_${posts.length}_${title.length}_${phone.slice(-4)}`, ...rec }, ...posts]);
     resetForm(); setDone(true);
   };
   const closePost = () => { setPostOpen(false); setDone(false); resetForm(); };
-  const startEdit = (p: Post) => { setEditId(p.id); setSize(p.size); setHl(p.hl); setTitle(p.title); setPrice(p.price); setPhone(p.phone); setImages(p.images || []); setManageOpen(false); setDone(false); setPostOpen(true); };
+  const startEdit = (p: Post) => { setEditId(p.id); setPlan(p.hl !== 'none' || p.size === 'large' ? 'paid' : 'free'); setHl(p.hl); setTitle(p.title); setPrice(p.price); setPhone(p.phone); setImages(p.images || []); setManageOpen(false); setDone(false); setPostOpen(true); };
   const remove = (id: string) => { const list = posts.filter(p => p.id !== id); persist(list); setMResult(list.filter(p => p.phone === mPhone.trim())); };
   const find = () => setMResult(posts.filter(p => p.phone === mPhone.trim()));
 
@@ -217,19 +221,22 @@ export default function RealEstateScreen() {
               <ScrollView showsVerticalScrollIndicator={false}>
                 <Text style={[s.sheetTitle, { textAlign: ta, writingDirection: wd }]}>{editId ? t.editTitle : t.postTitle}</Text>
 
-                <Text style={[s.sheetLabel, { textAlign: ta, writingDirection: wd }]}>{t.typeLbl}</Text>
+                <Text style={[s.sheetLabel, { textAlign: ta, writingDirection: wd }]}>{t.planLbl}</Text>
                 <View style={[s.rowWrap, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-                  <Chip on={size === 'small'} label={t.small} sub={t.free} onPress={() => setSize('small')} />
-                  <Chip on={size === 'large'} label={t.large} sub={t.free} onPress={() => setSize('large')} />
+                  <Chip on={plan === 'free'} label={t.planFree} sub={t.planFreeSub} onPress={() => { setPlan('free'); setHl('none'); }} />
+                  <Chip on={plan === 'paid'} label={t.planPaid} sub={t.priceTag} onPress={() => { setPlan('paid'); if (hl === 'none') setHl('yellow-border'); }} />
                 </View>
 
-                <Text style={[s.sheetLabel, { textAlign: ta, writingDirection: wd, marginTop: 6 }]}>{t.hlLbl}</Text>
-                <View style={[s.rowWrap, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-                  <Chip on={hl === 'none'} label={t.hlNone} onPress={() => setHl('none')} />
-                  <Chip on={hl === 'yellow'} label={t.hlYellow} onPress={() => setHl('yellow')} />
-                  <Chip on={hl === 'negative'} label={t.hlNeg} onPress={() => setHl('negative')} />
-                  <Chip on={hl === 'yellow-border'} label={t.hlYb} onPress={() => setHl('yellow-border')} />
-                </View>
+                {plan === 'paid' && (
+                  <>
+                    <Text style={[s.sheetLabel, { textAlign: ta, writingDirection: wd, marginTop: 6 }]}>{t.styleLbl}</Text>
+                    <View style={[s.rowWrap, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+                      <Chip on={hl === 'yellow-border'} label={t.hlYb} onPress={() => setHl('yellow-border')} />
+                      <Chip on={hl === 'negative'} label={t.hlNeg} onPress={() => setHl('negative')} />
+                    </View>
+                    <Text style={[s.sheetLabel, { textAlign: ta, writingDirection: wd, marginTop: 4 }]}>💳 {t.payNote}</Text>
+                  </>
+                )}
 
                 <Text style={[s.sheetLabel, { textAlign: ta, writingDirection: wd, marginTop: 6 }]}>{t.photos} ({images.length}/6)</Text>
                 <View style={[s.rowWrap, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>

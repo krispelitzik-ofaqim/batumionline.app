@@ -6,6 +6,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Colors } from '../constants/colors';
 import BottomTabBar from '../components/BottomTabBar';
 
+const F = { x: 'Assistant_800ExtraBold', b: 'Assistant_700Bold', sb: 'Assistant_600SemiBold', m: 'Assistant_500Medium', r: 'Assistant_400Regular' };
+const NAVY = '#16222C', CREAM = '#F5F1EA', GOLD = '#4F8A6E';
+
 type Row = { date: string; last4: string; pct: number; time: string };
 // A few sample redemptions so the list isn't empty in the demo.
 const DEMO_ROWS: Row[] = [
@@ -90,7 +93,7 @@ export default function CouponDashboard() {
             {HOURLY.map((x) => (
               <View key={x.h} style={s.barCol}>
                 <Text style={s.barVal}>{x.n}</Text>
-                <View style={[s.bar, { height: 12 + (x.n / MAX) * 120, backgroundColor: x.n === MAX ? Colors.ACCENT : Colors.SECONDARY }]} />
+                <View style={[s.bar, { height: 12 + (x.n / MAX) * 120, backgroundColor: x.n === MAX ? GOLD : '#A7C0B4' }]} />
                 <Text style={s.barLbl}>{x.h}</Text>
               </View>
             ))}
@@ -109,7 +112,7 @@ export default function CouponDashboard() {
           {rows.map((r, i) => (
             <View key={i} style={[s.tr, i % 2 === 0 && { backgroundColor: '#f8fafc' }]}>
               <Text style={[s.td, { flex: 1.2 }]}>{r.date}</Text>
-              <Text style={[s.td, { width: 60, fontWeight: '900', color: Colors.PRIMARY }]}>{r.pct}%</Text>
+              <Text style={[s.td, { width: 60, fontFamily: F.b, color: NAVY }]}>{r.pct}%</Text>
               <Text style={[s.td, { width: 80 }]}>····{r.last4}</Text>
               <Text style={[s.td, { width: 52 }]}>{r.time}</Text>
             </View>
@@ -133,38 +136,38 @@ export default function CouponDashboard() {
 }
 
 const s = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: Colors.BACKGROUND },
-  header: { flexDirection: 'row-reverse', alignItems: 'center', padding: 12, gap: 8, backgroundColor: Colors.PRIMARY },
-  backBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(255,255,255,0.2)', alignItems: 'center', justifyContent: 'center' },
-  backTxt: { color: '#fff', fontSize: 24, fontWeight: '300' },
-  hTitle: { flex: 1, fontSize: 16, fontWeight: '900', color: '#fff', textAlign: 'right', writingDirection: 'rtl' },
-  periodRow: { flexDirection: 'row-reverse', gap: 6, marginBottom: 12 },
-  periodBtn: { flex: 1, paddingVertical: 8, borderRadius: 10, backgroundColor: '#fff', borderWidth: 1, borderColor: '#e2e8f0', alignItems: 'center' },
-  periodBtnOn: { backgroundColor: Colors.PRIMARY, borderColor: Colors.PRIMARY },
-  periodTxt: { fontSize: 12, fontWeight: '800', color: '#475569', writingDirection: 'rtl' },
+  safe: { flex: 1, backgroundColor: CREAM },
+  header: { flexDirection: 'row-reverse', alignItems: 'center', padding: 12, gap: 8, backgroundColor: NAVY },
+  backBtn: { width: 36, height: 36, borderRadius: 8, backgroundColor: 'rgba(255,255,255,0.16)', alignItems: 'center', justifyContent: 'center' },
+  backTxt: { color: '#fff', fontSize: 24, fontFamily: F.r },
+  hTitle: { flex: 1, fontSize: 20, fontFamily: F.m, color: '#fff', textAlign: 'right', writingDirection: 'rtl' },
+  periodRow: { flexDirection: 'row-reverse', gap: 6, marginBottom: 14 },
+  periodBtn: { flex: 1, paddingVertical: 10, borderRadius: 4, backgroundColor: '#fff', borderWidth: 1, borderColor: '#e7e0d4', alignItems: 'center' },
+  periodBtnOn: { backgroundColor: NAVY, borderColor: NAVY },
+  periodTxt: { fontSize: 13, fontFamily: F.sb, color: NAVY, writingDirection: 'rtl' },
   periodTxtOn: { color: '#fff' },
-  summaryCard: { backgroundColor: '#fff', borderRadius: 16, padding: 18, alignItems: 'center', marginBottom: 14, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 6, elevation: 2 },
-  summaryVal: { fontSize: 44, fontWeight: '900', color: Colors.PRIMARY },
-  summaryLbl: { fontSize: 13, color: '#64748b', fontWeight: '700', writingDirection: 'rtl', marginTop: 2 },
-  summaryMetaRow: { flexDirection: 'row-reverse', gap: 12, marginTop: 14 },
-  metaBox: { alignItems: 'center', paddingHorizontal: 16, paddingVertical: 6, backgroundColor: '#f1f5f9', borderRadius: 10 },
-  metaVal: { fontSize: 18, fontWeight: '900', color: Colors.TEXT },
-  metaLbl: { fontSize: 10, color: '#64748b', writingDirection: 'rtl', marginTop: 2 },
-  card: { backgroundColor: '#fff', borderRadius: 16, padding: 16, marginBottom: 14 },
-  cardTitle: { fontSize: 15, fontWeight: '900', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl', marginBottom: 14 },
+  summaryCard: { backgroundColor: '#fff', borderRadius: 4, padding: 20, alignItems: 'center', marginBottom: 14, shadowColor: '#1a2b35', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.08, shadowRadius: 14, elevation: 3 },
+  summaryVal: { fontSize: 48, fontFamily: F.x, color: NAVY },
+  summaryLbl: { fontSize: 13, color: '#7a7261', fontFamily: F.sb, writingDirection: 'rtl', marginTop: 2 },
+  summaryMetaRow: { flexDirection: 'row-reverse', gap: 12, marginTop: 16 },
+  metaBox: { alignItems: 'center', paddingHorizontal: 18, paddingVertical: 8, backgroundColor: '#f2ede3', borderRadius: 4 },
+  metaVal: { fontSize: 18, fontFamily: F.b, color: '#16222c' },
+  metaLbl: { fontSize: 10, color: '#7a7261', fontFamily: F.r, writingDirection: 'rtl', marginTop: 2 },
+  card: { backgroundColor: '#fff', borderRadius: 4, padding: 16, marginBottom: 14, shadowColor: '#1a2b35', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.06, shadowRadius: 12, elevation: 2 },
+  cardTitle: { fontSize: 17, fontFamily: F.m, color: '#16222c', textAlign: 'right', writingDirection: 'rtl', marginBottom: 14 },
   chart: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', height: 170 },
   barCol: { flex: 1, alignItems: 'center' },
-  bar: { width: '62%', borderRadius: 4, marginTop: 4 },
-  barVal: { fontSize: 9, color: '#94a3b8', fontWeight: '700' },
-  barLbl: { fontSize: 9, color: '#64748b', marginTop: 4 },
-  trHead: { flexDirection: 'row-reverse', paddingBottom: 8, borderBottomWidth: 2, borderBottomColor: '#e2e8f0' },
-  th: { fontSize: 12, fontWeight: '900', color: '#64748b', textAlign: 'center' },
-  tr: { flexDirection: 'row-reverse', paddingVertical: 9, borderRadius: 6, alignItems: 'center' },
-  td: { fontSize: 12, color: Colors.TEXT, textAlign: 'center', fontWeight: '600' },
-  promo: { backgroundColor: Colors.TEXT, borderRadius: 16, padding: 18, marginBottom: 14 },
-  promoTitle: { fontSize: 16, fontWeight: '900', color: '#fff', textAlign: 'right', writingDirection: 'rtl' },
-  promoSub: { fontSize: 12, color: '#cbd5e1', textAlign: 'right', writingDirection: 'rtl', marginTop: 6, lineHeight: 18 },
-  promoBtn: { backgroundColor: Colors.ACCENT, borderRadius: 12, paddingVertical: 12, alignItems: 'center', marginTop: 14 },
-  promoBtnTxt: { color: '#fff', fontSize: 15, fontWeight: '900' },
-  note: { fontSize: 10, color: '#94a3b8', textAlign: 'center', marginTop: 6, writingDirection: 'rtl' },
+  bar: { width: '62%', borderRadius: 3, marginTop: 4 },
+  barVal: { fontSize: 9, color: '#a9a291', fontFamily: F.sb },
+  barLbl: { fontSize: 9, color: '#7a7261', fontFamily: F.r, marginTop: 4 },
+  trHead: { flexDirection: 'row-reverse', paddingBottom: 8, borderBottomWidth: 2, borderBottomColor: '#efe9df' },
+  th: { fontSize: 12, fontFamily: F.b, color: '#7a7261', textAlign: 'center' },
+  tr: { flexDirection: 'row-reverse', paddingVertical: 9, alignItems: 'center' },
+  td: { fontSize: 12, color: '#16222c', textAlign: 'center', fontFamily: F.sb },
+  promo: { backgroundColor: NAVY, borderRadius: 4, padding: 20, marginBottom: 14 },
+  promoTitle: { fontSize: 18, fontFamily: F.m, color: '#fff', textAlign: 'right', writingDirection: 'rtl' },
+  promoSub: { fontSize: 12.5, color: '#cbd5e1', fontFamily: F.r, textAlign: 'right', writingDirection: 'rtl', marginTop: 6, lineHeight: 19 },
+  promoBtn: { backgroundColor: GOLD, borderRadius: 4, paddingVertical: 13, alignItems: 'center', marginTop: 16 },
+  promoBtnTxt: { color: '#fff', fontSize: 15, fontFamily: F.b },
+  note: { fontSize: 10, color: '#a9a291', fontFamily: F.r, textAlign: 'center', marginTop: 6, writingDirection: 'rtl' },
 });

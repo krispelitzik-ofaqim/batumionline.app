@@ -11,7 +11,10 @@ import { useI18n } from '../constants/i18n';
 import BottomTabBar from '../components/BottomTabBar';
 
 type Lang = 'he' | 'en' | 'fa' | 'ru';
-type Item = { id: string; title: string; price: string; phone: string; images: string[]; video?: string };
+type HL = 'none' | 'yellow-border' | 'negative';
+type Item = { id: string; title: string; price: string; phone: string; images: string[]; video?: string; hl?: HL };
+const hlBg = (hl?: HL) => hl === 'negative' ? '#0c1e3a' : '#fff';
+const hlBorder = (hl?: HL) => hl === 'yellow-border' ? { borderWidth: 2, borderColor: '#f59e0b' } : hl === 'negative' ? { borderWidth: 2, borderColor: '#1e3a8a' } : {};
 const STORE = '@market:items/v2';
 const HERO = 'https://images.unsplash.com/photo-1481437156560-3205f6a55735?w=1000&q=80';
 const F = { x: 'Assistant_800ExtraBold', b: 'Assistant_700Bold', sb: 'Assistant_600SemiBold', m: 'Assistant_500Medium', r: 'Assistant_400Regular' };
@@ -21,21 +24,25 @@ const TR: Record<Lang, Record<string, string>> = {
   he: { title: 'יד2 בטומי', kicker: 'BATUMI CLASSIFIEDS', sub: 'קנייה ומכירה בין הגולשים', postCta: '📢 פרסם מוצר', manageCta: '⚙️ המוצרים שלי',
         postTitle: 'פרסום מוצר', editTitle: 'עריכת מוצר', fTitle: 'מה מוכרים?', fPrice: 'מחיר', fPhone: 'טלפון ליצירת קשר',
         photos: 'תמונות', addPhotos: '＋ הוסף תמונות', video: 'וידאו', addVideo: '🎥 הוסף וידאו', submit: 'פרסם', save: 'שמור שינויים',
+        planLbl: 'סוג מודעה', planFree: 'מודעה לבנה', planFreeSub: 'חינם', planPaid: 'מודעה מובלטת', priceTag: '$20 · 90 יום', styleLbl: 'סגנון הבלטה', hlYb: 'מסגרת כתומה', hlNeg: 'נגטיב', payNote: 'התשלום בעת הפרסום · PayPal',
         empty: 'עדיין אין מוצרים — היו הראשונים!', missing: 'נא למלא כותרת וטלפון', done: 'המוצר פורסם!', close: 'סגור',
         managePrompt: 'הזן את הטלפון שפרסמת איתו', find: 'חפש', none: 'לא נמצאו מוצרים לטלפון זה', edit: 'ערוך', del: 'מחק' },
   en: { title: 'Batumi Classifieds', kicker: 'BATUMI CLASSIFIEDS', sub: 'Community buy & sell', postCta: '📢 Post an item', manageCta: '⚙️ My items',
         postTitle: 'Post an item', editTitle: 'Edit item', fTitle: 'What are you selling?', fPrice: 'Price', fPhone: 'Contact phone',
         photos: 'Photos', addPhotos: '＋ Add photos', video: 'Video', addVideo: '🎥 Add video', submit: 'Post', save: 'Save changes',
+        planLbl: 'Listing type', planFree: 'White listing', planFreeSub: 'Free', planPaid: 'Featured listing', priceTag: '$20 · 90 days', styleLbl: 'Highlight style', hlYb: 'Orange border', hlNeg: 'Negative', payNote: 'Paid on posting · PayPal',
         empty: 'No items yet — be the first!', missing: 'Please fill in a title and phone', done: 'Item posted!', close: 'Close',
         managePrompt: 'Enter the phone you posted with', find: 'Find', none: 'No items for this phone', edit: 'Edit', del: 'Delete' },
   fa: { title: 'نیازمندی‌های باتومی', kicker: 'BATUMI CLASSIFIEDS', sub: 'خرید و فروش بین کاربران', postCta: '📢 ثبت آگهی', manageCta: '⚙️ آگهی‌های من',
         postTitle: 'ثبت آگهی', editTitle: 'ویرایش آگهی', fTitle: 'چه می‌فروشید؟', fPrice: 'قیمت', fPhone: 'تلفن تماس',
         photos: 'عکس‌ها', addPhotos: '＋ افزودن عکس', video: 'ویدیو', addVideo: '🎥 افزودن ویدیو', submit: 'ثبت', save: 'ذخیره',
+        planLbl: 'نوع آگهی', planFree: 'آگهی ساده', planFreeSub: 'رایگان', planPaid: 'آگهی ویژه', priceTag: '۲۰$ · ۹۰ روز', styleLbl: 'سبک برجسته‌سازی', hlYb: 'قاب نارنجی', hlNeg: 'نگاتیو', payNote: 'پرداخت هنگام ثبت · PayPal',
         empty: 'هنوز آگهی‌ای نیست — اولین نفر باشید!', missing: 'لطفاً عنوان و تلفن را وارد کنید', done: 'آگهی ثبت شد!', close: 'بستن',
         managePrompt: 'تلفنی که با آن ثبت کردید را وارد کنید', find: 'جستجو', none: 'آگهی‌ای یافت نشد', edit: 'ویرایش', del: 'حذف' },
   ru: { title: 'Объявления Батуми', kicker: 'BATUMI CLASSIFIEDS', sub: 'Купля-продажа между пользователями', postCta: '📢 Разместить товар', manageCta: '⚙️ Мои товары',
         postTitle: 'Разместить товар', editTitle: 'Редактировать', fTitle: 'Что продаёте?', fPrice: 'Цена', fPhone: 'Телефон для связи',
         photos: 'Фото', addPhotos: '＋ Добавить фото', video: 'Видео', addVideo: '🎥 Добавить видео', submit: 'Разместить', save: 'Сохранить',
+        planLbl: 'Тип объявления', planFree: 'Обычное', planFreeSub: 'Бесплатно', planPaid: 'Выделенное', priceTag: '$20 · 90 дней', styleLbl: 'Стиль выделения', hlYb: 'Оранжевая рамка', hlNeg: 'Негатив', payNote: 'Оплата при публикации · PayPal',
         empty: 'Пока нет товаров — будьте первым!', missing: 'Заполните заголовок и телефон', done: 'Товар размещён!', close: 'Закрыть',
         managePrompt: 'Введите телефон, с которого разместили', find: 'Найти', none: 'Товаров нет', edit: 'Изменить', del: 'Удалить' },
 };
@@ -49,6 +56,8 @@ export default function MarketplaceScreen() {
   const [items, setItems] = useState<Item[]>([]);
   const [postOpen, setPostOpen] = useState(false);
   const [manageOpen, setManageOpen] = useState(false);
+  const [plan, setPlan] = useState<'free' | 'paid'>('free');
+  const [hl, setHl] = useState<HL>('none');
   const [title, setTitle] = useState('');
   const [price, setPrice] = useState('');
   const [phone, setPhone] = useState('');
@@ -69,21 +78,23 @@ export default function MarketplaceScreen() {
     try { const r = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['videos'] as any, quality: 0.6 }); if (!r.canceled && r.assets[0]) setVideo(r.assets[0].uri); } catch {}
   };
 
-  const reset = () => { setTitle(''); setPrice(''); setPhone(''); setImages([]); setVideo(undefined); setEditId(null); };
+  const reset = () => { setPlan('free'); setHl('none'); setTitle(''); setPrice(''); setPhone(''); setImages([]); setVideo(undefined); setEditId(null); };
   const submit = () => {
     if (!title.trim() || !phone.trim()) { alert(t.missing); return; }
-    const rec = { title: title.trim(), price: price.trim(), phone: phone.trim(), images, video };
+    const rec = { title: title.trim(), price: price.trim(), phone: phone.trim(), images, video, hl: (plan === 'paid' ? hl : 'none') as HL };
     if (editId) persist(items.map(x => x.id === editId ? { ...x, ...rec } : x));
     else persist([{ id: `m_${items.length}_${title.length}_${phone.slice(-4)}`, ...rec }, ...items]);
     reset(); setDone(true);
   };
   const closePost = () => { setPostOpen(false); setDone(false); reset(); };
-  const startEdit = (x: Item) => { setEditId(x.id); setTitle(x.title); setPrice(x.price); setPhone(x.phone); setImages(x.images || []); setVideo(x.video); setManageOpen(false); setDone(false); setPostOpen(true); };
+  const startEdit = (x: Item) => { setEditId(x.id); setPlan(x.hl && x.hl !== 'none' ? 'paid' : 'free'); setHl(x.hl || 'none'); setTitle(x.title); setPrice(x.price); setPhone(x.phone); setImages(x.images || []); setVideo(x.video); setManageOpen(false); setDone(false); setPostOpen(true); };
   const remove = (id: string) => { const list = items.filter(x => x.id !== id); persist(list); setMResult(list.filter(x => x.phone === mPhone.trim())); };
   const find = () => setMResult(items.filter(x => x.phone === mPhone.trim()));
 
-  const ItemCard = ({ x }: { x: Item }) => (
-    <View style={s.card}>
+  const ItemCard = ({ x }: { x: Item }) => {
+    const neg = x.hl === 'negative';
+    return (
+    <View style={[s.card, { backgroundColor: hlBg(x.hl) }, hlBorder(x.hl)]}>
       {x.video ? (
         <Video source={{ uri: x.video }} style={s.media} resizeMode={ResizeMode.COVER} useNativeControls isMuted />
       ) : x.images?.[0] ? (
@@ -91,8 +102,8 @@ export default function MarketplaceScreen() {
       ) : null}
       <View style={s.cardBody}>
         <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Text style={[s.itemTitle, { textAlign: ta, writingDirection: wd, flex: 1 }]} numberOfLines={2}>{x.title}</Text>
-          {!!x.price && <Text style={s.itemPrice}>{x.price}</Text>}
+          <Text style={[s.itemTitle, { textAlign: ta, writingDirection: wd, flex: 1 }, neg && { color: '#fff' }]} numberOfLines={2}>{x.title}</Text>
+          {!!x.price && <Text style={[s.itemPrice, neg && { color: GOLD }]}>{x.price}</Text>}
         </View>
         <View style={[s.contactRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
           <TouchableOpacity onPress={() => Linking.openURL(`https://wa.me/${x.phone.replace(/\D/g, '')}`)} style={[s.cBtn, { backgroundColor: '#25D366' }]}><Text style={s.cBtnTxt}>WhatsApp</Text></TouchableOpacity>
@@ -100,7 +111,16 @@ export default function MarketplaceScreen() {
         </View>
       </View>
     </View>
+  ); };
+
+  const Chip = ({ on, label, sub, onPress }: { on: boolean; label: string; sub?: string; onPress: () => void }) => (
+    <TouchableOpacity onPress={onPress} activeOpacity={0.8} style={[s.selChip, on && s.selChipOn]}>
+      <Text style={[s.selTxt, on && s.selTxtOn]}>{label}</Text>
+      {sub ? <Text style={[s.selSub, on && { color: '#e6f2f7' }]}>{sub}</Text> : null}
+    </TouchableOpacity>
   );
+
+  const shown = [...items].sort((a, b) => ((b.hl && b.hl !== 'none') ? 1 : 0) - ((a.hl && a.hl !== 'none') ? 1 : 0));
 
   return (
     <SafeAreaView style={s.safe}>
@@ -122,7 +142,7 @@ export default function MarketplaceScreen() {
         </ImageBackground>
 
         <View style={{ padding: 16 }}>
-          {items.length === 0 ? <Text style={[s.empty, { writingDirection: wd }]}>{t.empty}</Text> : items.map(x => <ItemCard key={x.id} x={x} />)}
+          {items.length === 0 ? <Text style={[s.empty, { writingDirection: wd }]}>{t.empty}</Text> : shown.map(x => <ItemCard key={x.id} x={x} />)}
           <TouchableOpacity style={s.postBtn} activeOpacity={0.85} onPress={() => { setDone(false); reset(); setPostOpen(true); }}><Text style={s.postBtnTxt}>{t.postCta}</Text></TouchableOpacity>
           <TouchableOpacity style={s.manageBtn} activeOpacity={0.85} onPress={() => { setMResult(null); setMPhone(''); setManageOpen(true); }}><Text style={s.manageTxt}>{t.manageCta}</Text></TouchableOpacity>
         </View>
@@ -141,7 +161,24 @@ export default function MarketplaceScreen() {
             ) : (
               <ScrollView showsVerticalScrollIndicator={false}>
                 <Text style={[s.sheetTitle, { textAlign: ta, writingDirection: wd }]}>{editId ? t.editTitle : t.postTitle}</Text>
-                <Text style={[s.sheetLabel, { textAlign: ta, writingDirection: wd }]}>{t.photos} ({images.length}/6){video ? ' · 🎥' : ''}</Text>
+
+                <Text style={[s.sheetLabel, { textAlign: ta, writingDirection: wd }]}>{t.planLbl}</Text>
+                <View style={[s.rowWrap, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+                  <Chip on={plan === 'free'} label={t.planFree} sub={t.planFreeSub} onPress={() => { setPlan('free'); setHl('none'); }} />
+                  <Chip on={plan === 'paid'} label={t.planPaid} sub={t.priceTag} onPress={() => { setPlan('paid'); if (hl === 'none') setHl('yellow-border'); }} />
+                </View>
+                {plan === 'paid' && (
+                  <>
+                    <Text style={[s.sheetLabel, { textAlign: ta, writingDirection: wd, marginTop: 6 }]}>{t.styleLbl}</Text>
+                    <View style={[s.rowWrap, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+                      <Chip on={hl === 'yellow-border'} label={t.hlYb} onPress={() => setHl('yellow-border')} />
+                      <Chip on={hl === 'negative'} label={t.hlNeg} onPress={() => setHl('negative')} />
+                    </View>
+                    <Text style={[s.sheetLabel, { textAlign: ta, writingDirection: wd, marginTop: 4 }]}>💳 {t.payNote}</Text>
+                  </>
+                )}
+
+                <Text style={[s.sheetLabel, { textAlign: ta, writingDirection: wd, marginTop: 6 }]}>{t.photos} ({images.length}/6){video ? ' · 🎥' : ''}</Text>
                 <View style={[s.rowWrap, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
                   {images.map((u, i) => <Image key={i} source={{ uri: u }} style={s.thumb} />)}
                   <TouchableOpacity onPress={pickImages} style={s.addThumb}><Text style={{ fontSize: 22, color: Colors.PRIMARY }}>＋</Text></TouchableOpacity>
@@ -211,6 +248,11 @@ const s = StyleSheet.create({
   modalBg: { flex: 1, backgroundColor: 'rgba(0,0,0,0.45)', justifyContent: 'flex-end' },
   sheet: { backgroundColor: '#fff', borderTopLeftRadius: 12, borderTopRightRadius: 12, padding: 20, maxHeight: '90%' },
   sheetTitle: { fontSize: 22, fontFamily: F.m, color: '#16222c', marginBottom: 12 },
+  selChip: { borderWidth: 1.5, borderColor: '#e7e0d4', borderRadius: 4, paddingVertical: 8, paddingHorizontal: 14, alignItems: 'center' },
+  selChipOn: { backgroundColor: NAVY, borderColor: NAVY },
+  selTxt: { fontSize: 14, fontFamily: F.sb, color: '#16222c' },
+  selTxtOn: { color: '#fff' },
+  selSub: { fontSize: 11, fontFamily: F.sb, color: '#a9b2ba', marginTop: 1 },
   sheetLabel: { fontSize: 14, fontFamily: F.sb, color: '#7a7261', marginBottom: 8 },
   rowWrap: { flexWrap: 'wrap', gap: 8, marginBottom: 6 },
   thumb: { width: 60, height: 60, borderRadius: 4 },
