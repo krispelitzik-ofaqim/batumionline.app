@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Modal, ScrollView, Linking, Platform, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Modal, ScrollView, Linking, Platform, Alert, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { router, usePathname } from 'expo-router';
 import { Colors } from '../constants/colors';
@@ -36,7 +36,6 @@ const LANGS: { code: 'he' | 'en' | 'fa' | 'ru'; label: string }[] = [
 export default function HeaderBar() {
   const { dark, toggle } = useContext(ThemeContext);
   const { lang, setLang } = useI18n();
-  const time = useBatumiClock();
   const pathname = usePathname();
   const isHome = pathname === '/' || pathname === '/index';
   const bg = dark ? Colors.TEXT : Colors.BACKGROUND;
@@ -47,14 +46,14 @@ export default function HeaderBar() {
 
   return (
     <View style={[styles.bar, { backgroundColor: bg, borderBottomColor: dark ? Colors.PRIMARY : Colors.SECONDARY + '30' }]}>
-      {/* LEFT — back arrow (when not home) + clock */}
+      {/* LEFT — back arrow (when not home) + Batumi Online logo */}
       <View style={styles.sideLeft}>
         {!isHome && (
           <TouchableOpacity style={styles.btn} onPress={() => router.replace('/')}>
             <Text style={{ fontSize: 28, color: fg, fontWeight: '300' }}>‹</Text>
           </TouchableOpacity>
         )}
-        <Text style={[styles.clock, { color: fg }]}>{time}</Text>
+        <Image source={require('../assets/images/batumi_icon.png')} style={styles.logo} resizeMode="contain" />
       </View>
 
       {/* CENTER — wide language segmented control */}
@@ -170,6 +169,11 @@ const styles = StyleSheet.create({
   clock: {
     fontSize: 16,
     fontWeight: '800',
+  },
+  logo: {
+    width: 34,
+    height: 34,
+    borderRadius: 8,
   },
   langSeg: {
     flexDirection: 'row',

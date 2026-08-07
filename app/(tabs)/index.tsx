@@ -266,6 +266,9 @@ export default function HomeScreen() {
           return (
             <View style={{ marginHorizontal: 16, marginTop: 8, marginBottom: 4, height: 180, borderRadius: 18, overflow: 'hidden' }}>
               <Image source={pick} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+              <View style={{ position: 'absolute', top: 10, left: 10, backgroundColor: 'rgba(0,0,0,0.38)', borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4 }}>
+                <BatumiClock dark />
+              </View>
             </View>
           );
         })()}
