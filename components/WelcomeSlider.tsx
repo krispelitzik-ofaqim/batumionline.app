@@ -54,7 +54,7 @@ const INITIAL_ITEMS: Item[] = [
 ];
 
 export default function WelcomeSlider() {
-  const { t, lang } = useI18n();
+  const { t, lang, isRTL } = useI18n();
   const [items, setItems] = useState<Item[]>(INITIAL_ITEMS);
   const scrollRef = useRef<ScrollView>(null);
   const didInit = useRef(false);
@@ -112,8 +112,8 @@ export default function WelcomeSlider() {
           </View>
         )}
         <View style={styles.textWrap}>
-          <Text style={styles.title} numberOfLines={1}>{item.title}</Text>
-          {item.subtitle ? <Text style={styles.sub} numberOfLines={1}>{item.subtitle}</Text> : null}
+          <Text style={[styles.title, { textAlign: isRTL ? 'right' : 'left', writingDirection: isRTL ? 'rtl' : 'ltr' }]} numberOfLines={1}>{item.title}</Text>
+          {item.subtitle ? <Text style={[styles.sub, { textAlign: isRTL ? 'right' : 'left', writingDirection: isRTL ? 'rtl' : 'ltr' }]} numberOfLines={1}>{item.subtitle}</Text> : null}
         </View>
       </TouchableOpacity>
     );

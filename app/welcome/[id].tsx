@@ -81,7 +81,7 @@ export default function WelcomeScreen() {
           {item.icon && (item.icon.startsWith('http') || item.icon.startsWith('data:') || item.icon.startsWith('/')) ? (
             Platform.OS === 'web' ? (
               React.createElement('img', {
-                src: item.icon,
+                src: resolveUri(item.icon),
                 style: { width: '100%', height: 240, objectFit: 'cover', display: 'block' },
                 alt: item.title,
               })

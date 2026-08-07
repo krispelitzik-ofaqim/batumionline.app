@@ -69,7 +69,7 @@ export default function InfoPage() {
             {hasImage ? (
               Platform.OS === 'web' ? (
                 React.createElement('img', {
-                  src: portalItem.image,
+                  src: resolveUri(portalItem.image),
                   style: { width: '100%', height: 160, objectFit: 'cover', display: 'block' },
                   alt: portalItem.title,
                 })
