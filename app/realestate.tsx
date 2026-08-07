@@ -9,6 +9,7 @@ import { useI18n } from '../constants/i18n';
 import { openInAppBrowser } from '../constants/affiliates';
 import { fetchBoard, createAd, updateAd, deleteAd, payAd, uploadLocalUri, resolveUri } from '../constants/api';
 import BottomTabBar from '../components/BottomTabBar';
+import ListingDetailModal from '../components/ListingDetailModal';
 
 // Trimmed, localized real-estate: For Sale + For Rent, plus a rich
 // "Post a listing" window (size + highlight incl. negative + photos) and
@@ -85,12 +86,38 @@ const RENT: Unit[] = [
 ];
 
 const hlBg = (hl: HL) => hl === 'yellow' ? '#fffbeb' : hl === 'negative' ? '#0c1e3a' : '#fff';
-const hlBorder = (hl: HL) => hl === 'yellow-border' ? { borderWidth: 2, borderColor: '#f59e0b' } : hl === 'negative' ? { borderWidth: 2, borderColor: '#1e3a8a' } : {};
+const hlBorder = (hl: HL) => hl === 'yellow-border' ? { borderWidth: 4, borderColor: '#f59e0b' } : hl === 'negative' ? { borderWidth: 2, borderColor: '#1e3a8a' } : {};
 
 const PREVIEW_TXT: Record<Lang, string> = { he: 'כך המודעה תיראה', en: 'How your ad will look', fa: 'آگهی شما این‌گونه دیده می‌شود', ru: 'Как будет выглядеть объявление' };
 const SUMMARY_TXT: Record<Lang, string> = { he: 'סיכום', en: 'Summary', fa: 'خلاصه', ru: 'Итог' };
 const DESC_TXT: Record<Lang, string> = { he: 'תיאור המודעה (תוכן)', en: 'Description', fa: 'توضیحات آگهی', ru: 'Описание' };
 const TOP_TXT: Record<Lang, string> = { he: 'קפיצה לראש הרשימה', en: 'Bumped to the top', fa: 'انتقال به بالای فهرست', ru: 'Поднятие в топ' };
+const FEATURED_TXT: Record<Lang, string> = { he: 'מובלט', en: 'Featured', fa: 'ویژه', ru: 'ТОП' };
+
+// Swipeable image gallery for a listing card: shows every photo with a counter + dots.
+function MediaGallery({ images, height }: { images: string[]; height: number }) {
+  const [w, setW] = useState(0);
+  const [idx, setIdx] = useState(0);
+  const imgs = (images || []).filter(Boolean);
+  if (imgs.length === 0) return null;
+  if (imgs.length === 1) return <Image source={{ uri: imgs[0] }} style={{ width: '100%', height }} resizeMode="cover" />;
+  return (
+    <View onLayout={(e) => setW(e.nativeEvent.layout.width)}>
+      <ScrollView horizontal pagingEnabled showsHorizontalScrollIndicator={false} onMomentumScrollEnd={(e) => w && setIdx(Math.round(e.nativeEvent.contentOffset.x / w))}>
+        {imgs.map((u, i) => <Image key={i} source={{ uri: u }} style={{ width: w || 1, height }} resizeMode="cover" />)}
+      </ScrollView>
+      <View style={gal.counter}><Text style={gal.counterTxt}>{idx + 1}/{imgs.length}</Text></View>
+      <View style={gal.dots}>{imgs.map((_, i) => <View key={i} style={[gal.dot, i === idx && gal.dotOn]} />)}</View>
+    </View>
+  );
+}
+const gal = StyleSheet.create({
+  counter: { position: 'absolute', bottom: 8, right: 8, backgroundColor: 'rgba(0,0,0,0.6)', borderRadius: 10, paddingHorizontal: 8, paddingVertical: 2 },
+  counterTxt: { color: '#fff', fontSize: 11, fontWeight: '700' },
+  dots: { position: 'absolute', bottom: 8, left: 0, right: 0, flexDirection: 'row', justifyContent: 'center', gap: 4 },
+  dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: 'rgba(255,255,255,0.5)' },
+  dotOn: { backgroundColor: '#fff', width: 8, height: 8, borderRadius: 4 },
+});
 
 export default function RealEstateScreen() {
   const { lang, isRTL } = useI18n();
@@ -112,6 +139,7 @@ export default function RealEstateScreen() {
   const [done, setDone] = useState(false);
   const [mPhone, setMPhone] = useState('');
   const [mResult, setMResult] = useState<Post[] | null>(null);
+  const [detail, setDetail] = useState<Post | null>(null);
   const wd = isRTL ? 'rtl' : 'ltr';
   const ta = isRTL ? 'right' : 'left';
 
@@ -154,18 +182,29 @@ export default function RealEstateScreen() {
     const effHl: HL = p.featured ? p.hl : 'none';
     const neg = effHl === 'negative';
     return (
-      <View style={[s.card, { backgroundColor: hlBg(effHl) }, hlBorder(effHl)]}>
-        {p.images[0] ? <Image source={{ uri: resolveUri(p.images[0]) }} style={s.cardImg} resizeMode="cover" /> : null}
+      <View style={[s.card, { backgroundColor: hlBg(effHl) }, hlBorder(effHl), p.featured && s.featuredCard]}>
+        {p.featured && (
+          <View style={[s.ribbon, isRTL ? { left: 10 } : { right: 10 }]}>
+            <Text style={s.ribbonTxt}>⭐ {FEATURED_TXT[L]}</Text>
+          </View>
+        )}
+        <MediaGallery images={(p.images || []).map(resolveUri)} height={190} />
         <View style={s.cardBody}>
-          <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Text style={[{ fontSize: 16, fontWeight: '900', color: neg ? '#fff' : Colors.TEXT, flex: 1 }, { textAlign: ta, writingDirection: wd }]} numberOfLines={2}>{p.title}</Text>
-            {!!p.price && <Text style={{ fontSize: 16, fontWeight: '900', color: neg ? GOLD : '#10b981', marginHorizontal: 8 }}>{p.price}</Text>}
+          <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <Text style={[s.postTitle, { textAlign: ta, writingDirection: wd, flex: 1 }, neg && { color: '#fff' }]} numberOfLines={3}>{p.title}</Text>
+            <View style={{ alignItems: isRTL ? 'flex-start' : 'flex-end', marginHorizontal: 8 }}>
+              {!!p.price && <Text style={[s.postPrice, { color: neg ? GOLD : '#10b981' }]}>{p.price}</Text>}
+              {!!p.phone && p.phone !== '—' && (
+                <TouchableOpacity onPress={() => Linking.openURL(`tel:${p.phone}`)}>
+                  <Text style={[s.phoneTxt, { color: neg ? GOLD : NAVY }]}>☎ {p.phone}</Text>
+                </TouchableOpacity>
+              )}
+            </View>
           </View>
           {!!p.description && <Text style={[s.postDesc, { textAlign: ta, writingDirection: wd }, neg && { color: '#cbd5e1' }]}>{p.description}</Text>}
-          {!!p.phone && (
-            <View style={[s.contactRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-              <TouchableOpacity onPress={() => Linking.openURL(`https://wa.me/${p.phone.replace(/\D/g, '')}`)} style={[s.cBtn, { backgroundColor: '#25D366' }]}><Text style={s.cBtnTxt}>WhatsApp</Text></TouchableOpacity>
-              <TouchableOpacity onPress={() => Linking.openURL(`tel:${p.phone}`)} style={[s.cBtn, { backgroundColor: neg ? GOLD : Colors.PRIMARY }]}><Text style={[s.cBtnTxt, neg && { color: '#fff' }]}>{'☎'} {p.phone}</Text></TouchableOpacity>
+          {!!p.phone && p.phone !== '—' && (
+            <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', marginTop: 12 }}>
+              <TouchableOpacity onPress={() => Linking.openURL(`https://wa.me/${p.phone.replace(/\D/g, '')}`)} style={s.waCircle}><Text style={s.waIcon}>✆</Text></TouchableOpacity>
             </View>
           )}
         </View>
@@ -215,14 +254,16 @@ export default function RealEstateScreen() {
         </ImageBackground>
 
         <View style={{ padding: 16 }}>
-          {myPosts.filter(p => p.featured).map(p => <PostCard key={p.id} p={p} />)}
+          {myPosts.filter(p => p.featured).map(p => <TouchableOpacity key={p.id} activeOpacity={0.9} onPress={() => setDetail(p)}><PostCard p={p} /></TouchableOpacity>)}
           {units.map(u => <Card key={u.id} u={u} />)}
-          {myPosts.filter(p => !p.featured).map(p => <PostCard key={p.id} p={p} />)}
+          {myPosts.filter(p => !p.featured).map(p => <TouchableOpacity key={p.id} activeOpacity={0.9} onPress={() => setDetail(p)}><PostCard p={p} /></TouchableOpacity>)}
           <TouchableOpacity style={s.postBtn} activeOpacity={0.85} onPress={() => { setDone(false); resetForm(); setPostOpen(true); }}><Text style={s.postBtnTxt}>{t.postCta}</Text></TouchableOpacity>
           <TouchableOpacity style={s.manageBtn} activeOpacity={0.85} onPress={() => { setMResult(null); setMPhone(''); setManageOpen(true); }}><Text style={s.manageTxt}>{t.manageCta}</Text></TouchableOpacity>
         </View>
       </ScrollView>
       <BottomTabBar />
+
+      <ListingDetailModal visible={!!detail} listing={detail} onClose={() => setDetail(null)} isRTL={isRTL} lang={L} />
 
       {/* Post / edit */}
       <Modal visible={postOpen} transparent animationType="slide" onRequestClose={closePost}>
@@ -334,6 +375,9 @@ const s = StyleSheet.create({
   tabTxt: { fontSize: 15, fontFamily: F.sb, color: NAVY },
   tabTxtActive: { color: '#fff' },
   card: { backgroundColor: '#fff', borderRadius: 4, overflow: 'hidden', marginBottom: 14, shadowColor: '#1a2b35', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.08, shadowRadius: 14, elevation: 3 },
+  featuredCard: { borderWidth: 5, borderColor: '#E0A82E', shadowColor: '#E0A82E', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.55, shadowRadius: 16, elevation: 10, overflow: 'visible' },
+  ribbon: { position: 'absolute', top: 10, zIndex: 5, backgroundColor: '#E0A82E', paddingHorizontal: 11, paddingVertical: 5, borderRadius: 4, shadowColor: '#000', shadowOpacity: 0.3, shadowRadius: 3, shadowOffset: { width: 0, height: 1 } },
+  ribbonTxt: { color: '#16222c', fontFamily: F.x, fontSize: 12.5 },
   cardImg: { width: '100%', height: 170 },
   cardBody: { padding: 14 },
   cardTitle: { fontSize: 19, fontFamily: F.m, color: '#16222c' },
@@ -362,6 +406,11 @@ const s = StyleSheet.create({
   addThumb: { width: 60, height: 60, borderRadius: 4, borderWidth: 1.5, borderColor: NAVY, borderStyle: 'dashed', alignItems: 'center', justifyContent: 'center' },
   input: { borderWidth: 1.5, borderColor: '#e7e0d4', borderRadius: 4, paddingVertical: 12, paddingHorizontal: 14, fontSize: 15, marginTop: 10, color: '#16222c', fontFamily: F.r },
   doneTxt: { fontSize: 16, fontFamily: F.sb, color: '#16222c', marginTop: 12, marginBottom: 16 },
+  postTitle: { fontSize: 22, fontFamily: F.m, color: '#16222c', lineHeight: 28 },
+  postPrice: { fontSize: 18, fontFamily: F.b },
+  phoneTxt: { fontSize: 15, fontFamily: F.b, marginTop: 4 },
+  waCircle: { width: 46, height: 46, borderRadius: 23, backgroundColor: '#25D366', alignItems: 'center', justifyContent: 'center', shadowColor: '#25D366', shadowOpacity: 0.4, shadowRadius: 6, shadowOffset: { width: 0, height: 2 } },
+  waIcon: { color: '#fff', fontSize: 24, fontFamily: F.b },
   postDesc: { fontSize: 14, fontFamily: F.r, color: '#5c6b76', marginTop: 6, lineHeight: 20 },
   summaryBox: { backgroundColor: '#f7f2e9', borderRadius: 4, borderWidth: 1, borderColor: '#e7e0d4', padding: 14, marginTop: 12 },
   summaryLine: { fontSize: 13, fontFamily: F.sb, color: '#7a7261', marginBottom: 8 },
