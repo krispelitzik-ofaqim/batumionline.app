@@ -53,6 +53,8 @@ const SUMMARY_TXT: Record<Lang, string> = { he: 'סיכום', en: 'Summary', fa:
 const DESC_TXT: Record<Lang, string> = { he: 'תיאור המודעה (תוכן)', en: 'Description', fa: 'توضیحات آگهی', ru: 'Описание' };
 const TOP_TXT: Record<Lang, string> = { he: 'קפיצה לראש הרשימה', en: 'Bumped to the top', fa: 'انتقال به بالای فهرست', ru: 'Поднятие в топ' };
 const FEATURED_TXT: Record<Lang, string> = { he: 'מובלט', en: 'Featured', fa: 'ویژه', ru: 'ТОП' };
+const FEATURED_90_TXT: Record<Lang, string> = { he: 'מודעה מובלטת ל-90 יום', en: 'Featured ad for 90 days', fa: 'آگهی ویژه برای ۹۰ روز', ru: 'Выделенное объявление на 90 дней' };
+const PRICE_AMT: Record<Lang, string> = { he: '$20', en: '$20', fa: '۲۰$', ru: '$20' };
 
 // Swipeable image gallery for a listing card: shows every photo with a counter + dots.
 function MediaGallery({ images, height }: { images: string[]; height: number }) {
@@ -258,8 +260,8 @@ export default function MarketplaceScreen() {
                 <View style={s.summaryBox}>
                   <Text style={[s.summaryLine, { textAlign: ta, writingDirection: wd }]}>{SUMMARY_TXT[L]}</Text>
                   <View style={[s.summaryRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-                    <Text style={[s.summaryK, { textAlign: ta, writingDirection: wd }]}>{plan === 'paid' ? t.planPaid : t.planFree}</Text>
-                    <Text style={s.summaryV}>{plan === 'paid' ? t.priceTag : t.planFreeSub}</Text>
+                    <Text style={[s.summaryK, { textAlign: ta, writingDirection: wd }]}>{plan === 'paid' ? FEATURED_90_TXT[L] : t.planFree}</Text>
+                    <Text style={s.summaryV}>{plan === 'paid' ? PRICE_AMT[L] : t.planFreeSub}</Text>
                   </View>
                   {plan === 'paid' && (
                     <View style={[s.summaryRow, { flexDirection: isRTL ? 'row-reverse' : 'row', marginTop: 6 }]}>
@@ -362,7 +364,7 @@ const s = StyleSheet.create({
   summaryLine: { fontSize: 13, fontFamily: F.sb, color: '#7a7261', marginBottom: 8 },
   summaryRow: { justifyContent: 'space-between', alignItems: 'center' },
   summaryK: { fontSize: 16, fontFamily: F.m, color: '#16222c', flex: 1 },
-  summaryV: { fontSize: 16, fontFamily: F.b, color: GOLD, marginHorizontal: 8 },
+  summaryV: { fontSize: 18, fontFamily: F.x, color: GOLD, marginHorizontal: 8, writingDirection: 'ltr' },
   summarySub: { fontSize: 12.5, fontFamily: F.sb, color: '#7a7261', flex: 1 },
   inputArea: { minHeight: 84, textAlignVertical: 'top', paddingTop: 12 },
   mineRow: { flexDirection: 'row', alignItems: 'center', gap: 8, borderTopWidth: 1, borderTopColor: '#efe9df', paddingVertical: 12 },
