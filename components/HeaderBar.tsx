@@ -26,11 +26,11 @@ function useBatumiClock() {
   return time;
 }
 
-const LANGS: { code: 'he' | 'en' | 'fa' | 'ru'; label: string }[] = [
-  { code: 'he', label: 'עב' },
-  { code: 'en', label: 'EN' },
-  { code: 'fa', label: 'فا' },
-  { code: 'ru', label: 'RU' },
+const LANGS: { code: 'he' | 'en' | 'fa' | 'ru'; label: string; name: string }[] = [
+  { code: 'he', label: 'עב', name: 'עברית' },
+  { code: 'en', label: 'EN', name: 'English' },
+  { code: 'fa', label: 'فا', name: 'فارسی' },
+  { code: 'ru', label: 'RU', name: 'Русский' },
 ];
 
 export default function HeaderBar() {
@@ -42,6 +42,8 @@ export default function HeaderBar() {
   const fg = dark ? Colors.BACKGROUND : Colors.TEXT;
   const accent = dark ? Colors.ACCENT : Colors.PRIMARY;
   const [a11yOpen, setA11yOpen] = useState(false);
+  const [langOpen, setLangOpen] = useState(false);
+  const current = LANGS.find((l) => l.code === lang) || LANGS[0];
   const { settings, update, reset } = useAccessibility();
 
   return (
@@ -56,21 +58,24 @@ export default function HeaderBar() {
         <Image source={require('../assets/images/batumi_icon.png')} style={styles.logo} resizeMode="contain" />
       </View>
 
-      {/* CENTER — wide language segmented control */}
-      <View style={[styles.langSeg, { borderColor: accent + '55' }]}>
-        {LANGS.map((L) => {
-          const on = lang === L.code;
-          return (
-            <TouchableOpacity
-              key={L.code}
-              onPress={() => setLang(L.code)}
-              activeOpacity={0.7}
-              style={[styles.langSegBtn, on && { backgroundColor: accent }]}
-            >
-              <Text style={[styles.langSegTxt, { color: on ? (dark ? Colors.TEXT : '#fff') : fg }]}>{L.label}</Text>
-            </TouchableOpacity>
-          );
-        })}
+      {/* CENTER — compact language dropdown */}
+      <View style={{ position: 'relative', zIndex: 50 }}>
+        <TouchableOpacity onPress={() => setLangOpen((o) => !o)} activeOpacity={0.8} style={[styles.langPick, { borderColor: accent + '55' }]}>
+          <Text style={[styles.langPickTxt, { color: fg }]}>{current.label}</Text>
+          <Text style={[styles.langChevron, { color: accent }]}>{langOpen ? '▲' : '▼'}</Text>
+        </TouchableOpacity>
+        {langOpen && (
+          <View style={[styles.langMenu, { backgroundColor: bg, borderColor: accent + '55' }]}>
+            {LANGS.map((L) => {
+              const on = lang === L.code;
+              return (
+                <TouchableOpacity key={L.code} onPress={() => { setLang(L.code); setLangOpen(false); }} activeOpacity={0.7} style={[styles.langItem, on && { backgroundColor: accent }]}>
+                  <Text style={[styles.langItemTxt, { color: on ? '#fff' : fg }]}>{L.name}</Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        )}
       </View>
 
       {/* RIGHT — light/dark toggle */}
@@ -192,4 +197,32 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '900',
   },
+  langPick: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    borderWidth: 1.5,
+    borderRadius: 14,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+  },
+  langPickTxt: { fontSize: 14, fontWeight: '900' },
+  langChevron: { fontSize: 11, fontWeight: '900' },
+  langMenu: {
+    position: 'absolute',
+    top: 40,
+    alignSelf: 'center',
+    minWidth: 120,
+    borderWidth: 1.5,
+    borderRadius: 12,
+    overflow: 'hidden',
+    zIndex: 100,
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOpacity: 0.18,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+  },
+  langItem: { paddingVertical: 11, paddingHorizontal: 16, alignItems: 'center' },
+  langItemTxt: { fontSize: 15, fontWeight: '800' },
 });
