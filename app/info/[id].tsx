@@ -7,6 +7,7 @@ import { useI18n } from '../../constants/i18n';
 import { fetchContent, API_BASE, resolveUri } from '../../constants/api';
 import HtmlContent from '../../components/HtmlContent';
 import BottomTabBar from '../../components/BottomTabBar';
+import { PORTAL_TR } from '../../constants/portalTranslations';
 
 
 
@@ -25,7 +26,7 @@ const WHATSAPP = '972502844867';
 const SITE = 'https://www.batumionline.app';
 
 export default function InfoPage() {
-  const { t, isRTL } = useI18n();
+  const { t, isRTL, lang } = useI18n();
   const A = (isRTL ? 'right' : 'left') as 'right' | 'left';
   const D = (isRTL ? 'rtl' : 'ltr') as 'rtl' | 'ltr';
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -50,11 +51,20 @@ export default function InfoPage() {
         }
         if (!isLegal && data.infoPortal && Array.isArray(data.infoPortal)) {
           const found = data.infoPortal.find((x: any) => x.id === id);
-          if (found) setPortalItem({ title: found.title, subtitle: found.subtitle || '', body: found.longText || found.subtitle || '', image: found.icon });
+          if (found) {
+            // For non-Hebrew editions use the pre-translated portal article when available.
+            const tr = lang !== 'he' ? PORTAL_TR[id as string]?.[lang as 'en' | 'fa' | 'ru'] : null;
+            setPortalItem({
+              title: tr?.title || found.title,
+              subtitle: tr?.subtitle || found.subtitle || '',
+              body: tr?.longText || found.longText || found.subtitle || '',
+              image: found.icon,
+            });
+          }
         }
       })
       .catch(() => {});
-  }, [id]);
+  }, [id, lang]);
 
   if (!isLegal && portalItem) {
     const hasImage = portalItem.image && (portalItem.image.startsWith('http') || portalItem.image.startsWith('data:') || portalItem.image.startsWith('/'));
