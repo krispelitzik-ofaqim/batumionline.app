@@ -3,11 +3,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CONTENT_TR } from './contentTranslations';
 
 // ---- Content localization (server content is Hebrew; translate on read) ----
-type ContentLang = 'he' | 'en' | 'fa';
+type ContentLang = 'he' | 'en' | 'fa' | 'ru';
 let _contentLang: ContentLang = 'he';
 export function setContentLang(l: ContentLang) { _contentLang = l; }
 
-function deepLocalize(v: any, lang: 'en' | 'fa'): any {
+function deepLocalize(v: any, lang: 'en' | 'fa' | 'ru'): any {
   if (typeof v === 'string') {
     const tr = CONTENT_TR[v];
     return tr && tr[lang] ? tr[lang] : v;
@@ -27,6 +27,7 @@ const HIDE_NON_HE: Record<string, string[]> = {
   mainCategories: ['3'],        // "סיורים קוליים" (Hebrew audio tours)
   bottomBanners: ['news'],      // "חדשות בעברית"
   sideBanners: ['realestate'],  // "פורטל הנדל״ן"
+  infoPortal: ['culture'],      // "תרבות וכשרות" (Jewish/kosher — Hebrew only)
 };
 
 export function localizeContent(data: any, lang: ContentLang = _contentLang): any {

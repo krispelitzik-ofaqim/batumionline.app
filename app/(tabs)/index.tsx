@@ -18,6 +18,7 @@ import { fetchContent, getCachedContent, resolveUri } from '../../constants/api'
 import { Colors } from '../../constants/colors';
 import { useI18n } from '../../constants/i18n';
 import WelcomeSlider from '../../components/WelcomeSlider';
+import AdBanner from '../../components/AdBanner';
 import HomeGallery from '../../components/HomeGallery';
 import AccessibilityButton from '../../components/AccessibilityButton';
 import InfoPortal from '../../components/InfoPortal';
@@ -151,7 +152,7 @@ function CatCard({ item, width }: { item: CatItem; width: number }) {
 }
 
 export default function HomeScreen() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const { width: screenW } = useWindowDimensions();
   const [showExtra, setShowExtra] = useState(false);
   const [extraGroupVisible, setExtraGroupVisible] = useState(false);
@@ -288,13 +289,15 @@ export default function HomeScreen() {
           </View>
         )}
 
-        {/* 2. קטגוריות נוספות — דרופדאון */}
-        {extraGroupVisible && (
+        {/* 2. קטגוריות נוספות — דרופדאון בעברית; פתוח תמיד בשאר השפות */}
+        {(extraGroupVisible || lang !== 'he') && (
           <View style={styles.section}>
-            <TouchableOpacity style={styles.dropdownBtn} onPress={() => setShowExtra(!showExtra)}>
-              <Text style={styles.dropdownTxt}>{showExtra ? '▲' : '▼'} {t('home.moreCategories')}</Text>
-            </TouchableOpacity>
-            {showExtra && (
+            {lang === 'he' && (
+              <TouchableOpacity style={styles.dropdownBtn} onPress={() => setShowExtra(!showExtra)}>
+                <Text style={styles.dropdownTxt}>{showExtra ? '▲' : '▼'} {t('home.moreCategories')}</Text>
+              </TouchableOpacity>
+            )}
+            {(showExtra || lang !== 'he') && (
               <View style={styles.grid}>
                 {editExtraCats.filter((c: any) => c.visible !== false).map((cat) => (
                   <CatCard key={cat.id} item={cat} width={cardW} />
@@ -320,8 +323,8 @@ export default function HomeScreen() {
           </View>
         )}
 
-        {/* 5. באנר — פורטל הנדל"ן והעסקים */}
-        {sideGroupVisible && (
+        {/* 5. באנר — פורטל הנדל"ן והעסקים (עברית בלבד; מוסתר ב-EN/FA) */}
+        {sideGroupVisible && lang === 'he' && (
           <View style={styles.section}>
             <TouchableOpacity activeOpacity={0.85} style={styles.megaBannerWrap} onPress={() => router.push('/portal/realestate')}>
               <ImageBackground
@@ -345,6 +348,20 @@ export default function HomeScreen() {
           </View>
         )}
 
+        {/* 5b. The Market — במקום פורטל הנדל"ן, לגרסאות שאינן עברית */}
+        {lang !== 'he' && (
+          <View style={styles.section}>
+            <TouchableOpacity activeOpacity={0.9} style={styles.megaBannerWrap} onPress={() => router.push('/market')}>
+              <ImageBackground source={{ uri: resolveUri('/uploads/1786081911740-787.jpg') }} style={styles.megaBanner} imageStyle={{ borderRadius: 18 }}>
+                <LinearGradient colors={['rgba(255,255,255,0.1)', 'rgba(15,41,66,0.86)']} style={styles.megaBannerOverlay}>
+                  <Text style={styles.megaBannerTitle}>🛍️ {t('mk.title')}</Text>
+                  <Text style={styles.ctaBannerSub}>{t('mk.sub')}</Text>
+                </LinearGradient>
+              </ImageBackground>
+            </TouchableOpacity>
+          </View>
+        )}
+
         {/* 6. באנרים רוחביים */}
         {bottomGroupVisible && (
           <View style={styles.section}>
@@ -362,6 +379,8 @@ export default function HomeScreen() {
         )}
 
         <ClientBannerDisplay page="home" position="bottom" />
+
+        <AdBanner />
 
         <View style={{ height: 24 }} />
       </ScrollView>
@@ -415,6 +434,7 @@ const styles = StyleSheet.create({
   megaBannerOverlay: { flex: 1, borderRadius: 18, justifyContent: 'flex-end', padding: 16 },
   megaBannerKicker: { fontSize: 11, fontWeight: '700', color: Colors.WHITE, opacity: 0.85, letterSpacing: 2, textAlign: 'right', writingDirection: 'rtl' },
   megaBannerTitle: { fontSize: 20, fontWeight: '900', color: Colors.WHITE, textAlign: 'right', writingDirection: 'rtl', marginTop: 2, lineHeight: 24 },
+  ctaBannerSub: { fontSize: 13, fontWeight: '600', color: Colors.WHITE, opacity: 0.92, textAlign: 'right', writingDirection: 'rtl', marginTop: 2 },
   megaBannerSub: { fontSize: 12, fontWeight: '500', color: Colors.WHITE, opacity: 0.85, textAlign: 'right', writingDirection: 'rtl', marginTop: 4 },
 
   // Bottom banners (6)
@@ -423,6 +443,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row-reverse', alignItems: 'center',
     paddingHorizontal: 16, justifyContent: 'space-between',
   },
+  ctaCardWrap: {
+    flex: 1, borderRadius: 18, overflow: 'hidden',
+    shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.18, shadowRadius: 8, elevation: 4,
+  },
+  ctaCard: { height: 124, justifyContent: 'flex-end', overflow: 'hidden', backgroundColor: '#4CAF50' },
+  ctaOverlay: { flex: 1, borderRadius: 18, justifyContent: 'flex-end', padding: 12 },
+  ctaCardGlyph: { position: 'absolute', top: -16, left: -12, fontSize: 100, opacity: 0.15 },
+  ctaIconBadge: { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.22)', alignItems: 'center', justifyContent: 'center', alignSelf: 'flex-end', overflow: 'hidden' },
+  ctaIconBadgeTxt: { fontSize: 22 },
+  ctaIconImg: { width: 40, height: 40, borderRadius: 20 },
+  ctaBottom: { flexDirection: 'row-reverse', alignItems: 'flex-end', justifyContent: 'space-between' },
+  ctaArrow: { color: Colors.WHITE, fontSize: 24, fontWeight: '900', opacity: 0.9, marginBottom: -2 },
+  ctaCardTitle: { fontSize: 17, fontWeight: '900', color: Colors.WHITE, textAlign: 'right', writingDirection: 'rtl' },
+  ctaCardSub: { fontSize: 11, fontWeight: '600', color: Colors.WHITE, opacity: 0.9, textAlign: 'right', writingDirection: 'rtl', marginTop: 2 },
   bottomBannerTitle: { fontSize: 13, fontWeight: '700', color: Colors.WHITE, textAlign: 'right', writingDirection: 'rtl', flex: 1 },
   bottomBannerIcon: { fontSize: 28, marginLeft: 8 },
   bottomSectionTitle: { fontSize: 16, fontWeight: 'normal', color: '#999999', textAlign: 'right', writingDirection: 'rtl', marginBottom: 8 },

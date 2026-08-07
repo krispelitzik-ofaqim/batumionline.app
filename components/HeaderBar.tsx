@@ -26,10 +26,11 @@ function useBatumiClock() {
   return time;
 }
 
-const LANGS: { code: 'he' | 'en' | 'fa'; label: string }[] = [
+const LANGS: { code: 'he' | 'en' | 'fa' | 'ru'; label: string }[] = [
   { code: 'he', label: 'עב' },
   { code: 'en', label: 'EN' },
   { code: 'fa', label: 'فا' },
+  { code: 'ru', label: 'RU' },
 ];
 
 export default function HeaderBar() {
@@ -177,8 +178,8 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   langSegBtn: {
-    minWidth: 46,
-    paddingHorizontal: 12,
+    minWidth: 34,
+    paddingHorizontal: 9,
     paddingVertical: 6,
     alignItems: 'center',
     justifyContent: 'center',

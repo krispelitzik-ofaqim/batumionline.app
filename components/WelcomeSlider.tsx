@@ -4,6 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { Colors } from '../constants/colors';
 import { fetchContent, resolveUri } from '../constants/api';
+import { useI18n } from '../constants/i18n';
 
 function fireConfetti() {
   if (Platform.OS !== 'web') return;
@@ -39,7 +40,7 @@ function fireConfetti() {
   setTimeout(() => container.remove(), 5000);
 }
 
-type Item = { id: string; title: string; subtitle?: string; icon: string; bg?: string };
+type Item = { id: string; title: string; subtitle?: string; icon: string; bg?: string; localImage?: any; route?: string };
 
 const CARD_W = 140;
 const GAP = 10;
@@ -53,6 +54,7 @@ const INITIAL_ITEMS: Item[] = [
 ];
 
 export default function WelcomeSlider() {
+  const { t, lang } = useI18n();
   const [items, setItems] = useState<Item[]>(INITIAL_ITEMS);
   const scrollRef = useRef<ScrollView>(null);
   const didInit = useRef(false);
@@ -63,15 +65,22 @@ export default function WelcomeSlider() {
     }).catch(() => {});
   }, []);
 
-  const looped = [...items, ...items, ...items];
-  const singleWidth = items.length * (CARD_W + GAP);
+  // Tickets & Coupon as the first cards in the welcome slider.
+  const ticketsItem: Item = { id: '__tickets__', title: t('tk2.tickets'), subtitle: t('tk2.ticketsSub'), icon: '/uploads/1786082390271-386.jpg', route: '/tickets' };
+  const couponItem: Item = { id: '__coupon__', title: t('cp.coupon'), subtitle: t('cp.couponSub'), icon: '/uploads/1786082391353-69.jpg', route: '/coupon' };
+  const yad2Item: Item = { id: '__yad2__', title: t('mk.classifieds'), subtitle: t('mk.classifiedsSub'), icon: '/uploads/1786082392340-392.jpg', route: '/marketplace' };
+  // Hebrew has no "The Market" banner, so surface the classifieds board here instead.
+  const displayItems = [ticketsItem, couponItem, ...(lang === 'he' ? [yad2Item] : []), ...items];
+
+  const looped = [...displayItems, ...displayItems, ...displayItems];
+  const singleWidth = displayItems.length * (CARD_W + GAP);
 
   const onLayout = useCallback(() => {
-    if (!didInit.current && scrollRef.current && items.length > 0) {
+    if (!didInit.current && scrollRef.current && displayItems.length > 0) {
       didInit.current = true;
       scrollRef.current.scrollTo({ x: singleWidth, animated: false });
     }
-  }, [singleWidth, items.length]);
+  }, [singleWidth, displayItems.length]);
 
   const onScroll = useCallback((e: NativeSyntheticEvent<NativeScrollEvent>) => {
     const x = e.nativeEvent.contentOffset.x;
@@ -85,10 +94,15 @@ export default function WelcomeSlider() {
   const renderCard = (item: Item, idx: number) => {
     const isImage = !!item.icon && (item.icon.startsWith('data:') || item.icon.startsWith('http') || item.icon.startsWith('/'));
     return (
-      <TouchableOpacity key={`${item.id}-${idx}`} style={styles.card} activeOpacity={0.7} onPress={() => { if (item.id === '1') fireConfetti(); router.push(`/welcome/${item.id}` as any); }}>
-        {isImage ? (
+      <TouchableOpacity key={`${item.id}-${idx}`} style={[styles.card, !!item.route && styles.ctaCard]} activeOpacity={0.7} onPress={() => { if (item.route) { router.push(item.route as any); return; } if (item.id === '1') fireConfetti(); router.push(`/welcome/${item.id}` as any); }}>
+        {item.localImage ? (
           <>
-            <Image source={{ uri: resolveUri(item.icon) }} style={StyleSheet.absoluteFillObject} resizeMode="cover" />
+            <Image source={item.localImage} style={StyleSheet.absoluteFillObject} resizeMode="cover" />
+            <LinearGradient colors={['transparent', 'rgba(0,0,0,0.72)']} style={StyleSheet.absoluteFillObject} />
+          </>
+        ) : isImage ? (
+          <>
+            <Image source={{ uri: resolveUri(item.icon) }} style={item.route ? styles.ctaImgZoom : StyleSheet.absoluteFillObject} resizeMode="cover" />
             <LinearGradient colors={['transparent', 'rgba(0,0,0,0.75)']} style={StyleSheet.absoluteFillObject} />
           </>
         ) : (
@@ -106,7 +120,7 @@ export default function WelcomeSlider() {
 
   return (
     <View>
-      <Text style={styles.sectionTitle}>ברוכים הבאים</Text>
+      <Text style={styles.sectionTitle}>{t('wl.welcome')}</Text>
       <ScrollView
         ref={scrollRef}
         horizontal
@@ -128,6 +142,11 @@ const styles = StyleSheet.create({
   card: {
     width: CARD_W, height: 120, borderRadius: 16, overflow: 'hidden',
     justifyContent: 'flex-end',
+  },
+  ctaImg: { position: 'absolute', top: 10, left: 14, right: 14, height: 62 },
+  ctaImgZoom: { position: 'absolute', top: -22, left: -22, right: -22, bottom: -22 },
+  ctaCard: {
+    shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.15, shadowRadius: 5, elevation: 3,
   },
   icon: { fontSize: 44, textAlign: 'center', marginTop: 14 },
   textWrap: { paddingHorizontal: 12, paddingVertical: 10 },
