@@ -16,7 +16,7 @@ type Lang = 'he' | 'en' | 'fa' | 'ru';
 type HL = 'none' | 'yellow-border' | 'negative';
 type Item = { id: string; title: string; description?: string; price: string; phone: string; images: string[]; video?: string; hl?: HL; featured?: boolean };
 const hlBg = (hl?: HL) => hl === 'negative' ? '#0c1e3a' : '#fff';
-const hlBorder = (hl?: HL) => hl === 'yellow-border' ? { borderWidth: 4, borderColor: '#f59e0b' } : hl === 'negative' ? { borderWidth: 2, borderColor: '#1e3a8a' } : {};
+const hlBorder = (hl?: HL) => hl === 'yellow-border' ? { borderWidth: 5, borderColor: '#f59e0b' } : hl === 'negative' ? { borderWidth: 2, borderColor: '#1e3a8a' } : {};
 const HERO = 'https://images.unsplash.com/photo-1481437156560-3205f6a55735?w=1000&q=80';
 const F = { x: 'Assistant_800ExtraBold', b: 'Assistant_700Bold', sb: 'Assistant_600SemiBold', m: 'Assistant_500Medium', r: 'Assistant_400Regular' };
 const NAVY = '#16222C', CREAM = '#F5F1EA', GOLD = '#4F8A6E';
@@ -92,6 +92,7 @@ export default function MarketplaceScreen() {
   const [hl, setHl] = useState<HL>('none');
   const [title, setTitle] = useState('');
   const [desc, setDesc] = useState('');
+  const [cur, setCur] = useState<'$' | '₾'>('$');
   const [price, setPrice] = useState('');
   const [phone, setPhone] = useState('');
   const [images, setImages] = useState<string[]>([]);
@@ -113,7 +114,8 @@ export default function MarketplaceScreen() {
   };
 
   const [busy, setBusy] = useState(false);
-  const reset = () => { setPlan('free'); setHl('none'); setTitle(''); setDesc(''); setPrice(''); setPhone(''); setImages([]); setVideo(undefined); setEditId(null); };
+  const reset = () => { setPlan('free'); setHl('none'); setTitle(''); setDesc(''); setCur('$'); setPrice(''); setPhone(''); setImages([]); setVideo(undefined); setEditId(null); };
+  const priceStr = price.trim() ? `${cur}${price.trim()}` : '';
   const submit = async () => {
     if (!title.trim() || !phone.trim()) { alert(t.missing); return; }
     if (busy) return;
@@ -122,7 +124,7 @@ export default function MarketplaceScreen() {
       const imgs: string[] = [];
       for (const u of images) imgs.push(await uploadLocalUri(u, 'image'));
       const vid = video ? await uploadLocalUri(video, 'video') : null;
-      const rec = { board: 'market', title: title.trim(), description: desc.trim(), price: price.trim(), phone: phone.trim(), images: imgs, video: vid, hl: (plan === 'paid' ? hl : 'none') as HL };
+      const rec = { board: 'market', title: title.trim(), description: desc.trim(), price: priceStr, phone: phone.trim(), images: imgs, video: vid, hl: (plan === 'paid' ? hl : 'none') as HL };
       const ad = editId ? await updateAd(editId, rec) : await createAd(rec);
       if (plan === 'paid' && ad?.id) { const pay = await payAd(ad.id); if (pay?.url) openInAppBrowser(pay.url); }
       await load();
@@ -131,7 +133,7 @@ export default function MarketplaceScreen() {
     finally { setBusy(false); }
   };
   const closePost = () => { setPostOpen(false); setDone(false); reset(); };
-  const startEdit = (x: Item) => { setEditId(x.id); setPlan(x.hl && x.hl !== 'none' ? 'paid' : 'free'); setHl(x.hl || 'none'); setTitle(x.title); setDesc(x.description || ''); setPrice(x.price); setPhone(x.phone); setImages(x.images || []); setVideo(x.video); setManageOpen(false); setDone(false); setPostOpen(true); };
+  const startEdit = (x: Item) => { setEditId(x.id); setPlan(x.hl && x.hl !== 'none' ? 'paid' : 'free'); setHl(x.hl || 'none'); setTitle(x.title); setDesc(x.description || ''); const pc = (x.price || '').trim(); setCur(pc.startsWith('₾') ? '₾' : '$'); setPrice(pc.replace(/^[$₾]/, '')); setPhone(x.phone); setImages(x.images || []); setVideo(x.video); setManageOpen(false); setDone(false); setPostOpen(true); };
   const remove = async (id: string) => { try { await deleteAd(id, mPhone.trim()); } catch {} await load(); setMResult((items.filter(x => x.phone === mPhone.trim() && x.id !== id))); };
   const find = () => setMResult(items.filter(x => x.phone === mPhone.trim()));
 
@@ -145,26 +147,22 @@ export default function MarketplaceScreen() {
           <Text style={s.ribbonTxt}>⭐ {FEATURED_TXT[L]}</Text>
         </View>
       )}
-      {x.video ? (
-        <Video source={{ uri: resolveUri(x.video) }} style={s.media} resizeMode={ResizeMode.COVER} useNativeControls isMuted />
-      ) : (
-        <MediaGallery images={(x.images || []).map(resolveUri)} height={200} />
-      )}
+      <View>
+        {x.video ? (
+          <Video source={{ uri: resolveUri(x.video) }} style={s.media} resizeMode={ResizeMode.COVER} useNativeControls isMuted />
+        ) : (
+          <MediaGallery images={(x.images || []).map(resolveUri)} height={240} />
+        )}
+        {!!x.price && <View style={s.priceBadge}><Text style={s.priceBadgeTxt}>{x.price}</Text></View>}
+      </View>
       <View style={s.cardBody}>
-        <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-          <Text style={[s.itemTitle, { textAlign: ta, writingDirection: wd, flex: 1 }, neg && { color: '#fff' }]} numberOfLines={3}>{x.title}</Text>
-          <View style={{ alignItems: isRTL ? 'flex-start' : 'flex-end', marginHorizontal: 8 }}>
-            {!!x.price && <Text style={[s.itemPrice, neg && { color: GOLD }]}>{x.price}</Text>}
-            {!!x.phone && x.phone !== '—' && (
-              <TouchableOpacity onPress={() => Linking.openURL(`tel:${x.phone}`)}>
-                <Text style={[s.phoneTxt, { color: neg ? GOLD : NAVY }]}>☎ {x.phone}</Text>
-              </TouchableOpacity>
-            )}
-          </View>
-        </View>
+        <Text style={[s.itemTitle, { textAlign: ta, writingDirection: wd }, neg && { color: '#fff' }]} numberOfLines={3}>{x.title}</Text>
         {!!x.description && <Text style={[s.itemDesc, { textAlign: ta, writingDirection: wd }, neg && { color: '#cbd5e1' }]}>{x.description}</Text>}
         {!!x.phone && x.phone !== '—' && (
-          <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', marginTop: 12 }}>
+          <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 10, marginTop: 14 }}>
+            <TouchableOpacity onPress={() => Linking.openURL(`tel:${x.phone}`)} style={[s.phonePill, neg && { borderColor: GOLD, backgroundColor: 'rgba(224,168,46,0.14)' }]}>
+              <Text style={[s.phonePillTxt, { color: neg ? GOLD : NAVY }]}>☎ {x.phone}</Text>
+            </TouchableOpacity>
             <TouchableOpacity onPress={() => Linking.openURL(`https://wa.me/${x.phone.replace(/\D/g, '')}`)} style={s.waCircle}><Text style={s.waIcon}>✆</Text></TouchableOpacity>
           </View>
         )}
@@ -247,11 +245,15 @@ export default function MarketplaceScreen() {
                 <TouchableOpacity onPress={pickVideo} style={s.videoBtn}><Text style={s.videoBtnTxt}>{video ? '🎥 ✓' : t.addVideo}</Text></TouchableOpacity>
                 <TextInput value={title} onChangeText={setTitle} placeholder={t.fTitle} placeholderTextColor="#9aa5b1" style={[s.input, { textAlign: ta, writingDirection: wd }]} />
                 <TextInput value={desc} onChangeText={setDesc} placeholder={DESC_TXT[L]} placeholderTextColor="#9aa5b1" multiline style={[s.input, s.inputArea, { textAlign: ta, writingDirection: wd }]} />
-                <TextInput value={price} onChangeText={setPrice} placeholder={t.fPrice} placeholderTextColor="#9aa5b1" style={[s.input, { textAlign: ta, writingDirection: wd }]} />
+                <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', gap: 8, marginTop: 10, alignItems: 'center' }}>
+                  <TouchableOpacity onPress={() => setCur('$')} style={[s.curChip, cur === '$' && s.curChipOn]}><Text style={[s.curTxt, cur === '$' && s.curTxtOn]}>$</Text></TouchableOpacity>
+                  <TouchableOpacity onPress={() => setCur('₾')} style={[s.curChip, cur === '₾' && s.curChipOn]}><Text style={[s.curTxt, cur === '₾' && s.curTxtOn]}>₾</Text></TouchableOpacity>
+                  <TextInput value={price} onChangeText={setPrice} placeholder={t.fPrice} placeholderTextColor="#9aa5b1" keyboardType="numeric" style={[s.input, { flex: 1, marginTop: 0, textAlign: ta, writingDirection: wd }]} />
+                </View>
                 <TextInput value={phone} onChangeText={setPhone} placeholder={t.fPhone} placeholderTextColor="#9aa5b1" keyboardType="phone-pad" style={[s.input, { textAlign: ta, writingDirection: wd }]} />
 
                 <Text style={[s.sheetLabel, { textAlign: ta, writingDirection: wd, marginTop: 14 }]}>👁 {PREVIEW_TXT[L]}</Text>
-                <ItemCard x={{ id: 'preview', title: title.trim() || t.fTitle, description: desc.trim(), price: price.trim(), phone: phone.trim() || '—', images, video, hl: plan === 'paid' ? hl : 'none', featured: plan === 'paid' }} />
+                <ItemCard x={{ id: 'preview', title: title.trim() || t.fTitle, description: desc.trim(), price: priceStr, phone: phone.trim() || '—', images, video, hl: plan === 'paid' ? hl : 'none', featured: plan === 'paid' }} />
 
                 <View style={s.summaryBox}>
                   <Text style={[s.summaryLine, { textAlign: ta, writingDirection: wd }]}>{SUMMARY_TXT[L]}</Text>
@@ -313,14 +315,22 @@ const s = StyleSheet.create({
   heroTitle: { fontSize: 30, fontFamily: F.m, color: '#fff', marginTop: 3 },
   heroSub: { fontSize: 13, fontFamily: F.sb, color: '#fff', opacity: 0.9, marginTop: 2 },
   card: { backgroundColor: '#fff', borderRadius: 4, overflow: 'hidden', marginBottom: 14, shadowColor: '#1a2b35', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.08, shadowRadius: 14, elevation: 3 },
-  featuredCard: { borderWidth: 5, borderColor: '#E0A82E', shadowColor: '#E0A82E', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.55, shadowRadius: 16, elevation: 10, overflow: 'visible' },
+  featuredCard: { shadowColor: '#E0A82E', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.5, shadowRadius: 18, elevation: 10 },
   ribbon: { position: 'absolute', top: 10, zIndex: 5, backgroundColor: '#E0A82E', paddingHorizontal: 11, paddingVertical: 5, borderRadius: 4, shadowColor: '#000', shadowOpacity: 0.3, shadowRadius: 3, shadowOffset: { width: 0, height: 1 } },
   ribbonTxt: { color: '#16222c', fontFamily: F.x, fontSize: 12.5 },
   media: { width: '100%', height: 200, backgroundColor: '#000' },
   cardBody: { padding: 14 },
-  itemTitle: { fontSize: 23, fontFamily: F.m, color: '#16222c', lineHeight: 29 },
+  itemTitle: { fontSize: 26, fontFamily: F.m, color: '#16222c', lineHeight: 32 },
   phoneTxt: { fontSize: 15, fontFamily: F.b, marginTop: 4 },
-  waCircle: { width: 46, height: 46, borderRadius: 23, backgroundColor: '#25D366', alignItems: 'center', justifyContent: 'center', shadowColor: '#25D366', shadowOpacity: 0.4, shadowRadius: 6, shadowOffset: { width: 0, height: 2 } },
+  priceBadge: { position: 'absolute', bottom: 12, left: 12, backgroundColor: 'rgba(22,34,44,0.92)', paddingHorizontal: 16, paddingVertical: 9, borderRadius: 6 },
+  priceBadgeTxt: { color: '#fff', fontSize: 28, fontFamily: F.x },
+  phonePill: { flex: 1, borderWidth: 1.5, borderColor: NAVY, backgroundColor: '#eef3f6', borderRadius: 8, paddingVertical: 14, paddingHorizontal: 14 },
+  phonePillTxt: { fontSize: 20, fontFamily: F.b, textAlign: 'center' },
+  curChip: { borderWidth: 1.5, borderColor: '#e7e0d4', borderRadius: 8, width: 48, height: 48, alignItems: 'center', justifyContent: 'center' },
+  curChipOn: { backgroundColor: NAVY, borderColor: NAVY },
+  curTxt: { fontSize: 22, fontFamily: F.b, color: NAVY },
+  curTxtOn: { color: '#fff' },
+  waCircle: { width: 50, height: 50, borderRadius: 25, backgroundColor: '#25D366', alignItems: 'center', justifyContent: 'center', shadowColor: '#25D366', shadowOpacity: 0.4, shadowRadius: 6, shadowOffset: { width: 0, height: 2 } },
   waIcon: { color: '#fff', fontSize: 24, fontFamily: F.b },
   itemPrice: { fontSize: 18, fontFamily: F.b, color: '#2E9E6B', marginHorizontal: 8 },
   itemDesc: { fontSize: 14, fontFamily: F.r, color: '#5c6b76', marginTop: 6, lineHeight: 20 },

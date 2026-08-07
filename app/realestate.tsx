@@ -86,7 +86,7 @@ const RENT: Unit[] = [
 ];
 
 const hlBg = (hl: HL) => hl === 'yellow' ? '#fffbeb' : hl === 'negative' ? '#0c1e3a' : '#fff';
-const hlBorder = (hl: HL) => hl === 'yellow-border' ? { borderWidth: 4, borderColor: '#f59e0b' } : hl === 'negative' ? { borderWidth: 2, borderColor: '#1e3a8a' } : {};
+const hlBorder = (hl: HL) => hl === 'yellow-border' ? { borderWidth: 5, borderColor: '#f59e0b' } : hl === 'negative' ? { borderWidth: 2, borderColor: '#1e3a8a' } : {};
 
 const PREVIEW_TXT: Record<Lang, string> = { he: 'כך המודעה תיראה', en: 'How your ad will look', fa: 'آگهی شما این‌گونه دیده می‌شود', ru: 'Как будет выглядеть объявление' };
 const SUMMARY_TXT: Record<Lang, string> = { he: 'סיכום', en: 'Summary', fa: 'خلاصه', ru: 'Итог' };
@@ -132,6 +132,7 @@ export default function RealEstateScreen() {
   const [hl, setHl] = useState<HL>('none');
   const [title, setTitle] = useState('');
   const [desc, setDesc] = useState('');
+  const [cur, setCur] = useState<'$' | '₾'>('$');
   const [price, setPrice] = useState('');
   const [phone, setPhone] = useState('');
   const [images, setImages] = useState<string[]>([]);
@@ -154,7 +155,8 @@ export default function RealEstateScreen() {
     } catch {}
   };
 
-  const resetForm = () => { setPlan('free'); setHl('none'); setTitle(''); setDesc(''); setPrice(''); setPhone(''); setImages([]); setEditId(null); };
+  const resetForm = () => { setPlan('free'); setHl('none'); setTitle(''); setDesc(''); setCur('$'); setPrice(''); setPhone(''); setImages([]); setEditId(null); };
+  const priceStr = price.trim() ? `${cur}${price.trim()}` : '';
   const submit = async () => {
     if (!title.trim() || !phone.trim()) { alert(t.missing); return; }
     if (busy) return;
@@ -162,7 +164,7 @@ export default function RealEstateScreen() {
     try {
       const imgs: string[] = [];
       for (const u of images) imgs.push(await uploadLocalUri(u, 'image'));
-      const rec = { board: 'realestate', mode, hl: (plan === 'paid' ? hl : 'none') as HL, title: title.trim(), description: desc.trim(), price: price.trim(), phone: phone.trim(), images: imgs };
+      const rec = { board: 'realestate', mode, hl: (plan === 'paid' ? hl : 'none') as HL, title: title.trim(), description: desc.trim(), price: priceStr, phone: phone.trim(), images: imgs };
       const ad = editId ? await updateAd(editId, rec) : await createAd(rec);
       if (plan === 'paid' && ad?.id) { const pay = await payAd(ad.id); if (pay?.url) openInAppBrowser(pay.url); }
       await load();
@@ -171,7 +173,7 @@ export default function RealEstateScreen() {
     finally { setBusy(false); }
   };
   const closePost = () => { setPostOpen(false); setDone(false); resetForm(); };
-  const startEdit = (p: Post) => { setEditId(p.id); setPlan(p.featured || p.hl !== 'none' ? 'paid' : 'free'); setHl(p.hl); setTitle(p.title); setDesc(p.description || ''); setPrice(p.price); setPhone(p.phone); setImages(p.images || []); setManageOpen(false); setDone(false); setPostOpen(true); };
+  const startEdit = (p: Post) => { setEditId(p.id); setPlan(p.featured || p.hl !== 'none' ? 'paid' : 'free'); setHl(p.hl); setTitle(p.title); setDesc(p.description || ''); const pc = (p.price || '').trim(); setCur(pc.startsWith('₾') ? '₾' : '$'); setPrice(pc.replace(/^[$₾]/, '')); setPhone(p.phone); setImages(p.images || []); setManageOpen(false); setDone(false); setPostOpen(true); };
   const remove = async (id: string) => { try { await deleteAd(id, mPhone.trim()); } catch {} await load(); setMResult(posts.filter(p => p.phone === mPhone.trim() && p.id !== id)); };
   const find = () => setMResult(posts.filter(p => p.phone === mPhone.trim()));
 
@@ -188,22 +190,18 @@ export default function RealEstateScreen() {
             <Text style={s.ribbonTxt}>⭐ {FEATURED_TXT[L]}</Text>
           </View>
         )}
-        <MediaGallery images={(p.images || []).map(resolveUri)} height={190} />
+        <View>
+          <MediaGallery images={(p.images || []).map(resolveUri)} height={230} />
+          {!!p.price && <View style={s.priceBadge}><Text style={s.priceBadgeTxt}>{p.price}</Text></View>}
+        </View>
         <View style={s.cardBody}>
-          <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-            <Text style={[s.postTitle, { textAlign: ta, writingDirection: wd, flex: 1 }, neg && { color: '#fff' }]} numberOfLines={3}>{p.title}</Text>
-            <View style={{ alignItems: isRTL ? 'flex-start' : 'flex-end', marginHorizontal: 8 }}>
-              {!!p.price && <Text style={[s.postPrice, { color: neg ? GOLD : '#10b981' }]}>{p.price}</Text>}
-              {!!p.phone && p.phone !== '—' && (
-                <TouchableOpacity onPress={() => Linking.openURL(`tel:${p.phone}`)}>
-                  <Text style={[s.phoneTxt, { color: neg ? GOLD : NAVY }]}>☎ {p.phone}</Text>
-                </TouchableOpacity>
-              )}
-            </View>
-          </View>
+          <Text style={[s.postTitle, { textAlign: ta, writingDirection: wd }, neg && { color: '#fff' }]} numberOfLines={3}>{p.title}</Text>
           {!!p.description && <Text style={[s.postDesc, { textAlign: ta, writingDirection: wd }, neg && { color: '#cbd5e1' }]}>{p.description}</Text>}
           {!!p.phone && p.phone !== '—' && (
-            <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', marginTop: 12 }}>
+            <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 10, marginTop: 14 }}>
+              <TouchableOpacity onPress={() => Linking.openURL(`tel:${p.phone}`)} style={[s.phonePill, neg && { borderColor: '#E0A82E', backgroundColor: 'rgba(224,168,46,0.14)' }]}>
+                <Text style={[s.phonePillTxt, { color: neg ? '#E0A82E' : NAVY }]}>☎ {p.phone}</Text>
+              </TouchableOpacity>
               <TouchableOpacity onPress={() => Linking.openURL(`https://wa.me/${p.phone.replace(/\D/g, '')}`)} style={s.waCircle}><Text style={s.waIcon}>✆</Text></TouchableOpacity>
             </View>
           )}
@@ -304,11 +302,15 @@ export default function RealEstateScreen() {
 
                 <TextInput value={title} onChangeText={setTitle} placeholder={t.fTitle} placeholderTextColor="#9aa5b1" style={[s.input, { textAlign: ta, writingDirection: wd }]} />
                 <TextInput value={desc} onChangeText={setDesc} placeholder={DESC_TXT[L]} placeholderTextColor="#9aa5b1" multiline style={[s.input, s.inputArea, { textAlign: ta, writingDirection: wd }]} />
-                <TextInput value={price} onChangeText={setPrice} placeholder={t.fPrice} placeholderTextColor="#9aa5b1" style={[s.input, { textAlign: ta, writingDirection: wd }]} />
+                <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', gap: 8, marginTop: 10, alignItems: 'center' }}>
+                  <TouchableOpacity onPress={() => setCur('$')} style={[s.curChip, cur === '$' && s.curChipOn]}><Text style={[s.curTxt, cur === '$' && s.curTxtOn]}>$</Text></TouchableOpacity>
+                  <TouchableOpacity onPress={() => setCur('₾')} style={[s.curChip, cur === '₾' && s.curChipOn]}><Text style={[s.curTxt, cur === '₾' && s.curTxtOn]}>₾</Text></TouchableOpacity>
+                  <TextInput value={price} onChangeText={setPrice} placeholder={t.fPrice} placeholderTextColor="#9aa5b1" keyboardType="numeric" style={[s.input, { flex: 1, marginTop: 0, textAlign: ta, writingDirection: wd }]} />
+                </View>
                 <TextInput value={phone} onChangeText={setPhone} placeholder={t.fPhone} placeholderTextColor="#9aa5b1" keyboardType="phone-pad" style={[s.input, { textAlign: ta, writingDirection: wd }]} />
 
                 <Text style={[s.sheetLabel, { textAlign: ta, writingDirection: wd, marginTop: 14 }]}>👁 {PREVIEW_TXT[L]}</Text>
-                <PostCard p={{ id: 'preview', mode, hl: plan === 'paid' ? hl : 'none', title: title.trim() || t.fTitle, description: desc.trim(), price: price.trim(), phone: phone.trim() || '—', images, featured: plan === 'paid' }} />
+                <PostCard p={{ id: 'preview', mode, hl: plan === 'paid' ? hl : 'none', title: title.trim() || t.fTitle, description: desc.trim(), price: priceStr, phone: phone.trim() || '—', images, featured: plan === 'paid' }} />
 
                 <View style={s.summaryBox}>
                   <Text style={[s.summaryLine, { textAlign: ta, writingDirection: wd }]}>{SUMMARY_TXT[L]}</Text>
@@ -375,7 +377,7 @@ const s = StyleSheet.create({
   tabTxt: { fontSize: 15, fontFamily: F.sb, color: NAVY },
   tabTxtActive: { color: '#fff' },
   card: { backgroundColor: '#fff', borderRadius: 4, overflow: 'hidden', marginBottom: 14, shadowColor: '#1a2b35', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.08, shadowRadius: 14, elevation: 3 },
-  featuredCard: { borderWidth: 5, borderColor: '#E0A82E', shadowColor: '#E0A82E', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.55, shadowRadius: 16, elevation: 10, overflow: 'visible' },
+  featuredCard: { shadowColor: '#E0A82E', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.5, shadowRadius: 18, elevation: 10 },
   ribbon: { position: 'absolute', top: 10, zIndex: 5, backgroundColor: '#E0A82E', paddingHorizontal: 11, paddingVertical: 5, borderRadius: 4, shadowColor: '#000', shadowOpacity: 0.3, shadowRadius: 3, shadowOffset: { width: 0, height: 1 } },
   ribbonTxt: { color: '#16222c', fontFamily: F.x, fontSize: 12.5 },
   cardImg: { width: '100%', height: 170 },
@@ -406,10 +408,18 @@ const s = StyleSheet.create({
   addThumb: { width: 60, height: 60, borderRadius: 4, borderWidth: 1.5, borderColor: NAVY, borderStyle: 'dashed', alignItems: 'center', justifyContent: 'center' },
   input: { borderWidth: 1.5, borderColor: '#e7e0d4', borderRadius: 4, paddingVertical: 12, paddingHorizontal: 14, fontSize: 15, marginTop: 10, color: '#16222c', fontFamily: F.r },
   doneTxt: { fontSize: 16, fontFamily: F.sb, color: '#16222c', marginTop: 12, marginBottom: 16 },
-  postTitle: { fontSize: 22, fontFamily: F.m, color: '#16222c', lineHeight: 28 },
+  postTitle: { fontSize: 25, fontFamily: F.m, color: '#16222c', lineHeight: 31 },
   postPrice: { fontSize: 18, fontFamily: F.b },
   phoneTxt: { fontSize: 15, fontFamily: F.b, marginTop: 4 },
-  waCircle: { width: 46, height: 46, borderRadius: 23, backgroundColor: '#25D366', alignItems: 'center', justifyContent: 'center', shadowColor: '#25D366', shadowOpacity: 0.4, shadowRadius: 6, shadowOffset: { width: 0, height: 2 } },
+  priceBadge: { position: 'absolute', bottom: 10, left: 10, backgroundColor: 'rgba(22,34,44,0.92)', paddingHorizontal: 14, paddingVertical: 7, borderRadius: 6 },
+  priceBadgeTxt: { color: '#fff', fontSize: 24, fontFamily: F.x },
+  phonePill: { flex: 1, borderWidth: 1.5, borderColor: NAVY, backgroundColor: '#eef3f6', borderRadius: 8, paddingVertical: 14, paddingHorizontal: 14 },
+  phonePillTxt: { fontSize: 20, fontFamily: F.b, textAlign: 'center' },
+  curChip: { borderWidth: 1.5, borderColor: '#e7e0d4', borderRadius: 8, width: 48, height: 48, alignItems: 'center', justifyContent: 'center' },
+  curChipOn: { backgroundColor: NAVY, borderColor: NAVY },
+  curTxt: { fontSize: 22, fontFamily: F.b, color: NAVY },
+  curTxtOn: { color: '#fff' },
+  waCircle: { width: 50, height: 50, borderRadius: 25, backgroundColor: '#25D366', alignItems: 'center', justifyContent: 'center', shadowColor: '#25D366', shadowOpacity: 0.4, shadowRadius: 6, shadowOffset: { width: 0, height: 2 } },
   waIcon: { color: '#fff', fontSize: 24, fontFamily: F.b },
   postDesc: { fontSize: 14, fontFamily: F.r, color: '#5c6b76', marginTop: 6, lineHeight: 20 },
   summaryBox: { backgroundColor: '#f7f2e9', borderRadius: 4, borderWidth: 1, borderColor: '#e7e0d4', padding: 14, marginTop: 12 },
