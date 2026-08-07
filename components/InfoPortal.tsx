@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, NativeScro
 import { router } from 'expo-router';
 import { Colors } from '../constants/colors';
 import { fetchContent, resolveUri } from '../constants/api';
+import { useI18n } from '../constants/i18n';
 
 type Item = { id: string; title: string; subtitle?: string; icon: string; bg?: string };
 
@@ -22,6 +23,7 @@ const GAP = 10;
 const STEP = CARD_W + GAP;
 
 export default function InfoPortal() {
+  const { t, isRTL } = useI18n();
   const [items, setItems] = useState<Item[]>(INITIAL_ITEMS);
   const [selected, setSelected] = useState<Item | null>(null);
   const scrollRef = useRef<ScrollView>(null);
@@ -66,7 +68,7 @@ export default function InfoPortal() {
 
   return (
     <View>
-      <Text style={styles.sectionTitle}>פורטל המידע</Text>
+      <Text style={[styles.sectionTitle, { textAlign: isRTL ? 'right' : 'left', writingDirection: isRTL ? 'rtl' : 'ltr' }]}>{t('po.infoTitle')}</Text>
 
       {(
         <ScrollView

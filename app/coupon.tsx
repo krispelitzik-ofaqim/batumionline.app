@@ -1,11 +1,15 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, TextInput, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
+import QRCode from 'qrcode';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Colors } from '../constants/colors';
 import { resolveUri } from '../constants/api';
 import BottomTabBar from '../components/BottomTabBar';
+
+const F = { x: 'Assistant_800ExtraBold', b: 'Assistant_700Bold', sb: 'Assistant_600SemiBold', m: 'Assistant_500Medium', r: 'Assistant_400Regular' };
+const NAVY = '#16222C', CREAM = '#F5F1EA', GOLD = '#4F8A6E';
 
 // ---- DEMO business (placement / which business = TBD) ----
 const BIZ = {
@@ -91,16 +95,26 @@ export default function CouponScreen() {
     try { await AsyncStorage.setItem(lockKey(phone.trim()), JSON.stringify({ pct: chosen, time })); } catch {}
   };
 
-  const Barcode = () => (
-    <View style={s.barcodeWrap}>
-      <View style={s.barcode}>
-        {bars(barSeed).map((w, i) => (
-          <View key={i} style={{ width: w, height: 54, backgroundColor: i % 2 ? '#111' : 'transparent', marginRight: 1 }} />
-        ))}
+  // QR encodes a deep link that opens this restaurant's page inside our app.
+  const deepLink = `batumionline://place/${BIZ.id}`;
+  const QR = () => {
+    const modules = useMemo(() => { try { return QRCode.create(deepLink, { errorCorrectionLevel: 'M' }).modules; } catch { return null; } }, []);
+    if (!modules) return null;
+    const size = modules.size, cell = 5;
+    const rows = [];
+    for (let r = 0; r < size; r++) {
+      const cells = [];
+      for (let c = 0; c < size; c++) cells.push(<View key={c} style={{ width: cell, height: cell, backgroundColor: modules.data[r * size + c] ? NAVY : '#fff' }} />);
+      rows.push(<View key={r} style={{ flexDirection: 'row' }}>{cells}</View>);
+    }
+    return (
+      <View style={s.qrWrap}>
+        <View style={s.qrBox}>{rows}</View>
+        <Text style={s.qrTxt}>סרקו לדף המסעדה באפליקציה</Text>
+        <Text style={s.qrCode}>{code}</Text>
       </View>
-      <Text style={s.barcodeTxt}>{code}</Text>
-    </View>
-  );
+    );
+  };
 
   return (
     <SafeAreaView style={s.safe}>
@@ -134,7 +148,7 @@ export default function CouponScreen() {
             <TextInput value={date} onChangeText={setDate} placeholder="תאריך (YYYY-MM-DD)" placeholderTextColor="#94a3b8" style={s.input} />
             <TextInput value={phone} onChangeText={setPhone} placeholder="טלפון" placeholderTextColor="#94a3b8" keyboardType="phone-pad" style={s.input} />
 
-            <Barcode />
+            <QR />
 
             {!!msg && <Text style={s.err}>{msg}</Text>}
             <TouchableOpacity style={[s.sendBtn, !valid && { opacity: 0.4 }]} activeOpacity={0.85} disabled={!valid} onPress={send}>
@@ -158,7 +172,7 @@ export default function CouponScreen() {
             <Text style={s.bizName2}>{BIZ.name}</Text>
             <Text style={s.bizAddr2}>📍 {BIZ.address}</Text>
             <Text style={s.doneTime}>נוצל היום בשעה {redeemedAt}</Text>
-            <Barcode />
+            <QR />
             <Text style={s.lockNote}>מימוש נוסף אפשרי מחר (בתאריך חדש). קופון אחד לחשבון משולם בלבד.</Text>
           </View>
         </ScrollView>
@@ -169,59 +183,50 @@ export default function CouponScreen() {
 }
 
 const s = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: Colors.BACKGROUND },
-  header: { flexDirection: 'row-reverse', alignItems: 'center', padding: 12, gap: 8, backgroundColor: Colors.PRIMARY },
-  backBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(255,255,255,0.2)', alignItems: 'center', justifyContent: 'center' },
-  backTxt: { color: '#fff', fontSize: 24, fontWeight: '300' },
-  hTitle: { flex: 1, fontSize: 18, fontWeight: '900', color: '#fff', textAlign: 'right', writingDirection: 'rtl' },
-  sheet: { backgroundColor: '#fff', borderRadius: 20, padding: 16, borderWidth: 2, borderColor: Colors.ACCENT, borderStyle: 'dashed', alignItems: 'center' },
-  sheetDone: { borderColor: '#16a34a', minHeight: 460, justifyContent: 'center' },
-  bizWrap: { width: '100%', height: 150, borderRadius: 14, overflow: 'hidden', justifyContent: 'flex-end', backgroundColor: '#e5e7eb' },
+  safe: { flex: 1, backgroundColor: CREAM },
+  header: { flexDirection: 'row-reverse', alignItems: 'center', padding: 12, gap: 8, backgroundColor: NAVY },
+  backBtn: { width: 36, height: 36, borderRadius: 8, backgroundColor: 'rgba(255,255,255,0.16)', alignItems: 'center', justifyContent: 'center' },
+  backTxt: { color: '#fff', fontSize: 24, fontFamily: F.r },
+  hTitle: { flex: 1, fontSize: 24, fontFamily: F.m, color: '#fff', textAlign: 'right', writingDirection: 'rtl' },
+  sheet: { backgroundColor: '#fff', borderRadius: 6, padding: 16, borderWidth: 1.5, borderColor: '#e7e0d4', alignItems: 'center' },
+  sheetDone: { borderColor: '#2E9E6B', minHeight: 460, justifyContent: 'center' },
+  bizWrap: { width: '100%', height: 160, borderRadius: 4, overflow: 'hidden', justifyContent: 'flex-end', backgroundColor: '#e5e7eb' },
   bizImg: { ...StyleSheet.absoluteFillObject, width: '100%', height: '100%' },
   bizOverlay: { backgroundColor: 'rgba(0,0,0,0.5)', padding: 12 },
-  ribbon: { position: 'absolute', top: 22, left: -42, width: 172, transform: [{ rotate: '-45deg' }], backgroundColor: Colors.ACCENT, paddingVertical: 5, alignItems: 'center', shadowColor: '#000', shadowOpacity: 0.25, shadowRadius: 3, shadowOffset: { width: 0, height: 1 } },
-  ribbonTxt: { color: '#fff', fontSize: 11, fontWeight: '900', writingDirection: 'rtl' },
-  bizName: { color: '#fff', fontSize: 20, fontWeight: '900', textAlign: 'right', writingDirection: 'rtl' },
-  bizAddr: { color: '#e2e8f0', fontSize: 12, textAlign: 'right', writingDirection: 'rtl', marginTop: 2 },
-  bigPct: { fontSize: 34, fontWeight: '900', color: Colors.PRIMARY, marginTop: 14 },
-  sub: { fontSize: 13, color: '#64748b', marginBottom: 14, writingDirection: 'rtl', textAlign: 'center' },
-  modeRow: { flexDirection: 'row-reverse', gap: 8, marginBottom: 14, alignSelf: 'stretch' },
-  modeBtn: { flex: 1, paddingVertical: 8, borderRadius: 10, backgroundColor: '#fff', borderWidth: 1, borderColor: '#e2e8f0', alignItems: 'center' },
-  modeBtnOn: { backgroundColor: Colors.PRIMARY, borderColor: Colors.PRIMARY },
-  modeTxt: { fontSize: 13, fontWeight: '800', color: '#475569', writingDirection: 'rtl' },
-  modeTxtOn: { color: '#fff' },
-  pctRow: { flexDirection: 'row-reverse', gap: 8, marginBottom: 12 },
-  pctBtn: { width: 62, height: 62, borderRadius: 12, backgroundColor: '#f1f5f9', borderWidth: 1.5, borderColor: '#e2e8f0', alignItems: 'center', justifyContent: 'center' },
-  pctBtnOn: { backgroundColor: Colors.PRIMARY, borderColor: Colors.PRIMARY },
-  pctTxt: { fontSize: 20, fontWeight: '900', color: '#475569' },
-  pctTxtOn: { color: '#fff' },
-  validity: { fontSize: 12, fontWeight: '800', color: '#16a34a', backgroundColor: '#dcfce7', paddingHorizontal: 12, paddingVertical: 4, borderRadius: 20, overflow: 'hidden', marginBottom: 14, writingDirection: 'rtl' },
-  wheelLabel: { fontSize: 13, fontWeight: '800', color: Colors.TEXT, marginBottom: 6, writingDirection: 'rtl', textAlign: 'center' },
+  ribbon: { position: 'absolute', top: 22, left: -42, width: 172, transform: [{ rotate: '-45deg' }], backgroundColor: GOLD, paddingVertical: 5, alignItems: 'center', shadowColor: '#000', shadowOpacity: 0.25, shadowRadius: 3, shadowOffset: { width: 0, height: 1 } },
+  ribbonTxt: { color: '#fff', fontSize: 11, fontFamily: F.x, writingDirection: 'rtl' },
+  bizName: { color: '#fff', fontSize: 22, fontFamily: F.m, textAlign: 'right', writingDirection: 'rtl' },
+  bizAddr: { color: '#e2e8f0', fontSize: 12, fontFamily: F.r, textAlign: 'right', writingDirection: 'rtl', marginTop: 2 },
+  bigPct: { fontSize: 38, fontFamily: F.m, color: NAVY, marginTop: 16 },
+  sub: { fontSize: 13, color: '#7a7261', fontFamily: F.r, marginBottom: 14, writingDirection: 'rtl', textAlign: 'center' },
+  validity: { fontSize: 12, fontFamily: F.sb, color: '#2E9E6B', backgroundColor: '#e6f4ec', paddingHorizontal: 12, paddingVertical: 4, borderRadius: 4, overflow: 'hidden', marginBottom: 14, writingDirection: 'rtl' },
+  wheelLabel: { fontSize: 13, fontFamily: F.sb, color: '#16222c', marginBottom: 6, writingDirection: 'rtl', textAlign: 'center' },
   selWrap: { alignSelf: 'stretch', marginBottom: 14, zIndex: 10 },
-  selBox: { flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#f1f5f9', borderRadius: 10, paddingHorizontal: 14, paddingVertical: 14, borderWidth: 1.5, borderColor: Colors.PRIMARY },
-  selVal: { fontSize: 20, fontWeight: '900', color: Colors.PRIMARY, writingDirection: 'rtl' },
-  selPlaceholder: { color: '#94a3b8', fontWeight: '700', fontSize: 15 },
-  selChevron: { fontSize: 14, color: '#64748b', fontWeight: '900' },
-  selList: { backgroundColor: '#fff', borderRadius: 10, borderWidth: 1, borderColor: '#e2e8f0', marginTop: 6, overflow: 'hidden' },
-  selOpt: { paddingVertical: 12, alignItems: 'center', borderBottomWidth: 1, borderBottomColor: '#f1f5f9' },
-  selOptOn: { backgroundColor: '#eef6f9' },
-  selOptTxt: { fontSize: 17, fontWeight: '800', color: Colors.TEXT },
-  selOptTxtOn: { color: Colors.PRIMARY },
-  input: { alignSelf: 'stretch', backgroundColor: '#f1f5f9', borderRadius: 10, padding: 12, fontSize: 15, textAlign: 'right', writingDirection: 'rtl', marginBottom: 12, borderWidth: 1, borderColor: '#e2e8f0' },
-  barcodeWrap: { alignItems: 'center', marginVertical: 10 },
-  barcode: { flexDirection: 'row', alignItems: 'flex-end', height: 54 },
-  barcodeTxt: { fontSize: 11, color: '#334155', letterSpacing: 2, marginTop: 6, fontWeight: '800' },
-  err: { color: '#dc2626', fontSize: 13, marginBottom: 8, writingDirection: 'rtl' },
-  sendBtn: { alignSelf: 'stretch', backgroundColor: Colors.ACCENT, borderRadius: 12, paddingVertical: 14, alignItems: 'center' },
-  sendTxt: { color: '#fff', fontSize: 17, fontWeight: '900' },
-  finePrint: { fontSize: 10, color: '#94a3b8', marginTop: 12, lineHeight: 15, textAlign: 'center', writingDirection: 'rtl' },
-  doneMark: { fontSize: 64, color: '#16a34a', fontWeight: '900' },
-  doneTitle: { fontSize: 20, fontWeight: '900', color: '#16a34a', marginTop: 6, writingDirection: 'rtl', textAlign: 'center' },
-  donePct: { fontSize: 56, fontWeight: '900', color: Colors.TEXT, marginVertical: 4 },
-  bizName2: { fontSize: 20, fontWeight: '900', color: Colors.TEXT, writingDirection: 'rtl', textAlign: 'center' },
-  bizAddr2: { fontSize: 12, color: '#64748b', writingDirection: 'rtl', textAlign: 'center', marginTop: 2 },
-  doneTime: { fontSize: 13, color: '#64748b', writingDirection: 'rtl', marginTop: 8 },
-  lockNote: { fontSize: 11, color: '#94a3b8', marginTop: 14, writingDirection: 'rtl', textAlign: 'center', lineHeight: 16 },
+  selBox: { flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#f7f2e9', borderRadius: 4, paddingHorizontal: 14, paddingVertical: 14, borderWidth: 1.5, borderColor: NAVY },
+  selVal: { fontSize: 20, fontFamily: F.b, color: NAVY, writingDirection: 'rtl' },
+  selPlaceholder: { color: '#a9a291', fontFamily: F.sb, fontSize: 15 },
+  selChevron: { fontSize: 14, color: '#7a7261', fontFamily: F.b },
+  selList: { backgroundColor: '#fff', borderRadius: 4, borderWidth: 1, borderColor: '#e7e0d4', marginTop: 6, overflow: 'hidden' },
+  selOpt: { paddingVertical: 12, alignItems: 'center', borderBottomWidth: 1, borderBottomColor: '#f2ede3' },
+  selOptOn: { backgroundColor: '#f2ede3' },
+  selOptTxt: { fontSize: 17, fontFamily: F.sb, color: '#16222c' },
+  selOptTxtOn: { color: NAVY },
+  input: { alignSelf: 'stretch', backgroundColor: '#f7f2e9', borderRadius: 4, padding: 12, fontSize: 15, fontFamily: F.r, textAlign: 'right', writingDirection: 'rtl', marginBottom: 12, borderWidth: 1, borderColor: '#e7e0d4', color: '#16222c' },
+  qrWrap: { alignItems: 'center', marginVertical: 14 },
+  qrBox: { padding: 10, backgroundColor: '#fff', borderWidth: 1, borderColor: '#e7e0d4', borderRadius: 4 },
+  qrTxt: { fontSize: 12, color: '#16222c', fontFamily: F.sb, marginTop: 8, writingDirection: 'rtl' },
+  qrCode: { fontSize: 11, color: '#a9a291', letterSpacing: 2, marginTop: 2, fontFamily: F.b },
+  err: { color: '#dc2626', fontSize: 13, fontFamily: F.sb, marginBottom: 8, writingDirection: 'rtl' },
+  sendBtn: { alignSelf: 'stretch', backgroundColor: GOLD, borderRadius: 4, paddingVertical: 15, alignItems: 'center' },
+  sendTxt: { color: '#fff', fontSize: 17, fontFamily: F.b },
+  finePrint: { fontSize: 10, color: '#a9a291', fontFamily: F.r, marginTop: 12, lineHeight: 15, textAlign: 'center', writingDirection: 'rtl' },
+  doneMark: { fontSize: 64, color: '#2E9E6B', fontFamily: F.x },
+  doneTitle: { fontSize: 22, fontFamily: F.m, color: '#2E9E6B', marginTop: 6, writingDirection: 'rtl', textAlign: 'center' },
+  donePct: { fontSize: 56, fontFamily: F.x, color: NAVY, marginVertical: 4 },
+  bizName2: { fontSize: 22, fontFamily: F.m, color: '#16222c', writingDirection: 'rtl', textAlign: 'center' },
+  bizAddr2: { fontSize: 12, color: '#7a7261', fontFamily: F.r, writingDirection: 'rtl', textAlign: 'center', marginTop: 2 },
+  doneTime: { fontSize: 13, color: '#7a7261', fontFamily: F.sb, writingDirection: 'rtl', marginTop: 8 },
+  lockNote: { fontSize: 11, color: '#a9a291', fontFamily: F.r, marginTop: 14, writingDirection: 'rtl', textAlign: 'center', lineHeight: 16 },
   dashLink: { marginTop: 18, alignItems: 'center', paddingVertical: 12 },
-  dashLinkTxt: { fontSize: 13, fontWeight: '800', color: Colors.PRIMARY, writingDirection: 'rtl' },
+  dashLinkTxt: { fontSize: 13, fontFamily: F.sb, color: NAVY, writingDirection: 'rtl' },
 });

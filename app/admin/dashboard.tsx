@@ -141,7 +141,7 @@ const DEFAULT_AUDIO: DataItem[] = [
 
 const DEFAULT_TEXTS = {
   headerTitle: 'Batumi Online',
-  headerSub: 'המדריך לתייר הישראלי בבטומי',
+  headerSub: 'המדריך לתייר בבטומי',
   welcomeTitle: 'ברוכים הבאים',
   infoTitle: 'פורטל המידע',
   bottomTitle: 'מידע On Line',

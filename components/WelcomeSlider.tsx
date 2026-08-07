@@ -69,8 +69,9 @@ export default function WelcomeSlider() {
   const ticketsItem: Item = { id: '__tickets__', title: t('tk2.tickets'), subtitle: t('tk2.ticketsSub'), icon: '/uploads/1786082390271-386.jpg', route: '/tickets' };
   const couponItem: Item = { id: '__coupon__', title: t('cp.coupon'), subtitle: t('cp.couponSub'), icon: '/uploads/1786082391353-69.jpg', route: '/coupon' };
   const yad2Item: Item = { id: '__yad2__', title: t('mk.classifieds'), subtitle: t('mk.classifiedsSub'), icon: '/uploads/1786082392340-392.jpg', route: '/marketplace' };
+  const marketItem: Item = { id: '__market__', title: t('mk.title'), subtitle: t('mk.sub'), icon: '/uploads/1786081911740-787.jpg', route: '/market' };
   // Hebrew has no "The Market" banner, so surface the classifieds board here instead.
-  const displayItems = [ticketsItem, couponItem, ...(lang === 'he' ? [yad2Item] : []), ...items];
+  const displayItems = [...(lang === 'he' ? [marketItem] : []), ticketsItem, couponItem, ...(lang === 'he' ? [yad2Item] : []), ...items];
 
   const looped = [...displayItems, ...displayItems, ...displayItems];
   const singleWidth = displayItems.length * (CARD_W + GAP);

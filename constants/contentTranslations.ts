@@ -5,6 +5,7 @@
 // Hebrew until added here.
 export const CONTENT_TR: Record<string, { en: string; fa: string; ru?: string }> = {
   "המדריך לתייר הישראלי בבטומי": {"en":"The Traveler's Guide to Batumi","fa":"راهنمای گردشگران در باتومی","ru":"Путеводитель по Батуми для туристов"},
+  "המדריך לתייר בבטומי": {"en":"The Traveler's Guide to Batumi","fa":"راهنمای گردشگران در باتومی","ru":"Путеводитель по Батуми для туристов"},
   "ברוכים הבאים": {"en":"Welcome","fa":"خوش آمدید","ru":"Добро пожаловать"},
   "פורטל המידע": {"en":"Information Portal","fa":"پورتال اطلاعات","ru":"Информационный портал"},
   "מידע On Line": {"en":"Online Info","fa":"اطلاعات آنلاین","ru":"Информация On Line"},

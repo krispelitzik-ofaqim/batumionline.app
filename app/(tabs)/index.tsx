@@ -124,12 +124,14 @@ function BatumiClock({ dark }: { dark: boolean }) {
 }
 
 function CatCard({ item, width }: { item: CatItem; width: number }) {
+  const { isRTL } = useI18n();
+  const dir = { textAlign: (isRTL ? 'right' : 'left') as 'right' | 'left', writingDirection: (isRTL ? 'rtl' : 'ltr') as 'rtl' | 'ltr' };
   const iconIsImage = !!item.icon && (item.icon.startsWith('data:') || item.icon.startsWith('http') || item.icon.startsWith('/'));
   return (
     <TouchableOpacity
       style={[styles.card, { width }]}
       activeOpacity={0.7}
-      onPress={() => router.push(`/category/${item.id}`)}
+      onPress={() => router.push(((item as any).route || `/category/${item.id}`) as any)}
     >
       {iconIsImage ? (
         <Image source={{ uri: resolveUri(item.icon) }} style={styles.cardTop} resizeMode="cover" />
@@ -144,15 +146,16 @@ function CatCard({ item, width }: { item: CatItem; width: number }) {
         </LinearGradient>
       )}
       <View style={styles.cardBottom}>
-        <Text style={styles.cardTitle} numberOfLines={1}>{item.title}</Text>
-        <Text style={styles.cardSub} numberOfLines={1}>{item.subtitle}</Text>
+        <Text style={[styles.cardTitle, dir]} numberOfLines={1}>{item.title}</Text>
+        <Text style={[styles.cardSub, dir]} numberOfLines={1}>{item.subtitle}</Text>
       </View>
     </TouchableOpacity>
   );
 }
 
 export default function HomeScreen() {
-  const { t, lang } = useI18n();
+  const { t, lang, isRTL } = useI18n();
+  const gridDir = { flexDirection: (isRTL ? 'row-reverse' : 'row') as 'row-reverse' | 'row' };
   const { width: screenW } = useWindowDimensions();
   const [showExtra, setShowExtra] = useState(false);
   const [extraGroupVisible, setExtraGroupVisible] = useState(false);
@@ -164,7 +167,7 @@ export default function HomeScreen() {
   const [editMode, setEditMode] = useState(false);
   const [activeModal, setActiveModal] = useState<string | null>(null);
   const [editHeaderTitle, setEditHeaderTitle] = useState('Batumi Online');
-  const [editHeaderSub, setEditHeaderSub] = useState('המדריך לתייר הישראלי בבטומי');
+  const [editHeaderSub, setEditHeaderSub] = useState('המדריך לתייר בבטומי');
   const [editMainCats, setEditMainCats] = useState(MAIN_CATEGORIES);
   const [editExtraCats, setEditExtraCats] = useState(EXTRA_CATEGORIES);
   const [editBottomBanners, setEditBottomBanners] = useState(BOTTOM_BANNERS);
@@ -186,7 +189,7 @@ export default function HomeScreen() {
       if (!data) return;
       if (data.texts) {
         setEditHeaderTitle(data.texts.headerTitle || 'Batumi Online');
-        setEditHeaderSub(data.texts.headerSub || 'המדריך לתייר הישראלי בבטומי');
+        setEditHeaderSub(data.texts.headerSub || 'המדריך לתייר בבטומי');
       }
       if (data.mainCategories) setEditMainCats(data.mainCategories);
       if (data.extraCategories) setEditExtraCats(data.extraCategories);
@@ -218,7 +221,7 @@ export default function HomeScreen() {
 
   const handleExitEdit = () => {
     setEditHeaderTitle('Batumi Online');
-    setEditHeaderSub('המדריך לתייר הישראלי בבטומי');
+    setEditHeaderSub('המדריך לתייר בבטומי');
     setEditMainCats(MAIN_CATEGORIES);
     setEditExtraCats(EXTRA_CATEGORIES);
     setEditBottomBanners(BOTTOM_BANNERS);
@@ -278,13 +281,18 @@ export default function HomeScreen() {
         {/* 1. קטגוריות ראשיות — 6 קארדים, 2 בשורה */}
         {mainGroupVisible && (
           <View style={styles.section}>
-            <View style={styles.grid}>
-              {editMainCats.filter((c: any) => c.visible !== false).map((cat, idx) => (
-                <View key={cat.id} style={{ position: 'relative' }}>
-                  {editMode && <ReorderControls index={idx} total={editMainCats.length} onMove={(dir) => moveMainCat(idx, dir)} />}
-                  <CatCard item={cat} width={cardW} />
-                </View>
-              ))}
+            <View style={[styles.grid, gridDir]}>
+              {(() => {
+                const base = editMainCats.filter((c: any) => c.visible !== false);
+                const marketCard = { id: '__market__', title: t('mk.title'), subtitle: t('mk.sub'), icon: '🛒', bg: '#2E7D9A', bgDark: '#16222C', route: '/market' } as any;
+                const L = lang !== 'he' ? [...base, marketCard] : base;
+                return L.map((cat, idx) => (
+                  <View key={cat.id} style={{ position: 'relative' }}>
+                    {editMode && cat.id !== '__market__' && <ReorderControls index={idx} total={L.length} onMove={(dir) => moveMainCat(idx, dir)} />}
+                    <CatCard item={cat} width={cardW} />
+                  </View>
+                ));
+              })()}
             </View>
           </View>
         )}
@@ -298,8 +306,8 @@ export default function HomeScreen() {
               </TouchableOpacity>
             )}
             {(showExtra || lang !== 'he') && (
-              <View style={styles.grid}>
-                {editExtraCats.filter((c: any) => c.visible !== false).map((cat) => (
+              <View style={[styles.grid, gridDir]}>
+                {editExtraCats.filter((c: any) => c.visible !== false && !(lang !== 'he' && c.id === '10')).map((cat) => (
                   <CatCard key={cat.id} item={cat} width={cardW} />
                 ))}
               </View>
