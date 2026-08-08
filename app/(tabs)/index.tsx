@@ -362,8 +362,8 @@ export default function HomeScreen() {
             <TouchableOpacity activeOpacity={0.9} style={styles.megaBannerWrap} onPress={() => router.push('/market')}>
               <ImageBackground source={{ uri: resolveUri('/uploads/1786081911740-787.jpg') }} style={styles.megaBanner} imageStyle={{ borderRadius: 18 }}>
                 <LinearGradient colors={['rgba(255,255,255,0.1)', 'rgba(15,41,66,0.86)']} style={styles.megaBannerOverlay}>
-                  <Text style={styles.megaBannerTitle}>🛍️ {t('mk.title')}</Text>
-                  <Text style={styles.ctaBannerSub}>{t('mk.sub')}</Text>
+                  <Text style={[styles.megaBannerTitle, { textAlign: isRTL ? 'right' : 'left', writingDirection: isRTL ? 'rtl' : 'ltr' }]}>🛍️ {t('mk.title')}</Text>
+                  <Text style={[styles.ctaBannerSub, { textAlign: isRTL ? 'right' : 'left', writingDirection: isRTL ? 'rtl' : 'ltr' }]}>{t('mk.sub')}</Text>
                 </LinearGradient>
               </ImageBackground>
             </TouchableOpacity>
