@@ -121,7 +121,7 @@ export default function WelcomeSlider() {
 
   return (
     <View>
-      <Text style={styles.sectionTitle}>{t('wl.welcome')}</Text>
+      <Text style={[styles.sectionTitle, { textAlign: isRTL ? 'right' : 'left', writingDirection: isRTL ? 'rtl' : 'ltr' }]}>{t('wl.welcome')}</Text>
       <ScrollView
         ref={scrollRef}
         horizontal

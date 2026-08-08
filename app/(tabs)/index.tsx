@@ -373,12 +373,12 @@ export default function HomeScreen() {
         {/* 6. באנרים רוחביים */}
         {bottomGroupVisible && (
           <View style={styles.section}>
-            <Text style={styles.bottomSectionTitle}>{t('home.onlineInfo')}</Text>
+            <Text style={[styles.bottomSectionTitle, { textAlign: isRTL ? 'right' : 'left', writingDirection: isRTL ? 'rtl' : 'ltr' }]}>{t('home.onlineInfo')}</Text>
             {editBottomBanners.filter((b: any) => b.visible !== false).map((b, idx) => (
               <View key={b.id} style={{ position: 'relative' }}>
                 {editMode && <ReorderControls index={idx} total={editBottomBanners.length} onMove={(dir) => moveBottomBanner(idx, dir)} />}
                 <TouchableOpacity style={[styles.bottomBanner, { backgroundColor: b.bg }]} activeOpacity={0.7} onPress={() => { if (b.id === 'gyg') openInAppBrowser(gygBatumi()); else setActiveModal(b.id); }}>
-                  <Text style={styles.bottomBannerTitle} numberOfLines={1}>{b.title}</Text>
+                  <Text style={[styles.bottomBannerTitle, { textAlign: isRTL ? 'right' : 'left', writingDirection: isRTL ? 'rtl' : 'ltr' }]} numberOfLines={1}>{b.title}</Text>
                   <Text style={styles.bottomBannerIcon}>{b.icon}</Text>
                 </TouchableOpacity>
               </View>
