@@ -7,9 +7,26 @@ type Rates = { ILS: number; GEL: number; USD: number; EUR: number };
 
 const FLAGS: Record<string, string> = { ILS: '🇮🇱', GEL: '🇬🇪', USD: '🇺🇸', EUR: '🇪🇺' };
 const NAMES: Record<string, string> = { ILS: 'שקל', GEL: 'לארי', USD: 'דולר', EUR: 'יורו' };
+type CLang = 'he' | 'en' | 'fa' | 'ru';
+const CUR_NAMES: Record<CLang, Record<string, string>> = {
+  he: { ILS: 'שקל', GEL: 'לארי', USD: 'דולר', EUR: 'יורו' },
+  en: { ILS: 'Shekel', GEL: 'Lari', USD: 'Dollar', EUR: 'Euro' },
+  fa: { ILS: 'شِکِل', GEL: 'لاری', USD: 'دلار', EUR: 'یورو' },
+  ru: { ILS: 'Шекель', GEL: 'Лари', USD: 'Доллар', EUR: 'Евро' },
+};
+const CL_TR: Record<CLang, Record<string, string>> = {
+  he: { updated: 'עודכן:', enterIn: 'הקלד סכום ב', source: 'מקור הנתונים: open.er-api.com (שערים גלובליים, מתעדכנים יומית)' },
+  en: { updated: 'Updated:', enterIn: 'Enter amount in ', source: 'Data source: open.er-api.com (global rates, updated daily)' },
+  fa: { updated: 'به‌روزرسانی:', enterIn: 'مبلغ را به ', source: 'منبع داده: open.er-api.com (نرخ‌های جهانی، به‌روزرسانی روزانه)' },
+  ru: { updated: 'Обновлено:', enterIn: 'Введите сумму в ', source: 'Источник: open.er-api.com (мировые курсы, обновляются ежедневно)' },
+};
+const CLL = (l: string): CLang => (['he', 'en', 'fa', 'ru'].includes(l) ? (l as CLang) : 'en');
 
 export default function CurrencyModal({ visible, onClose, bgColor }: { visible: boolean; onClose: () => void; bgColor: string }) {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
+  const L = CLL(lang);
+  const N = CUR_NAMES[L];
+  const C = CL_TR[L];
   const [rates, setRates] = useState<Rates | null>(null);
   const [loading, setLoading] = useState(true);
   const [amount, setAmount] = useState('');
@@ -64,7 +81,7 @@ export default function CurrencyModal({ visible, onClose, bgColor }: { visible: 
         <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
           <Text style={s.title}>{t('cur.title')}</Text>
           <Text style={s.subtitle}>{t('cur.sub')}</Text>
-          {lastUpdate ? <Text style={s.updatedTxt}>עודכן: {lastUpdate}</Text> : null}
+          {lastUpdate ? <Text style={s.updatedTxt}>{C.updated} {lastUpdate}</Text> : null}
           <TouchableOpacity style={s.refreshBtn} onPress={loadRates} disabled={loading}>
             {loading ? (
               <ActivityIndicator size="small" color={Colors.WHITE} />
@@ -87,7 +104,7 @@ export default function CurrencyModal({ visible, onClose, bgColor }: { visible: 
                     onPress={() => setFrom(c)}
                   >
                     <Text style={s.currFlag}>{FLAGS[c]}</Text>
-                    <Text style={[s.currLabel, from === c && s.currLabelActive]}>{NAMES[c]}</Text>
+                    <Text style={[s.currLabel, from === c && s.currLabelActive]}>{N[c]}</Text>
                   </TouchableOpacity>
                 ))}
               </View>
@@ -96,7 +113,7 @@ export default function CurrencyModal({ visible, onClose, bgColor }: { visible: 
               <View style={s.inputCard}>
                 <View style={s.inputRow}>
                   <Text style={[s.input, { color: amount ? '#fff' : 'rgba(255,255,255,0.6)' }]}>
-                    {amount || `הקלד סכום ב${NAMES[from]}`}
+                    {amount || `${C.enterIn}${N[from]}`}
                   </Text>
                 </View>
               </View>
@@ -132,16 +149,16 @@ export default function CurrencyModal({ visible, onClose, bgColor }: { visible: 
                   <View style={{ flexDirection: 'row-reverse', alignItems: 'baseline', justifyContent: 'center', gap: 8 }}>
                     <Text style={s.resultFlag}>{FLAGS[c]}</Text>
                     <Text style={s.resultAmount}>{convert(c)}</Text>
-                    <Text style={s.resultName}>{NAMES[c]}</Text>
+                    <Text style={s.resultName}>{N[c]}</Text>
                   </View>
                   {rates && (
                     <Text style={[s.rateText, { textAlign: 'center' }]}>
-                      1 {NAMES[from]} = {(rates[c] / rates[from]).toFixed(4)} {NAMES[c]}
+                      1 {N[from]} = {(rates[c] / rates[from]).toFixed(4)} {N[c]}
                     </Text>
                   )}
                 </View>
               ))}
-              <Text style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', textAlign: 'center', marginTop: 16, writingDirection: 'rtl' }}>מקור הנתונים: open.er-api.com (שערים גלובליים, מתעדכנים יומית)</Text>
+              <Text style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', textAlign: 'center', marginTop: 16, writingDirection: 'rtl' }}>{C.source}</Text>
             </>
           )}
         </ScrollView>
