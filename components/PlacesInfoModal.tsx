@@ -3,7 +3,17 @@ import { Modal, View, Text, TouchableOpacity, ScrollView, ActivityIndicator, Sty
 import { API_BASE } from '../constants/api';
 import { Colors } from '../constants/colors';
 import { openInAppBrowser, bookingSearch, hotellookSearch, woltSearch } from '../constants/affiliates';
+import { useI18n } from '../constants/i18n';
 import MapEmbed from './MapEmbed';
+
+type PLang = 'he' | 'en' | 'fa' | 'ru';
+const P_TR: Record<PLang, Record<string, string>> = {
+  he: { notFound: 'לא נמצא מידע נוסף', reviews: 'ביקורות', hours: '🕐 שעות פתיחה', openNow: '🟢 פתוח כעת', closedNow: '🔴 סגור כעת', allWeek: 'כל ימות השבוע:', bookTable: 'להזמנת שולחן', call: 'חייג', site: 'אתר רשמי', priceAvail: 'ראה מחיר וזמינות', buyTicket: 'רכישת כרטיס', payAtEntry: 'תשלום בכניסה', free: 'חינם', byAppt: 'בתיאום מראש', seeAlso: 'לא מצאתם? ראו גם כאן' },
+  en: { notFound: 'No further info found', reviews: 'reviews', hours: '🕐 Opening hours', openNow: '🟢 Open now', closedNow: '🔴 Closed now', allWeek: 'Every day:', bookTable: 'Book a table', call: 'Call', site: 'Official website', priceAvail: 'See price & availability', buyTicket: 'Buy a ticket', payAtEntry: 'Pay at entrance', free: 'Free', byAppt: 'By appointment', seeAlso: "Didn't find it? See also here" },
+  fa: { notFound: 'اطلاعات بیشتری یافت نشد', reviews: 'نظر', hours: '🕐 ساعات کاری', openNow: '🟢 اکنون باز است', closedNow: '🔴 اکنون بسته است', allWeek: 'همه روزها:', bookTable: 'رزرو میز', call: 'تماس', site: 'وب‌سایت رسمی', priceAvail: 'مشاهده قیمت و موجودی', buyTicket: 'خرید بلیط', payAtEntry: 'پرداخت در ورودی', free: 'رایگان', byAppt: 'با تعیین وقت قبلی', seeAlso: 'پیدا نکردید؟ اینجا هم ببینید' },
+  ru: { notFound: 'Доп. информация не найдена', reviews: 'отзывов', hours: '🕐 Часы работы', openNow: '🟢 Открыто сейчас', closedNow: '🔴 Закрыто сейчас', allWeek: 'Каждый день:', bookTable: 'Забронировать стол', call: 'Позвонить', site: 'Официальный сайт', priceAvail: 'Цена и наличие', buyTicket: 'Купить билет', payAtEntry: 'Оплата на входе', free: 'Бесплатно', byAppt: 'По записи', seeAlso: 'Не нашли? Смотрите также здесь' },
+};
+const PPL = (l: string): PLang => (['he', 'en', 'fa', 'ru'].includes(l) ? (l as PLang) : 'en');
 
 function PhotoGallery({ photos }: { photos: { ref: string; url: string }[] }) {
   const [idx, setIdx] = useState(0);
@@ -56,6 +66,10 @@ type PlaceData = {
 };
 
 export default function PlacesInfoModal({ query, title, onClose, hideHours, showHotelPrices, showAttractionTickets, isRestaurant, ticketType, ticketUrl, ticketUrlAlt }: { query: string; title: string; onClose: () => void; hideHours?: boolean; showHotelPrices?: boolean; showAttractionTickets?: boolean; isRestaurant?: boolean; ticketType?: string; ticketUrl?: string; ticketUrlAlt?: string }) {
+  const { lang, isRTL } = useI18n();
+  const L = PPL(lang);
+  const P = P_TR[L];
+  const dir = { textAlign: (isRTL ? 'right' : 'left') as 'right' | 'left', writingDirection: (isRTL ? 'rtl' : 'ltr') as 'rtl' | 'ltr' };
   const [data, setData] = useState<PlaceData | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -80,12 +94,12 @@ export default function PlacesInfoModal({ query, title, onClose, hideHours, show
           <TouchableOpacity style={s.close} onPress={onClose}>
             <Text style={s.closeX}>✕</Text>
           </TouchableOpacity>
-          <Text style={s.title}>{title}</Text>
+          <Text style={[s.title, dir]}>{title}</Text>
 
           {loading ? (
             <ActivityIndicator size="large" color={Colors.PRIMARY} style={{ marginVertical: 30 }} />
           ) : !data?.found ? (
-            <Text style={s.notFound}>לא נמצא מידע נוסף</Text>
+            <Text style={[s.notFound, dir]}>{P.notFound}</Text>
           ) : (
             <ScrollView style={{ maxHeight: 520 }} showsVerticalScrollIndicator={false}>
               {!!(data.photos && data.photos.length) && (
@@ -100,13 +114,13 @@ export default function PlacesInfoModal({ query, title, onClose, hideHours, show
                 <View style={s.rowCenter}>
                   <Text style={s.star}>⭐</Text>
                   <Text style={s.rating}>{data.rating.toFixed(1)}</Text>
-                  {!!data.reviews && <Text style={s.reviews}>· {data.reviews.toLocaleString()} ביקורות</Text>}
+                  {!!data.reviews && <Text style={s.reviews}>· {data.reviews.toLocaleString()} {P.reviews}</Text>}
                 </View>
               )}
               {!!data.address && (
                 <View style={s.infoRow}>
                   <Text style={s.infoIcon}>📍</Text>
-                  <Text style={s.infoTxt}>{data.address}</Text>
+                  <Text style={[s.infoTxt, dir]}>{data.address}</Text>
                 </View>
               )}
               {!hideHours && !!(data.openingHours && data.openingHours.length) && (() => {
@@ -116,17 +130,17 @@ export default function PlacesInfoModal({ query, title, onClose, hideHours, show
                 return (
                   <View style={s.hoursBlock}>
                     <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-                      <Text style={s.hoursTitle}>🕐 שעות פתיחה</Text>
+                      <Text style={[s.hoursTitle, dir]}>{P.hours}</Text>
                       {data.openNow != null && (
                         <View style={{ paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6, backgroundColor: data.openNow ? '#dcfce7' : '#fee2e2' }}>
                           <Text style={{ fontSize: 11, fontWeight: '900', color: data.openNow ? '#16a34a' : '#dc2626' }}>
-                            {data.openNow ? '🟢 פתוח כעת' : '🔴 סגור כעת'}
+                            {data.openNow ? P.openNow : P.closedNow}
                           </Text>
                         </View>
                       )}
                     </View>
                     {allSame ? (
-                      <Text style={s.hoursLine}>כל ימות השבוע: {timesOnly[0]}</Text>
+                      <Text style={[s.hoursLine, dir]}>{P.allWeek} {timesOnly[0]}</Text>
                     ) : (
                       hours.map((line, i) => (
                         <Text key={i} style={s.hoursLine}>{line}</Text>
@@ -139,12 +153,12 @@ export default function PlacesInfoModal({ query, title, onClose, hideHours, show
                 <View style={s.btnCol}>
                   {!!data.phone && (
                     <TouchableOpacity style={[s.btn, { backgroundColor: '#10b981' }]} onPress={() => Linking.openURL(`tel:${data.phone}`)}>
-                      <Text style={s.btnTxt}>{isRestaurant ? 'להזמנת שולחן' : 'חייג'} · {data.phone}</Text>
+                      <Text style={s.btnTxt}>{isRestaurant ? P.bookTable : P.call} · {data.phone}</Text>
                     </TouchableOpacity>
                   )}
                   {!!data.website && (
                     <TouchableOpacity style={[s.btn, { backgroundColor: Colors.PRIMARY }]} onPress={() => Linking.openURL(data.website!)}>
-                      <Text style={s.btnTxt}>אתר רשמי</Text>
+                      <Text style={s.btnTxt}>{P.site}</Text>
                     </TouchableOpacity>
                   )}
                 </View>
@@ -152,7 +166,7 @@ export default function PlacesInfoModal({ query, title, onClose, hideHours, show
               {showHotelPrices && (
                 <View style={[s.btnRow, { marginTop: 10 }]}>
                   <TouchableOpacity style={[s.btn, { flex: 1, backgroundColor: '#FF6B00' }]} onPress={() => openInAppBrowser(hotellookSearch(title))}>
-                    <Text style={s.btnTxt}>ראה מחיר וזמינות</Text>
+                    <Text style={s.btnTxt}>{P.priceAvail}</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={[s.btn, { flex: 1, backgroundColor: '#003580' }]} onPress={() => openInAppBrowser(bookingSearch(title))}>
                     <Text style={s.btnTxt}>Booking</Text>
@@ -161,10 +175,10 @@ export default function PlacesInfoModal({ query, title, onClose, hideHours, show
               )}
               {showAttractionTickets && (() => {
                 const config: Record<string, { color: string; label: string; clickable: boolean }> = {
-                  online: { color: '#f97316', label: 'רכישת כרטיס', clickable: true },
-                  onsite: { color: '#64748b', label: 'תשלום בכניסה', clickable: false },
-                  free: { color: '#10b981', label: 'חינם', clickable: false },
-                  appointment: { color: '#3DA5C4', label: 'בתיאום מראש', clickable: false },
+                  online: { color: '#f97316', label: P.buyTicket, clickable: true },
+                  onsite: { color: '#64748b', label: P.payAtEntry, clickable: false },
+                  free: { color: '#10b981', label: P.free, clickable: false },
+                  appointment: { color: '#3DA5C4', label: P.byAppt, clickable: false },
                 };
                 const c = ticketType ? config[ticketType] : null;
                 if (!c || ticketType === 'skip') return null;
@@ -181,7 +195,7 @@ export default function PlacesInfoModal({ query, title, onClose, hideHours, show
                     )}
                     {c.clickable && ticketUrlAlt && (
                       <TouchableOpacity onPress={() => openInAppBrowser(ticketUrlAlt)} style={{ marginTop: 6, alignSelf: 'center' }}>
-                        <Text style={{ color: '#1A6B8A', fontSize: 13, fontWeight: '700', textDecorationLine: 'underline' }}>לא מצאתם? ראו גם כאן</Text>
+                        <Text style={{ color: '#1A6B8A', fontSize: 13, fontWeight: '700', textDecorationLine: 'underline' }}>{P.seeAlso}</Text>
                       </TouchableOpacity>
                     )}
                   </View>
