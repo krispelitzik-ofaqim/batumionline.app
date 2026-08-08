@@ -15,7 +15,7 @@ type Result = {
 };
 
 export default function SearchModal({ visible, onClose }: { visible: boolean; onClose: () => void }) {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const [query, setQuery] = useState('');
   const [data, setData] = useState<any>(null);
 
@@ -153,7 +153,12 @@ export default function SearchModal({ visible, onClose }: { visible: boolean; on
             <Text style={s.hint}>{t('srch.hint')}</Text>
           )}
           {query.trim() && results.length === 0 && (
-            <Text style={s.hint}>לא נמצאו תוצאות עבור "{query}"</Text>
+            <Text style={s.hint}>{
+              lang === 'en' ? `No results found for "${query}"`
+              : lang === 'fa' ? `نتیجه‌ای برای "${query}" یافت نشد`
+              : lang === 'ru' ? `Ничего не найдено по запросу "${query}"`
+              : `לא נמצאו תוצאות עבור "${query}"`
+            }</Text>
           )}
           {results.map((r, i) => (
             <TouchableOpacity key={`${r.id}-${i}`} style={s.item} onPress={() => open(r)}>
