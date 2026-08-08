@@ -107,7 +107,7 @@ const FALLBACK_TIPS: Article[] = [
 export default function RealEstatePortal() {
   const { t } = useI18n();
   const [topButtons, setTopButtons] = useState<TopButton[]>(DEFAULT_TOP_BUTTONS);
-  const [activeTop, setActiveTop] = useState<string | null>(null);
+  const [activeTop, setActiveTop] = useState<string | null>('sale');
   const [rentPeriod, setRentPeriod] = useState<'daily' | 'yearly'>('daily');
   const [formOpen, setFormOpen] = useState(false);
   const [choiceOpen, setChoiceOpen] = useState(false);
@@ -240,13 +240,13 @@ export default function RealEstatePortal() {
           </LinearGradient>
         </ImageBackground>
 
-        {/* Top buttons - fit in one row */}
-        <View style={s.topRow}>
+        {/* Top buttons — gold pills, horizontal scroll (no crowding on small phones) */}
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.topRow}>
           <TouchableOpacity
             style={[s.topBtnRect, s.homeBtn, activeTop === null && s.topBtnActive]}
             onPress={() => setActiveTop(null)}
           >
-            <Text style={[s.topBtnTxt, activeTop === null && s.topBtnTxtActive]} numberOfLines={2}>{t('re.homeBtn')}</Text>
+            <Text style={[s.topBtnTxt, activeTop === null && s.topBtnTxtActive]} numberOfLines={1}>{t('re.homeBtn')}</Text>
           </TouchableOpacity>
           {topButtons.filter(b => b.id !== 'hotels').map(b => (
             <TouchableOpacity
@@ -254,10 +254,10 @@ export default function RealEstatePortal() {
               style={[s.topBtnRect, activeTop === b.id && s.topBtnActive]}
               onPress={() => setActiveTop(activeTop === b.id ? null : b.id)}
             >
-              <Text style={[s.topBtnTxt, activeTop === b.id && s.topBtnTxtActive]} numberOfLines={2}>{b.label}</Text>
+              <Text style={[s.topBtnTxt, activeTop === b.id && s.topBtnTxtActive]} numberOfLines={1}>{b.label}</Text>
             </TouchableOpacity>
           ))}
-        </View>
+        </ScrollView>
 
         {activeTop ? (
           <>
@@ -269,18 +269,18 @@ export default function RealEstatePortal() {
 
             {(activeTop === 'sale' || activeTop === 'rent' || activeTop === 'hotels') && (
               <View style={{ marginBottom: 14, paddingHorizontal: 12, gap: 6 }}>
-                <TouchableOpacity onPress={() => activeTop === 'hotels' ? setChoiceOpen(true) : setFormOpen(true)} activeOpacity={0.85} style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 10, paddingVertical: 10, paddingHorizontal: 14, borderRadius: 10, borderWidth: 1.5, borderColor: Colors.PRIMARY, backgroundColor: '#fff' }}>
-                  <View style={{ width: 30, height: 30, borderRadius: 15, backgroundColor: Colors.PRIMARY, alignItems: 'center', justifyContent: 'center' }}>
-                    <Text style={{ fontSize: 16, color: '#fff', fontWeight: '900' }}>+</Text>
+                <TouchableOpacity onPress={() => activeTop === 'hotels' ? setChoiceOpen(true) : setFormOpen(true)} activeOpacity={0.85} style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 10, paddingVertical: 13, paddingHorizontal: 16, borderRadius: 14, borderWidth: 1.5, borderColor: GOLD, backgroundColor: '#fff', shadowColor: '#1B2A33', shadowOpacity: 0.06, shadowRadius: 10, shadowOffset: { width: 0, height: 5 }, elevation: 2 }}>
+                  <View style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: INK, alignItems: 'center', justifyContent: 'center' }}>
+                    <Text style={{ fontSize: 18, color: GOLD, fontWeight: '900' }}>＋</Text>
                   </View>
                   <View style={{ flex: 1 }}>
-                    <Text style={{ fontSize: 13, fontWeight: '900', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl' }}>{activeTop === 'sale' ? t('re.postSale') : activeTop === 'rent' ? t('re.postRent') : t('re.postProject')}</Text>
-                    <Text style={{ fontSize: 10, color: '#64748b', textAlign: 'right', writingDirection: 'rtl', marginTop: 1 }}>{t('re.freeExposure')}</Text>
+                    <Text style={{ fontSize: 14, fontWeight: '900', color: INK, textAlign: 'right', writingDirection: 'rtl' }}>{activeTop === 'sale' ? t('re.postSale') : activeTop === 'rent' ? t('re.postRent') : t('re.postProject')}</Text>
+                    <Text style={{ fontSize: 11, color: '#8a7f6b', textAlign: 'right', writingDirection: 'rtl', marginTop: 1 }}>{t('re.freeExposure')}</Text>
                   </View>
-                  <Text style={{ fontSize: 16, color: Colors.PRIMARY, fontWeight: '300' }}>‹</Text>
+                  <Text style={{ fontSize: 18, color: GOLD, fontWeight: '300' }}>‹</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => setMyListingsOpen(true)} activeOpacity={0.7} style={{ paddingVertical: 6, alignItems: 'center' }}>
-                  <Text style={{ fontSize: 12, color: Colors.PRIMARY, fontWeight: '700', textDecorationLine: 'underline' }}>{t('re.myListings')}</Text>
+                <TouchableOpacity onPress={() => setMyListingsOpen(true)} activeOpacity={0.7} style={{ paddingVertical: 8, alignItems: 'center' }}>
+                  <Text style={{ fontSize: 12, color: INK, fontWeight: '800', textDecorationLine: 'underline' }}>{t('re.myListings')}</Text>
                 </TouchableOpacity>
               </View>
             )}
@@ -304,13 +304,15 @@ export default function RealEstatePortal() {
                     style={[s.listingCard, lst.size === 'half' && s.listingCardHalf, isBanner && { width: '100%', flexDirection: 'row-reverse', height: 130 }, { backgroundColor: cardBg }, cardBorder]}
                     onPress={() => setExpandedFixedId(expandedFixedId === lst.id ? null : lst.id)}
                   >
-                    <Image source={{ uri: resolveUri(lst.image) }} style={[s.listingImage, isBanner && { width: 150, height: '100%' }]} />
+                    <View style={isBanner ? { width: 150, height: '100%' } : undefined}>
+                      <Image source={{ uri: resolveUri(lst.image) }} style={[s.listingImage, isBanner && { width: 150, height: '100%' }]} />
+                      {!!lst.price && <View style={s.priceBadge}><Text style={s.priceBadgeTxt}>{lst.price}</Text></View>}
+                    </View>
                     <View style={[s.listingBody, isBanner && { flex: 1, padding: 8 }]}>
                       {isFull ? (
                         <>
                           <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
                             <Text style={[{ flex: 1, fontSize: 18, fontWeight: '900', color: txtColor, textAlign: 'right', writingDirection: 'rtl' }]} numberOfLines={2}>{lst.title}</Text>
-                            <Text style={[s.listingPrice, { color: priceColor, marginTop: 0, fontSize: 18 }]}>{lst.price}</Text>
                           </View>
                           {!!lst.location && <Text style={[s.listingFeatureTxt, { color: subColor, marginTop: 6, fontSize: 12 }]}>📍 {lst.location}</Text>}
                           {(lst.features || []).slice(0, 4).map((f: string, i: number) => (
@@ -319,7 +321,7 @@ export default function RealEstatePortal() {
                               <Text style={[s.listingFeatureTxt, { color: subColor }]} numberOfLines={1}>{f}</Text>
                             </View>
                           ))}
-                          <Text style={{ fontSize: 11, color: isBlue ? '#F4A94E' : Colors.PRIMARY, fontWeight: '700', textAlign: 'left', marginTop: 8 }}>{t('re.moreDetails')}</Text>
+                          <Text style={{ fontSize: 12, color: GOLD, fontWeight: '800', textAlign: 'left', marginTop: 10 }}>{t('re.moreDetails')} ‹</Text>
                         </>
                       ) : (
                         <>
@@ -331,9 +333,8 @@ export default function RealEstatePortal() {
                               <Text style={[s.listingFeatureTxt, { color: subColor }]} numberOfLines={1}>{f}</Text>
                             </View>
                           ))}
-                          <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginTop: 6 }}>
-                            <Text style={[s.listingPrice, { color: priceColor, marginTop: 0 }, isBanner && { fontSize: 16 }]}>{lst.price}</Text>
-                            <Text style={{ fontSize: 11, color: isBlue ? '#F4A94E' : Colors.PRIMARY, fontWeight: '700' }}>{t('re.details')}</Text>
+                          <View style={{ flexDirection: 'row-reverse', justifyContent: 'flex-start', alignItems: 'center', marginTop: 6 }}>
+                            <Text style={{ fontSize: 11, color: isBlue ? GOLD : GOLD, fontWeight: '800' }}>{t('re.details')} ‹</Text>
                           </View>
                         </>
                       )}
@@ -988,8 +989,11 @@ function NewsSliderArrows({ news }: { news: Article[] }) {
   );
 }
 
+// Luxury palette (approved via /portal-lux demo)
+const GOLD = '#C9A24B', INK = '#1B2A33', SANDBG = '#F7F3EC', HLINE = '#E7DFD1';
+
 const s = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.BACKGROUND },
+  container: { flex: 1, backgroundColor: SANDBG },
   heroBackBtn: { position: 'absolute', top: 50, left: 16, width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(0,0,0,0.5)', alignItems: 'center', justifyContent: 'center', zIndex: 5 },
   backBtn: {
     position: 'absolute', top: 50, right: 16, zIndex: 10,
@@ -999,21 +1003,21 @@ const s = StyleSheet.create({
   backX: { fontSize: 28, color: Colors.WHITE, fontWeight: '700', marginTop: -2 },
   content: { paddingBottom: 20 },
 
-  hero: { width: '100%', height: 220 },
-  heroOverlay: { flex: 1, justifyContent: 'flex-end', padding: 20 },
-  heroKicker: { fontSize: 11, fontWeight: '700', color: Colors.WHITE, opacity: 0.85, letterSpacing: 2, textAlign: 'right', writingDirection: 'rtl' },
-  heroTitle: { fontSize: 32, fontWeight: '900', color: Colors.WHITE, textAlign: 'right', writingDirection: 'rtl', marginTop: 4 },
-  heroSub: { fontSize: 14, color: Colors.WHITE, opacity: 0.85, textAlign: 'right', writingDirection: 'rtl', marginTop: 4 },
+  hero: { width: '100%', height: 150 },
+  heroOverlay: { flex: 1, justifyContent: 'flex-end', padding: 18 },
+  heroKicker: { fontSize: 10, fontWeight: '800', color: GOLD, opacity: 1, letterSpacing: 3, textAlign: 'right', writingDirection: 'rtl' },
+  heroTitle: { fontSize: 23, fontWeight: '800', color: Colors.WHITE, textAlign: 'right', writingDirection: 'rtl', marginTop: 3, letterSpacing: 0.3 },
+  heroSub: { fontSize: 13, color: Colors.WHITE, opacity: 0.85, textAlign: 'right', writingDirection: 'rtl', marginTop: 4 },
 
-  topRow: { flexDirection: 'row-reverse', gap: 6, paddingHorizontal: 8, paddingVertical: 10, justifyContent: 'center' },
-  topBtnRect: { flex: 1, backgroundColor: 'transparent', paddingHorizontal: 4, paddingVertical: 8, borderRadius: 10, borderWidth: 2, borderColor: '#94a3b8', alignItems: 'center', justifyContent: 'center', minHeight: 52 },
+  topRow: { flexDirection: 'row-reverse', gap: 8, paddingHorizontal: 14, paddingVertical: 12, alignItems: 'center' },
+  topBtnRect: { backgroundColor: '#fff', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 22, borderWidth: 1, borderColor: HLINE, alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 8, shadowOffset: { width: 0, height: 4 }, elevation: 1 },
   topGrid: { flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 6, paddingHorizontal: 16, paddingVertical: 14, justifyContent: 'center' },
   topBtnGrid: { width: '32%', backgroundColor: Colors.WHITE, paddingHorizontal: 6, paddingVertical: 10, borderRadius: 10, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.08, shadowRadius: 4, elevation: 2, alignItems: 'center', justifyContent: 'center', minHeight: 50 },
   topBtn: { backgroundColor: Colors.WHITE, paddingHorizontal: 14, paddingVertical: 10, borderRadius: 22, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.08, shadowRadius: 4, elevation: 2 },
   homeBtn: {},
-  topBtnActive: { backgroundColor: '#fff', borderColor: Colors.PRIMARY },
-  topBtnTxt: { fontSize: 12, fontWeight: '600', color: '#64748b', writingDirection: 'rtl', textAlign: 'center' },
-  topBtnTxtActive: { color: '#1C2B35', fontWeight: '900' },
+  topBtnActive: { backgroundColor: INK, borderColor: INK },
+  topBtnTxt: { fontSize: 13, fontWeight: '700', color: INK, writingDirection: 'rtl', textAlign: 'center' },
+  topBtnTxtActive: { color: '#fff', fontWeight: '900' },
 
   layoutToggle: { flexDirection: 'row-reverse', gap: 8, paddingHorizontal: 16, marginBottom: 10 },
   layoutBtn: { backgroundColor: Colors.WHITE, paddingHorizontal: 14, paddingVertical: 8, borderRadius: 18, borderWidth: 1, borderColor: '#E5E5E5' },
@@ -1021,7 +1025,7 @@ const s = StyleSheet.create({
   layoutBtnTxt: { fontSize: 12, fontWeight: '700', color: Colors.TEXT, writingDirection: 'rtl' },
   layoutBtnTxtActive: { color: Colors.WHITE },
 
-  listingsGrid: { paddingHorizontal: 12, flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 6 },
+  listingsGrid: { paddingHorizontal: 16, flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 12 },
   fixedExpanded: { width: '100%', backgroundColor: '#0f172a', borderRadius: 14, overflow: 'hidden', marginTop: 2 },
   fixedExpandedHeader: { flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', padding: 12, backgroundColor: '#1e293b' },
   fixedExpandedTitle: { flex: 1, fontSize: 14, fontWeight: '900', color: '#fff', textAlign: 'right', writingDirection: 'rtl' },
@@ -1029,8 +1033,9 @@ const s = StyleSheet.create({
   fixedCloseTxt: { color: '#fff', fontSize: 14, fontWeight: '900' },
   listingCard: {
     width: '100%',
-    backgroundColor: Colors.WHITE, borderRadius: 6, overflow: 'hidden',
-    borderWidth: 1, borderColor: '#e2e8f0',
+    backgroundColor: Colors.WHITE, borderRadius: 18, overflow: 'hidden',
+    borderWidth: 1, borderColor: HLINE,
+    shadowColor: '#1B2A33', shadowOpacity: 0.10, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 3,
   },
   listingCardHalf: { width: '49%' },
   hBanner: { flexDirection: 'row-reverse', alignItems: 'stretch', width: 340, height: 100, alignSelf: 'center', backgroundColor: Colors.WHITE, borderRadius: 12, overflow: 'hidden', borderWidth: 1, borderColor: '#e2e8f0' },
@@ -1058,9 +1063,11 @@ const s = StyleSheet.create({
   choiceBtnTitle: { fontSize: 15, fontWeight: '900', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl' },
   choiceBtnSub: { fontSize: 11, color: '#64748b', textAlign: 'right', writingDirection: 'rtl', marginTop: 2 },
   choiceArrow: { fontSize: 22, color: '#64748b', fontWeight: '300' },
-  listingImage: { width: '100%', height: 140 },
-  listingBody: { padding: 10 },
-  listingTitle: { fontSize: 14, fontWeight: '800', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl', marginBottom: 6 },
+  listingImage: { width: '100%', height: 170 },
+  priceBadge: { position: 'absolute', bottom: 10, right: 10, backgroundColor: 'rgba(27,42,51,0.92)', paddingHorizontal: 13, paddingVertical: 6, borderRadius: 11, borderWidth: 1, borderColor: GOLD },
+  priceBadgeTxt: { color: '#fff', fontSize: 16, fontWeight: '900', letterSpacing: 0.3 },
+  listingBody: { padding: 14 },
+  listingTitle: { fontSize: 15, fontWeight: '800', color: INK, textAlign: 'right', writingDirection: 'rtl', marginBottom: 6 },
   listingFeature: { flexDirection: 'row-reverse', alignItems: 'flex-start', gap: 4, marginTop: 2 },
   listingFeatureCheck: { fontSize: 11, fontWeight: '800', color: Colors.PRIMARY, lineHeight: 14 },
   listingFeatureTxt: { flex: 1, fontSize: 11, color: '#555', textAlign: 'right', writingDirection: 'rtl', lineHeight: 14 },
@@ -1073,10 +1080,10 @@ const s = StyleSheet.create({
   sectionIcon: { fontSize: 20 },
   sectionTitle: { fontSize: 18, fontWeight: '800', color: Colors.TEXT, writingDirection: 'rtl' },
 
-  newsCard: { backgroundColor: Colors.WHITE, borderRadius: 14, overflow: 'hidden', marginBottom: 10, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.06, shadowRadius: 6, elevation: 2 },
+  newsCard: { backgroundColor: Colors.WHITE, borderRadius: 18, overflow: 'hidden', marginBottom: 10, borderWidth: 1, borderColor: HLINE, shadowColor: '#1B2A33', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.10, shadowRadius: 14, elevation: 3 },
   newsImg: { width: '100%', height: 140 },
   newsRow: { gap: 12 },
-  newsSlide: { width: 260, backgroundColor: Colors.WHITE, borderRadius: 14, overflow: 'hidden', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.08, shadowRadius: 6, elevation: 2 },
+  newsSlide: { width: 260, backgroundColor: Colors.WHITE, borderRadius: 18, overflow: 'hidden', borderWidth: 1, borderColor: HLINE, shadowColor: '#1B2A33', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.10, shadowRadius: 14, elevation: 3 },
   newsSliderWrap: { position: 'relative' },
   newsCardLike: { borderRadius: 16, overflow: 'hidden', backgroundColor: '#fff' },
   arrowBtn: { position: 'absolute', width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(0,0,0,0.5)', alignItems: 'center', justifyContent: 'center', zIndex: 5 },
@@ -1091,11 +1098,11 @@ const s = StyleSheet.create({
   newsDate: { fontSize: 11, color: '#999', textAlign: 'right', writingDirection: 'rtl', marginTop: 6 },
 
   indexGrid: { flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 10 },
-  indexCard: { flexGrow: 1, minWidth: '45%', backgroundColor: Colors.WHITE, borderRadius: 14, padding: 16, alignItems: 'center' },
-  indexValue: { fontSize: 22, fontWeight: '900', color: Colors.PRIMARY },
-  indexLabel: { fontSize: 11, color: '#666', textAlign: 'center', writingDirection: 'rtl', marginTop: 4 },
+  indexCard: { flexGrow: 1, minWidth: '45%', backgroundColor: Colors.WHITE, borderRadius: 18, padding: 16, alignItems: 'center', borderWidth: 1, borderColor: HLINE },
+  indexValue: { fontSize: 22, fontWeight: '900', color: INK },
+  indexLabel: { fontSize: 11, color: '#8a7f6b', textAlign: 'center', writingDirection: 'rtl', marginTop: 4 },
 
-  tipCard: { backgroundColor: Colors.WHITE, borderRadius: 14, padding: 14, marginBottom: 8 },
+  tipCard: { backgroundColor: Colors.WHITE, borderRadius: 18, padding: 16, marginBottom: 10, borderWidth: 1, borderColor: HLINE, shadowColor: '#1B2A33', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.08, shadowRadius: 12, elevation: 2 },
   tipTitle: { fontSize: 15, fontWeight: '800', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl', marginBottom: 4 },
   tipSummary: { fontSize: 13, color: '#555', textAlign: 'right', writingDirection: 'rtl', lineHeight: 18 },
 });
