@@ -263,11 +263,9 @@ export default function HomeScreen() {
             require('../../assets/welcome/galery6.jpg'),
           ];
           const pick = imgs[Math.floor(Math.random() * imgs.length)];
-          const src = typeof (Image as any).resolveAssetSource === 'function' ? (Image as any).resolveAssetSource(pick) : null;
-          const ar = src && src.width && src.height ? src.width / src.height : 1600 / 1080;
           return (
-            <View style={{ marginHorizontal: 16, marginTop: 8, marginBottom: 4, borderRadius: 18, overflow: 'hidden' }}>
-              <Image source={pick} style={{ width: '100%', aspectRatio: ar }} resizeMode="cover" />
+            <View style={{ marginHorizontal: 16, marginTop: 8, marginBottom: 4, height: 230, borderRadius: 18, overflow: 'hidden' }}>
+              <Image source={pick} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
             </View>
           );
         })()}
