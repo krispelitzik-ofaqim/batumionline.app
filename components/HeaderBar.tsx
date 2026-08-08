@@ -36,6 +36,7 @@ const LANGS: { code: 'he' | 'en' | 'fa' | 'ru'; label: string; name: string }[] 
 export default function HeaderBar() {
   const { dark, toggle } = useContext(ThemeContext);
   const { lang, setLang } = useI18n();
+  const time = useBatumiClock();
   const pathname = usePathname();
   const isHome = pathname === '/' || pathname === '/index';
   const bg = dark ? Colors.TEXT : Colors.BACKGROUND;
@@ -48,14 +49,14 @@ export default function HeaderBar() {
 
   return (
     <View style={[styles.bar, { backgroundColor: bg, borderBottomColor: dark ? Colors.PRIMARY : Colors.SECONDARY + '30' }]}>
-      {/* LEFT — back arrow (when not home) + Batumi Online logo */}
+      {/* LEFT — back arrow (when not home) + Batumi clock (black) */}
       <View style={styles.sideLeft}>
         {!isHome && (
           <TouchableOpacity style={styles.btn} onPress={() => router.replace('/')}>
             <Text style={{ fontSize: 28, color: fg, fontWeight: '300' }}>‹</Text>
           </TouchableOpacity>
         )}
-        <Image source={require('../assets/images/batumi_icon.png')} style={styles.logo} resizeMode="contain" />
+        <Text style={[styles.clock, { color: fg }]}>{time}</Text>
       </View>
 
       {/* CENTER — compact language dropdown */}
