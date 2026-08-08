@@ -7,6 +7,7 @@ import { useI18n } from '../../constants/i18n';
 import { fetchContent, API_BASE, resolveUri } from '../../constants/api';
 import HtmlContent from '../../components/HtmlContent';
 import BottomTabBar from '../../components/BottomTabBar';
+import AdBanner from '../../components/AdBanner';
 import { PORTAL_TR } from '../../constants/portalTranslations';
 
 
@@ -102,6 +103,7 @@ export default function InfoPage() {
                 <Text style={styles.cardBody}>{portalItem.body || 'תוכן יתווסף בקרוב'}</Text>
               )}
             </View>
+            <AdBanner />
           </View>
         </ScrollView>
       </View>

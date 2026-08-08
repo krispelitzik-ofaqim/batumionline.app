@@ -10,6 +10,7 @@ import AudioPlayer from '../../components/AudioPlayer';
 import HtmlContent from '../../components/HtmlContent';
 import AppHeader from '../../components/AppHeader';
 import BottomTabBar from '../../components/BottomTabBar';
+import AdBanner from '../../components/AdBanner';
 
 function fireHearts() {
   if (Platform.OS !== 'web') return;
@@ -166,6 +167,7 @@ export default function WelcomeScreen() {
           </View>
         ) : null}
 
+        <AdBanner />
       </ScrollView>
       <BottomTabBar />
     </SafeAreaView>
