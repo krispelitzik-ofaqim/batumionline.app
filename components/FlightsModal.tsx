@@ -62,6 +62,20 @@ const AIRLINE_LOGOS: Record<string, any> = {
   WZ: require('../assets/images/flights/WZ.png'),
   B2: require('../assets/images/flights/B2.png'),
   '4L': require('../assets/images/flights/4L.png'),
+  '3F': require('../assets/images/flights/3F.png'),
+  '9S': require('../assets/images/flights/9S.png'),
+  A9: require('../assets/images/flights/A9.png'),
+  BT: require('../assets/images/flights/BT.png'),
+  C6: require('../assets/images/flights/C6.png'),
+  DV: require('../assets/images/flights/DV.png'),
+  FS: require('../assets/images/flights/FS.png'),
+  FZ: require('../assets/images/flights/FZ.png'),
+  HY: require('../assets/images/flights/HY.png'),
+  J2: require('../assets/images/flights/J2.png'),
+  KC: require('../assets/images/flights/KC.png'),
+  PC: require('../assets/images/flights/PC.png'),
+  Q4: require('../assets/images/flights/Q4.png'),
+  XY: require('../assets/images/flights/XY.png'),
 };
 
 export default function FlightsModal({ visible, onClose, bgColor }: { visible: boolean; onClose: () => void; bgColor: string }) {
@@ -329,13 +343,13 @@ export default function FlightsModal({ visible, onClose, bgColor }: { visible: b
         </TouchableOpacity>
 
         <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
-          <Text style={[s.title, { fontSize: 18 }]} numberOfLines={2}>נחיתות והמראות{'\n'}משדה התעופה בטומי BUS</Text>
+          <Text style={[s.title, { fontSize: 18 }]} numberOfLines={2}>{F.boardTitle}</Text>
 
           {/* ONLINE LED - centered */}
           <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 8 }}>
             <Animated.View style={[s.led, { opacity: ledAnim }]} />
             <Text style={s.ledLabel}>ONLINE</Text>
-            <Text style={[s.updatedAt, { marginTop: 0 }]}>· עודכן ב: {lastUpdatedClock}</Text>
+            <Text style={[s.updatedAt, { marginTop: 0 }]}>· {F.updated}: {lastUpdatedClock}</Text>
           </View>
 
           {/* Clock + refresh */}
@@ -359,7 +373,7 @@ export default function FlightsModal({ visible, onClose, bgColor }: { visible: b
             </TouchableOpacity>
           </View>
 
-          <Text style={s.code}>TLV — BUS  •  {new Date().toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</Text>
+          <Text style={s.code}>{allFlights ? 'Batumi (BUS)' : 'TLV — BUS'}  •  {new Date().toLocaleDateString(F.locale || 'en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</Text>
 
           {/* Search flights CTA - full banner */}
           <TouchableOpacity
@@ -442,7 +456,11 @@ export default function FlightsModal({ visible, onClose, bgColor }: { visible: b
                       {(() => {
                         const iata = getAirlineIATA(f.flight);
                         if (AIRLINE_LOGOS[iata]) return <Image source={AIRLINE_LOGOS[iata]} style={{ width: '100%', height: '100%' }} resizeMode="contain" />;
-                        if (iata) return <Image source={{ uri: `https://pics.avs.io/120/120/${iata}.png` }} style={{ width: '100%', height: '100%' }} resizeMode="contain" />;
+                        if (iata) return (
+                          <View style={{ width: '100%', height: '100%', backgroundColor: '#fff', borderRadius: 6, padding: 1 }}>
+                            <Image source={{ uri: `https://logos.skyscnr.com/images/airlines/favicon/${iata}.png` }} style={{ width: '100%', height: '100%' }} resizeMode="contain" />
+                          </View>
+                        );
                         return <Text style={{ fontSize: 9, color: 'yellow', textAlign: 'center' }}>?</Text>;
                       })()}
                     </View>
@@ -581,10 +599,10 @@ const FSEL_TR: Record<FLang, { batumi: string; dest: string; origin: string; all
   ru: { batumi: 'Батуми', dest: 'Куда', origin: 'Откуда', allDest: 'Все направления', allOrigin: 'Все пункты' },
 };
 const F_TR: Record<FLang, Record<string, string>> = {
-  he: { gate: 'שער יציאה', terminal: 'טרמינל', checkin: 'דלפק צ׳ק-אין', baggage: 'סרט מזוודות', duration: 'משך טיסה', distance: 'מרחק', actualDep: 'המראה בפועל', actualArr: 'נחיתה בפועל', aircraft: 'דגם מטוס', tail: 'מספר זנב', km: 'ק״מ', hours: 'שעות', min: 'דק׳', delayIn: 'עיכוב ב', dep: 'המראה', arr: 'נחיתה', durH: 'ש׳', durM: 'ד׳' },
-  en: { gate: 'Gate', terminal: 'Terminal', checkin: 'Check-in desk', baggage: 'Baggage belt', duration: 'Flight duration', distance: 'Distance', actualDep: 'Actual departure', actualArr: 'Actual arrival', aircraft: 'Aircraft', tail: 'Tail number', km: 'km', hours: 'h', min: 'min', delayIn: 'Delay in ', dep: 'departure', arr: 'arrival', durH: 'h', durM: 'm' },
-  fa: { gate: 'گیت', terminal: 'ترمینال', checkin: 'باجه پذیرش', baggage: 'نوار چمدان', duration: 'مدت پرواز', distance: 'مسافت', actualDep: 'پرواز واقعی', actualArr: 'فرود واقعی', aircraft: 'هواپیما', tail: 'شماره دم', km: 'کیلومتر', hours: 'ساعت', min: 'دقیقه', delayIn: 'تأخیر در ', dep: 'پرواز', arr: 'فرود', durH: 'س', durM: 'د' },
-  ru: { gate: 'Выход', terminal: 'Терминал', checkin: 'Стойка регистрации', baggage: 'Лента багажа', duration: 'Длительность', distance: 'Расстояние', actualDep: 'Факт. вылет', actualArr: 'Факт. прилёт', aircraft: 'Самолёт', tail: 'Бортовой номер', km: 'км', hours: 'ч', min: 'мин', delayIn: 'Задержка: ', dep: 'вылет', arr: 'прилёт', durH: 'ч', durM: 'м' },
+  he: { gate: 'שער יציאה', terminal: 'טרמינל', checkin: 'דלפק צ׳ק-אין', baggage: 'סרט מזוודות', duration: 'משך טיסה', distance: 'מרחק', actualDep: 'המראה בפועל', actualArr: 'נחיתה בפועל', aircraft: 'דגם מטוס', tail: 'מספר זנב', km: 'ק״מ', hours: 'שעות', min: 'דק׳', delayIn: 'עיכוב ב', dep: 'המראה', arr: 'נחיתה', durH: 'ש׳', durM: 'ד׳', boardTitle: 'נחיתות והמראות · שדה התעופה בטומי (BUS)', updated: 'עודכן', locale: 'he-IL' },
+  en: { gate: 'Gate', terminal: 'Terminal', checkin: 'Check-in desk', baggage: 'Baggage belt', duration: 'Flight duration', distance: 'Distance', actualDep: 'Actual departure', actualArr: 'Actual arrival', aircraft: 'Aircraft', tail: 'Tail number', km: 'km', hours: 'h', min: 'min', delayIn: 'Delay in ', dep: 'departure', arr: 'arrival', durH: 'h', durM: 'm', boardTitle: 'Arrivals & Departures · Batumi Airport (BUS)', updated: 'Updated', locale: 'en-GB' },
+  fa: { gate: 'گیت', terminal: 'ترمینال', checkin: 'باجه پذیرش', baggage: 'نوار چمدان', duration: 'مدت پرواز', distance: 'مسافت', actualDep: 'پرواز واقعی', actualArr: 'فرود واقعی', aircraft: 'هواپیما', tail: 'شماره دم', km: 'کیلومتر', hours: 'ساعت', min: 'دقیقه', delayIn: 'تأخیر در ', dep: 'پرواز', arr: 'فرود', durH: 'س', durM: 'د', boardTitle: 'ورود و خروج · فرودگاه باتومی (BUS)', updated: 'به‌روزرسانی', locale: 'fa-IR' },
+  ru: { gate: 'Выход', terminal: 'Терминал', checkin: 'Стойка регистрации', baggage: 'Лента багажа', duration: 'Длительность', distance: 'Расстояние', actualDep: 'Факт. вылет', actualArr: 'Факт. прилёт', aircraft: 'Самолёт', tail: 'Бортовой номер', km: 'км', hours: 'ч', min: 'мин', delayIn: 'Задержка: ', dep: 'вылет', arr: 'прилёт', durH: 'ч', durM: 'м', boardTitle: 'Прилёты и вылеты · Аэропорт Батуми (BUS)', updated: 'Обновлено', locale: 'ru-RU' },
 };
 
 // ─── Helpers ───────────────────────────────────────────────────
