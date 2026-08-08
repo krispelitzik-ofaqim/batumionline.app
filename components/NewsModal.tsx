@@ -192,7 +192,7 @@ export default function NewsModal({ visible, onClose, bgColor }: { visible: bool
   };
 
   // ─── Fallback static data ───────────────────────────────────
-  const FB = L === 'he' ? FALLBACK_NEWS : FALLBACK_NEWS.filter(n => n.topic !== 'israel');
+  const FB = L === 'he' ? FALLBACK_NEWS : [];
   const loadFallback = () => {
     setNews(FB);
     setLoading(false);
@@ -248,7 +248,7 @@ export default function NewsModal({ visible, onClose, bgColor }: { visible: bool
             <ActivityIndicator size="large" color={Colors.WHITE} style={{ marginTop: 40 }} />
           ) : (
             filtered.map((item, i) => (
-              <NewsCard key={i} item={item} onPress={() => setExpanded(item)} />
+              <NewsCard key={i} item={item} L={L} onPress={() => setExpanded(item)} />
             ))
           )}
 
@@ -305,12 +305,12 @@ function FallbackImage({ src, topic, style }: { src: string; topic: Topic; style
   return <Image source={{ uri }} style={style} onError={() => setErrored(true)} />;
 }
 
-function NewsCard({ item, onPress }: { item: NewsItem; onPress: () => void }) {
+function NewsCard({ item, onPress, L }: { item: NewsItem; onPress: () => void; L: NLang }) {
   return (
     <TouchableOpacity style={s.card} activeOpacity={0.8} onPress={onPress}>
       <FallbackImage src={item.image} topic={item.topic} style={s.cardImage} />
       <View style={[s.topicTag, { backgroundColor: TOPIC_COLORS[item.topic] }]}>
-        <Text style={s.topicTxt}>{TOPIC_LABELS[item.topic]}</Text>
+        <Text style={s.topicTxt}>{TOPIC_LABELS_TR[L][item.topic]}</Text>
       </View>
       <View style={s.cardBody}>
         <Text style={s.cardTitle} numberOfLines={2}>{item.title}</Text>

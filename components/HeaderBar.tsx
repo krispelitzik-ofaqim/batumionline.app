@@ -64,18 +64,20 @@ export default function HeaderBar() {
           <Text style={[styles.langPickTxt, { color: fg }]}>{current.label}</Text>
           <Text style={[styles.langChevron, { color: accent }]}>{langOpen ? '▲' : '▼'}</Text>
         </TouchableOpacity>
-        {langOpen && (
-          <View style={[styles.langMenu, { backgroundColor: bg, borderColor: accent + '55' }]}>
-            {LANGS.map((L) => {
-              const on = lang === L.code;
-              return (
-                <TouchableOpacity key={L.code} onPress={() => { setLang(L.code); setLangOpen(false); }} activeOpacity={0.7} style={[styles.langItem, on && { backgroundColor: accent }]}>
-                  <Text style={[styles.langItemTxt, { color: on ? '#fff' : fg }]}>{L.name}</Text>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-        )}
+        <Modal visible={langOpen} transparent animationType="fade" onRequestClose={() => setLangOpen(false)}>
+          <TouchableOpacity activeOpacity={1} onPress={() => setLangOpen(false)} style={{ flex: 1, alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.15)' }}>
+            <View style={[styles.langMenuFloat, { backgroundColor: bg, borderColor: accent + '55' }]}>
+              {LANGS.map((L) => {
+                const on = lang === L.code;
+                return (
+                  <TouchableOpacity key={L.code} onPress={() => { setLang(L.code); setLangOpen(false); }} activeOpacity={0.7} style={[styles.langItem, on && { backgroundColor: accent }]}>
+                    <Text style={[styles.langItemTxt, { color: on ? '#fff' : fg }]}>{L.name}</Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          </TouchableOpacity>
+        </Modal>
       </View>
 
       {/* RIGHT — light/dark toggle */}
@@ -208,20 +210,17 @@ const styles = StyleSheet.create({
   },
   langPickTxt: { fontSize: 14, fontWeight: '900' },
   langChevron: { fontSize: 11, fontWeight: '900' },
-  langMenu: {
-    position: 'absolute',
-    top: 40,
-    alignSelf: 'center',
-    minWidth: 120,
+  langMenuFloat: {
+    marginTop: Platform.OS === 'ios' ? 96 : 60,
+    minWidth: 150,
     borderWidth: 1.5,
     borderRadius: 12,
     overflow: 'hidden',
-    zIndex: 100,
-    elevation: 8,
+    elevation: 12,
     shadowColor: '#000',
-    shadowOpacity: 0.18,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.22,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
   },
   langItem: { paddingVertical: 11, paddingHorizontal: 16, alignItems: 'center' },
   langItemTxt: { fontSize: 15, fontWeight: '800' },
