@@ -439,11 +439,12 @@ export default function FlightsModal({ visible, onClose, bgColor }: { visible: b
                 <TouchableOpacity key={i} style={[s.flightRow, { justifyContent: 'space-between' }]} activeOpacity={0.7} onPress={() => setSelected(f)}>
                   <View style={{ alignItems: 'center', width: 60 }}>
                     <View style={s.logo}>
-                      {AIRLINE_LOGOS[getAirlineIATA(f.flight)] ? (
-                        <Image source={AIRLINE_LOGOS[getAirlineIATA(f.flight)]} style={{ width: '100%', height: '100%' }} resizeMode="contain" />
-                      ) : (
-                        <Text style={{ fontSize: 9, color: 'yellow', textAlign: 'center' }}>{getAirlineIATA(f.flight) || '?'}</Text>
-                      )}
+                      {(() => {
+                        const iata = getAirlineIATA(f.flight);
+                        if (AIRLINE_LOGOS[iata]) return <Image source={AIRLINE_LOGOS[iata]} style={{ width: '100%', height: '100%' }} resizeMode="contain" />;
+                        if (iata) return <Image source={{ uri: `https://pics.avs.io/120/120/${iata}.png` }} style={{ width: '100%', height: '100%' }} resizeMode="contain" />;
+                        return <Text style={{ fontSize: 9, color: 'yellow', textAlign: 'center' }}>?</Text>;
+                      })()}
                     </View>
                     <Text style={[s.airline, { textAlign: 'center', marginTop: 2 }]} numberOfLines={1}>{cleanAirline(f.airline)}</Text>
                     <Text style={[s.flightNum, { textAlign: 'center', fontSize: 11 }]} numberOfLines={1}>{f.flight}</Text>
