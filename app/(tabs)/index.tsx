@@ -378,8 +378,8 @@ export default function HomeScreen() {
               <View key={b.id} style={{ position: 'relative' }}>
                 {editMode && <ReorderControls index={idx} total={editBottomBanners.length} onMove={(dir) => moveBottomBanner(idx, dir)} />}
                 <TouchableOpacity style={[styles.bottomBanner, { backgroundColor: b.bg }]} activeOpacity={0.7} onPress={() => { if (b.id === 'gyg') openInAppBrowser(gygBatumi()); else setActiveModal(b.id); }}>
-                  <Text style={[styles.bottomBannerTitle, { textAlign: isRTL ? 'right' : 'left', writingDirection: isRTL ? 'rtl' : 'ltr' }]} numberOfLines={1}>{b.title}</Text>
                   <Text style={styles.bottomBannerIcon}>{b.icon}</Text>
+                  <Text style={[styles.bottomBannerTitle, { textAlign: isRTL ? 'right' : 'left', writingDirection: isRTL ? 'rtl' : 'ltr' }]} numberOfLines={1}>{b.title}</Text>
                 </TouchableOpacity>
               </View>
             ))}
@@ -447,9 +447,9 @@ const styles = StyleSheet.create({
 
   // Bottom banners (6)
   bottomBanner: {
-    height: 50, borderRadius: 12, marginBottom: 8,
+    height: 64, borderRadius: 12, marginBottom: 10,
     flexDirection: 'row-reverse', alignItems: 'center',
-    paddingHorizontal: 16, justifyContent: 'space-between',
+    paddingHorizontal: 18, justifyContent: 'space-between',
   },
   ctaCardWrap: {
     flex: 1, borderRadius: 18, overflow: 'hidden',
@@ -465,8 +465,8 @@ const styles = StyleSheet.create({
   ctaArrow: { color: Colors.WHITE, fontSize: 24, fontWeight: '900', opacity: 0.9, marginBottom: -2 },
   ctaCardTitle: { fontSize: 17, fontWeight: '900', color: Colors.WHITE, textAlign: 'right', writingDirection: 'rtl' },
   ctaCardSub: { fontSize: 11, fontWeight: '600', color: Colors.WHITE, opacity: 0.9, textAlign: 'right', writingDirection: 'rtl', marginTop: 2 },
-  bottomBannerTitle: { fontSize: 13, fontWeight: '700', color: Colors.WHITE, textAlign: 'right', writingDirection: 'rtl', flex: 1 },
-  bottomBannerIcon: { fontSize: 28, marginLeft: 8 },
+  bottomBannerTitle: { fontSize: 17, fontWeight: '500', color: Colors.WHITE, textAlign: 'right', writingDirection: 'rtl', flex: 1 },
+  bottomBannerIcon: { fontSize: 32, marginLeft: 10 },
   bottomSectionTitle: { fontSize: 16, fontWeight: 'normal', color: '#999999', textAlign: 'right', writingDirection: 'rtl', marginBottom: 8 },
 
 });
