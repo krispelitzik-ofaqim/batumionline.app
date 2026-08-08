@@ -19,6 +19,8 @@ type Flight = {
   arrDate: string;
   status: string;
   type: 'arrival' | 'departure';
+  otherIata?: string;  // the non-Batumi endpoint (origin for arrivals, destination for departures)
+  otherName?: string;
   details?: FlightDetails;
 };
 
@@ -74,8 +76,10 @@ export default function FlightsModal({ visible, onClose, bgColor }: { visible: b
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [selected, setSelected] = useState<Flight | null>(null);
   const [visibleCount, setVisibleCount] = useState(10);
+  const [routeSel, setRouteSel] = useState<string>('ALL'); // filter by the non-Batumi endpoint IATA
+  const [pickerOpen, setPickerOpen] = useState(false);
 
-  useEffect(() => { setVisibleCount(10); }, [tab, visible]);
+  useEffect(() => { setVisibleCount(10); setRouteSel('ALL'); setPickerOpen(false); }, [tab, visible]);
 
   const lastUpdatedClock = lastUpdated
     ? `${lastUpdated.getHours().toString().padStart(2, '0')}:${lastUpdated.getMinutes().toString().padStart(2, '0')}`
@@ -162,6 +166,8 @@ export default function FlightsModal({ visible, onClose, bgColor }: { visible: b
           arrDate: formatDateShort(parseLocal(f.arrival?.scheduledTime)),
           status: translateStatus(f.status),
           type: 'arrival' as const,
+          otherIata: f.departure?.airport?.iata,
+          otherName: f.departure?.airport?.name,
           details: buildDetails(f),
         }));
 
@@ -176,6 +182,8 @@ export default function FlightsModal({ visible, onClose, bgColor }: { visible: b
           arrDate: formatDateShort(parseLocal(f.arrival?.scheduledTime)),
           status: translateStatus(f.status),
           type: 'departure' as const,
+          otherIata: f.arrival?.airport?.iata,
+          otherName: f.arrival?.airport?.name,
           details: buildDetails(f),
         }));
 
@@ -302,7 +310,16 @@ export default function FlightsModal({ visible, onClose, bgColor }: { visible: b
     setLoading(false);
   };
 
-  const filtered = flights.filter(f => f.type === tab);
+  // Unique destinations (departures) / origins (arrivals) for the picker, sorted by name.
+  const routeOptions = React.useMemo(() => {
+    const m = new Map<string, string>();
+    flights.filter(f => f.type === tab).forEach(f => { if (f.otherIata) m.set(f.otherIata, f.otherName || f.otherIata); });
+    return [...m].sort((a, b) => (a[1] || '').localeCompare(b[1] || ''));
+  }, [flights, tab]);
+  const FS = FSEL_TR[L];
+  const selName = routeSel === 'ALL' ? '' : (routeOptions.find(([k]) => k === routeSel)?.[1] || routeSel);
+
+  const filtered = flights.filter(f => f.type === tab && (routeSel === 'ALL' || f.otherIata === routeSel));
 
   return (
     <Modal visible={visible} animationType="slide" transparent={false}>
@@ -366,13 +383,44 @@ export default function FlightsModal({ visible, onClose, bgColor }: { visible: b
           <View style={s.tabRow}>
             <TouchableOpacity style={[s.tab, tab === 'departure' && s.tabActive]} onPress={() => setTab('departure')}>
               <Text style={[s.tabTxt, tab === 'departure' && s.tabTxtActive]}>{t('flt.departures')}</Text>
-              <Text style={[s.tabSub, tab === 'departure' && s.tabSubActive]}>BUS → TLV</Text>
+              <Text style={[s.tabSub, tab === 'departure' && s.tabSubActive]}>{allFlights ? 'BUS → ✈' : 'BUS → TLV'}</Text>
             </TouchableOpacity>
             <TouchableOpacity style={[s.tab, tab === 'arrival' && s.tabActive]} onPress={() => setTab('arrival')}>
               <Text style={[s.tabTxt, tab === 'arrival' && s.tabTxtActive]}>{t('flt.arrivals')}</Text>
-              <Text style={[s.tabSub, tab === 'arrival' && s.tabSubActive]}>TLV → BUS</Text>
+              <Text style={[s.tabSub, tab === 'arrival' && s.tabSubActive]}>{allFlights ? '✈ → BUS' : 'TLV → BUS'}</Text>
             </TouchableOpacity>
           </View>
+
+          {/* Route filter: fixed Batumi + destination/origin selector (non-Hebrew editions) */}
+          {allFlights && !loading && (
+            <View style={{ marginBottom: 16, zIndex: 20 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                <View style={s.routeFixed}>
+                  <Text style={s.routeFieldLabel}>{tab === 'departure' ? FS.origin : FS.dest}</Text>
+                  <Text style={s.routeFixedTxt}>{FS.batumi} · BUS</Text>
+                </View>
+                <Text style={{ color: '#fff', opacity: 0.6, fontSize: 18 }}>{tab === 'departure' ? '→' : '←'}</Text>
+                <TouchableOpacity style={[s.routeSelect, pickerOpen && s.routeSelectOpen]} onPress={() => setPickerOpen(o => !o)} activeOpacity={0.8}>
+                  <Text style={[s.routeFieldLabel, pickerOpen && { color: '#1C2B35' }]}>{tab === 'departure' ? FS.dest : FS.origin}</Text>
+                  <Text style={[s.routeSelectTxt, pickerOpen && { color: '#1C2B35' }]} numberOfLines={1}>
+                    {(routeSel === 'ALL' ? (tab === 'departure' ? FS.allDest : FS.allOrigin) : selName) + '  ▼'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+              {pickerOpen && (
+                <View style={s.routeList}>
+                  <TouchableOpacity style={s.routeOpt} onPress={() => { setRouteSel('ALL'); setPickerOpen(false); }}>
+                    <Text style={[s.routeOptTxt, { color: '#1A6B8A', fontWeight: '800' }]}>{tab === 'departure' ? FS.allDest : FS.allOrigin}</Text>
+                  </TouchableOpacity>
+                  {routeOptions.map(([iata, name]) => (
+                    <TouchableOpacity key={iata} style={[s.routeOpt, routeSel === iata && { backgroundColor: '#f2ede3' }]} onPress={() => { setRouteSel(iata); setPickerOpen(false); }}>
+                      <Text style={s.routeOptTxt}>{name} <Text style={{ color: '#999' }}>({iata})</Text></Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              )}
+            </View>
+          )}
 
           {loading ? (
             <ActivityIndicator size="large" color={Colors.WHITE} style={{ marginTop: 40 }} />
@@ -403,12 +451,12 @@ export default function FlightsModal({ visible, onClose, bgColor }: { visible: b
                   <View style={{ flex: 1, justifyContent: 'center', gap: 4 }}>
                     <View style={{ flexDirection: 'row-reverse', alignItems: 'baseline', justifyContent: 'center', gap: 6 }}>
                       <Text style={s.timeVal}>{f.depTime}</Text>
-                      <Text style={s.timeLabel}>{tab === 'arrival' ? 'TLV' : 'BUS'}</Text>
+                      <Text style={s.timeLabel}>{tab === 'arrival' ? (f.otherIata || 'TLV') : 'BUS'}</Text>
                       <Text style={s.timeDateLabel}>{f.depDate}</Text>
                     </View>
                     <View style={{ flexDirection: 'row-reverse', alignItems: 'baseline', justifyContent: 'center', gap: 6 }}>
                       <Text style={s.timeVal}>{f.arrTime}</Text>
-                      <Text style={s.timeLabel}>{tab === 'arrival' ? 'BUS' : 'TLV'}</Text>
+                      <Text style={s.timeLabel}>{tab === 'arrival' ? 'BUS' : (f.otherIata || 'TLV')}</Text>
                       <Text style={s.timeDateLabel}>{f.arrDate}</Text>
                     </View>
                   </View>
@@ -525,6 +573,12 @@ const STATUS_TR: Record<FLang, Record<string, string>> = {
   ru: { 'בזמן': 'Вовремя', 'מתוכננת': 'По расписанию', 'בדרך': 'В полёте', 'נחתה': 'Приземлился', 'המריאה': 'Вылетел', 'עיכוב': 'Задержка', 'בוטלה': 'Отменён', 'הועברה': 'Изменён' },
 };
 const ST = (status: string, L: FLang): string => (STATUS_TR[L] && STATUS_TR[L][status]) || status;
+const FSEL_TR: Record<FLang, { batumi: string; dest: string; origin: string; allDest: string; allOrigin: string }> = {
+  he: { batumi: 'בטומי', dest: 'יעד', origin: 'מוצא', allDest: 'כל היעדים', allOrigin: 'כל המקורות' },
+  en: { batumi: 'Batumi', dest: 'Destination', origin: 'Origin', allDest: 'All destinations', allOrigin: 'All origins' },
+  fa: { batumi: 'باتومی', dest: 'مقصد', origin: 'مبدأ', allDest: 'همه مقصدها', allOrigin: 'همه مبدأها' },
+  ru: { batumi: 'Батуми', dest: 'Куда', origin: 'Откуда', allDest: 'Все направления', allOrigin: 'Все пункты' },
+};
 const F_TR: Record<FLang, Record<string, string>> = {
   he: { gate: 'שער יציאה', terminal: 'טרמינל', checkin: 'דלפק צ׳ק-אין', baggage: 'סרט מזוודות', duration: 'משך טיסה', distance: 'מרחק', actualDep: 'המראה בפועל', actualArr: 'נחיתה בפועל', aircraft: 'דגם מטוס', tail: 'מספר זנב', km: 'ק״מ', hours: 'שעות', min: 'דק׳', delayIn: 'עיכוב ב', dep: 'המראה', arr: 'נחיתה', durH: 'ש׳', durM: 'ד׳' },
   en: { gate: 'Gate', terminal: 'Terminal', checkin: 'Check-in desk', baggage: 'Baggage belt', duration: 'Flight duration', distance: 'Distance', actualDep: 'Actual departure', actualArr: 'Actual arrival', aircraft: 'Aircraft', tail: 'Tail number', km: 'km', hours: 'h', min: 'min', delayIn: 'Delay in ', dep: 'departure', arr: 'arrival', durH: 'h', durM: 'm' },
@@ -714,6 +768,16 @@ const s = StyleSheet.create({
   tabTxtActive: { color: Colors.TEXT },
   tabSub: { fontSize: 11, color: Colors.WHITE, opacity: 0.5, marginTop: 2 },
   tabSubActive: { color: Colors.TEXT, opacity: 0.5 },
+
+  routeFixed: { flex: 1, backgroundColor: 'rgba(255,255,255,0.10)', borderRadius: 12, paddingVertical: 10, paddingHorizontal: 12, alignItems: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)' },
+  routeFixedTxt: { fontSize: 15, fontWeight: '900', color: Colors.WHITE },
+  routeFieldLabel: { fontSize: 11, color: Colors.WHITE, opacity: 0.55, marginBottom: 2 },
+  routeSelect: { flex: 1, backgroundColor: 'rgba(255,255,255,0.10)', borderRadius: 12, paddingVertical: 10, paddingHorizontal: 12, alignItems: 'center', borderWidth: 1.5, borderColor: 'rgba(244,169,78,0.7)' },
+  routeSelectOpen: { backgroundColor: '#fff' },
+  routeSelectTxt: { fontSize: 15, fontWeight: '900', color: '#F4A94E' },
+  routeList: { backgroundColor: '#fff', borderRadius: 12, marginTop: 6, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)' },
+  routeOpt: { paddingVertical: 12, paddingHorizontal: 16, borderBottomWidth: 1, borderBottomColor: '#f0ece4' },
+  routeOptTxt: { fontSize: 15, fontWeight: '700', color: '#1C2B35' },
 
   tableHeader: {
     flexDirection: 'row-reverse', alignItems: 'center', gap: 6,
