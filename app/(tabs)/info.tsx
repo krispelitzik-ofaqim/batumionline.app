@@ -6,6 +6,7 @@ import { ThemeContext } from '../../constants/theme';
 import { useI18n } from '../../constants/i18n';
 import { fetchContent, API_BASE } from '../../constants/api';
 import HtmlContent from '../../components/HtmlContent';
+import { LEGAL_TR } from '../../constants/legalTranslations';
 
 type TabId = 'about' | 'terms' | 'privacy' | 'contact';
 type Tab = { id: TabId; title: string; icon: string; body: string };
@@ -150,11 +151,14 @@ export default function InfoScreen() {
         ) : (
           <View style={styles.card}>
             <Text style={[styles.cardTitle, dir]}>{tabTitle(current.id, current.title)}</Text>
-            {current.body.includes('<') ? (
-              <HtmlContent html={current.body} baseStyle={{ fontSize: 14, color: '#444', lineHeight: 24 }} />
-            ) : (
-              <Text style={[styles.cardBody, dir]}>{current.body || SOON[L]}</Text>
-            )}
+            {(() => {
+              const body = (L !== 'he' && LEGAL_TR[current.id]?.[L as 'en' | 'fa' | 'ru']) || current.body;
+              return body.includes('<') ? (
+                <HtmlContent html={body} baseStyle={{ fontSize: 14, color: '#444', lineHeight: 24 }} />
+              ) : (
+                <Text style={[styles.cardBody, dir]}>{body || SOON[L]}</Text>
+              );
+            })()}
           </View>
         )}
       </ScrollView>

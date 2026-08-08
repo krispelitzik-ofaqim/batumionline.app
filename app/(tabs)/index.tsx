@@ -263,9 +263,11 @@ export default function HomeScreen() {
             require('../../assets/welcome/galery6.jpg'),
           ];
           const pick = imgs[Math.floor(Math.random() * imgs.length)];
+          const src = Image.resolveAssetSource(pick);
+          const ar = src && src.width && src.height ? src.width / src.height : 1.5;
           return (
-            <View style={{ marginHorizontal: 16, marginTop: 8, marginBottom: 4, height: 230, borderRadius: 18, overflow: 'hidden' }}>
-              <Image source={pick} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+            <View style={{ marginHorizontal: 16, marginTop: 8, marginBottom: 4, borderRadius: 18, overflow: 'hidden' }}>
+              <Image source={pick} style={{ width: '100%', aspectRatio: ar }} resizeMode="cover" />
             </View>
           );
         })()}
@@ -378,8 +380,8 @@ export default function HomeScreen() {
               <View key={b.id} style={{ position: 'relative' }}>
                 {editMode && <ReorderControls index={idx} total={editBottomBanners.length} onMove={(dir) => moveBottomBanner(idx, dir)} />}
                 <TouchableOpacity style={[styles.bottomBanner, { backgroundColor: b.bg, flexDirection: isRTL ? 'row-reverse' : 'row' }]} activeOpacity={0.7} onPress={() => { if (b.id === 'gyg') openInAppBrowser(gygBatumi()); else setActiveModal(b.id); }}>
-                  <Text style={styles.bottomBannerIcon}>{b.icon}</Text>
                   <Text style={[styles.bottomBannerTitle, { textAlign: isRTL ? 'right' : 'left', writingDirection: isRTL ? 'rtl' : 'ltr' }]} numberOfLines={1}>{b.title}</Text>
+                  <Text style={styles.bottomBannerIcon}>{b.icon}</Text>
                 </TouchableOpacity>
               </View>
             ))}
@@ -449,7 +451,7 @@ const styles = StyleSheet.create({
   bottomBanner: {
     height: 64, borderRadius: 12, marginBottom: 10,
     flexDirection: 'row-reverse', alignItems: 'center',
-    paddingHorizontal: 18, justifyContent: 'flex-start', gap: 12,
+    paddingHorizontal: 18, justifyContent: 'space-between',
   },
   ctaCardWrap: {
     flex: 1, borderRadius: 18, overflow: 'hidden',
@@ -465,7 +467,7 @@ const styles = StyleSheet.create({
   ctaArrow: { color: Colors.WHITE, fontSize: 24, fontWeight: '900', opacity: 0.9, marginBottom: -2 },
   ctaCardTitle: { fontSize: 17, fontWeight: '900', color: Colors.WHITE, textAlign: 'right', writingDirection: 'rtl' },
   ctaCardSub: { fontSize: 11, fontWeight: '600', color: Colors.WHITE, opacity: 0.9, textAlign: 'right', writingDirection: 'rtl', marginTop: 2 },
-  bottomBannerTitle: { fontSize: 17, fontWeight: '500', color: Colors.WHITE, textAlign: 'right', writingDirection: 'rtl' },
+  bottomBannerTitle: { fontSize: 17, fontWeight: '500', color: Colors.WHITE, textAlign: 'right', writingDirection: 'rtl', flex: 1 },
   bottomBannerIcon: { fontSize: 32 },
   bottomSectionTitle: { fontSize: 16, fontWeight: 'normal', color: '#999999', textAlign: 'right', writingDirection: 'rtl', marginBottom: 8 },
 
