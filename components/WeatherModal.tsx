@@ -7,7 +7,54 @@ import { API_BASE } from '../constants/api';
 import CamerasModal from './CamerasModal';
 import AudioPlayer from './AudioPlayer';
 
+type WLang = 'he' | 'en' | 'fa' | 'ru';
 const DAYS_HE = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
+const DAYS: Record<WLang, string[]> = {
+  he: ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'],
+  en: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+  fa: ['یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنجشنبه', 'جمعه', 'شنبه'],
+  ru: ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
+};
+const TODAY: Record<WLang, string> = { he: 'היום', en: 'Today', fa: 'امروز', ru: 'Сегодня' };
+const DIRS: Record<WLang, string[]> = {
+  he: ['צפון', 'צפון-מזרח', 'מזרח', 'דרום-מזרח', 'דרום', 'דרום-מערב', 'מערב', 'צפון-מערב'],
+  en: ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'],
+  fa: ['شمال', 'شمال‌شرق', 'شرق', 'جنوب‌شرق', 'جنوب', 'جنوب‌غرب', 'غرب', 'شمال‌غرب'],
+  ru: ['С', 'СВ', 'В', 'ЮВ', 'Ю', 'ЮЗ', 'З', 'СЗ'],
+};
+// weather condition terms keyed by a canonical id
+const WX: Record<string, Record<WLang, string>> = {
+  clear: { he: 'בהיר', en: 'Clear', fa: 'صاف', ru: 'Ясно' },
+  mostlyClear: { he: 'בהיר בעיקר', en: 'Mostly clear', fa: 'عمدتاً صاف', ru: 'Преим. ясно' },
+  partlyCloudy: { he: 'מעונן חלקית', en: 'Partly cloudy', fa: 'نیمه‌ابری', ru: 'Переменная облачность' },
+  cloudy: { he: 'מעונן', en: 'Cloudy', fa: 'ابری', ru: 'Облачно' },
+  fog: { he: 'ערפל', en: 'Fog', fa: 'مه', ru: 'Туман' },
+  drizzle: { he: 'טפטוף', en: 'Drizzle', fa: 'نم‌نم باران', ru: 'Морось' },
+  rain: { he: 'גשם', en: 'Rain', fa: 'باران', ru: 'Дождь' },
+  freezingRain: { he: 'גשם קפוא', en: 'Freezing rain', fa: 'باران یخ‌زده', ru: 'Ледяной дождь' },
+  snow: { he: 'שלג', en: 'Snow', fa: 'برف', ru: 'Снег' },
+  snowGrains: { he: 'גרגרי שלג', en: 'Snow grains', fa: 'دانه‌های برف', ru: 'Снежная крупа' },
+  showers: { he: 'ממטרים', en: 'Showers', fa: 'رگبار', ru: 'Ливни' },
+  snowShowers: { he: 'ממטרי שלג', en: 'Snow showers', fa: 'رگبار برف', ru: 'Снегопад' },
+  thunder: { he: 'סופת רעמים', en: 'Thunderstorm', fa: 'رعد و برق', ru: 'Гроза' },
+  thunderHail: { he: 'סופת רעמים עם ברד', en: 'Thunderstorm with hail', fa: 'رعد و برق با تگرگ', ru: 'Гроза с градом' },
+  varies: { he: 'משתנה', en: 'Variable', fa: 'متغیر', ru: 'Переменно' },
+};
+const SK: Record<WLang, Record<string, string>> = {
+  he: { wave: 'גובה גלים', waveDir: 'כיוון גלים', period: 'פריוד גלים', wind: 'רוח', windDir: 'כיוון רוח', gust: 'מכות רוח', vis: 'ראות', sea: 'מפלס ים', water: 'טמפ׳ מים', sec: 'שנ׳', kn: 'קשר', km: 'ק״מ' },
+  en: { wave: 'Wave height', waveDir: 'Wave dir', period: 'Wave period', wind: 'Wind', windDir: 'Wind dir', gust: 'Gusts', vis: 'Visibility', sea: 'Sea level', water: 'Water temp', sec: 's', kn: 'kn', km: 'km' },
+  fa: { wave: 'ارتفاع موج', waveDir: 'جهت موج', period: 'دوره موج', wind: 'باد', windDir: 'جهت باد', gust: 'تندباد', vis: 'دید', sea: 'سطح دریا', water: 'دمای آب', sec: 'ث', kn: 'گره', km: 'کم' },
+  ru: { wave: 'Высота волн', waveDir: 'Напр. волн', period: 'Период волн', wind: 'Ветер', windDir: 'Напр. ветра', gust: 'Порывы', vis: 'Видимость', sea: 'Уровень моря', water: 'Темп. воды', sec: 'с', kn: 'уз', km: 'км' },
+};
+const SAFE: Record<WLang, string[]> = {
+  he: ['⚠️ לא מומלץ — ים סוער', '⚠️ זהירות — תנאים בגבול', '✅ תנאים טובים לשיט'],
+  en: ['⚠️ Not recommended — rough sea', '⚠️ Caution — borderline conditions', '✅ Good conditions for sailing'],
+  fa: ['⚠️ توصیه نمی‌شود — دریای خروشان', '⚠️ احتیاط — شرایط مرزی', '✅ شرایط خوب برای قایق‌رانی'],
+  ru: ['⚠️ Не рекомендуется — море бурное', '⚠️ Осторожно — пограничные условия', '✅ Хорошие условия для плавания'],
+};
+const AUDIO_TITLE: Record<WLang, string> = { he: 'מזג האוויר בבטומי - סקירה שנתית', en: 'Batumi weather — annual overview', fa: 'آب‌وهوای باتومی — مرور سالانه', ru: 'Погода в Батуми — годовой обзор' };
+const OWM_LANG: Record<WLang, string> = { he: 'he', en: 'en', fa: 'en', ru: 'ru' };
+const WL = (l: string): WLang => (['he', 'en', 'fa', 'ru'].includes(l) ? (l as WLang) : 'en');
 const OWM_KEY = 'eb761e941b8ad25efb4bf8cc3d4d9b71';
 const BATUMI_ID = 615532;
 
@@ -23,14 +70,15 @@ type MarineData = {
   windSpeed?: number; windDirection?: number; gust?: number;
   visibility?: number; seaLevel?: number;
 };
-type DayForecast = { day: string; date: string; high: number; low: number; icon: string; desc: string };
+type DayForecast = { day: string; dayIdx?: number; date: string; high: number; low: number; icon: string; desc: string };
 type HourForecast = { hour: string; temp: number; icon: string; pop?: number };
 
 const BATUMI_LAT = 41.6168;
 const BATUMI_LON = 41.6367;
 
 export default function WeatherModal({ visible, onClose, bgColor }: { visible: boolean; onClose: () => void; bgColor: string }) {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
+  const L = WL(lang);
   const [current, setCurrent] = useState<CurrentWeather | null>(null);
   const [forecast, setForecast] = useState<DayForecast[]>([]);
   const [hourly, setHourly] = useState<HourForecast[]>([]);
@@ -101,7 +149,7 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
           feels: Math.round(data.current.apparent_temperature),
           humidity: Math.round(data.current.relative_humidity_2m),
           wind: Math.round(data.current.wind_speed_10m),
-          desc: wmoDesc(data.current.weather_code),
+          desc: wmoDesc(data.current.weather_code, L),
           icon: wmoEmoji(data.current.weather_code),
           uv: data.current.uv_index != null ? Math.round(data.current.uv_index) : undefined,
           seaTemp: seaTemp != null ? Math.round(seaTemp) : undefined,
@@ -113,12 +161,12 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
       const days: DayForecast[] = (data.daily?.time || []).map((dateStr: string, idx: number) => {
         const date = new Date(dateStr);
         return {
-          day: DAYS_HE[date.getDay()],
+          day: DAYS_HE[date.getDay()], dayIdx: date.getDay(),
           date: `${date.getDate()}/${date.getMonth() + 1}`,
           high: Math.round(data.daily.temperature_2m_max[idx]),
           low: Math.round(data.daily.temperature_2m_min[idx]),
           icon: wmoEmoji(data.daily.weather_code[idx]),
-          desc: wmoDesc(data.daily.weather_code[idx]),
+          desc: wmoDesc(data.daily.weather_code[idx], L),
         };
       });
 
@@ -132,11 +180,11 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
   const fetchOpenWeatherMap = async () => {
     try {
       // Current weather
-      const curRes = await fetch(`https://api.openweathermap.org/data/2.5/weather?id=${BATUMI_ID}&units=metric&lang=he&appid=${OWM_KEY}`);
+      const curRes = await fetch(`https://api.openweathermap.org/data/2.5/weather?id=${BATUMI_ID}&units=metric&lang=${OWM_LANG[L]}&appid=${OWM_KEY}`);
       const curData = await curRes.json();
 
       // 5-day/3-hour forecast (for hourly + daily aggregation)
-      const foreRes = await fetch(`https://api.openweathermap.org/data/2.5/forecast?id=${BATUMI_ID}&units=metric&lang=he&appid=${OWM_KEY}`);
+      const foreRes = await fetch(`https://api.openweathermap.org/data/2.5/forecast?id=${BATUMI_ID}&units=metric&lang=${OWM_LANG[L]}&appid=${OWM_KEY}`);
       const foreData = await foreRes.json();
 
       // Marine (Stormglass via our server — water temp + waves)
@@ -202,7 +250,7 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
       const days: DayForecast[] = Object.entries(dayMap).slice(0, 7).map(([dateStr, data]) => {
         const date = new Date(dateStr);
         return {
-          day: DAYS_HE[date.getDay()],
+          day: DAYS_HE[date.getDay()], dayIdx: date.getDay(),
           date: `${date.getDate()}/${date.getMonth() + 1}`,
           high: Math.round(data.high),
           low: Math.round(data.low),
@@ -236,7 +284,7 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
           feels: Number(cur.FeelsLikeC),
           humidity: Number(cur.humidity),
           wind: Number(cur.windspeedKmph),
-          desc: wttrDesc(Number(cur.weatherCode)),
+          desc: wttrDesc(Number(cur.weatherCode), L),
           icon: wttrEmoji(Number(cur.weatherCode)),
         });
       }
@@ -244,12 +292,12 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
       const days: DayForecast[] = (data.weather || []).slice(0, 7).map((d: any) => {
         const date = new Date(d.date);
         return {
-          day: DAYS_HE[date.getDay()],
+          day: DAYS_HE[date.getDay()], dayIdx: date.getDay(),
           date: `${date.getDate()}/${date.getMonth() + 1}`,
           high: Number(d.maxtempC),
           low: Number(d.mintempC),
           icon: wttrEmoji(Number(d.hourly?.[4]?.weatherCode || 0)),
-          desc: wttrDesc(Number(d.hourly?.[4]?.weatherCode || 0)),
+          desc: wttrDesc(Number(d.hourly?.[4]?.weatherCode || 0), L),
         };
       });
 
@@ -419,7 +467,7 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
                 return (
                   <View key={i} style={s.dayRow}>
                     <View style={s.dayNameCol}>
-                      <Text style={s.dayName}>{isToday ? 'היום' : day.day}</Text>
+                      <Text style={s.dayName}>{isToday ? TODAY[L] : (DAYS[L][day.dayIdx ?? 0] || day.day)}</Text>
                       <Text style={s.dayDate}>{day.date}</Text>
                     </View>
                     <Text style={s.dayIcon}>{icon}</Text>
@@ -435,7 +483,7 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
               {/* Skippers panel */}
               <View style={s.audioWrap}>
                 <AudioPlayer
-                  tracks={[{ title: 'מזג האוויר בבטומי - סקירה שנתית', url: '/uploads/1776419283438-349.mp3' }]}
+                  tracks={[{ title: AUDIO_TITLE[L], url: '/uploads/1776419283438-349.mp3' }]}
                   compact
                   playOnLeft
                   tint="transparent"
@@ -452,18 +500,18 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
                   {skippersOpen && (
                     <View style={s.skippersBody}>
                       <View style={[s.safetyBanner, safetyLevel(marine.waveHeight, marine.windSpeed)]}>
-                        <Text style={s.safetyTxt}>{safetyMessage(marine.waveHeight, marine.windSpeed)}</Text>
+                        <Text style={s.safetyTxt}>{safetyMessage(marine.waveHeight, marine.windSpeed, L)}</Text>
                       </View>
                       <View style={s.skGrid}>
-                        <SkCell icon="🌊" label="גובה גלים" val={marine.waveHeight != null ? `${marine.waveHeight.toFixed(1)} m` : '—'} />
-                        <SkCell icon="🧭" label="כיוון גלים" val={marine.waveDirection != null ? degToCardinal(marine.waveDirection) : '—'} />
-                        <SkCell icon="⏱️" label="פריוד גלים" val={marine.wavePeriod != null ? `${Math.round(marine.wavePeriod)} שנ׳` : '—'} />
-                        <SkCell icon="💨" label="רוח" val={marine.windSpeed != null ? `${Math.round(marine.windSpeed * 1.944)} קשר` : '—'} />
-                        <SkCell icon="🧭" label="כיוון רוח" val={marine.windDirection != null ? degToCardinal(marine.windDirection) : '—'} />
-                        <SkCell icon="💢" label="מכות רוח" val={marine.gust != null ? `${Math.round(marine.gust * 1.944)} קשר` : '—'} />
-                        <SkCell icon="👁️" label="ראות" val={marine.visibility != null ? `${marine.visibility.toFixed(1)} ק״מ` : '—'} />
-                        <SkCell icon="📏" label="מפלס ים" val={marine.seaLevel != null ? `${marine.seaLevel.toFixed(2)} m` : '—'} />
-                        <SkCell icon="🌡️" label="טמפ׳ מים" val={marine.waterTemp != null ? `${marine.waterTemp.toFixed(1)}°C` : '—'} />
+                        <SkCell icon="🌊" label={SK[L].wave} val={marine.waveHeight != null ? `${marine.waveHeight.toFixed(1)} m` : '—'} />
+                        <SkCell icon="🧭" label={SK[L].waveDir} val={marine.waveDirection != null ? degToCardinal(marine.waveDirection, L) : '—'} />
+                        <SkCell icon="⏱️" label={SK[L].period} val={marine.wavePeriod != null ? `${Math.round(marine.wavePeriod)} ${SK[L].sec}` : '—'} />
+                        <SkCell icon="💨" label={SK[L].wind} val={marine.windSpeed != null ? `${Math.round(marine.windSpeed * 1.944)} ${SK[L].kn}` : '—'} />
+                        <SkCell icon="🧭" label={SK[L].windDir} val={marine.windDirection != null ? degToCardinal(marine.windDirection, L) : '—'} />
+                        <SkCell icon="💢" label={SK[L].gust} val={marine.gust != null ? `${Math.round(marine.gust * 1.944)} ${SK[L].kn}` : '—'} />
+                        <SkCell icon="👁️" label={SK[L].vis} val={marine.visibility != null ? `${marine.visibility.toFixed(1)} ${SK[L].km}` : '—'} />
+                        <SkCell icon="📏" label={SK[L].sea} val={marine.seaLevel != null ? `${marine.seaLevel.toFixed(2)} m` : '—'} />
+                        <SkCell icon="🌡️" label={SK[L].water} val={marine.waterTemp != null ? `${marine.waterTemp.toFixed(1)}°C` : '—'} />
                       </View>
                       <Text style={s.skippersNote}>{t('wthr.skippersNote')}</Text>
                     </View>
@@ -479,9 +527,8 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
   );
 }
 
-function degToCardinal(deg: number): string {
-  const dirs = ['צפון', 'צפון-מזרח', 'מזרח', 'דרום-מזרח', 'דרום', 'דרום-מערב', 'מערב', 'צפון-מערב'];
-  return dirs[Math.round(deg / 45) % 8] || '—';
+function degToCardinal(deg: number, L: WLang): string {
+  return DIRS[L][Math.round(deg / 45) % 8] || '—';
 }
 
 function safetyLevel(wave?: number | null, wind?: number | null): { backgroundColor: string } {
@@ -492,12 +539,12 @@ function safetyLevel(wave?: number | null, wind?: number | null): { backgroundCo
   return { backgroundColor: '#16A34A' };
 }
 
-function safetyMessage(wave?: number | null, wind?: number | null): string {
+function safetyMessage(wave?: number | null, wind?: number | null, L: WLang = 'en'): string {
   const w = wave ?? 0;
   const windKts = (wind ?? 0) * 1.944;
-  if (w > 2 || windKts > 25) return '⚠️ לא מומלץ — ים סוער';
-  if (w > 1 || windKts > 15) return '⚠️ זהירות — תנאים בגבול';
-  return '✅ תנאים טובים לשיט';
+  if (w > 2 || windKts > 25) return SAFE[L][0];
+  if (w > 1 || windKts > 15) return SAFE[L][1];
+  return SAFE[L][2];
 }
 
 function SkCell({ icon, label, val }: { icon: string; label: string; val: string }) {
@@ -577,34 +624,35 @@ function wmoEmoji(code: number): string {
   return '🌤️';
 }
 
-function wmoDesc(code: number): string {
-  if (code === 0) return 'בהיר';
-  if (code === 1) return 'בהיר בעיקר';
-  if (code === 2) return 'מעונן חלקית';
-  if (code === 3) return 'מעונן';
-  if (code === 45 || code === 48) return 'ערפל';
-  if (code >= 51 && code <= 57) return 'טפטוף';
-  if (code >= 61 && code <= 65) return 'גשם';
-  if (code === 66 || code === 67) return 'גשם קפוא';
-  if (code >= 71 && code <= 75) return 'שלג';
-  if (code === 77) return 'גרגרי שלג';
-  if (code >= 80 && code <= 82) return 'ממטרים';
-  if (code === 85 || code === 86) return 'ממטרי שלג';
-  if (code === 95) return 'סופת רעמים';
-  if (code === 96 || code === 99) return 'סופת רעמים עם ברד';
-  return 'משתנה';
+function wmoDesc(code: number, L: WLang): string {
+  let id = 'varies';
+  if (code === 0) id = 'clear';
+  else if (code === 1) id = 'mostlyClear';
+  else if (code === 2) id = 'partlyCloudy';
+  else if (code === 3) id = 'cloudy';
+  else if (code === 45 || code === 48) id = 'fog';
+  else if (code >= 51 && code <= 57) id = 'drizzle';
+  else if (code >= 61 && code <= 65) id = 'rain';
+  else if (code === 66 || code === 67) id = 'freezingRain';
+  else if (code >= 71 && code <= 75) id = 'snow';
+  else if (code === 77) id = 'snowGrains';
+  else if (code >= 80 && code <= 82) id = 'showers';
+  else if (code === 85 || code === 86) id = 'snowShowers';
+  else if (code === 95) id = 'thunder';
+  else if (code === 96 || code === 99) id = 'thunderHail';
+  return WX[id][L];
 }
 
-function wttrDesc(code: number): string {
-  if (code === 113) return 'בהיר';
-  if (code === 116) return 'מעונן חלקית';
-  if (code === 119) return 'מעונן';
-  if (code === 122) return 'מעונן';
-  if ([176, 263, 266, 293, 296, 299, 302, 305, 308, 353, 356, 359].includes(code)) return 'גשם';
-  if ([200, 386, 389].includes(code)) return 'סופת רעמים';
-  if ([227, 230, 323, 326, 329, 332, 335, 338, 368, 371, 374, 377, 392, 395].includes(code)) return 'שלג';
-  if ([143, 248, 260].includes(code)) return 'ערפל';
-  return 'משתנה';
+function wttrDesc(code: number, L: WLang): string {
+  let id = 'varies';
+  if (code === 113) id = 'clear';
+  else if (code === 116) id = 'partlyCloudy';
+  else if (code === 119 || code === 122) id = 'cloudy';
+  else if ([176, 263, 266, 293, 296, 299, 302, 305, 308, 353, 356, 359].includes(code)) id = 'rain';
+  else if ([200, 386, 389].includes(code)) id = 'thunder';
+  else if ([227, 230, 323, 326, 329, 332, 335, 338, 368, 371, 374, 377, 392, 395].includes(code)) id = 'snow';
+  else if ([143, 248, 260].includes(code)) id = 'fog';
+  return WX[id][L];
 }
 
 function wttrEmoji(code: number): string {
