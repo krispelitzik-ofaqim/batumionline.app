@@ -82,6 +82,7 @@ export default function FlightsModal({ visible, onClose, bgColor }: { visible: b
   const { t, lang } = useI18n();
   const L = FL(lang);
   const F = F_TR[L];
+  const isRTL = lang === 'he' || lang === 'fa';
   const allFlights = lang !== 'he'; // Non-Hebrew editions (en/fa): show ALL Batumi flights, not only Israel routes
   const [flights, setFlights] = useState<Flight[]>([]);
   const [loading, setLoading] = useState(true);
@@ -394,26 +395,24 @@ export default function FlightsModal({ visible, onClose, bgColor }: { visible: b
           </TouchableOpacity>
 
           {/* Tabs */}
-          <View style={s.tabRow}>
-            <TouchableOpacity style={[s.tab, tab === 'departure' && s.tabActive]} onPress={() => setTab('departure')}>
-              <Text style={[s.tabTxt, tab === 'departure' && s.tabTxtActive]}>{t('flt.departures')}</Text>
-              <Text style={[s.tabSub, tab === 'departure' && s.tabSubActive]}>{allFlights ? 'BUS → ✈' : 'BUS → TLV'}</Text>
+          <View style={[s.tabRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+            <TouchableOpacity style={[s.tab, tab === 'departure' && s.tabActive]} onPress={() => setTab('departure')} activeOpacity={0.85}>
+              <Text style={[s.tabTxt, tab === 'departure' && s.tabTxtActive]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.75}>{t('flt.departures')}</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={[s.tab, tab === 'arrival' && s.tabActive]} onPress={() => setTab('arrival')}>
-              <Text style={[s.tabTxt, tab === 'arrival' && s.tabTxtActive]}>{t('flt.arrivals')}</Text>
-              <Text style={[s.tabSub, tab === 'arrival' && s.tabSubActive]}>{allFlights ? '✈ → BUS' : 'TLV → BUS'}</Text>
+            <TouchableOpacity style={[s.tab, tab === 'arrival' && s.tabActive]} onPress={() => setTab('arrival')} activeOpacity={0.85}>
+              <Text style={[s.tabTxt, tab === 'arrival' && s.tabTxtActive]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.75}>{t('flt.arrivals')}</Text>
             </TouchableOpacity>
           </View>
 
           {/* Route filter: fixed Batumi + destination/origin selector (non-Hebrew editions) */}
           {allFlights && !loading && (
             <View style={{ marginBottom: 16, zIndex: 20 }}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+              <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
                 <View style={s.routeFixed}>
                   <Text style={s.routeFieldLabel}>{tab === 'departure' ? FS.origin : FS.dest}</Text>
                   <Text style={s.routeFixedTxt}>{FS.batumi} · BUS</Text>
                 </View>
-                <Text style={{ color: '#fff', opacity: 0.6, fontSize: 18 }}>{tab === 'departure' ? '→' : '←'}</Text>
+                <Text style={{ color: '#F4A94E', opacity: 0.8, fontSize: 18 }}>{isRTL ? (tab === 'departure' ? '←' : '→') : (tab === 'departure' ? '→' : '←')}</Text>
                 <TouchableOpacity style={[s.routeSelect, pickerOpen && s.routeSelectOpen]} onPress={() => setPickerOpen(o => !o)} activeOpacity={0.8}>
                   <Text style={[s.routeFieldLabel, pickerOpen && { color: '#1C2B35' }]}>{tab === 'departure' ? FS.dest : FS.origin}</Text>
                   <Text style={[s.routeSelectTxt, pickerOpen && { color: '#1C2B35' }]} numberOfLines={1}>
@@ -440,50 +439,39 @@ export default function FlightsModal({ visible, onClose, bgColor }: { visible: b
             <ActivityIndicator size="large" color={Colors.WHITE} style={{ marginTop: 40 }} />
           ) : (
             <>
-              {/* Table header */}
-              {filtered.length > 0 && (
-                <View style={s.tableHeader}>
-                  <Text style={[s.thCell, { width: 70, textAlign: 'center' }]}>{t('flt.colFlight')}</Text>
-                  <Text style={[s.thCell, { flex: 1, textAlign: 'center' }]}>{t('flt.colRoute')}</Text>
-                  <Text style={[s.thCell, { width: 70, textAlign: 'center' }]}>{t('flt.colStatus')}</Text>
-                </View>
-              )}
-
-              {filtered.map((f, i) => (
-                <TouchableOpacity key={i} style={[s.flightRow, { justifyContent: 'space-between' }]} activeOpacity={0.7} onPress={() => setSelected(f)}>
-                  <View style={{ alignItems: 'center', width: 60 }}>
-                    <View style={s.logo}>
-                      {(() => {
-                        const iata = getAirlineIATA(f.flight);
-                        if (AIRLINE_LOGOS[iata]) return <Image source={AIRLINE_LOGOS[iata]} style={{ width: '100%', height: '100%' }} resizeMode="contain" />;
-                        if (iata) return (
-                          <View style={{ width: '100%', height: '100%', backgroundColor: '#fff', borderRadius: 6, padding: 1 }}>
-                            <Image source={{ uri: `https://logos.skyscnr.com/images/airlines/favicon/${iata}.png` }} style={{ width: '100%', height: '100%' }} resizeMode="contain" />
-                          </View>
-                        );
-                        return <Text style={{ fontSize: 9, color: 'yellow', textAlign: 'center' }}>?</Text>;
-                      })()}
+              {filtered.map((f, i) => {
+                const hex = statusHex(f.status);
+                const aIata = getAirlineIATA(f.flight);
+                return (
+                  <TouchableOpacity key={i} style={[s.card, { flexDirection: isRTL ? 'row-reverse' : 'row' }]} activeOpacity={0.8} onPress={() => setSelected(f)}>
+                    <View style={s.logoTile}>
+                      {AIRLINE_LOGOS[aIata]
+                        ? <Image source={AIRLINE_LOGOS[aIata]} style={{ width: '100%', height: '100%' }} resizeMode="contain" />
+                        : aIata
+                          ? <Image source={{ uri: `https://logos.skyscnr.com/images/airlines/favicon/${aIata}.png` }} style={{ width: '100%', height: '100%' }} resizeMode="contain" />
+                          : <Text style={{ color: '#0c1a24', fontWeight: '800', fontSize: 10 }}>?</Text>}
                     </View>
-                    <Text style={[s.airline, { textAlign: 'center', marginTop: 2 }]} numberOfLines={1}>{cleanAirline(f.airline)}</Text>
-                    <Text style={[s.flightNum, { textAlign: 'center', fontSize: 11 }]} numberOfLines={1}>{f.flight}</Text>
-                  </View>
-                  <View style={{ flex: 1, justifyContent: 'center', gap: 4 }}>
-                    <View style={{ flexDirection: 'row-reverse', alignItems: 'baseline', justifyContent: 'center', gap: 6 }}>
-                      <Text style={s.timeVal}>{f.depTime}</Text>
-                      <Text style={s.timeLabel}>{tab === 'arrival' ? (f.otherIata || 'TLV') : 'BUS'}</Text>
-                      <Text style={s.timeDateLabel}>{f.depDate}</Text>
+                    <View style={{ flex: 1, marginHorizontal: 10 }}>
+                      {f.otherName
+                        ? <Text style={[s.cardCity, { textAlign: isRTL ? 'right' : 'left' }]} numberOfLines={1}>{f.otherName} <Text style={s.cardIata}>({f.otherIata})</Text></Text>
+                        : <Text style={[s.cardCity, { textAlign: isRTL ? 'right' : 'left' }]} numberOfLines={1}>{f.otherIata || 'TLV'}</Text>}
+                      <Text style={[s.cardAirline, { textAlign: isRTL ? 'right' : 'left' }]} numberOfLines={1}>{cleanAirline(f.airline)} · {f.flight} · {f.depDate}</Text>
+                      <View style={[s.timeLine, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+                        <Text style={s.fTimeVal}>{f.depTime}</Text>
+                        <View style={s.timeTrack}>
+                          <View style={s.timeBar} />
+                          <View style={[s.timeDot, isRTL ? { right: 0 } : { left: 0 }]} />
+                          <Text style={[s.plane, isRTL ? { left: 0, transform: [{ scaleX: -1 }] } : { right: 0 }]}>✈</Text>
+                        </View>
+                        <Text style={s.fTimeVal}>{f.arrTime}</Text>
+                      </View>
                     </View>
-                    <View style={{ flexDirection: 'row-reverse', alignItems: 'baseline', justifyContent: 'center', gap: 6 }}>
-                      <Text style={s.timeVal}>{f.arrTime}</Text>
-                      <Text style={s.timeLabel}>{tab === 'arrival' ? 'BUS' : (f.otherIata || 'TLV')}</Text>
-                      <Text style={s.timeDateLabel}>{f.arrDate}</Text>
+                    <View style={[s.statusPill, { backgroundColor: hex + '22', borderColor: hex }]}>
+                      <Text style={[s.statusPillTxt, { color: hex }]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>{ST(f.status, L)}</Text>
                     </View>
-                  </View>
-                  <View style={[s.statusBadge, statusColor(f.status)]}>
-                    <Text style={s.statusTxt} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.6}>{ST(f.status, L)}</Text>
-                  </View>
-                </TouchableOpacity>
-              ))}
+                  </TouchableOpacity>
+                );
+              })}
 
               {filtered.length === 0 && (
                 <View style={s.empty}>
@@ -615,6 +603,16 @@ function statusColor(status: string) {
   if (status === 'בוטלה') return { backgroundColor: '#EF4444' }; // red — cancelled
   if (status === 'הועברה') return { backgroundColor: '#8B5CF6' }; // purple — diverted
   return { backgroundColor: 'rgba(255,255,255,0.15)' };
+}
+
+function statusHex(status: string): string {
+  if (status === 'בזמן' || status === 'מתוכננת') return '#10B981';
+  if (status === 'בדרך') return '#3B82F6';
+  if (status === 'נחתה' || status === 'המריאה') return '#6B7280';
+  if (status === 'עיכוב') return '#F59E0B';
+  if (status === 'בוטלה') return '#EF4444';
+  if (status === 'הועברה') return '#8B5CF6';
+  return '#9CA3AF';
 }
 
 function computeDelay(d: FlightDetails, L: FLang): string | null {
@@ -780,13 +778,28 @@ const s = StyleSheet.create({
 
   code: { fontSize: 13, color: Colors.WHITE, opacity: 0.6, textAlign: 'center', marginBottom: 16 },
 
-  tabRow: { flexDirection: 'row-reverse', backgroundColor: 'rgba(0,0,0,0.15)', borderRadius: 14, padding: 4, marginBottom: 20 },
-  tab: { flex: 1, paddingVertical: 10, borderRadius: 12, alignItems: 'center' },
-  tabActive: { backgroundColor: Colors.WHITE },
-  tabTxt: { fontSize: 14, fontWeight: '700', color: Colors.WHITE, writingDirection: 'rtl' },
-  tabTxtActive: { color: Colors.TEXT },
+  tabRow: { flexDirection: 'row', backgroundColor: 'rgba(0,0,0,0.25)', borderRadius: 16, padding: 5, marginBottom: 16, gap: 5 },
+  tab: { flex: 1, paddingVertical: 12, paddingHorizontal: 6, borderRadius: 12, alignItems: 'center' },
+  tabActive: { backgroundColor: '#F4A94E', shadowColor: '#F4A94E', shadowOpacity: 0.4, shadowRadius: 10, shadowOffset: { width: 0, height: 4 } },
+  tabTxt: { fontSize: 13, fontWeight: '700', color: 'rgba(255,255,255,0.7)' },
+  tabTxtActive: { color: '#1C2B35', fontWeight: '900' },
   tabSub: { fontSize: 11, color: Colors.WHITE, opacity: 0.5, marginTop: 2 },
   tabSubActive: { color: Colors.TEXT, opacity: 0.5 },
+
+  // Premium flight card
+  card: { alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)', padding: 10, marginBottom: 10, shadowColor: '#000', shadowOpacity: 0.22, shadowRadius: 8, shadowOffset: { width: 0, height: 4 } },
+  logoTile: { width: 42, height: 42, borderRadius: 11, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center', padding: 4 },
+  cardCity: { color: '#fff', fontSize: 15, fontWeight: '800' },
+  cardIata: { color: 'rgba(255,255,255,0.45)', fontSize: 12, fontWeight: '600' },
+  cardAirline: { color: 'rgba(255,255,255,0.5)', fontSize: 10, marginTop: 1 },
+  timeLine: { alignItems: 'center', gap: 8, marginTop: 7 },
+  fTimeVal: { color: '#fff', fontSize: 14, fontWeight: '900', fontVariant: ['tabular-nums'] },
+  timeTrack: { flex: 1, height: 14, justifyContent: 'center' },
+  timeBar: { position: 'absolute', left: 0, right: 0, height: 1.5, backgroundColor: 'rgba(255,255,255,0.18)' },
+  timeDot: { position: 'absolute', width: 6, height: 6, borderRadius: 3, backgroundColor: '#F4A94E' },
+  plane: { position: 'absolute', color: '#F4A94E', fontSize: 12 },
+  statusPill: { paddingHorizontal: 8, paddingVertical: 7, borderRadius: 10, borderWidth: 1, minWidth: 70, alignItems: 'center' },
+  statusPillTxt: { fontSize: 11, fontWeight: '900' },
 
   routeFixed: { flex: 1, backgroundColor: 'rgba(255,255,255,0.10)', borderRadius: 12, paddingVertical: 10, paddingHorizontal: 12, alignItems: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)' },
   routeFixedTxt: { fontSize: 15, fontWeight: '900', color: Colors.WHITE },
