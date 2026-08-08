@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { View, StyleProp, ViewStyle, TouchableOpacity, Text, ScrollView } from 'react-native';
+import { useI18n } from '../constants/i18n';
+
+const CHOOSE_LOC: Record<string, string> = { he: 'בחר מיקום מבוקש', en: 'Choose a location', fa: 'یک مکان انتخاب کنید', ru: 'Выберите место' };
 import { API_BASE } from '../constants/api';
 
 type Point = { name: string; lat: number; lng: number };
@@ -11,6 +14,7 @@ type Props = {
 };
 
 export default function CategoryHeaderMap({ points, color = '#1A6B8A', style }: Props) {
+  const { lang } = useI18n();
   const [focus, setFocus] = useState<Point | null>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [expanded, setExpanded] = useState(false);
@@ -47,7 +51,7 @@ export default function CategoryHeaderMap({ points, color = '#1A6B8A', style }: 
           activeOpacity={0.85}
         >
           <Text style={{ color: '#1C2B35', fontSize: 13, fontWeight: '800', writingDirection: 'rtl' }}>
-            📍 {focus ? focus.name : 'בחר מיקום מבוקש'}
+            📍 {focus ? focus.name : (CHOOSE_LOC[lang] || CHOOSE_LOC.en)}
           </Text>
           <Text style={{ color: '#64748b', fontSize: 12 }}>{pickerOpen ? '▲' : '▼'}</Text>
         </TouchableOpacity>

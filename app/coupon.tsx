@@ -6,7 +6,65 @@ import QRCode from 'qrcode';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Colors } from '../constants/colors';
 import { resolveUri, fetchContent } from '../constants/api';
+import { useI18n } from '../constants/i18n';
 import BottomTabBar from '../components/BottomTabBar';
+
+type CpLang = 'he' | 'en' | 'fa' | 'ru';
+const CP_TR: Record<CpLang, any> = {
+  he: {
+    title: 'קופון הנחה', titleDone: 'ההנחה התקבלה', getSpecial: 'קבל הנחה מיוחדת',
+    off: (n: number) => `${n}% הנחה`, upTo10: 'עד 10% הנחה',
+    showWaiter: 'הצג את הקופון למלצר בעת התשלום', validUntil: (d: string) => `בתוקף עד ${d}`,
+    discountToday: 'גובה ההנחה היום', phDate: 'תאריך (YYYY-MM-DD)', phPhone: 'טלפון',
+    scanQr: 'סרקו לדף המסעדה באפליקציה', send: 'שלח', ended: 'הקופון הסתיים',
+    endedMsg: 'הקופון של בית העסק הסתיים ואינו פעיל', fillDatePhone: 'נא למלא תאריך וטלפון',
+    choosePct: 'נא לבחור אחוז הנחה (3–10%)',
+    finePrint: 'קופון אחד לחשבון משולם בלבד · מימוש אחד ליום מכל טלפון. הבעלים רשאים לתת הנחות גורפות ללא קשר לקופון.',
+    dashLink: '📊 קופונים שמומשו · סטטיסטיקה', doneSuccess: 'ההנחה התקבלה בהצלחה',
+    usedAt: (t: string) => `נוצל היום בשעה ${t}`,
+    lockNote: 'מימוש נוסף אפשרי מחר (בתאריך חדש). קופון אחד לחשבון משולם בלבד.',
+  },
+  en: {
+    title: 'Discount coupon', titleDone: 'Discount received', getSpecial: 'Get a special discount',
+    off: (n: number) => `${n}% off`, upTo10: 'Up to 10% off',
+    showWaiter: 'Show the coupon to the waiter when paying', validUntil: (d: string) => `Valid until ${d}`,
+    discountToday: "Today's discount", phDate: 'Date (YYYY-MM-DD)', phPhone: 'Phone',
+    scanQr: 'Scan for the restaurant page in the app', send: 'Send', ended: 'Coupon ended',
+    endedMsg: 'This business coupon has ended and is no longer active', fillDatePhone: 'Please enter date and phone',
+    choosePct: 'Please choose a discount (3–10%)',
+    finePrint: 'One coupon per paid bill only · one redemption per day per phone. Owners may grant blanket discounts regardless of the coupon.',
+    dashLink: '📊 Redeemed coupons · statistics', doneSuccess: 'Discount received successfully',
+    usedAt: (t: string) => `Used today at ${t}`,
+    lockNote: 'Another redemption is possible tomorrow (a new date). One coupon per paid bill only.',
+  },
+  fa: {
+    title: 'کوپن تخفیف', titleDone: 'تخفیف دریافت شد', getSpecial: 'دریافت تخفیف ویژه',
+    off: (n: number) => `${n}% تخفیف`, upTo10: 'تا ۱۰٪ تخفیف',
+    showWaiter: 'هنگام پرداخت کوپن را به گارسون نشان دهید', validUntil: (d: string) => `معتبر تا ${d}`,
+    discountToday: 'تخفیف امروز', phDate: 'تاریخ (YYYY-MM-DD)', phPhone: 'تلفن',
+    scanQr: 'برای صفحه رستوران در اپ اسکن کنید', send: 'ارسال', ended: 'کوپن به پایان رسید',
+    endedMsg: 'کوپن این کسب‌وکار به پایان رسیده و دیگر فعال نیست', fillDatePhone: 'لطفاً تاریخ و تلفن را وارد کنید',
+    choosePct: 'لطفاً درصد تخفیف را انتخاب کنید (۳–۱۰٪)',
+    finePrint: 'فقط یک کوپن برای هر صورت‌حساب پرداختی · هر روز یک بار برای هر تلفن. مالکان می‌توانند بدون توجه به کوپن تخفیف عمومی بدهند.',
+    dashLink: '📊 کوپن‌های استفاده‌شده · آمار', doneSuccess: 'تخفیف با موفقیت دریافت شد',
+    usedAt: (t: string) => `امروز ساعت ${t} استفاده شد`,
+    lockNote: 'استفاده مجدد فردا امکان‌پذیر است (تاریخ جدید). فقط یک کوپن برای هر صورت‌حساب پرداختی.',
+  },
+  ru: {
+    title: 'Купон на скидку', titleDone: 'Скидка получена', getSpecial: 'Получите специальную скидку',
+    off: (n: number) => `Скидка ${n}%`, upTo10: 'До 10% скидки',
+    showWaiter: 'Покажите купон официанту при оплате', validUntil: (d: string) => `Действителен до ${d}`,
+    discountToday: 'Скидка сегодня', phDate: 'Дата (YYYY-MM-DD)', phPhone: 'Телефон',
+    scanQr: 'Сканируйте для страницы ресторана в приложении', send: 'Отправить', ended: 'Купон завершён',
+    endedMsg: 'Купон этого заведения завершён и больше не активен', fillDatePhone: 'Пожалуйста, введите дату и телефон',
+    choosePct: 'Пожалуйста, выберите скидку (3–10%)',
+    finePrint: 'Один купон на один оплаченный счёт · одно использование в день с одного телефона. Владельцы могут предоставлять общие скидки независимо от купона.',
+    dashLink: '📊 Использованные купоны · статистика', doneSuccess: 'Скидка успешно получена',
+    usedAt: (t: string) => `Использовано сегодня в ${t}`,
+    lockNote: 'Повторное использование возможно завтра (новая дата). Один купон на один оплаченный счёт.',
+  },
+};
+const CPL = (l: string): CpLang => (['he', 'en', 'fa', 'ru'].includes(l) ? (l as CpLang) : 'en');
 
 const F = { x: 'Assistant_800ExtraBold', b: 'Assistant_700Bold', sb: 'Assistant_600SemiBold', m: 'Assistant_500Medium', r: 'Assistant_400Regular' };
 const NAVY = '#16222C', CREAM = '#F5F1EA', GOLD = '#4F8A6E';
@@ -43,12 +101,14 @@ function bars(seed: string): number[] {
 // tapping opens the list to choose).
 const WHEEL_VALS = [3, 4, 5, 6, 7, 8, 9, 10];
 function DiscountSelect({ value, onChange }: { value: number | null; onChange: (v: number) => void }) {
+  const { lang } = useI18n();
+  const C = CP_TR[CPL(lang)];
   const [open, setOpen] = useState(false);
   return (
     <View style={s.selWrap}>
       <TouchableOpacity style={s.selBox} activeOpacity={0.8} onPress={() => setOpen((o) => !o)}>
         <Text style={s.selChevron}>{open ? '▲' : '▼'}</Text>
-        <Text style={[s.selVal, value == null && s.selPlaceholder]}>{value == null ? 'גובה ההנחה היום' : `${value}%`}</Text>
+        <Text style={[s.selVal, value == null && s.selPlaceholder]}>{value == null ? C.discountToday : `${value}%`}</Text>
       </TouchableOpacity>
       {open && (
         <View style={s.selList}>
@@ -64,6 +124,10 @@ function DiscountSelect({ value, onChange }: { value: number | null; onChange: (
 }
 
 export default function CouponScreen() {
+  const { lang, isRTL } = useI18n();
+  const C = CP_TR[CPL(lang)];
+  const dir = { textAlign: (isRTL ? 'right' : 'left') as 'right' | 'left', writingDirection: (isRTL ? 'rtl' : 'ltr') as 'rtl' | 'ltr' };
+  const rowDir = { flexDirection: (isRTL ? 'row-reverse' : 'row') as 'row-reverse' | 'row' };
   const { biz: bizParam } = useLocalSearchParams<{ biz?: string }>();
   const [biz, setBiz] = useState<typeof FALLBACK>(FALLBACK);
   const [done, setDone] = useState(false);
@@ -93,10 +157,10 @@ export default function CouponScreen() {
 
   const send = async () => {
     setMsg('');
-    if (todayKey() > biz.activeUntil) { setMsg('הקופון של בית העסק הסתיים ואינו פעיל'); return; }
-    if (!date.trim() || !phone.trim()) { setMsg('נא למלא תאריך וטלפון'); return; }
+    if (todayKey() > biz.activeUntil) { setMsg(C.endedMsg); return; }
+    if (!date.trim() || !phone.trim()) { setMsg(C.fillDatePhone); return; }
     const chosen = isFixed ? biz.pct : selPct;
-    if (!chosen || chosen < 3 || chosen > 10) { setMsg('נא לבחור אחוז הנחה (3–10%)'); return; }
+    if (!chosen || chosen < 3 || chosen > 10) { setMsg(C.choosePct); return; }
     // one redemption per phone per day
     try {
       const raw = await AsyncStorage.getItem(lockKey(biz.id, phone.trim()));
@@ -128,7 +192,7 @@ export default function CouponScreen() {
     return (
       <View style={s.qrWrap}>
         <View style={s.qrBox}>{rows}</View>
-        <Text style={s.qrTxt}>סרקו לדף המסעדה באפליקציה</Text>
+        <Text style={s.qrTxt}>{C.scanQr}</Text>
         <Text style={s.qrCode}>{code}</Text>
       </View>
     );
@@ -136,11 +200,11 @@ export default function CouponScreen() {
 
   return (
     <SafeAreaView style={s.safe}>
-      <View style={s.header}>
+      <View style={[s.header, rowDir]}>
         <TouchableOpacity onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))} style={s.backBtn}>
           <Text style={s.backTxt}>‹</Text>
         </TouchableOpacity>
-        <Text style={s.hTitle}>{done ? 'ההנחה התקבלה' : 'קופון הנחה'}</Text>
+        <Text style={[s.hTitle, dir]}>{done ? C.titleDone : C.title}</Text>
       </View>
 
       {!done ? (
@@ -149,39 +213,39 @@ export default function CouponScreen() {
           <View style={s.sheet}>
             <View style={s.bizWrap}>
               <Image source={{ uri: resolveUri(biz.image) }} style={s.bizImg} resizeMode="cover" />
-              {valid && <View style={s.ribbon}><Text style={s.ribbonTxt}>קבל הנחה מיוחדת</Text></View>}
+              {valid && <View style={s.ribbon}><Text style={s.ribbonTxt}>{C.getSpecial}</Text></View>}
               <View style={s.bizOverlay}>
-                <Text style={s.bizName}>{biz.name}</Text>
-                {!!biz.address && <Text style={s.bizAddr}>📍 {biz.address}</Text>}
+                <Text style={[s.bizName, dir]}>{biz.name}</Text>
+                {!!biz.address && <Text style={[s.bizAddr, dir]}>📍 {biz.address}</Text>}
               </View>
             </View>
 
-            <Text style={s.bigPct}>{isFixed ? `${biz.pct}% הנחה` : 'עד 10% הנחה'}</Text>
-            <Text style={s.sub}>הצג את הקופון למלצר בעת התשלום</Text>
-            <Text style={s.validity}>בתוקף עד {fmtDate(biz.activeUntil)}</Text>
+            <Text style={s.bigPct}>{isFixed ? C.off(biz.pct) : C.upTo10}</Text>
+            <Text style={s.sub}>{C.showWaiter}</Text>
+            <Text style={s.validity}>{C.validUntil(fmtDate(biz.activeUntil))}</Text>
 
             {!isFixed && (
               <>
-                <Text style={s.wheelLabel}>גובה ההנחה היום</Text>
+                <Text style={s.wheelLabel}>{C.discountToday}</Text>
                 <DiscountSelect value={selPct} onChange={setSelPct} />
               </>
             )}
 
-            <TextInput value={date} onChangeText={setDate} placeholder="תאריך (YYYY-MM-DD)" placeholderTextColor="#94a3b8" style={s.input} />
-            <TextInput value={phone} onChangeText={setPhone} placeholder="טלפון" placeholderTextColor="#94a3b8" keyboardType="phone-pad" style={s.input} />
+            <TextInput value={date} onChangeText={setDate} placeholder={C.phDate} placeholderTextColor="#94a3b8" style={[s.input, dir]} />
+            <TextInput value={phone} onChangeText={setPhone} placeholder={C.phPhone} placeholderTextColor="#94a3b8" keyboardType="phone-pad" style={[s.input, dir]} />
 
             <QR />
 
             {!!msg && <Text style={s.err}>{msg}</Text>}
             <TouchableOpacity style={[s.sendBtn, !valid && { opacity: 0.4 }]} activeOpacity={0.85} disabled={!valid} onPress={send}>
-              <Text style={s.sendTxt}>{valid ? 'שלח' : 'הקופון הסתיים'}</Text>
+              <Text style={s.sendTxt}>{valid ? C.send : C.ended}</Text>
             </TouchableOpacity>
 
-            <Text style={s.finePrint}>קופון אחד לחשבון משולם בלבד · מימוש אחד ליום מכל טלפון. הבעלים רשאים לתת הנחות גורפות ללא קשר לקופון.</Text>
+            <Text style={s.finePrint}>{C.finePrint}</Text>
           </View>
 
           <TouchableOpacity style={s.dashLink} onPress={() => router.push('/coupon-dashboard' as any)}>
-            <Text style={s.dashLinkTxt}>📊 קופונים שמומשו · סטטיסטיקה</Text>
+            <Text style={s.dashLinkTxt}>{C.dashLink}</Text>
           </TouchableOpacity>
         </ScrollView>
       ) : (
@@ -189,13 +253,13 @@ export default function CouponScreen() {
         <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 14, paddingBottom: 32 }}>
           <View style={[s.sheet, s.sheetDone]}>
             <Text style={s.doneMark}>✓</Text>
-            <Text style={s.doneTitle}>ההנחה התקבלה בהצלחה</Text>
+            <Text style={s.doneTitle}>{C.doneSuccess}</Text>
             <Text style={s.donePct}>{pct}%</Text>
             <Text style={s.bizName2}>{biz.name}</Text>
             {!!biz.address && <Text style={s.bizAddr2}>📍 {biz.address}</Text>}
-            <Text style={s.doneTime}>נוצל היום בשעה {redeemedAt}</Text>
+            <Text style={s.doneTime}>{C.usedAt(redeemedAt)}</Text>
             <QR />
-            <Text style={s.lockNote}>מימוש נוסף אפשרי מחר (בתאריך חדש). קופון אחד לחשבון משולם בלבד.</Text>
+            <Text style={s.lockNote}>{C.lockNote}</Text>
           </View>
         </ScrollView>
       )}

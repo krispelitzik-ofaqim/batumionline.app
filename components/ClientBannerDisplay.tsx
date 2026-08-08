@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, Linking, Platform } from 'react-native';
+import { useI18n } from '../constants/i18n';
 import { fetchContent, resolveUri } from '../constants/api';
 
 type Banner = {
@@ -18,7 +19,10 @@ type Banner = {
 
 const SIZE_PX: Record<Banner['size'], number> = { small: 50, medium: 100, large: 180 };
 
+const SPONSORED: Record<string, string> = { he: 'פרסומי', en: 'Sponsored', fa: 'تبلیغاتی', ru: 'Реклама' };
+
 export default function ClientBannerDisplay({ page, position }: { page: string; position: 'top' | 'middle' | 'bottom' }) {
+  const { lang } = useI18n();
   const [banner, setBanner] = useState<Banner | null>(null);
 
   useEffect(() => {
@@ -65,7 +69,7 @@ export default function ClientBannerDisplay({ page, position }: { page: string; 
         )}
       </TouchableOpacity>
       <View style={s.adTag}>
-        <Text style={s.adTxt}>פרסומי</Text>
+        <Text style={s.adTxt}>{SPONSORED[lang] || SPONSORED.en}</Text>
       </View>
     </View>
   );

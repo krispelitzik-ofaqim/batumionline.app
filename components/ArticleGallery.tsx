@@ -1,5 +1,13 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Image, StyleSheet, useWindowDimensions } from 'react-native';
+import { useI18n } from '../constants/i18n';
+
+const G_TR: Record<string, { hide: string; show: string; slider: string; grid: string; stack: string }> = {
+  he: { hide: 'הסתר גלריה', show: 'הצג גלריה', slider: 'סליידר', grid: 'רשת', stack: 'רצף' },
+  en: { hide: 'Hide gallery', show: 'Show gallery', slider: 'Slider', grid: 'Grid', stack: 'Stack' },
+  fa: { hide: 'پنهان کردن گالری', show: 'نمایش گالری', slider: 'اسلایدر', grid: 'شبکه', stack: 'پشته' },
+  ru: { hide: 'Скрыть галерею', show: 'Показать галерею', slider: 'Слайдер', grid: 'Сетка', stack: 'Лента' },
+};
 import { Colors } from '../constants/colors';
 
 type Mode = 'slider' | 'grid' | 'stack';
@@ -16,6 +24,8 @@ export default function ArticleGallery({
   const [mode, setMode] = useState<Mode>(defaultMode);
   const [visible, setVisible] = useState(defaultVisible);
   const { width: screenW } = useWindowDimensions();
+  const { lang } = useI18n();
+  const G = G_TR[lang] || G_TR.en;
 
   if (!images || images.length === 0) return null;
 
@@ -40,13 +50,13 @@ export default function ArticleGallery({
     <View style={styles.wrap}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => setVisible(v => !v)} style={styles.toggleBtn}>
-          <Text style={styles.toggleBtnTxt}>{visible ? 'הסתר גלריה' : `הצג גלריה (${images.length})`}</Text>
+          <Text style={styles.toggleBtnTxt}>{visible ? G.hide : `${G.show} (${images.length})`}</Text>
         </TouchableOpacity>
         {visible && (
           <View style={styles.modeRow}>
-            {modeBtn('slider', '◀▶', 'סליידר')}
-            {modeBtn('grid', '▦', 'רשת')}
-            {modeBtn('stack', '≡', 'רצף')}
+            {modeBtn('slider', '◀▶', G.slider)}
+            {modeBtn('grid', '▦', G.grid)}
+            {modeBtn('stack', '≡', G.stack)}
           </View>
         )}
       </View>

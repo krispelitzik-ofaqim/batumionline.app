@@ -17,12 +17,23 @@ const DEFAULTS: Tab[] = [
   { id: 'contact', title: 'כתוב לנו', icon: '✉️', body: '' },
 ];
 
+const TABS_TR: Record<string, Record<TabId, string>> = {
+  he: { about: 'אודותינו', terms: 'תקנון', privacy: 'פרטיות', contact: 'כתוב לנו' },
+  en: { about: 'About us', terms: 'Terms', privacy: 'Privacy', contact: 'Contact us' },
+  fa: { about: 'درباره ما', terms: 'قوانین', privacy: 'حریم خصوصی', contact: 'تماس با ما' },
+  ru: { about: 'О нас', terms: 'Условия', privacy: 'Конфиденциальность', contact: 'Написать нам' },
+};
+const SOON: Record<string, string> = { he: 'תוכן יתווסף בקרוב', en: 'Content coming soon', fa: 'محتوا به‌زودی اضافه می‌شود', ru: 'Контент скоро появится' };
+
 const EMAIL = 'krispelitzik@gmail.com';
 const WHATSAPP = '972502844867';
 const SITE = 'https://www.batumionline.app';
 
 export default function InfoScreen() {
-  const { t } = useI18n();
+  const { t, lang, isRTL } = useI18n();
+  const L = (['he', 'en', 'fa', 'ru'].includes(lang) ? lang : 'en') as string;
+  const dir = { textAlign: (isRTL ? 'right' : 'left') as 'right' | 'left', writingDirection: (isRTL ? 'rtl' : 'ltr') as 'rtl' | 'ltr' };
+  const tabTitle = (id: TabId, fallback: string) => TABS_TR[L]?.[id] || fallback;
   const { dark } = useContext(ThemeContext);
   const [active, setActive] = useState<TabId>('about');
   const [tabs, setTabs] = useState<Tab[]>(DEFAULTS);
@@ -78,12 +89,12 @@ export default function InfoScreen() {
               {on ? (
                 <LinearGradient colors={['#1A6B8A', '#3DA5C4']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={[styles.banner, styles.bannerOn]}>
                   <Text style={styles.icon}>{t.icon}</Text>
-                  <Text style={[styles.bannerTxt, styles.bannerTxtOn]}>{t.title}</Text>
+                  <Text style={[styles.bannerTxt, styles.bannerTxtOn]}>{tabTitle(t.id, t.title)}</Text>
                 </LinearGradient>
               ) : (
                 <View style={styles.banner}>
                   <Text style={styles.icon}>{t.icon}</Text>
-                  <Text style={styles.bannerTxt}>{t.title}</Text>
+                  <Text style={styles.bannerTxt}>{tabTitle(t.id, t.title)}</Text>
                 </View>
               )}
             </TouchableOpacity>
@@ -138,11 +149,11 @@ export default function InfoScreen() {
           </View>
         ) : (
           <View style={styles.card}>
-            <Text style={styles.cardTitle}>{current.title}</Text>
+            <Text style={[styles.cardTitle, dir]}>{tabTitle(current.id, current.title)}</Text>
             {current.body.includes('<') ? (
               <HtmlContent html={current.body} baseStyle={{ fontSize: 14, color: '#444', lineHeight: 24 }} />
             ) : (
-              <Text style={styles.cardBody}>{current.body || 'תוכן יתווסף בקרוב'}</Text>
+              <Text style={[styles.cardBody, dir]}>{current.body || SOON[L]}</Text>
             )}
           </View>
         )}

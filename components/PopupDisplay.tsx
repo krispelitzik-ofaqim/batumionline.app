@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, Platform } from 'react-native';
+import { useI18n } from '../constants/i18n';
+
+const REDEEM_CODE: Record<string, string> = { he: 'קוד למימוש ההטבה', en: 'Redemption code', fa: 'کد استفاده از مزیت', ru: 'Код для получения' };
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { fetchContent } from '../constants/api';
 
@@ -19,6 +22,7 @@ type Popup = {
 const DISMISSED_KEY = '@popup_dismissed_ids';
 
 export default function PopupDisplay({ page }: { page: string }) {
+  const { lang } = useI18n();
   const [active, setActive] = useState<Popup | null>(null);
   const [dismissedIds, setDismissedIds] = useState<string[]>([]);
 
@@ -86,7 +90,7 @@ export default function PopupDisplay({ page }: { page: string }) {
         <Text style={[s.msg, { color: msgColor }]}>{active.message}</Text>
         {!!active.redeemCode && (
           <View style={s.codeBox}>
-            <Text style={s.codeLabel}>🎁 קוד למימוש ההטבה</Text>
+            <Text style={s.codeLabel}>🎁 {REDEEM_CODE[lang] || REDEEM_CODE.en}</Text>
             <Text selectable style={s.codeVal}>{active.redeemCode}</Text>
           </View>
         )}
