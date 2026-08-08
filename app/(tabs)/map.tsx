@@ -11,8 +11,23 @@ import * as Location from 'expo-location';
 type MapPoint = { name: string; lat: number; lng: number; description?: string };
 type MapLayer = { name: string; points: MapPoint[] };
 
+type MLang = 'he' | 'en' | 'fa' | 'ru';
+const M: Record<MLang, Record<string, string>> = {
+  he: { all: 'הכל', choose: 'בחר קטגוריה', nearby: 'מיקומים קרובים', locations: 'מיקומים', m: 'מ׳', km: 'ק״מ', errBrowser: 'לא ניתן לקבל מיקום בדפדפן הזה', errPerm: 'כדי לראות מה קרוב אליך צריך לאשר גישה למיקום בהגדרות המכשיר', errNow: 'לא ניתן לקבל מיקום כרגע, נסה שוב', errGeneric: 'לא ניתן לקבל מיקום', moreInfo: 'מידע נוסף באתר:', moreDetails: 'יותר פרטים קרא באתר:' },
+  en: { all: 'All', choose: 'Choose a category', nearby: 'nearby locations', locations: 'locations', m: 'm', km: 'km', errBrowser: 'Location is not available in this browser', errPerm: 'To see what is near you, allow location access in your device settings', errNow: 'Cannot get location right now, please try again', errGeneric: 'Location unavailable', moreInfo: 'More info on the website:', moreDetails: 'Read more on the website:' },
+  fa: { all: 'همه', choose: 'یک دسته را انتخاب کنید', nearby: 'مکان‌های نزدیک', locations: 'مکان', m: 'متر', km: 'کیلومتر', errBrowser: 'موقعیت در این مرورگر در دسترس نیست', errPerm: 'برای دیدن نزدیکی‌ها، دسترسی به موقعیت را در تنظیمات دستگاه فعال کنید', errNow: 'در حال حاضر امکان دریافت موقعیت نیست، دوباره تلاش کنید', errGeneric: 'موقعیت در دسترس نیست', moreInfo: 'اطلاعات بیشتر در وب‌سایت:', moreDetails: 'جزئیات بیشتر در وب‌سایت:' },
+  ru: { all: 'Все', choose: 'Выберите категорию', nearby: 'мест рядом', locations: 'мест', m: 'м', km: 'км', errBrowser: 'Геолокация недоступна в этом браузере', errPerm: 'Чтобы видеть, что рядом, разрешите доступ к геолокации в настройках устройства', errNow: 'Сейчас не удаётся получить местоположение, попробуйте снова', errGeneric: 'Местоположение недоступно', moreInfo: 'Подробнее на сайте:', moreDetails: 'Подробнее читайте на сайте:' },
+};
+const ML = (l: string): MLang => (['he', 'en', 'fa', 'ru'].includes(l) ? (l as MLang) : 'en');
+function locDesc(html: string, L: MLang): string {
+  if (!html) return html;
+  return html.split(M.he.moreInfo).join(M[L].moreInfo).split(M.he.moreDetails).join(M[L].moreDetails);
+}
+
 export default function MapScreen() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
+  const L = ML(lang);
+  const MM = M[L];
   const { dark } = useContext(ThemeContext);
   const [active, setActive] = useState('הכל');
   const [layers, setLayers] = useState<MapLayer[]>([]);
@@ -31,11 +46,11 @@ export default function MapScreen() {
       if (typeof navigator !== 'undefined' && navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
           (pos) => setUserLoc({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-          (err) => setLocError(err.message || 'לא ניתן לקבל מיקום'),
+          (err) => setLocError(err.message || MM.errGeneric),
           { enableHighAccuracy: true, timeout: 8000 }
         );
       } else {
-        setLocError('לא ניתן לקבל מיקום בדפדפן הזה');
+        setLocError(MM.errBrowser);
       }
       return;
     }
@@ -43,13 +58,13 @@ export default function MapScreen() {
       try {
         const { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== 'granted') {
-          setLocError('כדי לראות מה קרוב אליך צריך לאשר גישה למיקום בהגדרות המכשיר');
+          setLocError(MM.errPerm);
           return;
         }
         const pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
         setUserLoc({ lat: pos.coords.latitude, lng: pos.coords.longitude });
       } catch (e) {
-        setLocError('לא ניתן לקבל מיקום כרגע, נסה שוב');
+        setLocError(MM.errNow);
       }
     })();
   }, [nearMode]);
@@ -123,7 +138,7 @@ export default function MapScreen() {
                 const color = layer?.color || (c === 'הכל' ? Colors.PRIMARY : '#64748b');
                 return (
                   <TouchableOpacity key={c} onPress={() => { setActive(c); setFocusPoint(null); setMenuOpen(false); }} style={{ flexDirection: 'row-reverse', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 14, backgroundColor: on ? color + '20' : 'transparent', borderRightWidth: 4, borderRightColor: color }}>
-                    <Text style={{ flex: 1, fontSize: 14, fontWeight: on ? '900' : '700', color, textAlign: 'right', writingDirection: 'rtl' }}>{c}</Text>
+                    <Text style={{ flex: 1, fontSize: 14, fontWeight: on ? '900' : '700', color, textAlign: 'right', writingDirection: 'rtl' }}>{c === 'הכל' ? MM.all : c}</Text>
                     {layer?.points && <Text style={{ fontSize: 11, color: '#94a3b8', fontWeight: '700' }}>{layer.points.length}</Text>}
                   </TouchableOpacity>
                 );
@@ -137,7 +152,7 @@ export default function MapScreen() {
           <MapEmbed src={buildMapSrc()} style={{ flex: 1 }} />
         </View>
         <TouchableOpacity onPress={() => setMenuOpen(true)} style={styles.openMenuBtn} activeOpacity={0.85}>
-          <Text style={styles.openMenuTxt}>📍 {active === 'הכל' ? 'בחר קטגוריה' : active}</Text>
+          <Text style={styles.openMenuTxt}>📍 {active === 'הכל' ? MM.choose : active}</Text>
           <Text style={styles.openMenuArrow}>▲</Text>
         </TouchableOpacity>
 
@@ -146,7 +161,7 @@ export default function MapScreen() {
             <View style={styles.panelHandle} />
             <View style={styles.panelHeader}>
               <Text style={styles.panelTitle}>{t('map.nearMe')}</Text>
-              <Text style={styles.panelCount}>{nearby.length} מיקומים קרובים</Text>
+              <Text style={styles.panelCount}>{nearby.length} {MM.nearby}</Text>
               <TouchableOpacity onPress={() => { setUserLoc(null); setLocError(null); setActive('הכל'); }} style={styles.panelClose}>
                 <Text style={styles.panelCloseX}>✕</Text>
               </TouchableOpacity>
@@ -171,7 +186,7 @@ export default function MapScreen() {
                     <Text style={styles.panelIcon}>📍</Text>
                     <View style={{ flex: 1 }}>
                       <Text style={styles.panelName} numberOfLines={1}>{p.name}</Text>
-                      <Text style={styles.panelDesc}>{(p as any).category} · {(p as any).distKm < 1 ? `${Math.round((p as any).distKm * 1000)} מ׳` : `${(p as any).distKm.toFixed(1)} ק״מ`}</Text>
+                      <Text style={styles.panelDesc}>{(p as any).category} · {(p as any).distKm < 1 ? `${Math.round((p as any).distKm * 1000)} ${MM.m}` : `${(p as any).distKm.toFixed(1)} ${MM.km}`}</Text>
                     </View>
                     <TouchableOpacity onPress={() => openNav(p.lat, p.lng)} style={styles.navBtn} hitSlop={8} activeOpacity={0.8}>
                       <Text style={styles.navBtnTxt}>{t('c.navigate')}</Text>
@@ -190,7 +205,7 @@ export default function MapScreen() {
               <View style={styles.panelHandle} />
               <View style={styles.panelHeader}>
                 <Text style={styles.panelTitle}>{active}</Text>
-                <Text style={styles.panelCount}>{layer.points.length} מיקומים</Text>
+                <Text style={styles.panelCount}>{layer.points.length} {MM.locations}</Text>
                 <TouchableOpacity onPress={() => { setActive('הכל'); setFocusPoint(null); }} style={styles.panelClose}>
                   <Text style={styles.panelCloseX}>✕</Text>
                 </TouchableOpacity>
@@ -205,15 +220,15 @@ export default function MapScreen() {
                       {focusPoint?.name === p.name && p.description ? (
                         Platform.OS === 'web' ? (
                           React.createElement('div', {
-                            dangerouslySetInnerHTML: { __html: p.description },
+                            dangerouslySetInnerHTML: { __html: locDesc(p.description, L) },
                             style: {
                               marginTop: 6, fontSize: 12, color: 'rgba(255,255,255,0.9)',
                               direction: 'rtl', textAlign: 'right', lineHeight: '1.6',
                               maxHeight: 150, overflow: 'auto',
                             },
                           })
-                        ) : <Text style={styles.panelDesc}>{(p.description || '').replace(/<[^>]+>/g, '')}</Text>
-                      ) : p.description ? <Text style={styles.panelDesc} numberOfLines={1}>{p.description.replace(/<[^>]+>/g, '').substring(0, 40)}</Text> : null}
+                        ) : <Text style={styles.panelDesc}>{locDesc(p.description || '', L).replace(/<[^>]+>/g, '')}</Text>
+                      ) : p.description ? <Text style={styles.panelDesc} numberOfLines={1}>{locDesc(p.description, L).replace(/<[^>]+>/g, '').substring(0, 40)}</Text> : null}
                     </View>
                     <TouchableOpacity onPress={() => openNav(p.lat, p.lng)} style={styles.navBtn} hitSlop={8} activeOpacity={0.8}>
                       <Text style={styles.navBtnTxt}>{t('c.navigate')}</Text>
