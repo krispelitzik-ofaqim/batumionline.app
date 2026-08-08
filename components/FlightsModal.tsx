@@ -407,19 +407,33 @@ export default function FlightsModal({ visible, onClose, bgColor }: { visible: b
           {/* Route filter: fixed Batumi + destination/origin selector (non-Hebrew editions) */}
           {allFlights && !loading && (
             <View style={{ marginBottom: 16, zIndex: 20 }}>
-              <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                <View style={s.routeFixed}>
-                  <Text style={s.routeFieldLabel}>{tab === 'departure' ? FS.origin : FS.dest}</Text>
-                  <Text style={s.routeFixedTxt}>{FS.batumi} · BUS</Text>
-                </View>
-                <Text style={{ color: '#F4A94E', opacity: 0.8, fontSize: 18 }}>{isRTL ? (tab === 'departure' ? '←' : '→') : (tab === 'departure' ? '→' : '←')}</Text>
-                <TouchableOpacity style={[s.routeSelect, pickerOpen && s.routeSelectOpen]} onPress={() => setPickerOpen(o => !o)} activeOpacity={0.8}>
-                  <Text style={[s.routeFieldLabel, pickerOpen && { color: '#1C2B35' }]}>{tab === 'departure' ? FS.dest : FS.origin}</Text>
-                  <Text style={[s.routeSelectTxt, pickerOpen && { color: '#1C2B35' }]} numberOfLines={1}>
-                    {(routeSel === 'ALL' ? (tab === 'departure' ? FS.allDest : FS.allOrigin) : selName) + '  ▼'}
-                  </Text>
-                </TouchableOpacity>
-              </View>
+              {(() => {
+                const fixedBox = (
+                  <View style={s.routeFixed}>
+                    <Text style={s.routeFieldLabel}>{tab === 'departure' ? FS.origin : FS.dest}</Text>
+                    <Text style={s.routeFixedTxt}>{FS.batumi} · BUS</Text>
+                  </View>
+                );
+                const selectorBox = (
+                  <TouchableOpacity style={[s.routeSelect, pickerOpen && s.routeSelectOpen]} onPress={() => setPickerOpen(o => !o)} activeOpacity={0.8}>
+                    <Text style={[s.routeFieldLabel, pickerOpen && { color: '#1C2B35' }]}>{tab === 'departure' ? FS.dest : FS.origin}</Text>
+                    <Text style={[s.routeSelectTxt, pickerOpen && { color: '#1C2B35' }]} numberOfLines={1}>
+                      {(routeSel === 'ALL' ? (tab === 'departure' ? FS.allDest : FS.allOrigin) : selName) + '  ▼'}
+                    </Text>
+                  </TouchableOpacity>
+                );
+                // Align the two controls with the flight-card columns: origin on the start
+                // side, Batumi on the end side. Departures: Batumi=origin (start); Arrivals: Batumi=dest (end).
+                const startEl = tab === 'departure' ? fixedBox : selectorBox;
+                const endEl = tab === 'departure' ? selectorBox : fixedBox;
+                return (
+                  <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                    {startEl}
+                    <Text style={{ color: '#F4A94E', opacity: 0.8, fontSize: 18 }}>{isRTL ? '←' : '→'}</Text>
+                    {endEl}
+                  </View>
+                );
+              })()}
               {pickerOpen && (
                 <View style={s.routeList}>
                   <TouchableOpacity style={s.routeOpt} onPress={() => { setRouteSel('ALL'); setPickerOpen(false); }}>
@@ -442,6 +456,11 @@ export default function FlightsModal({ visible, onClose, bgColor }: { visible: b
               {filtered.map((f, i) => {
                 const hex = statusHex(f.status);
                 const aIata = getAirlineIATA(f.flight);
+                const depCode = tab === 'arrival' ? (f.otherIata || 'TLV') : 'BUS';
+                const arrCode = tab === 'arrival' ? 'BUS' : (f.otherIata || 'TLV');
+                const otherCity = cleanCity(f.otherName);
+                const depCity = tab === 'arrival' ? otherCity : FS.batumi;
+                const arrCity = tab === 'arrival' ? FS.batumi : otherCity;
                 return (
                   <TouchableOpacity key={i} style={[s.card, { flexDirection: isRTL ? 'row-reverse' : 'row' }]} activeOpacity={0.8} onPress={() => setSelected(f)}>
                     <View style={s.logoTile}>
@@ -452,18 +471,22 @@ export default function FlightsModal({ visible, onClose, bgColor }: { visible: b
                           : <Text style={{ color: '#0c1a24', fontWeight: '800', fontSize: 10 }}>?</Text>}
                     </View>
                     <View style={{ flex: 1, marginHorizontal: 10 }}>
-                      {f.otherName
-                        ? <Text style={[s.cardCity, { textAlign: isRTL ? 'right' : 'left' }]} numberOfLines={1}>{f.otherName} <Text style={s.cardIata}>({f.otherIata})</Text></Text>
-                        : <Text style={[s.cardCity, { textAlign: isRTL ? 'right' : 'left' }]} numberOfLines={1}>{f.otherIata || 'TLV'}</Text>}
                       <Text style={[s.cardAirline, { textAlign: isRTL ? 'right' : 'left' }]} numberOfLines={1}>{cleanAirline(f.airline)} · {f.flight} · {f.depDate}</Text>
                       <View style={[s.timeLine, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-                        <Text style={s.fTimeVal}>{f.depTime}</Text>
+                        <View style={s.ep}>
+                          <Text style={s.epCode}>{depCode}</Text>
+                          {!!depCity && <Text style={s.epCity} numberOfLines={1}>{depCity}</Text>}
+                          <Text style={s.fTimeVal}>{f.depTime}</Text>
+                        </View>
                         <View style={s.timeTrack}>
                           <View style={s.timeBar} />
-                          <View style={[s.timeDot, isRTL ? { right: 0 } : { left: 0 }]} />
                           <Text style={[s.plane, isRTL ? { left: 0, transform: [{ scaleX: -1 }] } : { right: 0 }]}>✈</Text>
                         </View>
-                        <Text style={s.fTimeVal}>{f.arrTime}</Text>
+                        <View style={s.ep}>
+                          <Text style={s.epCode}>{arrCode}</Text>
+                          {!!arrCity && <Text style={s.epCity} numberOfLines={1}>{arrCity}</Text>}
+                          <Text style={s.fTimeVal}>{f.arrTime}</Text>
+                        </View>
                       </View>
                     </View>
                     <View style={[s.statusPill, { backgroundColor: hex + '22', borderColor: hex }]}>
@@ -674,6 +697,11 @@ function formatTime(dateStr: string | undefined): string {
   return d.getHours().toString().padStart(2, '0') + ':' + d.getMinutes().toString().padStart(2, '0');
 }
 
+function cleanCity(name: string | undefined): string {
+  if (!name) return '';
+  return name.replace(/\s*Yafo\b/i, '').trim();
+}
+
 function cleanAirline(name: string | undefined): string {
   if (!name) return '';
   return name
@@ -793,7 +821,10 @@ const s = StyleSheet.create({
   cardIata: { color: 'rgba(255,255,255,0.45)', fontSize: 12, fontWeight: '600' },
   cardAirline: { color: 'rgba(255,255,255,0.5)', fontSize: 10, marginTop: 1 },
   timeLine: { alignItems: 'center', gap: 8, marginTop: 7 },
-  fTimeVal: { color: '#fff', fontSize: 14, fontWeight: '900', fontVariant: ['tabular-nums'] },
+  ep: { alignItems: 'center', minWidth: 54 },
+  epCode: { color: '#F4A94E', fontSize: 12, fontWeight: '900', letterSpacing: 0.5 },
+  epCity: { color: 'rgba(255,255,255,0.6)', fontSize: 9, marginTop: 1, maxWidth: 66 },
+  fTimeVal: { color: '#fff', fontSize: 14, fontWeight: '900', fontVariant: ['tabular-nums'], marginTop: 1 },
   timeTrack: { flex: 1, height: 14, justifyContent: 'center' },
   timeBar: { position: 'absolute', left: 0, right: 0, height: 1.5, backgroundColor: 'rgba(255,255,255,0.18)' },
   timeDot: { position: 'absolute', width: 6, height: 6, borderRadius: 3, backgroundColor: '#F4A94E' },
