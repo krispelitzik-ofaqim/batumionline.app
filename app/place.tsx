@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, StyleSheet, Linking, Image, Platform, StatusBar } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
+import RestaurantCouponBanner from '../components/RestaurantCouponBanner';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { API_BASE, fetchContent } from '../constants/api';
 import { Colors } from '../constants/colors';
@@ -197,6 +198,7 @@ export default function PlacePage() {
               })()}
             </View>
           </View>
+          {isRestaurant && <RestaurantCouponBanner />}
         </ScrollView>
       )}
     </View>

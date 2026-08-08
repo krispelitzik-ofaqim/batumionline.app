@@ -17,6 +17,7 @@ type MapPoint = { name: string; lat: number; lng: number; description?: string }
 import AudioPlayer from '../../components/AudioPlayer';
 import FlightsModal from '../../components/FlightsModal';
 import BottomTabBar from '../../components/BottomTabBar';
+import RestaurantCouponBanner from '../../components/RestaurantCouponBanner';
 import Breadcrumb from '../../components/Breadcrumb';
 import AppHeader from '../../components/AppHeader';
 import PlacesInfoModal from '../../components/PlacesInfoModal';
@@ -1635,6 +1636,7 @@ export default function CategoryScreen() {
             </Text>
           </View>
         )}
+        {id === '6' && <RestaurantCouponBanner />}
       </ScrollView>
       {showTopBtn && (
         <TouchableOpacity
