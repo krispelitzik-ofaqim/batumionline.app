@@ -35,6 +35,24 @@ const TOPIC_LABELS: Record<Topic, string> = {
   israel: '🇮🇱 מישראל',
 };
 
+type NLang = 'he' | 'en' | 'fa' | 'ru';
+const TOPIC_LABELS_TR: Record<NLang, Record<Topic, string>> = {
+  he: { tourism: 'תיירות', realestate: 'נדל״ן', food: 'אוכל ומסעדות', entertainment: 'בילוי ואירועים', israel: '🇮🇱 מישראל' },
+  en: { tourism: 'Tourism', realestate: 'Real estate', food: 'Food & dining', entertainment: 'Events & nightlife', israel: '🇮🇱 From Israel' },
+  fa: { tourism: 'گردشگری', realestate: 'املاک', food: 'غذا و رستوران', entertainment: 'رویدادها و سرگرمی', israel: '🇮🇱 از اسرائیل' },
+  ru: { tourism: 'Туризм', realestate: 'Недвижимость', food: 'Еда и рестораны', entertainment: 'События и ночная жизнь', israel: '🇮🇱 Из Израиля' },
+};
+const TOPIC_QUERIES_TR: Record<NLang, Record<Topic, string>> = {
+  he: { tourism: 'בטומי תיירות', realestate: 'בטומי נדלן', food: 'בטומי מסעדות', entertainment: 'בטומי חיי לילה', israel: 'בטומי ישראלים' },
+  en: { tourism: 'Batumi tourism', realestate: 'Batumi real estate', food: 'Batumi restaurants', entertainment: 'Batumi nightlife', israel: 'Batumi Israelis' },
+  fa: { tourism: 'باتومی گردشگری', realestate: 'باتومی املاک', food: 'باتومی رستوران', entertainment: 'باتومی زندگی شبانه', israel: 'باتومی اسرائیلی‌ها' },
+  ru: { tourism: 'Батуми туризм', realestate: 'Батуми недвижимость', food: 'Батуми рестораны', entertainment: 'Батуми ночная жизнь', israel: 'Батуми израильтяне' },
+};
+const RSS_LOCALE: Record<NLang, string> = { he: 'hl=he&gl=IL&ceid=IL:he', en: 'hl=en-US&gl=US&ceid=US:en', fa: 'hl=fa&gl=IR&ceid=IR:fa', ru: 'hl=ru&gl=RU&ceid=RU:ru' };
+const NL = (l: string): NLang => (['he', 'en', 'fa', 'ru'].includes(l) ? (l as NLang) : 'en');
+// Topics per edition — the Israel topic is Hebrew-audience only.
+const TOPICS_FOR = (l: NLang): Topic[] => (l === 'he' ? ['tourism', 'realestate', 'food', 'entertainment', 'israel'] : ['tourism', 'realestate', 'food', 'entertainment']);
+
 type NewsItem = {
   title: string;
   summary: string;
@@ -57,7 +75,10 @@ function detectTopic(text: string): Topic {
 }
 
 export default function NewsModal({ visible, onClose, bgColor }: { visible: boolean; onClose: () => void; bgColor: string }) {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
+  const L = NL(lang);
+  const TOPICS = TOPICS_FOR(L);
+  const LBL = TOPIC_LABELS_TR[L];
   const [news, setNews] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<Topic | 'all'>('all');
@@ -94,19 +115,13 @@ export default function NewsModal({ visible, onClose, bgColor }: { visible: bool
     return `${API_BASE}/batumi-images/${images[idx]}`;
   };
 
-  // ─── Search queries per topic ─────────────────────────────────
-  const TOPIC_QUERIES: Record<Topic, string> = {
-    tourism: 'בטומי תיירות',
-    realestate: 'בטומי נדלן',
-    food: 'בטומי מסעדות',
-    entertainment: 'בטומי חיי לילה',
-    israel: 'בטומי ישראלים',
-  };
+  // ─── Search queries per topic (localized to the current edition) ──
+  const TOPIC_QUERIES = TOPIC_QUERIES_TR[L];
 
   // ─── NewsAPI — fetch per topic ──────────────────────────────
   const fetchNewsAPI = async (_images: string[] = []) => {
     try {
-      const topics = Object.keys(TOPIC_QUERIES) as Topic[];
+      const topics = TOPICS;
       const results = await Promise.all(
         topics.map(async (topic) => {
           const q = encodeURIComponent(TOPIC_QUERIES[topic]);
@@ -139,10 +154,10 @@ export default function NewsModal({ visible, onClose, bgColor }: { visible: bool
   // ─── Google News RSS — fetch per topic ──────────────────────
   const fetchRSS = async (images: string[] = []) => {
     try {
-      const topics = Object.keys(TOPIC_QUERIES) as Topic[];
+      const topics = TOPICS;
       const results = await Promise.all(
         topics.map(async (topic) => {
-          const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(TOPIC_QUERIES[topic])}&hl=he&gl=IL&ceid=IL:he`;
+          const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(TOPIC_QUERIES[topic])}&${RSS_LOCALE[L]}`;
           const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`;
           try {
             const res = await fetch(apiUrl);
@@ -177,8 +192,9 @@ export default function NewsModal({ visible, onClose, bgColor }: { visible: bool
   };
 
   // ─── Fallback static data ───────────────────────────────────
+  const FB = L === 'he' ? FALLBACK_NEWS : FALLBACK_NEWS.filter(n => n.topic !== 'israel');
   const loadFallback = () => {
-    setNews(FALLBACK_NEWS);
+    setNews(FB);
     setLoading(false);
   };
 
@@ -189,8 +205,8 @@ export default function NewsModal({ visible, onClose, bgColor }: { visible: bool
     : [
         ...baseFiltered,
         ...(filter === 'all'
-          ? FALLBACK_NEWS
-          : FALLBACK_NEWS.filter(n => n.topic === filter)
+          ? FB
+          : FB.filter(n => n.topic === filter)
         ).filter(f => !baseFiltered.some(b => b.title === f.title)).slice(0, MIN_ITEMS - baseFiltered.length),
       ];
 
@@ -213,14 +229,14 @@ export default function NewsModal({ visible, onClose, bgColor }: { visible: bool
             ref={chipScrollRef}
             onContentSizeChange={() => chipScrollRef.current?.scrollToEnd({ animated: false })}
           >
-            {(Object.keys(TOPIC_LABELS) as Topic[]).map(t => (
+            {TOPICS.map(t => (
               <TouchableOpacity
                 key={t}
                 style={[s.chip, filter === t && { backgroundColor: TOPIC_COLORS[t] }]}
                 onPress={() => setFilter(filter === t ? 'all' : t)}
               >
                 <View style={[s.chipDot, { backgroundColor: TOPIC_COLORS[t] }]} />
-                <Text style={[s.chipTxt, filter === t && s.chipTxtActive]}>{TOPIC_LABELS[t]}</Text>
+                <Text style={[s.chipTxt, filter === t && s.chipTxtActive]}>{LBL[t]}</Text>
               </TouchableOpacity>
             ))}
             <TouchableOpacity style={[s.chip, filter === 'all' && s.chipActive]} onPress={() => setFilter('all')}>
@@ -253,7 +269,7 @@ export default function NewsModal({ visible, onClose, bgColor }: { visible: bool
             <ScrollView contentContainerStyle={s.expandedContent} showsVerticalScrollIndicator={false}>
               <FallbackImage src={expanded.image} topic={expanded.topic} style={s.expandedImage} />
               <View style={[s.topicTag, { backgroundColor: TOPIC_COLORS[expanded.topic], position: 'relative', alignSelf: 'flex-end', marginTop: 12, marginHorizontal: 16 }]}>
-                <Text style={s.topicTxt}>{TOPIC_LABELS[expanded.topic]}</Text>
+                <Text style={s.topicTxt}>{LBL[expanded.topic]}</Text>
               </View>
               <View style={{ padding: 16 }}>
                 <Text style={s.expandedTitle}>{expanded.title}</Text>

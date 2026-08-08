@@ -25,7 +25,7 @@ function deepLocalize(v: any, lang: 'en' | 'fa' | 'ru'): any {
 const HIDE_NON_HE: Record<string, string[]> = {
   welcome: ['4', '5'],          // "ישראלים בבטומי", "חוזרים הביתה"
   mainCategories: ['3'],        // "סיורים קוליים" (Hebrew audio tours)
-  bottomBanners: ['news'],      // "חדשות בעברית"
+  // News banner now shown in all languages (was hidden for non-Hebrew).
   sideBanners: ['realestate'],  // "פורטל הנדל״ן"
   infoPortal: ['culture'],      // "תרבות וכשרות" (Jewish/kosher — Hebrew only)
 };
@@ -69,7 +69,7 @@ export function localizeContent(data: any, lang: ContentLang = _contentLang): an
 // On a physical device "localhost" is the phone itself, so dev native builds
 // can't reach a local backend — always load content from the live server.
 export const API_BASE = Platform.OS === 'web'
-  ? (typeof window !== 'undefined' && (window.location.port === '8081' || window.location.port === '19006') ? 'http://localhost:3001' : '')
+  ? (typeof window !== 'undefined' && (window.location.port === '8081' || window.location.port === '19006') ? 'http://localhost:3001' : 'https://www.batumionline.app')
   : 'https://www.batumionline.app';
 
 /**
