@@ -24,7 +24,14 @@ type PlaceData = {
 };
 
 export default function PlacePage() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
+  const PLL = (['he', 'en', 'fa', 'ru'].includes(lang) ? lang : 'en') as 'he' | 'en' | 'fa' | 'ru';
+  const PL = ({
+    he: { reviews: 'ביקורות', siteHotel: 'לאתר המלון - ', siteRest: 'לאתר המסעדה - ', siteOfficial: 'לאתר הרשמי - ', here: 'כאן', allWeek: 'כל ימות השבוע:', getCoupon: 'קבל קופון הנחה', bookTable: 'להזמנת שולחן', call: 'חייג', seeAlso: 'לא מצאתם? ראו גם כאן' },
+    en: { reviews: 'reviews', siteHotel: 'Hotel website - ', siteRest: 'Restaurant website - ', siteOfficial: 'Official website - ', here: 'here', allWeek: 'Every day:', getCoupon: 'Get a discount coupon', bookTable: 'Book a table', call: 'Call', seeAlso: "Didn't find it? See also here" },
+    fa: { reviews: 'نظر', siteHotel: 'وب‌سایت هتل - ', siteRest: 'وب‌سایت رستوران - ', siteOfficial: 'وب‌سایت رسمی - ', here: 'اینجا', allWeek: 'همه روزها:', getCoupon: 'دریافت کوپن تخفیف', bookTable: 'رزرو میز', call: 'تماس', seeAlso: 'پیدا نکردید؟ اینجا هم ببینید' },
+    ru: { reviews: 'отзывов', siteHotel: 'Сайт отеля - ', siteRest: 'Сайт ресторана - ', siteOfficial: 'Официальный сайт - ', here: 'здесь', allWeek: 'Каждый день:', getCoupon: 'Получить купон на скидку', bookTable: 'Забронировать стол', call: 'Позвонить', seeAlso: 'Не нашли? Смотрите также здесь' },
+  } as const)[PLL];
   const { q, title, type, ticketType, ticketUrl, ticketUrlAlt } = useLocalSearchParams<{ q?: string; title?: string; type?: string; ticketType?: string; ticketUrl?: string; ticketUrlAlt?: string }>();
   const insets = useSafeAreaInsets();
   const [data, setData] = useState<PlaceData | null>(null);
@@ -112,7 +119,7 @@ export default function PlacePage() {
               <View style={s.rowCenter}>
                 <Text style={s.star}>★</Text>
                 <Text style={s.rating}>{data.rating.toFixed(1)}</Text>
-                {!!data.reviews && <Text style={s.reviews}>· {data.reviews.toLocaleString()} ביקורות</Text>}
+                {!!data.reviews && <Text style={s.reviews}>· {data.reviews.toLocaleString()} {PL.reviews}</Text>}
               </View>
             )}
             {!!data.address && (
@@ -120,8 +127,8 @@ export default function PlacePage() {
             )}
             {!!data.website && (
               <Text style={s.addr}>
-                {isHotel ? 'לאתר המלון - ' : isRestaurant ? 'לאתר המסעדה - ' : 'לאתר הרשמי - '}
-                <Text style={{ color: Colors.PRIMARY, fontWeight: '900', textDecorationLine: 'underline' }} onPress={() => Linking.openURL(data.website!)}>כאן</Text>
+                {isHotel ? PL.siteHotel : isRestaurant ? PL.siteRest : PL.siteOfficial}
+                <Text style={{ color: Colors.PRIMARY, fontWeight: '900', textDecorationLine: 'underline' }} onPress={() => Linking.openURL(data.website!)}>{PL.here}</Text>
               </Text>
             )}
             {!!(data.openingHours && data.openingHours.length) && (() => {
@@ -135,7 +142,7 @@ export default function PlacePage() {
                   {all24 ? (
                     <Text style={s.hoursLine}>{t('pl.open247')}</Text>
                   ) : allSame ? (
-                    <Text style={s.hoursLine}>כל ימות השבוע: {timesOnly[0]}</Text>
+                    <Text style={s.hoursLine}>{PL.allWeek} {timesOnly[0]}</Text>
                   ) : (
                     hours.map((l, i) => <Text key={i} style={s.hoursLine}>{l}</Text>)
                   )}
@@ -146,12 +153,12 @@ export default function PlacePage() {
             <View style={{ gap: 8, marginTop: 6 }}>
               {coupon && (
                 <TouchableOpacity style={[s.btn, { backgroundColor: '#4F8A6E' }]} onPress={() => router.push(`/coupon?biz=${encodeURIComponent(title || data.name || '')}` as any)}>
-                  <Text style={s.btnTxt}>🎫 קבל קופון הנחה{coupon.type === 'fixed' && coupon.pct ? ` · ${coupon.pct}%` : ''}</Text>
+                  <Text style={s.btnTxt}>🎫 {PL.getCoupon}{coupon.type === 'fixed' && coupon.pct ? ` · ${coupon.pct}%` : ''}</Text>
                 </TouchableOpacity>
               )}
               {!!data.phone && (
                 <TouchableOpacity style={[s.btn, { backgroundColor: '#10b981' }]} onPress={() => Linking.openURL(`tel:${data.phone}`)}>
-                  <Text style={s.btnTxt}>{isRestaurant ? 'להזמנת שולחן' : 'חייג'} · {'⁦'}{data.phone}{'⁩'}</Text>
+                  <Text style={s.btnTxt}>{isRestaurant ? PL.bookTable : PL.call} · {'⁦'}{data.phone}{'⁩'}</Text>
                 </TouchableOpacity>
               )}
               {/* website link embedded in address above */}
@@ -182,7 +189,7 @@ export default function PlacePage() {
                     )}
                     {c.clickable && ticketUrlAlt && (
                       <TouchableOpacity onPress={() => openInAppBrowser(ticketUrlAlt)} style={{ marginTop: 6, alignSelf: 'center' }}>
-                        <Text style={{ color: '#1A6B8A', fontSize: 13, fontWeight: '700', textDecorationLine: 'underline' }}>לא מצאתם? ראו גם כאן</Text>
+                        <Text style={{ color: '#1A6B8A', fontSize: 13, fontWeight: '700', textDecorationLine: 'underline' }}>{PL.seeAlso}</Text>
                       </TouchableOpacity>
                     )}
                   </View>
