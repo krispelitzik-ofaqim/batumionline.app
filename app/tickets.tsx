@@ -14,20 +14,20 @@ const HERO = 'https://images.unsplash.com/photo-1533105079780-92b9be482077?w=100
 // GetYourGuide affiliate partner id — every purchase through these links earns commission.
 const PARTNER = '?partner_id=PE2GLSE3MAO4YDEIXLNOYXMC67BCZ32C';
 
-type Ticket = { id: string; image: string; he: string; en: string; fa: string; url: string };
+type Ticket = { id: string; image: string; he: string; en: string; fa: string; ru: string; url: string };
 const TICKETS: Ticket[] = [
-  { id: 'argo', image: '/uploads/cable_car_batumi.png', he: 'הרכבל Argo', en: 'Argo Cable Car', fa: 'تله‌کابین آرگو', url: 'https://www.getyourguide.com/batumi-l32542/batumi-argo-cable-car-ride-with-panoramic-views-t1161370/' },
-  { id: 'boat', image: '/uploads/marina_batumi.png', he: 'שייט פרטי בים השחור', en: 'Private Black Sea Boat Trip', fa: 'قایق‌سواری خصوصی دریای سیاه', url: 'https://www.getyourguide.com/batumi-l32542/batumi-exclusive-black-sea-adventure-private-boat-trip-t519000/' },
-  { id: 'garden', image: '/uploads/1776673028587-443.png', he: 'הגן הבוטני + טעימות יין', en: 'Botanical Garden + Wine Tasting', fa: 'باغ گیاه‌شناسی + مزه شراب', url: 'https://www.getyourguide.com/batumi-l32542/batumi-exploring-botanical-garden-family-wine-tasting-t542198/' },
-  { id: 'petra', image: '/uploads/a3_2_1778921033754.jpg', he: 'מבצר פטרה + גן בוטני + מיניאטורות', en: 'Petra Fortress + Botanical Garden + Miniatures', fa: 'قلعه پترا + باغ گیاه‌شناسی + پارک مینیاتور', url: 'https://www.getyourguide.com/batumi-l32542/batumi-botanical-garden-petra-fortress-and-miniatures-park-t547776/' },
-  { id: 'city', image: '/uploads/batumi_square.png', he: 'סיור עיר פרטי + גן בוטני + Argo', en: 'Private City Tour + Botanical Garden + Argo', fa: 'تور خصوصی شهر + باغ گیاه‌شناسی + آرگو', url: 'https://www.getyourguide.com/batumi-l32542/batumi-city-tour-batumi-botanical-garden-argo-cable-car-t754825/' },
+  { id: 'argo', image: '/uploads/cable_car_batumi.png', he: 'הרכבל Argo', en: 'Argo Cable Car', fa: 'تله‌کابین آرگو', ru: 'Канатная дорога Арго', url: 'https://www.getyourguide.com/batumi-l32542/batumi-argo-cable-car-ride-with-panoramic-views-t1161370/' },
+  { id: 'boat', image: '/uploads/marina_batumi.png', he: 'שייט פרטי בים השחור', en: 'Private Black Sea Boat Trip', fa: 'قایق‌سواری خصوصی دریای سیاه', ru: 'Частная морская прогулка по Чёрному морю', url: 'https://www.getyourguide.com/batumi-l32542/batumi-exclusive-black-sea-adventure-private-boat-trip-t519000/' },
+  { id: 'garden', image: '/uploads/1776673028587-443.png', he: 'הגן הבוטני + טעימות יין', en: 'Botanical Garden + Wine Tasting', fa: 'باغ گیاه‌شناسی + مزه شراب', ru: 'Ботанический сад + дегустация вина', url: 'https://www.getyourguide.com/batumi-l32542/batumi-exploring-botanical-garden-family-wine-tasting-t542198/' },
+  { id: 'petra', image: '/uploads/a3_2_1778921033754.jpg', he: 'מבצר פטרה + גן בוטני + מיניאטורות', en: 'Petra Fortress + Botanical Garden + Miniatures', fa: 'قلعه پترا + باغ گیاه‌شناسی + پارک مینیاتور', ru: 'Крепость Петра + Ботанический сад + Парк миниатюр', url: 'https://www.getyourguide.com/batumi-l32542/batumi-botanical-garden-petra-fortress-and-miniatures-park-t547776/' },
+  { id: 'city', image: '/uploads/batumi_square.png', he: 'סיור עיר פרטי + גן בוטני + Argo', en: 'Private City Tour + Botanical Garden + Argo', fa: 'تور خصوصی شهر + باغ گیاه‌شناسی + آرگو', ru: 'Частная экскурсия по городу + Ботанический сад + Арго', url: 'https://www.getyourguide.com/batumi-l32542/batumi-city-tour-batumi-botanical-garden-argo-cable-car-t754825/' },
 ];
 
 export default function TicketsScreen() {
   const { t, lang, isRTL } = useI18n();
   const ta = isRTL ? 'right' : 'left';
   const wd = isRTL ? 'rtl' : 'ltr';
-  const name = (tk: Ticket) => (lang === 'en' ? tk.en : lang === 'fa' ? tk.fa : tk.he);
+  const name = (tk: Ticket) => (lang === 'en' ? tk.en : lang === 'fa' ? tk.fa : lang === 'ru' ? tk.ru : tk.he);
 
   return (
     <SafeAreaView style={s.safe} edges={['top']}>
