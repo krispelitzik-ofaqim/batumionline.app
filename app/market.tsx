@@ -8,6 +8,7 @@ import { useI18n } from '../constants/i18n';
 import { resolveUri } from '../constants/api';
 import { openInAppBrowser } from '../constants/affiliates';
 import BottomTabBar from '../components/BottomTabBar';
+import AdBanner from '../components/AdBanner';
 
 const BIZ_URL = 'https://www.batumionline.biz';
 const HERO = resolveUri('/uploads/1786081911740-787.jpg');
@@ -58,6 +59,7 @@ export default function MarketScreen() {
           <Row emoji="🎫" tint="#D98A1E" label={t('cp.coupon')} sub={t('cp.couponSub')} onPress={() => router.push('/coupons' as any)} />
           <Row emoji="🛒" tint="#6C5CE7" label={t('mk.classifieds')} sub={t('mk.classifiedsSub')} onPress={() => router.push('/marketplace' as any)} last />
         </View>
+        <AdBanner />
       </ScrollView>
       <BottomTabBar />
     </SafeAreaView>
