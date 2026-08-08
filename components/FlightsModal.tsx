@@ -64,6 +64,8 @@ const AIRLINE_LOGOS: Record<string, any> = {
 
 export default function FlightsModal({ visible, onClose, bgColor }: { visible: boolean; onClose: () => void; bgColor: string }) {
   const { t, lang } = useI18n();
+  const L = FL(lang);
+  const F = F_TR[L];
   const allFlights = lang !== 'he'; // Non-Hebrew editions (en/fa): show ALL Batumi flights, not only Israel routes
   const [flights, setFlights] = useState<Flight[]>([]);
   const [loading, setLoading] = useState(true);
@@ -411,7 +413,7 @@ export default function FlightsModal({ visible, onClose, bgColor }: { visible: b
                     </View>
                   </View>
                   <View style={[s.statusBadge, statusColor(f.status)]}>
-                    <Text style={s.statusTxt} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.6}>{f.status}</Text>
+                    <Text style={s.statusTxt} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.6}>{ST(f.status, L)}</Text>
                   </View>
                 </TouchableOpacity>
               ))}
@@ -437,7 +439,7 @@ export default function FlightsModal({ visible, onClose, bgColor }: { visible: b
               <Text style={s.detailsTitle}>{selected.flight}</Text>
               <Text style={s.detailsAirline}>{selected.airline}</Text>
               <View style={[s.statusBadge, statusColor(selected.status), { alignSelf: 'center', marginTop: 8, width: 100 }]}>
-                <Text style={s.statusTxt}>{selected.status}</Text>
+                <Text style={s.statusTxt}>{ST(selected.status, L)}</Text>
               </View>
 
               <View style={s.detailsRoute}>
@@ -457,8 +459,8 @@ export default function FlightsModal({ visible, onClose, bgColor }: { visible: b
               {(() => {
                 const d = selected.details;
                 if (!d) return null;
-                const delay = computeDelay(d);
-                const duration = computeDuration(d);
+                const delay = computeDelay(d, L);
+                const duration = computeDuration(d, L);
                 return (
                   <>
                     {delay && (
@@ -467,16 +469,16 @@ export default function FlightsModal({ visible, onClose, bgColor }: { visible: b
                       </View>
                     )}
                     <View style={s.detailsGrid}>
-                      {d.gate && <DetailItem label="שער יציאה" value={d.gate} />}
-                      {d.terminal && <DetailItem label="טרמינל" value={d.terminal} />}
-                      {d.checkInDesk && <DetailItem label="דלפק צ׳ק-אין" value={d.checkInDesk} />}
-                      {d.baggageBelt && <DetailItem label="סרט מזוודות" value={d.baggageBelt} />}
-                      {duration && <DetailItem label="משך טיסה" value={duration} />}
-                      {d.distanceKm && <DetailItem label="מרחק" value={`${Math.round(d.distanceKm).toLocaleString()} ק״מ`} />}
-                      {d.depRunway && <DetailItem label="המראה בפועל" value={formatTime(d.depRunway)} />}
-                      {d.arrRunway && <DetailItem label="נחיתה בפועל" value={formatTime(d.arrRunway)} />}
-                      {d.aircraft && <DetailItem label="דגם מטוס" value={d.aircraft} />}
-                      {d.aircraftReg && <DetailItem label="מספר זנב" value={d.aircraftReg} />}
+                      {d.gate && <DetailItem label={F.gate} value={d.gate} />}
+                      {d.terminal && <DetailItem label={F.terminal} value={d.terminal} />}
+                      {d.checkInDesk && <DetailItem label={F.checkin} value={d.checkInDesk} />}
+                      {d.baggageBelt && <DetailItem label={F.baggage} value={d.baggageBelt} />}
+                      {duration && <DetailItem label={F.duration} value={duration} />}
+                      {d.distanceKm && <DetailItem label={F.distance} value={`${Math.round(d.distanceKm).toLocaleString()} ${F.km}`} />}
+                      {d.depRunway && <DetailItem label={F.actualDep} value={formatTime(d.depRunway)} />}
+                      {d.arrRunway && <DetailItem label={F.actualArr} value={formatTime(d.arrRunway)} />}
+                      {d.aircraft && <DetailItem label={F.aircraft} value={d.aircraft} />}
+                      {d.aircraftReg && <DetailItem label={F.tail} value={d.aircraftReg} />}
                       {d.callSign && <DetailItem label="Call Sign" value={d.callSign} />}
                     </View>
                     <TouchableOpacity
@@ -513,6 +515,23 @@ function DetailItem({ label, value }: { label: string; value: string }) {
   );
 }
 
+// ─── Localization ──────────────────────────────────────────────
+type FLang = 'he' | 'en' | 'fa' | 'ru';
+const FL = (l: string): FLang => (['he', 'en', 'fa', 'ru'].includes(l) ? (l as FLang) : 'en');
+const STATUS_TR: Record<FLang, Record<string, string>> = {
+  he: { 'בזמן': 'בזמן', 'מתוכננת': 'מתוכננת', 'בדרך': 'בדרך', 'נחתה': 'נחתה', 'המריאה': 'המריאה', 'עיכוב': 'עיכוב', 'בוטלה': 'בוטלה', 'הועברה': 'הועברה' },
+  en: { 'בזמן': 'On time', 'מתוכננת': 'Scheduled', 'בדרך': 'In flight', 'נחתה': 'Landed', 'המריאה': 'Departed', 'עיכוב': 'Delayed', 'בוטלה': 'Cancelled', 'הועברה': 'Diverted' },
+  fa: { 'בזמן': 'به‌موقع', 'מתוכננת': 'برنامه‌ریزی‌شده', 'בדרך': 'در پرواز', 'נחתה': 'فرود آمد', 'המריאה': 'پرواز کرد', 'עיכוב': 'تأخیر', 'בוטלה': 'لغو شد', 'הועברה': 'تغییر مسیر' },
+  ru: { 'בזמן': 'Вовремя', 'מתוכננת': 'По расписанию', 'בדרך': 'В полёте', 'נחתה': 'Приземлился', 'המריאה': 'Вылетел', 'עיכוב': 'Задержка', 'בוטלה': 'Отменён', 'הועברה': 'Изменён' },
+};
+const ST = (status: string, L: FLang): string => (STATUS_TR[L] && STATUS_TR[L][status]) || status;
+const F_TR: Record<FLang, Record<string, string>> = {
+  he: { gate: 'שער יציאה', terminal: 'טרמינל', checkin: 'דלפק צ׳ק-אין', baggage: 'סרט מזוודות', duration: 'משך טיסה', distance: 'מרחק', actualDep: 'המראה בפועל', actualArr: 'נחיתה בפועל', aircraft: 'דגם מטוס', tail: 'מספר זנב', km: 'ק״מ', hours: 'שעות', min: 'דק׳', delayIn: 'עיכוב ב', dep: 'המראה', arr: 'נחיתה', durH: 'ש׳', durM: 'ד׳' },
+  en: { gate: 'Gate', terminal: 'Terminal', checkin: 'Check-in desk', baggage: 'Baggage belt', duration: 'Flight duration', distance: 'Distance', actualDep: 'Actual departure', actualArr: 'Actual arrival', aircraft: 'Aircraft', tail: 'Tail number', km: 'km', hours: 'h', min: 'min', delayIn: 'Delay in ', dep: 'departure', arr: 'arrival', durH: 'h', durM: 'm' },
+  fa: { gate: 'گیت', terminal: 'ترمینال', checkin: 'باجه پذیرش', baggage: 'نوار چمدان', duration: 'مدت پرواز', distance: 'مسافت', actualDep: 'پرواز واقعی', actualArr: 'فرود واقعی', aircraft: 'هواپیما', tail: 'شماره دم', km: 'کیلومتر', hours: 'ساعت', min: 'دقیقه', delayIn: 'تأخیر در ', dep: 'پرواز', arr: 'فرود', durH: 'س', durM: 'د' },
+  ru: { gate: 'Выход', terminal: 'Терминал', checkin: 'Стойка регистрации', baggage: 'Лента багажа', duration: 'Длительность', distance: 'Расстояние', actualDep: 'Факт. вылет', actualArr: 'Факт. прилёт', aircraft: 'Самолёт', tail: 'Бортовой номер', km: 'км', hours: 'ч', min: 'мин', delayIn: 'Задержка: ', dep: 'вылет', arr: 'прилёт', durH: 'ч', durM: 'м' },
+};
+
 // ─── Helpers ───────────────────────────────────────────────────
 
 function statusColor(status: string) {
@@ -525,10 +544,10 @@ function statusColor(status: string) {
   return { backgroundColor: 'rgba(255,255,255,0.15)' };
 }
 
-function computeDelay(d: FlightDetails): string | null {
+function computeDelay(d: FlightDetails, L: FLang): string | null {
   const pairs: [string | undefined, string | undefined, string][] = [
-    [d.depScheduled, d.depRevised, 'המראה'],
-    [d.arrScheduled, d.arrRevised, 'נחיתה'],
+    [d.depScheduled, d.depRevised, F_TR[L].dep],
+    [d.arrScheduled, d.arrRevised, F_TR[L].arr],
   ];
   for (const [sched, rev, label] of pairs) {
     if (!sched || !rev || sched === rev) continue;
@@ -537,13 +556,13 @@ function computeDelay(d: FlightDetails): string | null {
     const mins = Math.round(ms / 60_000);
     const hh = Math.floor(mins / 60);
     const mm = mins % 60;
-    const dur = hh > 0 ? `${hh}:${String(mm).padStart(2, '0')} שעות` : `${mm} דק׳`;
-    return `עיכוב ב${label}: ${dur}`;
+    const dur = hh > 0 ? `${hh}:${String(mm).padStart(2, '0')} ${F_TR[L].hours}` : `${mm} ${F_TR[L].min}`;
+    return `${F_TR[L].delayIn}${label}: ${dur}`;
   }
   return null;
 }
 
-function computeDuration(d: FlightDetails): string | null {
+function computeDuration(d: FlightDetails, L: FLang): string | null {
   const dep = d.depScheduled;
   const arr = d.arrScheduled;
   if (!dep || !arr) return null;
@@ -552,7 +571,7 @@ function computeDuration(d: FlightDetails): string | null {
   const mins = Math.round(ms / 60_000);
   const hh = Math.floor(mins / 60);
   const mm = mins % 60;
-  return hh > 0 ? `${hh}ש׳ ${mm}ד׳` : `${mm} דק׳`;
+  return hh > 0 ? `${hh}${F_TR[L].durH} ${mm}${F_TR[L].durM}` : `${mm} ${F_TR[L].min}`;
 }
 
 function translateStatus(status: string): string {
