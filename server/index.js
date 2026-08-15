@@ -2086,6 +2086,86 @@ app.use((req, res, next) => {
   }).on('error', () => next());
 });
 
+// ─── Batumi AI — closed-domain voice guide over the app's own content ───────
+const ANTHROPIC_KEY = process.env.ANTHROPIC_API_KEY || '';
+const AI_MODEL = process.env.ANTHROPIC_MODEL || 'claude-sonnet-5';
+
+function aiStripHtml(t) { return String(t || '').replace(/<[^>]+>/g, ''); }
+function aiStripGoogle(t) { return String(t || '').replace(/\s*[^.!?\n]*Google[\s\S]*?\+995[\s\S]*?:[^.\n]*\.?/g, '').trim(); }
+function aiFirst(t, n) { t = aiStripGoogle(aiStripHtml(t)).replace(/\s+/g, ' ').trim(); return t.slice(0, n || 140); }
+
+function aiBuildKB(db) {
+  const lines = [];
+  const walk = (cats) => (cats || []).forEach((c) => {
+    const name = c.title;
+    (c.children || []).forEach((ch) => (ch.hotels || []).forEach((h) => {
+      if (h.visible === false) return;
+      const co = h.coords || {};
+      const loc = co.lat ? ` @${Number(co.lat).toFixed(4)},${Number(co.lng).toFixed(4)}` : '';
+      const pr = h.price ? ` [${h.price}]` : '';
+      lines.push(`- id:${h.id || ''} | ${h.title}${h.titleEn ? ` (${h.titleEn})` : ''} | ${name} > ${ch.title}${loc}${pr}: ${aiFirst(h.text)}`);
+    }));
+    (c.hotels || []).forEach((h) => {
+      if (h.visible === false) return;
+      const co = h.coords || {};
+      const loc = co.lat ? ` @${Number(co.lat).toFixed(4)},${Number(co.lng).toFixed(4)}` : '';
+      lines.push(`- id:${h.id || ''} | ${h.title}${h.titleEn ? ` (${h.titleEn})` : ''} | ${name}${loc}: ${aiFirst(h.text)}`);
+    });
+  });
+  walk(db.mainCategories); walk(db.extraCategories);
+  const info = (db.infoPortal || []).map((it) => `# ${it.title}: ${aiFirst(it.longText || it.subtitle, 400)}`);
+  return lines.join('\n') + '\n\n=== מידע כללי / Info topics ===\n' + info.join('\n');
+}
+
+function aiPlaceIndex(db) {
+  const byId = {};
+  const collect = (cats) => (cats || []).forEach((c) => {
+    (c.children || []).forEach((ch) => (ch.hotels || []).forEach((h) => { if (h.id) byId[h.id] = { id: h.id, title: h.title, titleEn: h.titleEn, category: c.title, catId: ch.id }; }));
+    (c.hotels || []).forEach((h) => { if (h.id) byId[h.id] = { id: h.id, title: h.title, titleEn: h.titleEn, category: c.title, catId: c.id }; });
+  });
+  collect(db.mainCategories); collect(db.extraCategories);
+  return byId;
+}
+
+function anthropicChat(system, userMsg) {
+  return new Promise((resolve, reject) => {
+    const payload = JSON.stringify({ model: AI_MODEL, max_tokens: 500, system, messages: [{ role: 'user', content: userMsg }] });
+    const r = https.request({ method: 'POST', hostname: 'api.anthropic.com', path: '/v1/messages', headers: { 'x-api-key': ANTHROPIC_KEY, 'anthropic-version': '2023-06-01', 'content-type': 'application/json', 'content-length': Buffer.byteLength(payload) } }, (resp) => {
+      let d = ''; resp.on('data', (c) => (d += c)); resp.on('end', () => { try { resolve(JSON.parse(d)); } catch (e) { reject(e); } });
+    });
+    r.on('error', reject); r.write(payload); r.end();
+  });
+}
+
+app.post('/api/ai/ask', async (req, res) => {
+  try {
+    const { question, lang, coords } = req.body || {};
+    if (!question || !String(question).trim()) return res.json({ error: 'empty' });
+    if (!ANTHROPIC_KEY) return res.json({ answer: 'המסייע עדיין לא מחובר.', demo: true });
+    const db = readDB();
+    const kb = aiBuildKB(db);
+    const langName = { he: 'Hebrew', en: 'English', fa: 'Persian', ru: 'Russian' }[lang] || "the user's language";
+    const loc = coords && coords.lat ? `\nUser's current location: ${coords.lat},${coords.lng} — use it for "near me"/distance questions.` : '';
+    const system = `You are "Batumi AI", the in-app voice guide of the Batumionline tourism app (Batumi, Georgia).
+Answer ONLY from the APP DATA below. This is a CLOSED assistant: do NOT use outside knowledge and NEVER invent places, prices, phone numbers or facts.
+If the answer is not in the app data, briefly say (in ${langName}) that you don't have that in the app, and suggest something related that the app DOES offer.
+Reply in ${langName}, 1-3 short spoken sentences (it is read aloud) — warm and concise.
+When you recommend specific places, add their id values on a FINAL line starting with "PLACES:" (comma-separated, max 3) so the app can link them. Never mention ids in the spoken text.${loc}
+
+=== APP DATA ===
+${kb}`;
+    const j = await anthropicChat(system, String(question));
+    if (j && j.error) return res.json({ error: (j.error.message || 'ai_error') });
+    let txt = (j && j.content && j.content[0] && j.content[0].text) || '';
+    let ids = [];
+    const m = txt.match(/PLACES:\s*(.+)\s*$/m);
+    if (m) { ids = m[1].split(',').map((s) => s.trim()).filter(Boolean); txt = txt.replace(/PLACES:.*$/m, '').trim(); }
+    const byId = aiPlaceIndex(db);
+    const places = ids.map((id) => byId[id]).filter(Boolean).slice(0, 3);
+    res.json({ answer: txt || '—', places });
+  } catch (e) { res.json({ error: String((e && e.message) || e) }); }
+});
+
 if (fs.existsSync(WEB_DIST)) {
   app.use(express.static(WEB_DIST, {
     setHeaders: (res, filePath) => {
