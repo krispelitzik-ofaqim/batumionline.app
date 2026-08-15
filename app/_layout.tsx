@@ -47,6 +47,7 @@ import { PreviewContext, PreviewMode } from '../constants/previewContext';
 import { AccessibilityProvider, useAccessibility } from '../constants/accessibilityContext';
 import { I18nProvider, useI18n } from '../constants/i18n';
 import { setContentLang } from '../constants/api';
+import UpdatePrompt from '../components/UpdatePrompt';
 
 // Remounts the navigator when the language changes so every screen re-fetches
 // and re-localizes its server content. Admin mode always sees RAW Hebrew
@@ -150,6 +151,23 @@ export default function RootLayout() {
     })();
   }, []);
 
+  // Auto-update on every launch: if a newer OTA version exists, download and
+  // reload immediately so the user always runs the latest version (no store).
+  useEffect(() => {
+    if (Platform.OS === 'web' || __DEV__) return;
+    (async () => {
+      try {
+        const Updates = require('expo-updates');
+        if (!Updates.isEnabled) return;
+        const res = await Updates.checkForUpdateAsync();
+        if (res && res.isAvailable) {
+          await Updates.fetchUpdateAsync();
+          await Updates.reloadAsync();
+        }
+      } catch {}
+    })();
+  }, []);
+
   const fontsReady = fontsLoaded || fontError || fontTimedOut;
 
   const simW = previewMode ? PREVIEW_WIDTHS[previewMode] : null;
@@ -172,6 +190,7 @@ export default function RootLayout() {
             <AccessibilityToThemeBridge dark={dark} setDark={setDark}>
               <StatusBar style={dark ? 'light' : 'dark'} />
               <LocalizedStack dark={dark} />
+              <UpdatePrompt />
             </AccessibilityToThemeBridge>
           </AdminContext.Provider>
         </PreviewContext.Provider>

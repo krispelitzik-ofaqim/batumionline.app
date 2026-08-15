@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useI18n } from '../constants/i18n';
 
 const TOURS_KEY = '@bo:myTours';
-const FAV_TOUR_NAME = '❤️ המועדפים שלי';
 
 type Props = {
   itemId: string;
@@ -32,6 +32,7 @@ function isHearted(tours: Tour[], itemId: string): boolean {
 }
 
 export default function AddToTourButton({ itemId, itemTitle, itemImage, itemType, sourcePath }: Props) {
+  const { t } = useI18n();
   const [fav, setFav] = useState(false);
 
   useEffect(() => {
@@ -49,18 +50,19 @@ export default function AddToTourButton({ itemId, itemTitle, itemImage, itemType
       await saveTours(next);
       setFav(false);
     } else {
+      const favName = t('atb.favTour');
       const stop: TourStop = {
         id: itemId,
-        title: itemTitle || 'פריט',
+        title: itemTitle || t('atb.item'),
         image: itemImage,
         type: itemType,
         sourcePath,
       };
-      const favIdx = tours.findIndex(t => t.name === FAV_TOUR_NAME);
+      const favIdx = tours.findIndex(tr => tr.name === favName);
       if (favIdx >= 0) {
         tours[favIdx] = { ...tours[favIdx], stops: [...tours[favIdx].stops, stop] };
       } else {
-        tours.unshift({ id: 't_fav_' + Date.now(), name: FAV_TOUR_NAME, createdAt: new Date().toISOString(), stops: [stop] });
+        tours.unshift({ id: 't_fav_' + Date.now(), name: favName, createdAt: new Date().toISOString(), stops: [stop] });
       }
       await saveTours(tours);
       setFav(true);

@@ -57,6 +57,7 @@ export default function MarketScreen() {
           <Row emoji="🔑" tint="#2E9E6B" label={t('mk.rent')} sub={t('mk.rentSub')} onPress={() => router.push('/realestate?mode=rent' as any)} />
           <Row emoji="🎟️" tint="#D64C4C" label={t('tk2.tickets')} sub={t('tk2.ticketsSub')} onPress={() => router.push('/tickets' as any)} />
           <Row emoji="🎫" tint="#D98A1E" label={t('cp.coupon')} sub={t('cp.couponSub')} onPress={() => router.push('/coupons' as any)} />
+          <Row emoji="✈️" tint="#E30613" label={t('mk.flights')} sub={t('mk.flightsSub')} onPress={() => router.push('/category/t9' as any)} />
           <Row emoji="🛒" tint="#6C5CE7" label={t('mk.classifieds')} sub={t('mk.classifiedsSub')} onPress={() => router.push('/marketplace' as any)} last />
         </View>
         <AdBanner />

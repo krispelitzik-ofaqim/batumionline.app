@@ -12,9 +12,9 @@ import AppHeader from '../../components/AppHeader';
 import BottomTabBar from '../../components/BottomTabBar';
 import AdBanner from '../../components/AdBanner';
 
-function fireHearts() {
+function fireHearts(flag: string) {
   if (Platform.OS !== 'web') return;
-  const hearts = ['❤️', '💙', '💜', '🧡', '💛', '🤍', '💗', '🇮🇱'];
+  const hearts = ['❤️', '💙', '💜', '🧡', '💛', '🤍', '💗', flag];
   const container = (window as any).document.createElement('div');
   Object.assign(container.style, { position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', pointerEvents: 'none', zIndex: 99999 });
   (window as any).document.body.appendChild(container);
@@ -49,7 +49,9 @@ type WelcomeItem = {
 };
 
 export default function WelcomeScreen() {
-  const { t, isRTL } = useI18n();
+  const { t, isRTL, lang } = useI18n();
+  // "Coming home" flag by audience; airplane for others.
+  const homeEmoji = ({ he: '🇮🇱', fa: '🇮🇷', ru: '🇷🇺' } as Record<string, string>)[lang] || '🛫';
   const { id } = useLocalSearchParams<{ id: string }>();
   const [item, setItem] = useState<WelcomeItem | null>(null);
   const [sub, setSub] = useState<any>(null);
@@ -65,7 +67,7 @@ export default function WelcomeScreen() {
   if (!item) {
     return (
       <SafeAreaView style={styles.safe}>
-        <Stack.Screen options={{ headerShown: true, title: 'ברוכים הבאים', headerBackTitle: 'חזרה' }} />
+        <Stack.Screen options={{ headerShown: true, title: t('wl.welcome'), headerBackTitle: t('c.back') }} />
         <View style={styles.center}><Text style={styles.loadTxt}>{t('c.loading')}</Text></View>
       </SafeAreaView>
     );
@@ -76,7 +78,7 @@ export default function WelcomeScreen() {
   return (
     <SafeAreaView style={styles.safe}>
       <Stack.Screen options={{ headerShown: false }} />
-      <AppHeader crumbs={[{ title: item.title || 'ברוכים הבאים' }]} />
+      <AppHeader crumbs={[{ title: item.title || t('wl.welcome') }]} />
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
         <View style={styles.heroWrap}>
           {item.icon && (item.icon.startsWith('http') || item.icon.startsWith('data:') || item.icon.startsWith('/')) ? (
@@ -106,7 +108,7 @@ export default function WelcomeScreen() {
               tracks={item.audios}
               compact
               playOnLeft
-              onTimeReached={item.id === '5' ? { seconds: 130, callback: fireHearts } : undefined}
+              onTimeReached={item.id === '5' ? { seconds: 130, callback: () => fireHearts(homeEmoji) } : undefined}
             />
           </View>
         )}
@@ -167,6 +169,31 @@ export default function WelcomeScreen() {
           </View>
         ) : null}
 
+        {item.id === 'tbilisi' && (
+          <TouchableOpacity activeOpacity={0.9} style={flSt.card} onPress={() => router.push('/category/t9' as any)}>
+            {Platform.OS === 'web' ? (
+              React.createElement('img', {
+                src: resolveUri('/uploads/1781936385523-235.png'),
+                style: { width: '100%', height: 118, objectFit: 'cover', display: 'block' },
+                alt: 'Georgian Airways',
+              })
+            ) : (
+              <Image source={{ uri: resolveUri('/uploads/1781936385523-235.png') }} style={flSt.img} resizeMode="cover" />
+            )}
+            <View style={flSt.band}>
+              <Text style={flSt.bandTxt}>✈️  {t('tb.flBand')}</Text>
+            </View>
+            <View style={flSt.body}>
+              <Text style={[flSt.title, { textAlign: isRTL ? 'right' : 'left', writingDirection: isRTL ? 'rtl' : 'ltr' }]}>{t('tb.flTitle')}</Text>
+              <Text style={[flSt.sub, { textAlign: isRTL ? 'right' : 'left', writingDirection: isRTL ? 'rtl' : 'ltr' }]}>{t('tb.flSub')}</Text>
+              <View style={[flSt.ctaRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+                <Text style={flSt.cta}>{t('tb.flCta')}</Text>
+                <Text style={flSt.ctaArrow}>{isRTL ? '←' : '→'}</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+        )}
+
         <AdBanner />
       </ScrollView>
       <BottomTabBar />
@@ -198,6 +225,22 @@ const styles = StyleSheet.create({
     shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 8, elevation: 2,
   },
   cardBody: { fontSize: 14, color: '#444', textAlign: 'right', writingDirection: 'rtl', lineHeight: 24 },
+});
+
+const flSt = StyleSheet.create({
+  card: {
+    backgroundColor: Colors.WHITE, borderRadius: 16, marginTop: 12, marginHorizontal: 8, overflow: 'hidden',
+    shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 8, elevation: 3,
+  },
+  img: { width: '100%', height: 118 },
+  band: { backgroundColor: '#E30613', paddingVertical: 9, alignItems: 'center', justifyContent: 'center' },
+  bandTxt: { color: Colors.WHITE, fontWeight: '900', fontSize: 15, letterSpacing: 0.5 },
+  body: { padding: 14 },
+  title: { fontSize: 15, fontWeight: '800', color: Colors.TEXT },
+  sub: { fontSize: 12.5, color: '#666', marginTop: 4, lineHeight: 18, writingDirection: 'rtl' },
+  ctaRow: { marginTop: 12, alignItems: 'center', gap: 6 },
+  cta: { color: Colors.PRIMARY, fontWeight: '800', fontSize: 13.5 },
+  ctaArrow: { color: Colors.PRIMARY, fontWeight: '900', fontSize: 15 },
 });
 
 const subSt = StyleSheet.create({

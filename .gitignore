@@ -48,3 +48,4 @@ marketing/
 my-release-key.p12
 my-release-key.jks
 credentials.json
+dist-latest/

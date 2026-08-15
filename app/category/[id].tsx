@@ -265,6 +265,16 @@ function FoodRecGps({ restaurants }: { restaurants: { name: string; lat: number;
   );
 }
 
+// Some restaurant descriptions were enriched with an appended "Google rating / phone / address"
+// block. That belongs on the detail page (place.tsx shows it natively) — strip it from card text.
+function stripGoogleInfo(text?: string): string {
+  if (!text) return '';
+  return text
+    .replace(/\s*[^.!?\n]*Google[\s\S]*?\+995[\s\S]*?:[^.\n]*\.?/g, ' ')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+}
+
 function isLight(hex: string): boolean {
   const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex || '');
   if (!m) return false;
@@ -658,7 +668,7 @@ function TourCard({ t, onRate, nearbyRestaurants }: { t: TourBlock; onRate: (id:
       </View>
       <Text style={tourSt.title} numberOfLines={2}>{t.title || tr('cat.untitled')}</Text>
       <Text style={[tourSt.text, !t.text && { fontStyle: 'italic', color: '#777' }]}>
-        {t.text || 'תיאור הסיור יופיע כאן — ערוך דרך פאנל הניהול'}
+        {t.text || tr('cat.tourDescPlaceholder')}
       </Text>
       <View style={[tourSt.mapWrap, { height: mapBig ? 400 : 200, overflow: 'hidden' }]}>
         {Platform.OS === 'web' ? (
@@ -704,7 +714,7 @@ function TourCard({ t, onRate, nearbyRestaurants }: { t: TourBlock; onRate: (id:
           />
         ) : (
           <Text style={{ textAlign: 'center', color: '#666', fontSize: 13, padding: 12 }}>
-            🎧 נגני אודיו יתווספו דרך פאנל הניהול
+            {tr('cat.audioPlayersSoon')}
           </Text>
         )}
       </View>
@@ -842,7 +852,7 @@ function CategoryMapModal({ visible, points, focusName, focusCoords, layerColor,
   );
 }
 
-function HotelCard({ h, dark, cardBg, pageBtnLabel, mapPoints, layerColor, placesQuery, isHotel, isAttraction, isRestaurant, isNightlife, sourcePath }: { h: Hotel; dark: boolean; cardBg?: string; pageBtnLabel: string; mapPoints?: MapPoint[]; layerColor?: string; placesQuery?: string; isHotel?: boolean; isAttraction?: boolean; isRestaurant?: boolean; isNightlife?: boolean; sourcePath?: string }) {
+function HotelCard({ h, dark, cardBg, pageBtnLabel, mapPoints, layerColor, placesQuery, isHotel, isAttraction, isRestaurant, isNightlife, coupon, sourcePath }: { h: Hotel; dark: boolean; cardBg?: string; pageBtnLabel: string; mapPoints?: MapPoint[]; layerColor?: string; placesQuery?: string; isHotel?: boolean; isAttraction?: boolean; isRestaurant?: boolean; isNightlife?: boolean; coupon?: any; sourcePath?: string }) {
   const { t: tr } = useI18n();
   const [showMap, setShowMap] = useState(false);
   const [showGallery, setShowGallery] = useState(false);
@@ -889,6 +899,12 @@ function HotelCard({ h, dark, cardBg, pageBtnLabel, mapPoints, layerColor, place
             <Text style={{ color: '#fff', fontSize: 9, fontWeight: '700' }} numberOfLines={1}>📷 {h.photoAttribution.name}</Text>
           </View>
         ) : null}
+        {coupon ? (
+          <View style={{ position: 'absolute', top: 12, left: 12, backgroundColor: '#E11D48', paddingHorizontal: 13, paddingVertical: 7, borderRadius: 9, flexDirection: 'row', alignItems: 'center', gap: 5, shadowColor: '#000', shadowOpacity: 0.35, shadowRadius: 6, shadowOffset: { width: 0, height: 3 }, elevation: 6 }}>
+            <Text style={{ fontSize: 15 }}>🎫</Text>
+            <Text style={{ color: '#fff', fontSize: 14, fontWeight: '900', letterSpacing: 0.5 }}>{coupon.type === 'fixed' && coupon.pct ? `${coupon.pct}%` : tr('cp.disc')}</Text>
+          </View>
+        ) : null}
       </View>
       {h.audio ? (
         <View style={{ paddingHorizontal: 24, paddingTop: 8 }}>
@@ -909,7 +925,7 @@ function HotelCard({ h, dark, cardBg, pageBtnLabel, mapPoints, layerColor, place
             ))}
           </View>
         )}
-        <Text style={[st.hotelText, dark && { color: '#cbd5e1' }]}>{h.text}</Text>
+        <Text style={[st.hotelText, dark && { color: '#cbd5e1' }]}>{isRestaurant ? stripGoogleInfo(h.text) : h.text}</Text>
         <View style={st.hotelBtnRow}>
           <TouchableOpacity
             style={[st.hotelBtn, st.hotelBtnAccent, !h.coords && st.hotelBtnDisabled]}
@@ -1047,6 +1063,7 @@ export default function CategoryScreen() {
   const [mapFocus, setMapFocus] = useState<MapPoint | null>(null);
   const [showCatMap, setShowCatMap] = useState(false);
   const [recommendations, setRecommendations] = useState<any[]>([]);
+  const [coupons, setCoupons] = useState<any[]>([]);
   const [allRestaurants, setAllRestaurants] = useState<{ name: string; lat: number; lng: number; mapUrl?: string }[]>([]);
   const [paywall, setPaywall] = useState<{ mode: string; lockedCategories: string[] }>({ mode: 'free', lockedCategories: [] });
   const [isLocked, setIsLocked] = useState(false);
@@ -1088,6 +1105,26 @@ export default function CategoryScreen() {
     } catch {}
   };
 
+  // Pull fresh content from the server (e.g. the 🔄 button on live timetables) and refresh this category.
+  const reloadContent = () => fetchContent().then((data: any) => {
+    const all = [...(data.mainCategories || []), ...(data.extraCategories || [])];
+    const findDeep = (list: Item[]): Item | undefined => {
+      for (const c of list) {
+        if (c.id === id) return c;
+        if (c.children) { const f = findDeep(c.children); if (f) return f; }
+      }
+      return undefined;
+    };
+    const found = findDeep(all);
+    if (found) setCat(found);
+  }).catch(() => {});
+
+  // Active coupon for a restaurant (matched by title or English title), for the card badge + top promotion.
+  const couponFor = (h: any) => coupons.find((x: any) => {
+    const key = (x.restaurant || x.id || '').trim().toLowerCase();
+    return !!key && (key === (h.title || '').trim().toLowerCase() || key === (h.titleEn || '').trim().toLowerCase());
+  });
+
   useEffect(() => {
     const applyContent = (data: any) => {
       if (!data) return;
@@ -1108,6 +1145,7 @@ export default function CategoryScreen() {
         ? all.find((c: Item) => c.id === aliased)
         : findDeep(all);
       if (found) setCat(found);
+      if (Array.isArray(data.coupons)) setCoupons(data.coupons);
 
       const findPath = (list: Item[], targetId: string, trail: Item[] = []): Item[] | null => {
         for (const c of list) {
@@ -1311,7 +1349,9 @@ export default function CategoryScreen() {
           const fallback = (cat.hotels || [])
             .filter(h => h.coords && h.visible !== false)
             .map(h => ({ name: h.title, lat: h.coords!.lat, lng: h.coords!.lng }));
-          const pts = mapPoints.length ? mapPoints : fallback;
+          // Prefer THIS page's own restaurants (so a sub-category map matches its list),
+          // fall back to the matched map layer only when the page has no coords.
+          const pts = fallback.length ? fallback : mapPoints;
           if (pts.length === 0) return null;
           const bannerText = rootId === '2' ? tr('cat.nearAttraction') : rootId === '6' ? tr('cat.nearRestaurant') : tr('cat.nearShop');
           const filterParam = rootId === '2' ? 'אטרקצי' : rootId === '6' ? 'מסעד' : 'קני';
@@ -1495,12 +1535,12 @@ export default function CategoryScreen() {
                 <AudioPlayer tracks={[{ title: cat.title, url: cat.introAudio }]} compact playOnLeft tint={darkCat ? '#1A6B8A' : undefined} textLight={darkCat} ringPlay={darkCat} />
               </View>
             )}
-            {cat.hotels.filter(h => h.visible !== false && (cat.id !== '10' || Boolean((h as any).isLocal) === (guideMode === 'local'))).map((h, idx) => (
+            {cat.hotels.filter(h => h.visible !== false && (cat.id !== '10' || Boolean((h as any).isLocal) === (guideMode === 'local'))).sort((a, b) => rootId === '6' ? ((couponFor(b) ? 1 : 0) - (couponFor(a) ? 1 : 0)) : 0).map((h, idx) => (
               cat.cardStyle === 'passport'
                 ? <PassportCard key={h.id} h={h} pageBtnLabel={cat.pageBtnLabel || tr('cat.siteFacebook')} />
                 : cat.cardStyle === 'foodie'
                 ? <FoodieCard key={h.id} h={h} isLast={cat.hotels!.filter(x => x.visible !== false).indexOf(h) === cat.hotels!.filter(x => x.visible !== false).length - 1} />
-                : <HotelCard key={h.id} h={h} dark={darkCat} cardBg={CARD_BGS[idx % CARD_BGS.length]} pageBtnLabel={cat.pageBtnLabel || tr('cat.hotelPage')} mapPoints={mapPoints} layerColor={mapLayerColor || (mapPoints.length > 0 ? Colors.PRIMARY : undefined)} placesQuery={extractEnNameFromMapUrl(h.mapUrl) || `${h.title} Batumi`} isHotel={rootId === '1'} isAttraction={rootId === '2'} isRestaurant={rootId === '6'} isNightlife={rootId === '4'} sourcePath={`/category/${cat.id}`} />
+                : <HotelCard key={h.id} h={h} dark={darkCat} cardBg={CARD_BGS[idx % CARD_BGS.length]} pageBtnLabel={cat.pageBtnLabel || tr('cat.hotelPage')} mapPoints={mapPoints} layerColor={mapLayerColor || (mapPoints.length > 0 ? Colors.PRIMARY : undefined)} placesQuery={extractEnNameFromMapUrl(h.mapUrl) || `${h.title} Batumi`} isHotel={rootId === '1'} isAttraction={rootId === '2'} isRestaurant={rootId === '6'} isNightlife={rootId === '4'} coupon={rootId === '6' ? couponFor(h) : undefined} sourcePath={`/category/${cat.id}`} />
             ))}
             {cat.longText && cat.hotels.length > 10 && (
               <View style={{ width: '100%', alignSelf: 'stretch', paddingBottom: 16, paddingHorizontal: 16 }}>
@@ -1624,7 +1664,7 @@ export default function CategoryScreen() {
             )}
           </View>
         ) : cat.article ? (
-          <ArticleView cat={cat} darkCat={darkCat} />
+          <ArticleView cat={cat} darkCat={darkCat} onReload={reloadContent} />
         ) : cat.longText ? (
           <View style={st.body}>
             <HtmlContent html={cat.longText} baseStyle={{ color: darkCat ? '#e2e8f0' : Colors.TEXT, lineHeight: 26, fontSize: 15, textAlign: 'right', writingDirection: 'rtl' }} />
@@ -1815,13 +1855,40 @@ function BlinkDot() {
   return <View style={[termSt.liveDot, { opacity: on ? 1 : 0.2 }]} />;
 }
 
-function TimetableTabs({ timetable, color, terminal }: { timetable: { title?: string; source?: string; tabs: { label: string; icon: string; rows: { depart: string; arrive: string; duration: string; price: string; note?: string }[] }[] }; color?: string; terminal?: boolean }) {
+function TimetableTabs({ timetable, color, terminal, onReload }: { timetable: { title?: string; source?: string; tabs: { label: string; icon: string; rows: { depart: string; arrive: string; duration: string; price: string; note?: string }[] }[] }; color?: string; terminal?: boolean; onReload?: () => Promise<any> }) {
   const { t: tr } = useI18n();
   const [activeTab, setActiveTab] = useState(0);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [refreshing, setRefreshing] = useState(false);
+  const doRefresh = () => {
+    setRefreshKey(k => k + 1);
+    if (onReload && !refreshing) { setRefreshing(true); Promise.resolve(onReload()).finally(() => setRefreshing(false)); }
+  };
   const [selectedDay, setSelectedDay] = useState(0);
   const tab = timetable.tabs[activeTab];
   const dark = !!terminal;
+
+  const dayNames2 = [tr('cat.daySun'), tr('cat.dayMon'), tr('cat.dayTue'), tr('cat.dayWed'), tr('cat.dayThu'), tr('cat.dayFri'), tr('cat.daySat')];
+  const now = new Date();
+  const todayStr = `${dayNames2[now.getDay()]} · ${now.getDate()}/${now.getMonth() + 1}/${now.getFullYear()}`;
+  // Recurring flights (hideDays): derive the weekly pattern from the existing note dates and
+  // regenerate the schedule rolling forward from today, so the dates never go stale.
+  let rollNotes: string[] | null = null;
+  if ((timetable as any).hideDays) {
+    const ym = (timetable.source || '').match(/(\d{4})/);
+    const baseYear = ym ? +ym[1] : now.getFullYear();
+    const wset = new Set<number>();
+    tab.rows.forEach((r) => { const m = (r.note || '').match(/(\d{1,2})\/(\d{1,2})/); if (m) wset.add(new Date(baseYear, +m[2] - 1, +m[1]).getDay()); });
+    if (wset.size) {
+      rollNotes = [];
+      const d = new Date(); d.setHours(0, 0, 0, 0);
+      let guard = 0;
+      while (rollNotes.length < tab.rows.length && guard < 500) {
+        if (wset.has(d.getDay())) rollNotes.push(`${dayNames2[d.getDay()]} ${d.getDate()}/${d.getMonth() + 1}`);
+        d.setDate(d.getDate() + 1); guard++;
+      }
+    }
+  }
 
   const days = Array.from({ length: 7 }, (_, i) => {
     const d = new Date();
@@ -1840,11 +1907,12 @@ function TimetableTabs({ timetable, color, terminal }: { timetable: { title?: st
             <BlinkDot />
             <Text style={[termSt.liveText, !dark && { color: '#fff' }]}>LIVE</Text>
           </View>
-          <TouchableOpacity onPress={() => setRefreshKey(k => k + 1)} style={[termSt.refreshBtn, !dark && { backgroundColor: '#fff', borderWidth: 1, borderColor: '#cbd5e1' }]}>
-            <Text style={[termSt.refreshTxt, !dark && { color: '#1C2B35' }]}>🔄 {tr('flt.refresh')}</Text>
+          <TouchableOpacity onPress={doRefresh} disabled={refreshing} style={[termSt.refreshBtn, !dark && { backgroundColor: '#fff', borderWidth: 1, borderColor: '#cbd5e1' }, refreshing && { opacity: 0.6 }]}>
+            <Text style={[termSt.refreshTxt, !dark && { color: '#1C2B35' }]}>{refreshing ? '⏳' : '🔄'} {refreshing ? tr('flt.refreshing') : tr('flt.refresh')}</Text>
           </TouchableOpacity>
         </View>
         <TerminalClock light={!dark} />
+        <Text style={{ fontSize: 12, fontWeight: '800', color: !dark ? '#1C2B35' : '#94a3b8', marginTop: 3, writingDirection: 'rtl' }}>📅 {todayStr}</Text>
       </View>
       <View style={[artSt.cardHeader, dark && { marginBottom: 4 }]}>
         <Text style={[artSt.cardIcon, { fontSize: dark ? 22 : 28 }]}>{(timetable as any).emoji || (dark ? '🚆' : '🚌')}</Text>
@@ -1914,7 +1982,7 @@ function TimetableTabs({ timetable, color, terminal }: { timetable: { title?: st
       </View>
       {tab.rows.map((row, i) => (
         <View key={`${refreshKey}-${i}`}>
-          {row.note && <Text style={{ fontSize: 11, color: dark ? '#6b7280' : '#666', textAlign: 'right', writingDirection: 'rtl', paddingTop: 6, paddingHorizontal: 4 }}>{row.note}</Text>}
+          {(rollNotes ? rollNotes[i] : row.note) ? <Text style={{ fontSize: 11, color: dark ? '#6b7280' : '#666', textAlign: 'right', writingDirection: 'rtl', paddingTop: 6, paddingHorizontal: 4 }}>{rollNotes ? rollNotes[i] : row.note}</Text> : null}
           <View style={[artSt.tableRow, { backgroundColor: dark ? (i % 2 === 0 ? '#1e293b' : '#0f172a') : (i % 2 === 0 ? '#f0f4f8' : 'transparent') }]}>
             <Text style={[artSt.tableCell, dark && { color: '#e2e8f0', fontWeight: '700' }]}>{row.depart}</Text>
             <Text style={[artSt.tableCell, dark && { color: '#e2e8f0' }]}>{row.arrive}</Text>
@@ -1955,15 +2023,17 @@ const termSt = StyleSheet.create({
   countTxt: { fontSize: 11, fontWeight: '400', color: '#4ade80', textAlign: 'center', writingDirection: 'rtl' },
 });
 
-function ArticleView({ cat, darkCat }: { cat: Item; darkCat: boolean }) {
+function ArticleView({ cat, darkCat, onReload }: { cat: Item; darkCat: boolean; onReload?: () => Promise<any> }) {
   const { t } = useI18n();
   const [showMap, setShowMap] = useState<{ lat: number; lng: number } | null>(null);
   const art = cat.article!;
   const termMode = !!art.terminal;
+  // Dark theme but a light (e.g. white) page background — force dark section text so it stays readable.
+  const lightDark = darkCat && isLight((cat as any).heroBg || '#0f1419');
   return (
     <View style={artSt.wrap}>
       {art.timetable && art.timetable.tabs && (
-        <TimetableTabs timetable={art.timetable} color={art.color} terminal={art.terminal} />
+        <TimetableTabs timetable={art.timetable} color={art.color} terminal={art.terminal} onReload={onReload} />
       )}
 
       {showMap && (
@@ -2034,12 +2104,12 @@ function ArticleView({ cat, darkCat }: { cat: Item; darkCat: boolean }) {
       )}
 
       {art.sections.map((sec, i) => (
-        <View key={i} style={[artSt.card, { backgroundColor: darkCat ? 'rgba(255,255,255,0.08)' : (art.color || '#f0f4f8') + '60' }]}>
+        <View key={i} style={[artSt.card, { backgroundColor: lightDark ? (art.color || '#f0f4f8') + '22' : (darkCat ? 'rgba(255,255,255,0.08)' : (art.color || '#f0f4f8') + '60') }]}>
           <View style={artSt.cardHeader}>
             <Text style={artSt.cardIcon}>{sec.icon}</Text>
-            <Text style={[artSt.cardTitle, darkCat && { color: '#f1f5f9' }]}>{sec.title}</Text>
+            <Text style={[artSt.cardTitle, darkCat && !lightDark && { color: '#f1f5f9' }]}>{sec.title}</Text>
           </View>
-          <Text style={[artSt.cardTip, darkCat && { color: '#cbd5e1' }]}>{sec.tip}</Text>
+          <Text style={[artSt.cardTip, darkCat && !lightDark && { color: '#cbd5e1' }]}>{sec.tip}</Text>
           {sec.image ? <Image source={{ uri: resolveUri(sec.image) }} style={artSt.cardImg} resizeMode="cover" /> : null}
           {sec.actionLabel && sec.actionUrl ? (
             <TouchableOpacity style={[artSt.cardBtn, { backgroundColor: art.color || Colors.PRIMARY }]} onPress={() => Linking.openURL(sec.actionUrl!)}>

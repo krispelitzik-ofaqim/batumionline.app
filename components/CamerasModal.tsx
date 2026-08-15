@@ -30,7 +30,9 @@ export default function CamerasModal({ visible, onClose, bgColor }: { visible: b
 
   useEffect(() => {
     if (!visible) return;
-    fetchContent().then((d: any) => {
+    // Use RAW (untranslated) content so the camera layer is found by its Hebrew
+    // name in every UI language (localized names would break the match).
+    fetchContent({ raw: true }).then((d: any) => {
       const layers = d.mapLayers || [];
       const camLayer = layers.find((l: any) => (l.name || '').includes('מצלמ'));
       if (camLayer && camLayer.points) {
@@ -141,7 +143,7 @@ export default function CamerasModal({ visible, onClose, bgColor }: { visible: b
               <Text style={s.closeX}>✕</Text>
             </TouchableOpacity>
             <View style={s.playerContent}>
-              <Text style={s.playerTitle}>📍 מיקום: {mapCam.name}</Text>
+              <Text style={s.playerTitle}>{t('cam.location')}: {mapCam.name}</Text>
               <View style={s.playerFrame}>
                 <MapEmbed src={`https://maps.google.com/maps?q=${mapCam.lat},${mapCam.lng}(${encodeURIComponent(mapCam.name)})&z=15&output=embed`} style={{ flex: 1 }} />
               </View>

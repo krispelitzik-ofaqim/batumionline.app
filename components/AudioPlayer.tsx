@@ -27,7 +27,7 @@ function darken(hex: string, amount = 0.45): string {
 const SPEEDS = [1, 1.5, 2];
 
 export default function AudioPlayer({ tracks: initialTracks, title, compact, onNavigate, tint, onActiveChange, onTimeReached, playOnLeft, textLight, ringPlay }: Props) {
-  const { lang } = useI18n();
+  const { lang, t } = useI18n();
   const [tracks, setTracks] = useState(initialTracks);
   const [activeIdx, setActiveIdx] = useState(0);
   const [playing, setPlaying] = useState(false);
@@ -184,7 +184,7 @@ export default function AudioPlayer({ tracks: initialTracks, title, compact, onN
       {compact ? (
         <>
           {!playOnLeft && (<View style={styles.topRow}>
-            <Text style={styles.titleText} numberOfLines={1}>{current?.title || `שיר ${activeIdx + 1}`}</Text>
+            <Text style={styles.titleText} numberOfLines={1}>{current?.title || `${t('ap.track')} ${activeIdx + 1}`}</Text>
             <View style={styles.topBtns}>
               <TouchableOpacity style={styles.skipCircle} onPress={() => skip(10)} activeOpacity={0.7}>
                 <Text style={styles.skipTxt}>+10</Text>
@@ -206,7 +206,7 @@ export default function AudioPlayer({ tracks: initialTracks, title, compact, onN
                 <Text style={styles.playIconSmall}>{playing ? '❚❚' : '▶'}</Text>
               </TouchableOpacity>
               <View style={styles.compactProgressWrap}>
-                <Text style={[styles.titleText, { marginBottom: 2 }, textLight && { color: '#fff', textShadowColor: 'rgba(0,0,0,0.35)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 2 }]} numberOfLines={1}>{current?.title || `שיר ${activeIdx + 1}`}</Text>
+                <Text style={[styles.titleText, { marginBottom: 2 }, textLight && { color: '#fff', textShadowColor: 'rgba(0,0,0,0.35)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 2 }]} numberOfLines={1}>{current?.title || `${t('ap.track')} ${activeIdx + 1}`}</Text>
                 <View style={styles.progressBg}>
                   <View style={[styles.progressFill, { width: `${pct}%` }]} />
                 </View>
@@ -243,7 +243,7 @@ export default function AudioPlayer({ tracks: initialTracks, title, compact, onN
         </>
       ) : (
         <>
-          <Text style={styles.nowTitle}>{current?.title || `שיר ${activeIdx + 1}`}</Text>
+          <Text style={styles.nowTitle}>{current?.title || `${t('ap.track')} ${activeIdx + 1}`}</Text>
           <View style={[styles.row, playOnLeft && { flexDirection: 'row' }]}>
             <TouchableOpacity style={[styles.playBtn, ringPlay && { borderWidth: 3, borderColor: '#fff', shadowColor: '#fff', shadowOpacity: 0.6, shadowRadius: 12 }]} onPress={toggle} activeOpacity={0.85}>
               <Text style={styles.playIcon}>{playing ? '❚❚' : '▶'}</Text>
@@ -263,23 +263,23 @@ export default function AudioPlayer({ tracks: initialTracks, title, compact, onN
 
       {tracks.length > 1 && (
         <View style={styles.list}>
-          {tracks.map((t, i) => {
+          {tracks.map((trk, i) => {
             const inner = (
               <>
                 <Text style={styles.dragHandle}>≡</Text>
                 <Text style={styles.listIcon}>🎧</Text>
                 <Text style={[styles.listTxt, i === activeIdx && styles.listTxtActive]}>
-                  {t.title || `שיר ${i + 1}`}
+                  {trk.title || `${t('ap.track')} ${i + 1}`}
                 </Text>
-                {t.coords && onNavigate && (
+                {trk.coords && onNavigate && (
                   <>
                     <View style={styles.navSpacer} />
                     <TouchableOpacity
-                      onPress={(e: any) => { e.stopPropagation?.(); onNavigate(t.coords!); }}
+                      onPress={(e: any) => { e.stopPropagation?.(); onNavigate(trk.coords!); }}
                       style={[styles.navBtn, { backgroundColor: tint ? darken(tint, 0.5) : '#555' }]}
                       activeOpacity={0.7}
                     >
-                      <Text style={styles.navBtnTxt}>נווט{'\n'}למקום</Text>
+                      <Text style={styles.navBtnTxt}>{t('ap.navigate')}</Text>
                     </TouchableOpacity>
                   </>
                 )}

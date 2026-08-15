@@ -70,8 +70,8 @@ export default function MyToursScreen() {
 
   const removeTour = (id: string) => {
     Alert.alert(t('mt.delTitle'), t('mt.delMsg'), [
-      { text: 'ביטול', style: 'cancel' },
-      { text: 'מחק', style: 'destructive', onPress: () => saveTours(tours.filter(t => t.id !== id)) },
+      { text: t('c.cancel'), style: 'cancel' },
+      { text: t('c.delete'), style: 'destructive', onPress: () => saveTours(tours.filter(t => t.id !== id)) },
     ]);
   };
 
@@ -88,12 +88,12 @@ export default function MyToursScreen() {
       const asset = r.assets?.[0];
       if (!asset) return;
       if (tours.length === 0) {
-        const newTour: Tour = { id: 't_' + Date.now(), name: 'הזכרונות שלי', createdAt: new Date().toISOString(), stops: [{ id: 'p_' + Date.now(), title: 'צילום שלי', image: asset.uri }] };
+        const newTour: Tour = { id: 't_' + Date.now(), name: t('mt.defTour'), createdAt: new Date().toISOString(), stops: [{ id: 'p_' + Date.now(), title: t('mt.defStop'), image: asset.uri }] };
         saveTours([newTour, ...tours]);
         Alert.alert(t('mt.savedTitle'), t('mt.savedMsg'));
       } else {
         const list = [...tours];
-        list[0].stops.push({ id: 'p_' + Date.now(), title: 'צילום שלי', image: asset.uri });
+        list[0].stops.push({ id: 'p_' + Date.now(), title: t('mt.defStop'), image: asset.uri });
         saveTours(list);
         Alert.alert(t('mt.addedTitle'), `${t('mt.addedTitle')} → ${list[0].name}`);
       }
@@ -122,16 +122,16 @@ export default function MyToursScreen() {
 
   return (
     <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: Colors.BACKGROUND }}>
-      <AppHeader crumbs={[{ title: 'אתרים ואטרקציות', path: '/category/2' }, { title: '❤️ הסיורים שלי' }]} />
+      <AppHeader crumbs={[{ title: t('mt.attractions'), path: '/category/2' }, { title: `❤️ ${t('mt.title')}` }]} />
       <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 100 }}>
-        <Text style={{ fontSize: 18, fontWeight: '900', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl', marginBottom: 6 }}>❤️ הסיורים שלי</Text>
+        <Text style={{ fontSize: 18, fontWeight: '900', color: Colors.TEXT, textAlign: 'right', writingDirection: 'rtl', marginBottom: 6 }}>{`❤️ ${t('mt.title')}`}</Text>
         <Text style={s.intro}>{t('mt.intro')}</Text>
 
         <TouchableOpacity onPress={takePhoto} activeOpacity={0.85} style={s.cameraBlock}>
           <Text style={{ fontSize: 32 }}>📷</Text>
           <View style={{ flex: 1 }}>
-            <Text style={{ fontSize: 14, fontWeight: '900', color: '#fff', textAlign: 'right', writingDirection: 'rtl' }}>צלם זיכרון מהמסע</Text>
-            <Text style={{ fontSize: 11, color: 'rgba(255,255,255,0.85)', textAlign: 'right', writingDirection: 'rtl', marginTop: 2 }}>הצילום יישמר בסיור</Text>
+            <Text style={{ fontSize: 14, fontWeight: '900', color: '#fff', textAlign: 'right', writingDirection: 'rtl' }}>{t('mt.photoCta')}</Text>
+            <Text style={{ fontSize: 11, color: 'rgba(255,255,255,0.85)', textAlign: 'right', writingDirection: 'rtl', marginTop: 2 }}>{t('mt.photoCtaSub')}</Text>
           </View>
         </TouchableOpacity>
 
@@ -170,22 +170,22 @@ export default function MyToursScreen() {
             <Text style={s.emptyTxt}>{t('mt.empty')}</Text>
             <Text style={s.emptySub}>{t('mt.emptySub')}</Text>
           </View>
-        ) : tours.map(t => (
-          <View key={t.id} style={s.card}>
+        ) : tours.map(tour => (
+          <View key={tour.id} style={s.card}>
             <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Text style={s.cardTitle}>{t.name}</Text>
-              <TouchableOpacity onPress={() => removeTour(t.id)}>
+              <Text style={s.cardTitle}>{tour.name}</Text>
+              <TouchableOpacity onPress={() => removeTour(tour.id)}>
                 <Text style={{ color: '#dc2626', fontSize: 18 }}>🗑</Text>
               </TouchableOpacity>
             </View>
-            <Text style={s.cardSub}>{t.stops.length} עצירות · {new Date(t.createdAt).toLocaleDateString('he-IL')}</Text>
-            {t.stops.length > 0 && (
+            <Text style={s.cardSub}>{tour.stops.length} {t('mt.stops')} · {(() => { const d = new Date(tour.createdAt); return `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`; })()}</Text>
+            {tour.stops.length > 0 && (
               <View style={{ marginTop: 10, gap: 8 }}>
-                {groupByDay(t.stops).map(({ day, items }) => (
+                {groupByDay(tour.stops).map(({ day, items }) => (
                   <View key={day} style={{ gap: 4 }}>
-                    <Text style={s.dayHeader}>{day === 0 ? 'ללא יום משויך' : `יום ${day}`}</Text>
+                    <Text style={s.dayHeader}>{day === 0 ? t('mt.noDay') : `${t('mt.day')} ${day}`}</Text>
                     {items.map(stop => {
-                      const isEditing = editingStop?.tourId === t.id && editingStop?.stopId === stop.id;
+                      const isEditing = editingStop?.tourId === tour.id && editingStop?.stopId === stop.id;
                       return (
                         <TouchableOpacity key={stop.id} style={s.stopRow} activeOpacity={stop.sourcePath ? 0.7 : 1} onPress={() => stop.sourcePath && !isEditing && router.push(stop.sourcePath as any)}>
                           {stop.image ? <Image source={{ uri: stop.image }} style={s.thumb} /> : null}
@@ -194,8 +194,8 @@ export default function MyToursScreen() {
                             {!isEditing && stop.time ? <Text style={s.stopTime}>🕐 {stop.time}</Text> : null}
                             {isEditing && (
                               <View style={{ flexDirection: 'row-reverse', gap: 6, marginTop: 6 }}>
-                                <TextInput style={[s.input, { flex: 1, paddingVertical: 6 }]} value={editDay} onChangeText={setEditDay} placeholder="יום (1)" placeholderTextColor="#94a3b8" keyboardType="numeric" textAlign="right" />
-                                <TextInput style={[s.input, { flex: 1, paddingVertical: 6 }]} value={editTime} onChangeText={setEditTime} placeholder="שעה (10:00)" placeholderTextColor="#94a3b8" textAlign="right" />
+                                <TextInput style={[s.input, { flex: 1, paddingVertical: 6 }]} value={editDay} onChangeText={setEditDay} placeholder={t('mt.dayPh')} placeholderTextColor="#94a3b8" keyboardType="numeric" textAlign="right" />
+                                <TextInput style={[s.input, { flex: 1, paddingVertical: 6 }]} value={editTime} onChangeText={setEditTime} placeholder={t('mt.timePh')} placeholderTextColor="#94a3b8" textAlign="right" />
                                 <TouchableOpacity onPress={saveEdit} style={[s.smallBtn, { backgroundColor: Colors.PRIMARY }]}>
                                   <Text style={{ color: '#fff', fontWeight: '900', fontSize: 12 }}>✓</Text>
                                 </TouchableOpacity>
@@ -204,10 +204,10 @@ export default function MyToursScreen() {
                           </View>
                           {!isEditing && (
                             <View style={{ flexDirection: 'row-reverse', gap: 4 }}>
-                              <TouchableOpacity onPress={(e) => { e.stopPropagation(); startEdit(t.id, stop); }} style={s.smallBtn}>
+                              <TouchableOpacity onPress={(e) => { e.stopPropagation(); startEdit(tour.id, stop); }} style={s.smallBtn}>
                                 <Text style={{ fontSize: 14 }}>✏️</Text>
                               </TouchableOpacity>
-                              <TouchableOpacity onPress={(e) => { e.stopPropagation(); removeStop(t.id, stop.id); }} style={s.smallBtn}>
+                              <TouchableOpacity onPress={(e) => { e.stopPropagation(); removeStop(tour.id, stop.id); }} style={s.smallBtn}>
                                 <Text style={{ fontSize: 14, color: '#dc2626' }}>🗑</Text>
                               </TouchableOpacity>
                             </View>

@@ -14,10 +14,10 @@ const PRICE = '$240';
 
 type Lang = 'he' | 'en' | 'fa' | 'ru';
 const TR: Record<Lang, Record<string, string>> = {
-  he: { title: 'הקמת חבילת קופון', validity: 'תוקף החבילה', from: 'מ', to: 'עד', pickBiz: 'חפש את המסעדה שלך', search: 'הקלד שם מסעדה...', discType: 'אחוז ההנחה', fixed: 'קבוע', variable: 'משתנה', fixedHint: 'האחוז יוצג על תמונת הקופון', varHint: 'סליידר 3%–10% יופעל במימוש (המלצר בוחר)', pay: 'המשך לתשלום', logout: 'יציאה', done: 'החבילה הוגדרה!', missing: 'בחר מסעדה ואחוז', dealTitle: 'פרטי עסקה', sumBiz: 'מסעדה', sumDisc: 'הנחה', sumTotal: 'סך לתשלום', varLbl: 'משתנה (3%-10%)', change: 'שנה', noRes: 'לא נמצאה מסעדה בשם זה' },
-  en: { title: 'Set up a coupon package', validity: 'Package validity', from: 'From', to: 'To', pickBiz: 'Search your restaurant', search: 'Type a restaurant name...', discType: 'Discount', fixed: 'Fixed', variable: 'Variable', fixedHint: 'The % is shown on the coupon image', varHint: 'A 3%–10% slider activates at redemption (waiter picks)', pay: 'Continue to payment', logout: 'Log out', done: 'Package configured!', missing: 'Pick a restaurant and a %', dealTitle: 'Order summary', sumBiz: 'Restaurant', sumDisc: 'Discount', sumTotal: 'Total', varLbl: 'Variable (3%-10%)', change: 'Change', noRes: 'No restaurant found' },
-  fa: { title: 'راه‌اندازی بسته کوپن', validity: 'اعتبار بسته', from: 'از', to: 'تا', pickBiz: 'رستوران خود را جستجو کنید', search: 'نام رستوران را وارد کنید...', discType: 'درصد تخفیف', fixed: 'ثابت', variable: 'متغیر', fixedHint: 'درصد روی تصویر کوپن نمایش داده می‌شود', varHint: 'اسلایدر ۳٪–۱۰٪ هنگام استفاده فعال می‌شود', pay: 'ادامه پرداخت', logout: 'خروج', done: 'بسته تنظیم شد!', missing: 'رستوران و درصد را انتخاب کنید', dealTitle: 'جزئیات سفارش', sumBiz: 'رستوران', sumDisc: 'تخفیف', sumTotal: 'مبلغ کل', varLbl: 'متغیر (۳٪-۱۰٪)', change: 'تغییر', noRes: 'رستورانی یافت نشد' },
-  ru: { title: 'Настройка пакета купонов', validity: 'Срок действия', from: 'С', to: 'По', pickBiz: 'Найдите свой ресторан', search: 'Введите название ресторана...', discType: 'Скидка', fixed: 'Фиксированная', variable: 'Переменная', fixedHint: 'Процент показан на изображении купона', varHint: 'Ползунок 3%–10% активируется при погашении', pay: 'Перейти к оплате', logout: 'Выход', done: 'Пакет настроен!', missing: 'Выберите ресторан и процент', dealTitle: 'Детали заказа', sumBiz: 'Ресторан', sumDisc: 'Скидка', sumTotal: 'Итого', varLbl: 'Переменная (3%-10%)', change: 'Изменить', noRes: 'Ресторан не найден' },
+  he: { title: 'הקמת חבילת קופון', validity: 'תוקף החבילה', from: 'מ', to: 'עד', pickBiz: 'חפש את המסעדה שלך', search: 'הקלד שם מסעדה...', discType: 'אחוז ההנחה', fixed: 'קבוע', variable: 'משתנה', fixedHint: 'האחוז יוצג על תמונת הקופון', varHint: 'סליידר 3%–10% יופעל במימוש (המלצר בוחר)', fixedDesc: 'הלקוח יודע את ההנחה מראש.', varDesc: 'בעל המסעדה מחליט את גובה ההנחה ביום הרכישה.', pay: 'המשך לתשלום', logout: 'יציאה', done: 'החבילה הוגדרה!', missing: 'בחר מסעדה ואחוז', dealTitle: 'פרטי עסקה', sumBiz: 'מסעדה', sumDisc: 'גובה ההנחה שנקבעה בקופון', sumTotal: 'סך לתשלום', varLbl: 'משתנה (3%-10%)', change: 'שנה', noRes: 'לא נמצאה מסעדה בשם זה', listNote: 'הרשימה מכילה רק מסעדות שהומלצו על ידי צוות בטומי און ליין' },
+  en: { title: 'Set up a coupon package', validity: 'Package validity', from: 'From', to: 'To', pickBiz: 'Search your restaurant', search: 'Type a restaurant name...', discType: 'Discount', fixed: 'Fixed', variable: 'Variable', fixedHint: 'The % is shown on the coupon image', varHint: 'A 3%–10% slider activates at redemption (waiter picks)', fixedDesc: 'the customer knows the discount in advance.', varDesc: 'the restaurant owner decides the discount on the day.', pay: 'Continue to payment', logout: 'Log out', done: 'Package configured!', missing: 'Pick a restaurant and a %', dealTitle: 'Order summary', sumBiz: 'Restaurant', sumDisc: 'Discount set in the coupon', sumTotal: 'Total', varLbl: 'Variable (3%-10%)', change: 'Change', noRes: 'No restaurant found', listNote: 'The list includes only restaurants recommended by the Batumi Online team' },
+  fa: { title: 'راه‌اندازی بسته کوپن', validity: 'اعتبار بسته', from: 'از', to: 'تا', pickBiz: 'رستوران خود را جستجو کنید', search: 'نام رستوران را وارد کنید...', discType: 'درصد تخفیف', fixed: 'ثابت', variable: 'متغیر', fixedHint: 'درصد روی تصویر کوپن نمایش داده می‌شود', varHint: 'اسلایدر ۳٪–۱۰٪ هنگام استفاده فعال می‌شود', fixedDesc: 'مشتری تخفیف را از قبل می‌داند.', varDesc: 'صاحب رستوران در روز خرید تصمیم می‌گیرد.', pay: 'ادامه پرداخت', logout: 'خروج', done: 'بسته تنظیم شد!', missing: 'رستوران و درصد را انتخاب کنید', dealTitle: 'جزئیات سفارش', sumBiz: 'رستوران', sumDisc: 'میزان تخفیف تعیین‌شده در کوپن', sumTotal: 'مبلغ کل', varLbl: 'متغیر (۳٪-۱۰٪)', change: 'تغییر', noRes: 'رستورانی یافت نشد', listNote: 'این فهرست فقط شامل رستوران‌هایی است که تیم باتومی آنلاین توصیه کرده است' },
+  ru: { title: 'Настройка пакета купонов', validity: 'Срок действия', from: 'С', to: 'По', pickBiz: 'Найдите свой ресторан', search: 'Введите название ресторана...', discType: 'Скидка', fixed: 'Фиксированная', variable: 'Переменная', fixedHint: 'Процент показан на изображении купона', varHint: 'Ползунок 3%–10% активируется при погашении', fixedDesc: 'клиент знает скидку заранее.', varDesc: 'владелец ресторана решает в день покупки.', pay: 'Перейти к оплате', logout: 'Выход', done: 'Пакет настроен!', missing: 'Выберите ресторан и процент', dealTitle: 'Детали заказа', sumBiz: 'Ресторан', sumDisc: 'Размер скидки, установленный в купоне', sumTotal: 'Итого', varLbl: 'Переменная (3%-10%)', change: 'Изменить', noRes: 'Ресторан не найден', listNote: 'В списке только рестораны, рекомендованные командой Batumi Online' },
 };
 
 type Rest = { name: string; image?: string };
@@ -95,7 +95,7 @@ export default function AgentCouponScreen() {
         <Text style={[s.lbl, { textAlign: ta, writingDirection: wd }]}>{t.validity}</Text>
         <View style={[s.dateRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
           <View style={s.dateBox}><Text style={s.dateSm}>{t.from}</Text><Text style={s.dateBig}>{dates.from}</Text></View>
-          <Text style={s.arrow}>→</Text>
+          <Text style={s.arrow}>{isRTL ? '←' : '→'}</Text>
           <View style={s.dateBox}><Text style={s.dateSm}>{t.to}</Text><Text style={s.dateBig}>{dates.to}</Text></View>
         </View>
 
@@ -104,6 +104,7 @@ export default function AgentCouponScreen() {
         {!biz ? (
           <>
             <TextInput value={q} onChangeText={setQ} placeholder={t.search} placeholderTextColor="#9aa5b1" style={[s.input, { textAlign: ta, writingDirection: wd }]} />
+            <Text style={[s.listNote, { textAlign: ta, writingDirection: wd }]}>{t.listNote}</Text>
             {q.trim().length > 0 && (
               results.length ? (
                 <View style={s.list}>
@@ -131,6 +132,7 @@ export default function AgentCouponScreen() {
         {biz && (
           <>
             <Text style={[s.lbl, { textAlign: ta, writingDirection: wd, marginTop: 18 }]}>{t.discType}</Text>
+            <Text style={[s.typeExplain, { textAlign: ta, writingDirection: wd }]}><Text style={s.typeKey}>{t.fixed}</Text> = {t.fixedDesc}{'\n'}<Text style={s.typeKey}>{t.variable}</Text> = {t.varDesc}</Text>
             <View style={[s.rowWrap, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
               <TouchableOpacity style={[s.seg, type === 'fixed' && s.segOn]} onPress={() => setType('fixed')}><Text style={[s.segTxt, type === 'fixed' && s.segTxtOn]}>{t.fixed}</Text></TouchableOpacity>
               <TouchableOpacity style={[s.seg, type === 'variable' && s.segOn]} onPress={() => { setType('variable'); setPct(null); }}><Text style={[s.segTxt, type === 'variable' && s.segTxtOn]}>{t.variable}</Text></TouchableOpacity>
@@ -176,6 +178,9 @@ const s = StyleSheet.create({
   dateBig: { fontSize: 18, fontFamily: F.b, color: NAVY, marginTop: 2 },
   arrow: { fontSize: 20, color: '#a9a291' },
   input: { borderWidth: 1.5, borderColor: '#e7e0d4', borderRadius: 4, paddingVertical: 12, paddingHorizontal: 14, fontSize: 15, color: '#16222c', fontFamily: F.r, backgroundColor: '#fff' },
+  listNote: { marginTop: 7, fontSize: 12, color: '#8a8578', fontFamily: F.r, lineHeight: 16 },
+  typeExplain: { marginTop: 4, marginBottom: 9, fontSize: 12.5, color: '#6b6558', fontFamily: F.r, lineHeight: 20 },
+  typeKey: { fontFamily: F.x, color: NAVY },
   list: { marginTop: 8, backgroundColor: '#fff', borderRadius: 4, borderWidth: 1, borderColor: '#e7e0d4', overflow: 'hidden' },
   resRow: { alignItems: 'center', gap: 12, paddingVertical: 10, paddingHorizontal: 12, borderBottomWidth: 1, borderBottomColor: '#f2ede3' },
   selRow: { alignItems: 'center', gap: 12, paddingVertical: 10, paddingHorizontal: 12, backgroundColor: '#fff', borderRadius: 4, borderWidth: 1.5, borderColor: GOLD, marginTop: 4 },

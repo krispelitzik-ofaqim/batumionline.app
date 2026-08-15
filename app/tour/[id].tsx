@@ -32,7 +32,7 @@ export default function TourScreen() {
   if (!tour) {
     return (
       <SafeAreaView style={styles.safe}>
-        <Stack.Screen options={{ headerShown: true, title: 'סיור', headerBackTitle: 'חזרה' }} />
+        <Stack.Screen options={{ headerShown: true, title: t('tr.tour'), headerBackTitle: t('c.back') }} />
         <View style={styles.center}><Text style={styles.loadTxt}>{t('c.loading')}</Text></View>
       </SafeAreaView>
     );
@@ -42,7 +42,7 @@ export default function TourScreen() {
 
   return (
     <SafeAreaView style={styles.safe}>
-      <Stack.Screen options={{ headerShown: true, title: tour.title, headerBackTitle: 'חזרה' }} />
+      <Stack.Screen options={{ headerShown: true, title: tour.title, headerBackTitle: t('c.back') }} />
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
         <LinearGradient
           colors={[bg, '#3DA5C4']}
@@ -79,7 +79,7 @@ export default function TourScreen() {
           </View>
         )}
 
-        <Text style={styles.sectionTitle}>גלריית הסיור — {tour.title}</Text>
+        <Text style={styles.sectionTitle}>{t('tr.gallery')} — {tour.title}</Text>
         <View style={styles.galleryWrap}>
           <Text style={styles.galleryPlaceholder}>{t('tr.photosSoon')}</Text>
         </View>

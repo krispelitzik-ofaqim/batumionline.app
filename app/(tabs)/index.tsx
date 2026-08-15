@@ -356,6 +356,31 @@ export default function HomeScreen() {
           </View>
         )}
 
+        {/* 5a. Real Estate banner — non-Hebrew editions, same size as the Hebrew RE portal banner */}
+        {lang !== 'he' && (
+          <View style={styles.section}>
+            <TouchableOpacity activeOpacity={0.85} style={styles.megaBannerWrap} onPress={() => router.push('/realestate')}>
+              <ImageBackground
+                source={{ uri: realEstateImg || resolveUri('/uploads/1777114889454-969.png') }}
+                style={styles.megaBanner}
+                imageStyle={{ borderRadius: 18 }}
+              >
+                <LinearGradient
+                  colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0)', 'rgba(10,30,50,0.85)']}
+                  locations={[0, 0.6, 1]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 0, y: 1 }}
+                  style={styles.megaBannerOverlay}
+                >
+                  <Text style={[styles.megaBannerKicker, { textAlign: isRTL ? 'right' : 'left', writingDirection: isRTL ? 'rtl' : 'ltr' }]}>BATUMI</Text>
+                  <Text style={[styles.megaBannerTitle, { textAlign: isRTL ? 'right' : 'left', writingDirection: isRTL ? 'rtl' : 'ltr' }]}>🏠 {t('re.bTitle')}</Text>
+                  <Text style={[styles.megaBannerSub, { textAlign: isRTL ? 'right' : 'left', writingDirection: isRTL ? 'rtl' : 'ltr' }]}>{t('re.bSub')}</Text>
+                </LinearGradient>
+              </ImageBackground>
+            </TouchableOpacity>
+          </View>
+        )}
+
         {/* 5b. The Market — במקום פורטל הנדל"ן, לגרסאות שאינן עברית */}
         {lang !== 'he' && (
           <View style={styles.section}>
@@ -373,7 +398,12 @@ export default function HomeScreen() {
         {/* 6. באנרים רוחביים */}
         {bottomGroupVisible && (
           <View style={styles.section}>
-            <Text style={[styles.bottomSectionTitle, { textAlign: isRTL ? 'right' : 'left', writingDirection: isRTL ? 'rtl' : 'ltr' }]}>{t('home.onlineInfo')}</Text>
+            <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+              <Text style={[styles.bottomSectionTitle, { textAlign: isRTL ? 'right' : 'left', writingDirection: isRTL ? 'rtl' : 'ltr', marginBottom: 0 }]}>{t('home.onlineInfo')}</Text>
+              <TouchableOpacity onPress={() => router.push('/ai' as any)} activeOpacity={0.85} style={{ flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: '#1A6B8A', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 16 }}>
+                <Text style={{ fontSize: 13, color: '#fff', fontWeight: '900' }}>{({ he: 'מסייע AI', en: 'AI Assistant', fa: 'دستیار AI', ru: 'AI-помощник' } as Record<string, string>)[lang] || 'AI Assistant'}</Text>
+              </TouchableOpacity>
+            </View>
             {editBottomBanners.filter((b: any) => b.visible !== false).map((b, idx) => (
               <View key={b.id} style={{ position: 'relative' }}>
                 {editMode && <ReorderControls index={idx} total={editBottomBanners.length} onMove={(dir) => moveBottomBanner(idx, dir)} />}

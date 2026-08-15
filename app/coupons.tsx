@@ -82,6 +82,9 @@ export default function CouponsScreen() {
           </TouchableOpacity>
         ))}
         <Text style={[s.soon, { textAlign: 'center', writingDirection: wd }]}>{t('cp.soon')}</Text>
+        <TouchableOpacity style={s.buyBtn} activeOpacity={0.85} onPress={() => router.push('/agent-coupon' as any)}>
+          <Text style={s.buyBtnTxt}>🎟️ {t('cp.buy')}</Text>
+        </TouchableOpacity>
         <TouchableOpacity style={s.agentBtn} activeOpacity={0.85} onPress={() => { setErr(''); setAgentOpen(true); }}>
           <Text style={s.agentBtnTxt}>🔑 {t('cp.agents')}</Text>
         </TouchableOpacity>
@@ -124,7 +127,9 @@ const s = StyleSheet.create({
   cardName: { fontSize: 21, fontFamily: F.m, color: '#16222c' },
   cardSub: { fontSize: 13, fontFamily: F.r, color: '#94a0ab', marginTop: 3 },
   soon: { color: '#a9b2ba', fontSize: 13, fontFamily: F.r, marginTop: 4 },
-  agentBtn: { marginTop: 18, alignSelf: 'center', borderWidth: 1.5, borderColor: NAVY, borderRadius: 4, paddingVertical: 11, paddingHorizontal: 22 },
+  buyBtn: { marginTop: 20, alignSelf: 'center', backgroundColor: GOLD, borderRadius: 4, paddingVertical: 13, paddingHorizontal: 26, shadowColor: '#000', shadowOpacity: 0.12, shadowRadius: 4, shadowOffset: { width: 0, height: 2 } },
+  buyBtnTxt: { color: '#fff', fontFamily: F.b, fontSize: 15 },
+  agentBtn: { marginTop: 12, alignSelf: 'center', borderWidth: 1.5, borderColor: NAVY, borderRadius: 4, paddingVertical: 11, paddingHorizontal: 22 },
   agentBtnTxt: { color: NAVY, fontFamily: F.sb, fontSize: 14 },
   modalBg: { flex: 1, backgroundColor: 'rgba(0,0,0,0.45)', justifyContent: 'flex-end' },
   sheet: { backgroundColor: '#fff', borderTopLeftRadius: 12, borderTopRightRadius: 12, padding: 20 },

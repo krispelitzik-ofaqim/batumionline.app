@@ -3,16 +3,16 @@ import { useI18n } from '../constants/i18n';
 import { View, Text, Modal, TouchableOpacity, TextInput, StyleSheet, ActivityIndicator, ScrollView } from 'react-native';
 import { Colors } from '../constants/colors';
 
-type Rates = { ILS: number; GEL: number; USD: number; EUR: number };
+type Rates = { ILS: number; GEL: number; USD: number; EUR: number; IRR: number; RUB: number };
 
-const FLAGS: Record<string, string> = { ILS: '🇮🇱', GEL: '🇬🇪', USD: '🇺🇸', EUR: '🇪🇺' };
+const FLAGS: Record<string, string> = { ILS: '🇮🇱', GEL: '🇬🇪', USD: '🇺🇸', EUR: '🇪🇺', IRR: '🇮🇷', RUB: '🇷🇺' };
 const NAMES: Record<string, string> = { ILS: 'שקל', GEL: 'לארי', USD: 'דולר', EUR: 'יורו' };
 type CLang = 'he' | 'en' | 'fa' | 'ru';
 const CUR_NAMES: Record<CLang, Record<string, string>> = {
-  he: { ILS: 'שקל', GEL: 'לארי', USD: 'דולר', EUR: 'יורו' },
-  en: { ILS: 'Shekel', GEL: 'Lari', USD: 'Dollar', EUR: 'Euro' },
-  fa: { ILS: 'شِکِل', GEL: 'لاری', USD: 'دلار', EUR: 'یورو' },
-  ru: { ILS: 'Шекель', GEL: 'Лари', USD: 'Доллар', EUR: 'Евро' },
+  he: { ILS: 'שקל', GEL: 'לארי', USD: 'דולר', EUR: 'יורו', IRR: 'ריאל', RUB: 'רובל' },
+  en: { ILS: 'Shekel', GEL: 'Lari', USD: 'Dollar', EUR: 'Euro', IRR: 'Rial', RUB: 'Ruble' },
+  fa: { ILS: 'شِکِل', GEL: 'لاری', USD: 'دلار', EUR: 'یورو', IRR: 'ریال', RUB: 'روبل' },
+  ru: { ILS: 'Шекель', GEL: 'Лари', USD: 'Доллар', EUR: 'Евро', IRR: 'Риал', RUB: 'Рубль' },
 };
 const CL_TR: Record<CLang, Record<string, string>> = {
   he: { updated: 'עודכן:', enterIn: 'הקלד סכום ב', source: 'מקור הנתונים: open.er-api.com (שערים גלובליים, מתעדכנים יומית)' },
@@ -30,7 +30,9 @@ export default function CurrencyModal({ visible, onClose, bgColor }: { visible: 
   const [rates, setRates] = useState<Rates | null>(null);
   const [loading, setLoading] = useState(true);
   const [amount, setAmount] = useState('');
-  const [from, setFrom] = useState<keyof Rates>('ILS');
+  // Home currency per audience (base local currencies for everyone: GEL/USD/EUR).
+  const home = ({ he: 'ILS', fa: 'IRR', ru: 'RUB' } as Record<string, keyof Rates>)[L];
+  const [from, setFrom] = useState<keyof Rates>(home || 'GEL');
   const [lastUpdate, setLastUpdate] = useState('');
 
   const loadRates = () => {
@@ -39,7 +41,7 @@ export default function CurrencyModal({ visible, onClose, bgColor }: { visible: 
       .then(r => r.json())
       .then(data => {
         if (data.rates) {
-          setRates({ ILS: data.rates.ILS, GEL: data.rates.GEL, USD: 1, EUR: data.rates.EUR });
+          setRates({ ILS: data.rates.ILS, GEL: data.rates.GEL, USD: 1, EUR: data.rates.EUR, IRR: data.rates.IRR, RUB: data.rates.RUB });
         }
         const src = data.time_last_update_utc || data.time_last_update_unix;
         if (src) {
@@ -68,7 +70,8 @@ export default function CurrencyModal({ visible, onClose, bgColor }: { visible: 
     return result.toFixed(2);
   };
 
-  const currencies: (keyof Rates)[] = ['EUR', 'USD', 'GEL', 'ILS'];
+  // Shekel is only relevant for Hebrew (Israeli) users; hide it for fa/en/ru.
+  const currencies: (keyof Rates)[] = home ? [home, 'GEL', 'USD', 'EUR'] : ['GEL', 'USD', 'EUR'];
   const others = currencies.filter(c => c !== from);
 
   return (

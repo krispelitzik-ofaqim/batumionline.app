@@ -53,6 +53,8 @@ const SAFE: Record<WLang, string[]> = {
   ru: ['⚠️ Не рекомендуется — море бурное', '⚠️ Осторожно — пограничные условия', '✅ Хорошие условия для плавания'],
 };
 const AUDIO_TITLE: Record<WLang, string> = { he: 'מזג האוויר בבטומי - סקירה שנתית', en: 'Batumi weather — annual overview', fa: 'آب‌وهوای باتومی — مرور سالانه', ru: 'Погода в Батуми — годовой обзор' };
+const UPDATED: Record<WLang, string> = { he: 'עודכן', en: 'Updated', fa: 'به‌روزرسانی شد', ru: 'Обновлено' };
+const REFRESH10: Record<WLang, string> = { he: 'מתרענן כל 10 דק׳', en: 'refreshes every 10 min', fa: 'هر ۱۰ دقیقه به‌روزرسانی می‌شود', ru: 'обновляется каждые 10 мин' };
 const OWM_LANG: Record<WLang, string> = { he: 'he', en: 'en', fa: 'en', ru: 'ru' };
 const WL = (l: string): WLang => (['he', 'en', 'fa', 'ru'].includes(l) ? (l as WLang) : 'en');
 const OWM_KEY = 'eb761e941b8ad25efb4bf8cc3d4d9b71';
@@ -335,7 +337,7 @@ export default function WeatherModal({ visible, onClose, bgColor }: { visible: b
           <Text style={[s.title, { fontSize: 16, marginBottom: 4, textAlign: 'center' }]}>{t('wthr.title')}</Text>
           <Text style={[s.batumiClock, { textAlign: 'center', alignSelf: 'center', marginBottom: 6 }]}>🕐 {batumiTime}</Text>
           {lastUpdated && (
-            <Text style={s.updatedTxt}>עודכן: {lastUpdated.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })} · מתרענן כל 10 דק׳</Text>
+            <Text style={s.updatedTxt}>{UPDATED[L]}: {lastUpdated.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })} · {REFRESH10[L]}</Text>
           )}
 
           <TouchableOpacity style={s.camBanner} activeOpacity={0.85} onPress={() => setCamerasOpen(true)}>

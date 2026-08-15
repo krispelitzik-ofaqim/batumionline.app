@@ -126,7 +126,7 @@ export default function RealEstateScreen() {
   const L = (lang as Lang) in TR ? (lang as Lang) : 'en';
   const t = TR[L];
   const params = useLocalSearchParams<{ mode?: string }>();
-  const mode: 'sale' | 'rent' = params.mode === 'rent' ? 'rent' : 'sale';
+  const [mode, setMode] = useState<'sale' | 'rent'>(params.mode === 'rent' ? 'rent' : 'sale');
   const [posts, setPosts] = useState<Post[]>([]);
   const [postOpen, setPostOpen] = useState(false);
   const [manageOpen, setManageOpen] = useState(false);
@@ -252,6 +252,15 @@ export default function RealEstateScreen() {
             <Text style={[s.heroTitle, { textAlign: ta, writingDirection: wd }]}>{mode === 'sale' ? t.sale : t.rent}</Text>
           </View>
         </ImageBackground>
+
+        <View style={[s.tabs, { flexDirection: isRTL ? 'row-reverse' : 'row', paddingHorizontal: 16, marginTop: 14 }]}>
+          <TouchableOpacity style={[s.tab, mode === 'sale' && s.tabActive]} activeOpacity={0.85} onPress={() => setMode('sale')}>
+            <Text style={[s.tabTxt, mode === 'sale' && s.tabTxtActive]}>{t.sale}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={[s.tab, mode === 'rent' && s.tabActive]} activeOpacity={0.85} onPress={() => setMode('rent')}>
+            <Text style={[s.tabTxt, mode === 'rent' && s.tabTxtActive]}>{t.rent}</Text>
+          </TouchableOpacity>
+        </View>
 
         <View style={{ padding: 16 }}>
           {myPosts.filter(p => p.featured).map(p => <TouchableOpacity key={p.id} activeOpacity={0.9} onPress={() => setDetail(p)}><PostCard p={p} /></TouchableOpacity>)}

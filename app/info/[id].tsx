@@ -169,9 +169,9 @@ export default function InfoPage() {
             <LinearGradient colors={['#10b981', '#059669']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={{ width: 120, height: 120, borderRadius: 60, alignItems: 'center', justifyContent: 'center', marginBottom: 24, shadowColor: '#10b981', shadowOpacity: 0.4, shadowRadius: 20, shadowOffset: { width: 0, height: 10 } }}>
               <Text style={{ fontSize: 60 }}>🎉</Text>
             </LinearGradient>
-            <Text style={{ fontSize: 26, fontWeight: '900', color: '#1C2B35', marginBottom: 12, writingDirection: 'rtl', textAlign: 'center' }}>ההודעה נשלחה בהצלחה!</Text>
+            <Text style={{ fontSize: 26, fontWeight: '900', color: '#1C2B35', marginBottom: 12, writingDirection: 'rtl', textAlign: 'center' }}>{t('ct.sentTitle')}</Text>
             <Text style={{ fontSize: 16, color: '#64748b', writingDirection: 'rtl', textAlign: 'center', lineHeight: 24, marginBottom: 32, paddingHorizontal: 20 }}>
-              תודה על פנייתך 🙏{'\n'}נחזור אליך בהקדם האפשרי
+              {t('ct.sentSub')}
             </Text>
             <TouchableOpacity onPress={() => setSent(false)} style={{ backgroundColor: '#1A6B8A', paddingHorizontal: 32, paddingVertical: 14, borderRadius: 12, marginBottom: 12 }} activeOpacity={0.85}>
               <Text style={{ color: '#fff', fontWeight: '800', fontSize: 15 }}>{t('c.message')}</Text>

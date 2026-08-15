@@ -21,7 +21,19 @@ const M: Record<MLang, Record<string, string>> = {
 const ML = (l: string): MLang => (['he', 'en', 'fa', 'ru'].includes(l) ? (l as MLang) : 'en');
 function locDesc(html: string, L: MLang): string {
   if (!html) return html;
-  return html.split(M.he.moreInfo).join(M[L].moreInfo).split(M.he.moreDetails).join(M[L].moreDetails);
+  // Translate the fixed captions first...
+  let out = html.split(M.he.moreInfo).join(M[L].moreInfo).split(M.he.moreDetails).join(M[L].moreDetails);
+  // ...then, for non-Hebrew editions, drop any leftover Hebrew blurb (imported from Google MyMaps,
+  // not in the translation map) so the popup doesn't leak Hebrew. Images + translated link stay.
+  if (L !== 'he') {
+    out = out
+      .replace(/\s*[֐-׿][֐-׿\s,.\-–—׳״'"()!?:0-9]*/g, ' ')
+      .replace(/(·\s*)+·/g, '·')
+      .replace(/>\s*·\s*/g, '> ')
+      .replace(/\s{2,}/g, ' ')
+      .trim();
+  }
+  return out;
 }
 
 export default function MapScreen() {

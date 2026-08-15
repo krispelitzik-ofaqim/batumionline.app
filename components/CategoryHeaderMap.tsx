@@ -3,6 +3,7 @@ import { View, StyleProp, ViewStyle, TouchableOpacity, Text, ScrollView } from '
 import { useI18n } from '../constants/i18n';
 
 const CHOOSE_LOC: Record<string, string> = { he: 'בחר מיקום מבוקש', en: 'Choose a location', fa: 'یک مکان انتخاب کنید', ru: 'Выберите место' };
+const SHOW_ALL: Record<string, string> = { he: 'הצג את כולם', en: 'Show all', fa: 'نمایش همه', ru: 'Показать все' };
 import { API_BASE } from '../constants/api';
 
 type Point = { name: string; lat: number; lng: number };
@@ -61,7 +62,7 @@ export default function CategoryHeaderMap({ points, color = '#1A6B8A', style }: 
               onPress={() => { setFocus(null); setPickerOpen(false); }}
               style={{ paddingVertical: 10, paddingHorizontal: 14, borderBottomWidth: 1, borderBottomColor: '#f1f5f9', backgroundColor: !focus ? '#eef6fa' : '#fff' }}
             >
-              <Text style={{ fontSize: 13, fontWeight: '800', color: '#1C2B35', textAlign: 'right', writingDirection: 'rtl' }}>הצג את כולם</Text>
+              <Text style={{ fontSize: 13, fontWeight: '800', color: '#1C2B35', textAlign: 'right', writingDirection: 'rtl' }}>{SHOW_ALL[lang] || SHOW_ALL.en}</Text>
             </TouchableOpacity>
             {points.map((p, i) => {
               const isOn = focus && focus.lat === p.lat && focus.lng === p.lng;

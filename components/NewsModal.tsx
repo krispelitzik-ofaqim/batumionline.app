@@ -49,6 +49,19 @@ const TOPIC_QUERIES_TR: Record<NLang, Record<Topic, string>> = {
   ru: { tourism: 'Батуми туризм', realestate: 'Батуми недвижимость', food: 'Батуми рестораны', entertainment: 'Батуми ночная жизнь', israel: 'Батуми израильтяне' },
 };
 const RSS_LOCALE: Record<NLang, string> = { he: 'hl=he&gl=IL&ceid=IL:he', en: 'hl=en-US&gl=US&ceid=US:en', fa: 'hl=fa&gl=IR&ceid=IR:fa', ru: 'hl=ru&gl=RU&ceid=RU:ru' };
+
+// Persian/Russian Batumi news is sparse, so most articles arrive in English.
+// Machine-translate title + summary into the reader's language (free endpoint, graceful fallback).
+const gtx = async (text: string, tl: string): Promise<string> => {
+  if (!text || !text.trim()) return text;
+  try {
+    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${tl}&dt=t&q=${encodeURIComponent(text)}`;
+    const r = await fetch(url);
+    const j = await r.json();
+    const out = (j?.[0] || []).map((seg: any) => seg?.[0] || '').join('');
+    return out || text;
+  } catch { return text; }
+};
 const NL = (l: string): NLang => (['he', 'en', 'fa', 'ru'].includes(l) ? (l as NLang) : 'en');
 // Topics per edition — the Israel topic is Hebrew-audience only.
 const TOPICS_FOR = (l: NLang): Topic[] => (l === 'he' ? ['tourism', 'realestate', 'food', 'entertainment', 'israel'] : ['tourism', 'realestate', 'food', 'entertainment']);
@@ -151,34 +164,47 @@ export default function NewsModal({ visible, onClose, bgColor }: { visible: bool
     }
   };
 
-  // ─── Google News RSS — fetch per topic ──────────────────────
+  // ─── Google News RSS — fetch per topic, for a given edition ──
+  const fetchRSSForLang = async (ql: NLang, images: string[]): Promise<NewsItem[]> => {
+    const queries = TOPIC_QUERIES_TR[ql];
+    const results = await Promise.all(
+      TOPICS.map(async (topic) => {
+        const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(queries[topic])}&${RSS_LOCALE[ql]}`;
+        const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`;
+        try {
+          const res = await fetch(apiUrl);
+          const data = await res.json();
+          return (data.items || []).map((item: any) => ({
+            title: item.title || '',
+            summary: item.description?.replace(/<[^>]+>/g, '').slice(0, 250) || '',
+            image: item.enclosure?.link || item.thumbnail || pickFromImages(item.title || item.guid || '', images) || PLACEHOLDER_IMAGES[topic],
+            link: item.link || '',
+            source: item.author || extractSource(item.title),
+            date: formatDate(item.pubDate),
+            pubTs: item.pubDate ? new Date(item.pubDate).getTime() : 0,
+            topic,
+          }));
+        } catch {
+          return [];
+        }
+      })
+    );
+    return (results.flat() as NewsItem[]).sort((a: any, b: any) => (b.pubTs || 0) - (a.pubTs || 0));
+  };
+
   const fetchRSS = async (images: string[] = []) => {
     try {
-      const topics = TOPICS;
-      const results = await Promise.all(
-        topics.map(async (topic) => {
-          const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(TOPIC_QUERIES[topic])}&${RSS_LOCALE[L]}`;
-          const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`;
-          try {
-            const res = await fetch(apiUrl);
-            const data = await res.json();
-            return (data.items || []).map((item: any) => ({
-              title: item.title || '',
-              summary: item.description?.replace(/<[^>]+>/g, '').slice(0, 250) || '',
-              image: item.enclosure?.link || item.thumbnail || pickFromImages(item.title || item.guid || '', images) || PLACEHOLDER_IMAGES[topic],
-              link: item.link || '',
-              source: item.author || extractSource(item.title),
-              date: formatDate(item.pubDate),
-              pubTs: item.pubDate ? new Date(item.pubDate).getTime() : 0,
-              topic,
-            }));
-          } catch {
-            return [];
-          }
-        })
-      );
-      const all: NewsItem[] = results.flat()
-        .sort((a: any, b: any) => (b.pubTs || 0) - (a.pubTs || 0));
+      let all = await fetchRSSForLang(L, images);
+      // Persian/Russian Batumi news is sparse — fall back to the English edition
+      // rather than showing an empty screen (mirrors the app's fallback-to-English).
+      if (all.length === 0 && L !== 'en') all = await fetchRSSForLang('en', images);
+      // Translate the article text into Persian/Russian so the content — not just the UI — is localized.
+      if ((L === 'fa' || L === 'ru') && all.length > 0) {
+        all = await Promise.all(all.map(async (it) => {
+          const [tt, ts] = await Promise.all([gtx(it.title, L), gtx(it.summary, L)]);
+          return { ...it, title: tt || it.title, summary: ts || it.summary };
+        }));
+      }
       if (all.length > 0) {
         setNews(all);
       } else {

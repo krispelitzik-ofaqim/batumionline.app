@@ -1,5 +1,7 @@
 import React, { useState, useRef, useMemo, useEffect } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, TextInput, Image } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, TextInput, Image, Share, Platform, Linking } from 'react-native';
+const IOS_LINK = 'https://apps.apple.com/app/id6762504162';
+const ANDROID_LINK = 'https://play.google.com/store/apps/details?id=com.batumionline.batumi';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams } from 'expo-router';
 import QRCode from 'qrcode';
@@ -13,53 +15,53 @@ type CpLang = 'he' | 'en' | 'fa' | 'ru';
 const CP_TR: Record<CpLang, any> = {
   he: {
     title: 'קופון הנחה', titleDone: 'ההנחה התקבלה', getSpecial: 'קבל הנחה מיוחדת',
-    off: (n: number) => `${n}% הנחה`, upTo10: 'עד 10% הנחה',
+    off: (n: number) => `${n}% הנחה`, upTo10: 'עד 10% הנחה', shareBtn: '💬 שתף בוואטסאפ', shareRedeem: 'למימוש הורידו את אפליקציית בטומי אונליין:',
     showWaiter: 'הצג את הקופון למלצר בעת התשלום', validUntil: (d: string) => `בתוקף עד ${d}`,
     discountToday: 'גובה ההנחה היום', phDate: 'תאריך (YYYY-MM-DD)', phPhone: 'טלפון',
     scanQr: 'סרקו לדף המסעדה באפליקציה', send: 'שלח', ended: 'הקופון הסתיים', toRestaurant: '🍽️ לדף המסעדה',
     endedMsg: 'הקופון של בית העסק הסתיים ואינו פעיל', fillDatePhone: 'נא למלא תאריך וטלפון',
     choosePct: 'נא לבחור אחוז הנחה (3–10%)',
     finePrint: 'קופון אחד לחשבון משולם בלבד · מימוש אחד ליום מכל טלפון. הבעלים רשאים לתת הנחות גורפות ללא קשר לקופון.',
-    dashLink: '📊 קופונים שמומשו · סטטיסטיקה', doneSuccess: 'ההנחה התקבלה בהצלחה',
+    dashLink: '📊 קופונים שמומשו · סטטיסטיקה', buyCoupons: '🎟️ רכישת קופונים · לבעלי מסעדות', doneSuccess: 'ההנחה התקבלה בהצלחה',
     usedAt: (t: string) => `נוצל היום בשעה ${t}`,
     lockNote: 'מימוש נוסף אפשרי מחר (בתאריך חדש). קופון אחד לחשבון משולם בלבד.',
   },
   en: {
     title: 'Discount coupon', titleDone: 'Discount received', getSpecial: 'Get a special discount',
-    off: (n: number) => `${n}% off`, upTo10: 'Up to 10% off',
+    off: (n: number) => `${n}% off`, upTo10: 'Up to 10% off', shareBtn: '💬 Share on WhatsApp', shareRedeem: 'To redeem, download the Batumi Online app:',
     showWaiter: 'Show the coupon to the waiter when paying', validUntil: (d: string) => `Valid until ${d}`,
     discountToday: "Today's discount", phDate: 'Date (YYYY-MM-DD)', phPhone: 'Phone',
     scanQr: 'Scan for the restaurant page in the app', send: 'Send', ended: 'Coupon ended', toRestaurant: '🍽️ To the restaurant page',
     endedMsg: 'This business coupon has ended and is no longer active', fillDatePhone: 'Please enter date and phone',
     choosePct: 'Please choose a discount (3–10%)',
     finePrint: 'One coupon per paid bill only · one redemption per day per phone. Owners may grant blanket discounts regardless of the coupon.',
-    dashLink: '📊 Redeemed coupons · statistics', doneSuccess: 'Discount received successfully',
+    dashLink: '📊 Redeemed coupons · statistics', buyCoupons: '🎟️ Buy coupons · for restaurant owners', doneSuccess: 'Discount received successfully',
     usedAt: (t: string) => `Used today at ${t}`,
     lockNote: 'Another redemption is possible tomorrow (a new date). One coupon per paid bill only.',
   },
   fa: {
     title: 'کوپن تخفیف', titleDone: 'تخفیف دریافت شد', getSpecial: 'دریافت تخفیف ویژه',
-    off: (n: number) => `${n}% تخفیف`, upTo10: 'تا ۱۰٪ تخفیف',
+    off: (n: number) => `${n}% تخفیف`, upTo10: 'تا ۱۰٪ تخفیف', shareBtn: '💬 اشتراک در واتساپ', shareRedeem: 'برای استفاده، اپلیکیشن باتومی آنلاین را دانلود کنید:',
     showWaiter: 'هنگام پرداخت کوپن را به گارسون نشان دهید', validUntil: (d: string) => `معتبر تا ${d}`,
     discountToday: 'تخفیف امروز', phDate: 'تاریخ (YYYY-MM-DD)', phPhone: 'تلفن',
     scanQr: 'برای صفحه رستوران در اپ اسکن کنید', send: 'ارسال', ended: 'کوپن به پایان رسید', toRestaurant: '🍽️ به صفحه رستوران',
     endedMsg: 'کوپن این کسب‌وکار به پایان رسیده و دیگر فعال نیست', fillDatePhone: 'لطفاً تاریخ و تلفن را وارد کنید',
     choosePct: 'لطفاً درصد تخفیف را انتخاب کنید (۳–۱۰٪)',
     finePrint: 'فقط یک کوپن برای هر صورت‌حساب پرداختی · هر روز یک بار برای هر تلفن. مالکان می‌توانند بدون توجه به کوپن تخفیف عمومی بدهند.',
-    dashLink: '📊 کوپن‌های استفاده‌شده · آمار', doneSuccess: 'تخفیف با موفقیت دریافت شد',
+    dashLink: '📊 کوپن‌های استفاده‌شده · آمار', buyCoupons: '🎟️ خرید کوپن · برای صاحبان رستوران', doneSuccess: 'تخفیف با موفقیت دریافت شد',
     usedAt: (t: string) => `امروز ساعت ${t} استفاده شد`,
     lockNote: 'استفاده مجدد فردا امکان‌پذیر است (تاریخ جدید). فقط یک کوپن برای هر صورت‌حساب پرداختی.',
   },
   ru: {
     title: 'Купон на скидку', titleDone: 'Скидка получена', getSpecial: 'Получите специальную скидку',
-    off: (n: number) => `Скидка ${n}%`, upTo10: 'До 10% скидки',
+    off: (n: number) => `Скидка ${n}%`, upTo10: 'До 10% скидки', shareBtn: '💬 Поделиться в WhatsApp', shareRedeem: 'Для использования скачайте приложение Batumi Online:',
     showWaiter: 'Покажите купон официанту при оплате', validUntil: (d: string) => `Действителен до ${d}`,
     discountToday: 'Скидка сегодня', phDate: 'Дата (YYYY-MM-DD)', phPhone: 'Телефон',
     scanQr: 'Сканируйте для страницы ресторана в приложении', send: 'Отправить', ended: 'Купон завершён', toRestaurant: '🍽️ На страницу ресторана',
     endedMsg: 'Купон этого заведения завершён и больше не активен', fillDatePhone: 'Пожалуйста, введите дату и телефон',
     choosePct: 'Пожалуйста, выберите скидку (3–10%)',
     finePrint: 'Один купон на один оплаченный счёт · одно использование в день с одного телефона. Владельцы могут предоставлять общие скидки независимо от купона.',
-    dashLink: '📊 Использованные купоны · статистика', doneSuccess: 'Скидка успешно получена',
+    dashLink: '📊 Использованные купоны · статистика', buyCoupons: '🎟️ Купить купоны · для владельцев', doneSuccess: 'Скидка успешно получена',
     usedAt: (t: string) => `Использовано сегодня в ${t}`,
     lockNote: 'Повторное использование возможно завтра (новая дата). Один купон на один оплаченный счёт.',
   },
@@ -177,6 +179,21 @@ export default function CouponScreen() {
     try { await AsyncStorage.setItem(lockKey(biz.id, phone.trim()), JSON.stringify({ pct: chosen, time })); } catch {}
   };
 
+  const shareCoupon = async () => {
+    const discount = isFixed ? C.off(biz.pct) : C.upTo10;
+    const caption = `🎁 ${biz.name} · ${discount}\n${C.shareRedeem}\n📱 ${IOS_LINK}\n🤖 ${ANDROID_LINK}`;
+    if (Platform.OS === 'web') {
+      try { (window as any).open('https://wa.me/?text=' + encodeURIComponent(caption), '_blank'); } catch {}
+      return;
+    }
+    try {
+      const img = (Image as any).resolveAssetSource(require('../assets/images/coupon-share.jpg'))?.uri;
+      await Share.share(img ? { message: caption, url: img } : { message: caption });
+    } catch {
+      try { Linking.openURL('whatsapp://send?text=' + encodeURIComponent(caption)); } catch {}
+    }
+  };
+
   // QR encodes a deep link that opens this restaurant's page inside our app.
   const deepLink = `batumionline://place/${biz.id}`;
   const QR = () => {
@@ -245,8 +262,16 @@ export default function CouponScreen() {
               <Text style={s.toRestTxt}>{C.toRestaurant}</Text>
             </TouchableOpacity>
 
+            <TouchableOpacity style={s.waBtn} activeOpacity={0.85} onPress={shareCoupon}>
+              <Text style={s.waTxt}>{C.shareBtn}</Text>
+            </TouchableOpacity>
+
             <Text style={s.finePrint}>{C.finePrint}</Text>
           </View>
+
+          <TouchableOpacity style={s.buyBtn} activeOpacity={0.85} onPress={() => router.push('/agent-coupon' as any)}>
+            <Text style={s.buyTxt}>{C.buyCoupons}</Text>
+          </TouchableOpacity>
 
           <TouchableOpacity style={s.dashLink} onPress={() => router.push('/coupon-dashboard' as any)}>
             <Text style={s.dashLinkTxt}>{C.dashLink}</Text>
@@ -319,6 +344,10 @@ const s = StyleSheet.create({
   lockNote: { fontSize: 11, color: '#a9a291', fontFamily: F.r, marginTop: 14, writingDirection: 'rtl', textAlign: 'center', lineHeight: 16 },
   toRestBtn: { alignSelf: 'stretch', marginTop: 10, borderRadius: 4, paddingVertical: 13, alignItems: 'center', borderWidth: 1.5, borderColor: GOLD, backgroundColor: '#fff' },
   toRestTxt: { fontSize: 15, fontFamily: F.b, color: GOLD },
-  dashLink: { marginTop: 18, alignItems: 'center', paddingVertical: 12 },
+  waBtn: { backgroundColor: '#25D366', borderRadius: 6, paddingVertical: 13, alignItems: 'center', marginTop: 14 },
+  waTxt: { color: '#fff', fontFamily: F.b, fontSize: 15 },
+  buyBtn: { marginTop: 16, backgroundColor: GOLD, borderRadius: 6, paddingVertical: 14, alignItems: 'center', shadowColor: '#000', shadowOpacity: 0.12, shadowRadius: 4, shadowOffset: { width: 0, height: 2 } },
+  buyTxt: { fontSize: 15, fontFamily: F.b, color: '#fff', writingDirection: 'rtl' },
+  dashLink: { marginTop: 12, alignItems: 'center', paddingVertical: 12 },
   dashLinkTxt: { fontSize: 13, fontFamily: F.sb, color: NAVY, writingDirection: 'rtl' },
 });

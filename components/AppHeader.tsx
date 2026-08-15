@@ -2,11 +2,13 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
 import { router } from 'expo-router';
 import { Colors } from '../constants/colors';
+import { useI18n } from '../constants/i18n';
 import Breadcrumb from './Breadcrumb';
 
 type Crumb = { id?: string; title: string; path?: string };
 
 export default function AppHeader({ crumbs = [], dark = false }: { crumbs?: Crumb[]; dark?: boolean }) {
+  const { t } = useI18n();
   const bg = dark ? '#1C2B35' : '#fff';
   const borderColor = dark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.08)';
   const buttonBg = dark ? 'rgba(255,255,255,0.12)' : '#f1f5f9';
@@ -18,7 +20,7 @@ export default function AppHeader({ crumbs = [], dark = false }: { crumbs?: Crum
       <TouchableOpacity
         onPress={() => (router.canGoBack() ? router.back() : router.replace("/"))}
         style={s.backBtn}
-        accessibilityLabel="חזור"
+        accessibilityLabel={t('c.back')}
       >
         <Text style={[s.arrow, { color: arrowColor }]}>←</Text>
       </TouchableOpacity>
