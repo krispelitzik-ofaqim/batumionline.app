@@ -2128,14 +2128,15 @@ function aiPlaceIndex(db) {
 }
 
 function anthropicChat(system, userMsg) {
-  return new Promise((resolve, reject) => {
-    const payload = JSON.stringify({ model: AI_MODEL, max_tokens: 500, system, messages: [{ role: 'user', content: userMsg }] });
+  return new Promise((resolve) => {
+    const payload = JSON.stringify({ model: AI_MODEL, max_tokens: 600, system, messages: [{ role: 'user', content: userMsg }] });
     const r = https.request({ method: 'POST', hostname: 'api.anthropic.com', path: '/v1/messages', headers: { 'x-api-key': ANTHROPIC_KEY, 'anthropic-version': '2023-06-01', 'content-type': 'application/json', 'content-length': Buffer.byteLength(payload) } }, (resp) => {
-      let d = ''; resp.on('data', (c) => (d += c)); resp.on('end', () => { try { resolve(JSON.parse(d)); } catch (e) { reject(e); } });
+      let d = ''; resp.on('data', (c) => (d += c)); resp.on('end', () => { let j = null; try { j = JSON.parse(d); } catch {} resolve({ status: resp.statusCode, json: j, raw: (d || '').slice(0, 200) }); });
     });
-    r.on('error', reject); r.write(payload); r.end();
+    r.on('error', (e) => resolve({ status: 0, json: null, raw: String(e && e.message || e) })); r.write(payload); r.end();
   });
 }
+function aiExtract(j) { return (j && j.content && Array.isArray(j.content) ? j.content.filter((b) => b && b.type === 'text').map((b) => b.text).join('') : '') || ''; }
 
 app.post('/api/ai/ask', async (req, res) => {
   try {
@@ -2150,18 +2151,25 @@ app.post('/api/ai/ask', async (req, res) => {
 Answer ONLY from the APP DATA below. This is a CLOSED assistant: do NOT use outside knowledge and NEVER invent places, prices, phone numbers or facts.
 If the answer is not in the app data, briefly say (in ${langName}) that you don't have that in the app, and suggest something related that the app DOES offer.
 Reply in ${langName}, 1-3 short spoken sentences (it is read aloud) — warm and concise.
-When you recommend specific places, add their id values on a FINAL line starting with "PLACES:" (comma-separated, max 3) so the app can link them. Never mention ids in the spoken text.${loc}
+When you recommend specific places, add a FINAL line exactly like: PLACES: id::Name, id::Name (max 3) — where "id" is the place id and "Name" is that place's name written in ${langName}. Never mention this line or the ids in the spoken text.${loc}
 
 === APP DATA ===
 ${kb}`;
-    const j = await anthropicChat(system, String(question));
-    if (j && j.error) return res.json({ error: (j.error.message || 'ai_error') });
-    let txt = (j && j.content && j.content[0] && j.content[0].text) || '';
-    let ids = [];
+    let resp = await anthropicChat(system, String(question));
+    if ((!resp.json || resp.status >= 429) ) { await new Promise((r) => setTimeout(r, 1500)); resp = await anthropicChat(system, String(question)); }
+    const j = resp.json;
+    if (!j) return res.json({ error: `no_response status ${resp.status}`, raw: resp.raw });
+    if (j.error) return res.json({ error: (j.error.message || j.error.type || 'ai_error'), status: resp.status });
+    let txt = aiExtract(j);
+    if (!txt) return res.json({ error: 'empty_response', debug: { status: resp.status, stop: j.stop_reason, type: j.type, keys: Object.keys(j || {}) } });
+    let pairs = [];
     const m = txt.match(/PLACES:\s*(.+)\s*$/m);
-    if (m) { ids = m[1].split(',').map((s) => s.trim()).filter(Boolean); txt = txt.replace(/PLACES:.*$/m, '').trim(); }
+    if (m) {
+      pairs = m[1].split(',').map((s) => s.trim()).filter(Boolean).map((s) => { const i = s.indexOf('::'); return i >= 0 ? { id: s.slice(0, i).trim(), name: s.slice(i + 2).trim() } : { id: s.trim(), name: '' }; });
+      txt = txt.replace(/PLACES:.*$/m, '').trim();
+    }
     const byId = aiPlaceIndex(db);
-    const places = ids.map((id) => byId[id]).filter(Boolean).slice(0, 3);
+    const places = pairs.map((p) => { const info = byId[p.id]; return info ? { ...info, name: p.name || info.titleEn || info.title } : null; }).filter(Boolean).slice(0, 3);
     res.json({ answer: txt || '—', places });
   } catch (e) { res.json({ error: String((e && e.message) || e) }); }
 });
