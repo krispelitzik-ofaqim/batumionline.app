@@ -2,7 +2,7 @@
   "expo": {
     "name": "Batumionline",
     "slug": "batumionline-app",
-    "version": "2.0.7",
+    "version": "2.0.8",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -16,7 +16,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.batumionline.app",
-      "buildNumber": "46",
+      "buildNumber": "47",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
         "NSLocationWhenInUseUsageDescription": "האפליקציה משתמשת במיקום שלך כדי להציג אתרים ומקומות קרובים אליך בבטומי."
@@ -29,7 +29,7 @@
       },
       "edgeToEdgeEnabled": true,
       "package": "com.batumionline.batumi",
-      "versionCode": 10007,
+      "versionCode": 10008,
       "config": {
         "googleMaps": {
           "apiKey": "AIzaSyALRDZxdJWr0htS6kI-PxyMTvnpXArqK-M"
