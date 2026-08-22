@@ -1552,7 +1552,7 @@ export default function CategoryScreen() {
                 <HtmlContent html={(cat as any).longTextBottom} baseStyle={{ color: darkCat ? '#e2e8f0' : Colors.TEXT, textAlign: 'right', writingDirection: 'rtl' }} />
               </View>
             )}
-            {cat.id === '10' && (
+            {(cat.id === '10' || cat.id === '5') && (
               <TouchableOpacity
                 onPress={() => router.push('/category/a8' as any)}
                 activeOpacity={0.85}

@@ -37,7 +37,8 @@
       },
       "permissions": [
         "ACCESS_FINE_LOCATION",
-        "ACCESS_COARSE_LOCATION"
+        "ACCESS_COARSE_LOCATION",
+        "RECORD_AUDIO"
       ]
     },
     "plugins": [
@@ -55,6 +56,13 @@
         {
           "androidAppId": "ca-app-pub-2780806346630674~9757661393",
           "iosAppId": "ca-app-pub-2780806346630674~2191582164"
+        }
+      ],
+      [
+        "expo-speech-recognition",
+        {
+          "microphonePermission": "האפליקציה משתמשת במיקרופון כדי שתוכל לשאול את המסייע הקולי בדיבור.",
+          "speechRecognitionPermission": "האפליקציה משתמשת בזיהוי דיבור כדי להבין את השאלות שלך למסייע הקולי."
         }
       ]
     ],

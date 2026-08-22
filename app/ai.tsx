@@ -10,6 +10,10 @@ import { API_BASE } from '../constants/api';
 let Speech: any = null;
 try { Speech = require('expo-speech'); } catch {}
 
+// Native speech-to-text (voice input) via expo-speech-recognition — guarded so web still runs.
+let NativeSR: any = null;
+try { NativeSR = require('expo-speech-recognition'); } catch {}
+
 // Speak text aloud: browser's built-in speechSynthesis on web, expo-speech on native.
 function speak(text: string, langCode: string) {
   try {
@@ -34,8 +38,16 @@ function stopSpeak() {
 
 type Phase = 'idle' | 'listening' | 'thinking' | 'answered' | 'locked';
 
-// Free-tries limit (per device) before an upgrade is required.
-const FREE_LIMIT = 5;
+// AI assistant is free & unlimited (no paywall). Set to a finite number to re-enable a limit.
+const FREE_LIMIT = Infinity;
+
+// Internal promo (AdMob-style slim banner) driving users to the coupons feature.
+const PROMO: Record<string, string> = {
+  he: 'קבלו הנחה במסעדות בטומי',
+  en: 'Get a discount at Batumi restaurants',
+  fa: 'در رستوران‌های باتومی تخفیف بگیرید',
+  ru: 'Получите скидку в ресторанах Батуми',
+};
 const USES_KEY = '@ai_uses';
 async function getUses(): Promise<number> {
   try {
@@ -79,7 +91,7 @@ export default function AIScreen() {
   const pulse = useRef(new Animated.Value(1)).current;
   const recRef = useRef<any>(null);
 
-  useEffect(() => { getUses().then(setUsed); return () => { try { recRef.current?.stop?.(); } catch {} stopSpeak(); }; }, []);
+  useEffect(() => { getUses().then(setUsed); return () => { try { const r: any = recRef.current; if (Array.isArray(r)) r.forEach((s: any) => s?.remove?.()); else r?.stop?.(); } catch {} try { NativeSR?.ExpoSpeechRecognitionModule?.stop?.(); } catch {} stopSpeak(); }; }, []);
 
   useEffect(() => {
     if (phase === 'listening') {
@@ -112,13 +124,38 @@ export default function AIScreen() {
     }
   };
 
-  const run = () => {
+  const run = async () => {
     if (phase === 'listening' || phase === 'thinking') return;
     if (used >= FREE_LIMIT) { stopSpeak(); setPhase('locked'); return; }
     stopSpeak();
+
+    // NATIVE (app): expo-speech-recognition
+    if (Platform.OS !== 'web') {
+      const M = NativeSR?.ExpoSpeechRecognitionModule;
+      if (!M) { setUserQ(''); setAns(T.noMic); setPhase('answered'); return; }
+      try {
+        const perm = await M.requestPermissionsAsync();
+        if (!perm?.granted) { setUserQ(''); setAns(T.noMic); setPhase('answered'); return; }
+        try { (recRef.current as any[])?.forEach?.((s: any) => s?.remove?.()); } catch {}
+        const subs: any[] = [];
+        const cleanup = () => { try { subs.forEach((s) => s?.remove?.()); } catch {} };
+        subs.push(M.addListener('result', (e: any) => {
+          const q = e?.results?.[0]?.transcript || '';
+          if (e?.isFinal) { cleanup(); try { M.stop(); } catch {} if (q) ask(q); else setPhase('idle'); }
+        }));
+        subs.push(M.addListener('error', () => { cleanup(); setPhase('idle'); }));
+        subs.push(M.addListener('end', () => { setPhase((p) => (p === 'listening' ? 'idle' : p)); }));
+        recRef.current = subs as any;
+        setUserQ(''); setAns(''); setPlaces([]); setPhase('listening');
+        M.start({ lang: T.speechLang, interimResults: false, continuous: false });
+      } catch { setPhase('idle'); }
+      return;
+    }
+
+    // WEB (browser): native SpeechRecognition
     const w: any = typeof window !== 'undefined' ? window : null;
     const SR = w && (w.SpeechRecognition || w.webkitSpeechRecognition);
-    if (Platform.OS !== 'web' || !SR) { setUserQ(''); setAns(T.noMic); setPhase('answered'); return; }
+    if (!SR) { setUserQ(''); setAns(T.noMic); setPhase('answered'); return; }
     try {
       const rec = new SR();
       rec.lang = T.speechLang;
@@ -191,8 +228,15 @@ export default function AIScreen() {
             </TouchableOpacity>
           </Animated.View>
           <Text style={[s.micLabel, { color: btnColor }]}>{btnLabel}</Text>
-          {!locked && <Text style={s.remain}>{T.remaining(remaining)}</Text>}
+          {!locked && Number.isFinite(FREE_LIMIT) && <Text style={s.remain}>{T.remaining(remaining)}</Text>}
         </View>
+
+        {/* Internal promo — restaurant coupons (slim AdMob-style banner, anchored to the bottom) */}
+        <TouchableOpacity style={[s.promo, { flexDirection: isRTL ? 'row-reverse' : 'row' }]} activeOpacity={0.85} onPress={() => router.push('/coupons' as any)}>
+          <Text style={s.promoIcon}>🎫</Text>
+          <Text style={[s.promoTxt, { flex: 1, textAlign: ta, writingDirection: wd }]} numberOfLines={1}>{PROMO[lang] || PROMO.en}</Text>
+          <Text style={s.promoArrow}>{isRTL ? '‹' : '›'}</Text>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
@@ -209,6 +253,10 @@ const s = StyleSheet.create({
   hint: { fontSize: 15, color: '#94a0ab', textAlign: 'center' },
   micBar: { alignItems: 'center', gap: 10, paddingVertical: 22, paddingHorizontal: 20 },
   remain: { fontSize: 12, color: '#94a0ab', fontWeight: '700' },
+  promo: { alignItems: 'center', gap: 10, height: 54, backgroundColor: '#FFFFFF', borderRadius: 12, borderWidth: 1, borderColor: '#E4DFD8', marginHorizontal: 14, marginBottom: 4, paddingHorizontal: 14 },
+  promoIcon: { fontSize: 20 },
+  promoTxt: { fontSize: 14, fontWeight: '700', color: Colors.TEXT },
+  promoArrow: { fontSize: 22, color: Colors.PRIMARY, fontWeight: '300' },
   lockWrap: { alignItems: 'center', gap: 10, paddingVertical: 30 },
   lockIcon: { fontSize: 48 },
   lockTitle: { fontSize: 17, fontWeight: '900', color: Colors.TEXT, textAlign: 'center' },

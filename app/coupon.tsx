@@ -269,8 +269,8 @@ export default function CouponScreen() {
             <Text style={s.finePrint}>{C.finePrint}</Text>
           </View>
 
-          <TouchableOpacity style={s.buyBtn} activeOpacity={0.85} onPress={() => router.push('/agent-coupon' as any)}>
-            <Text style={s.buyTxt}>{C.buyCoupons}</Text>
+          <TouchableOpacity style={[s.buyBtn, { alignItems: (lang === 'he' || lang === 'fa') ? 'flex-end' : 'flex-start' }]} activeOpacity={0.7} onPress={() => router.push('/agent-coupon' as any)}>
+            <Text style={[s.buyTxt, { textAlign: (lang === 'he' || lang === 'fa') ? 'right' : 'left', writingDirection: (lang === 'he' || lang === 'fa') ? 'rtl' : 'ltr' }]}>{C.buyCoupons}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={s.dashLink} onPress={() => router.push('/coupon-dashboard' as any)}>
@@ -346,8 +346,8 @@ const s = StyleSheet.create({
   toRestTxt: { fontSize: 15, fontFamily: F.b, color: GOLD },
   waBtn: { backgroundColor: '#25D366', borderRadius: 6, paddingVertical: 13, alignItems: 'center', marginTop: 14 },
   waTxt: { color: '#fff', fontFamily: F.b, fontSize: 15 },
-  buyBtn: { marginTop: 16, backgroundColor: GOLD, borderRadius: 6, paddingVertical: 14, alignItems: 'center', shadowColor: '#000', shadowOpacity: 0.12, shadowRadius: 4, shadowOffset: { width: 0, height: 2 } },
-  buyTxt: { fontSize: 15, fontFamily: F.b, color: '#fff', writingDirection: 'rtl' },
+  buyBtn: { marginTop: 16, backgroundColor: GOLD, borderRadius: 6, paddingVertical: 14, paddingHorizontal: 16, shadowColor: '#000', shadowOpacity: 0.12, shadowRadius: 4, shadowOffset: { width: 0, height: 2 } },
+  buyTxt: { fontSize: 15, fontFamily: F.b, color: '#fff' },
   dashLink: { marginTop: 12, alignItems: 'center', paddingVertical: 12 },
   dashLinkTxt: { fontSize: 13, fontFamily: F.sb, color: NAVY, writingDirection: 'rtl' },
 });
