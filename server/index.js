@@ -4,6 +4,7 @@ const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
 const multer = require('multer');
+const crypto = require('crypto');
 let Expo = null;
 try { Expo = require('expo-server-sdk').Expo; } catch (e) { console.warn('expo-server-sdk not available'); }
 const expoClient = Expo ? new Expo() : null;
@@ -709,6 +710,42 @@ app.get('/api/unsplash', async (req, res) => {
   }
 });
 
+// ─── Google Places photo proxy ────────────────────────────────
+// Handing the app a places.googleapis.com media URL meant Google billed us for
+// every photo every viewer loaded — that was the whole Places bill. We now fetch
+// each photo once, keep it on disk, and serve it ourselves. It also stops the
+// API key from travelling inside image URLs.
+const PLACES_PHOTO_DIR = path.join(UPLOADS_DIR, 'places');
+if (!fs.existsSync(PLACES_PHOTO_DIR)) fs.mkdirSync(PLACES_PHOTO_DIR, { recursive: true });
+
+function placePhotoFile(ref, w) {
+  return path.join(PLACES_PHOTO_DIR, crypto.createHash('sha1').update(`${ref}|${w}`).digest('hex') + '.jpg');
+}
+// The URL the app gets. Same shape for every caller, so nothing leaks the key.
+function placePhotoUrl(ref, w = 800) {
+  return `/api/places/photo?ref=${encodeURIComponent(ref)}&w=${w}`;
+}
+
+app.get('/api/places/photo', async (req, res) => {
+  const ref = String(req.query.ref || '');
+  const w = Math.min(1600, Math.max(200, parseInt(req.query.w, 10) || 800));
+  // Only ever a Places photo name — never an arbitrary URL.
+  if (!/^places\/[A-Za-z0-9_\-]+\/photos\/[A-Za-z0-9_\-]+$/.test(ref)) return res.status(400).end();
+  const file = placePhotoFile(ref, w);
+  res.set('Cache-Control', 'public, max-age=31536000, immutable');
+  if (fs.existsSync(file)) return res.sendFile(file);
+  const key = process.env.GOOGLE_PLACES_KEY;
+  if (!key) return res.status(503).end();
+  try {
+    const r = await fetch(`https://places.googleapis.com/v1/${ref}/media?maxWidthPx=${w}&key=${key}`, { redirect: 'follow' });
+    if (!r.ok) return res.status(r.status).end();
+    const buf = Buffer.from(await r.arrayBuffer());
+    fs.writeFile(file, buf, () => {});
+    res.set('Content-Type', r.headers.get('content-type') || 'image/jpeg');
+    return res.end(buf);
+  } catch { return res.status(502).end(); }
+});
+
 // ─── Google Places ────────────────────────────────────────────
 app.get('/api/places', async (req, res) => {
   const key = process.env.GOOGLE_PLACES_KEY;
@@ -740,7 +777,7 @@ app.get('/api/places', async (req, res) => {
 
     const photos = (p.photos || []).slice(0, 10).map(ph => ({
       ref: ph.name,
-      url: `https://places.googleapis.com/v1/${ph.name}/media?maxWidthPx=800&key=${key}`,
+      url: placePhotoUrl(ph.name, 800),
     }));
 
     const payload = {
@@ -804,7 +841,7 @@ app.post('/api/admin/fetch-photos', async (req, res) => {
       const photo0 = p?.photos?.[0];
       const photoName = photo0?.name;
       if (!photoName) { results.push({ id: h.id, title: h.title, status: 'no-photo' }); continue; }
-      const photoUrl = `https://places.googleapis.com/v1/${photoName}/media?maxWidthPx=800&key=${key}`;
+      const photoUrl = placePhotoUrl(photoName, 800);
       const imgRes = await fetch(photoUrl);
       if (!imgRes.ok) { results.push({ id: h.id, title: h.title, status: 'fetch-failed' }); continue; }
       const buf = Buffer.from(await imgRes.arrayBuffer());
@@ -946,7 +983,7 @@ app.post('/api/admin/populate-category', async (req, res) => {
       try {
         const photoName = p.photos?.[0]?.name;
         if (photoName) {
-          const photoUrl = `https://places.googleapis.com/v1/${photoName}/media?maxWidthPx=800&key=${key}`;
+          const photoUrl = placePhotoUrl(photoName, 800);
           const ir = await fetch(photoUrl);
           if (ir.ok) {
             const buf = Buffer.from(await ir.arrayBuffer());
