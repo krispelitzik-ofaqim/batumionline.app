@@ -2211,6 +2211,14 @@ ${kb}`;
   } catch (e) { res.json({ error: String((e && e.message) || e) }); }
 });
 
+// AdMob verifies the app by fetching this file from the domain the store listing
+// names. It has to be served as plain text and before the SPA catch-all, which
+// would otherwise answer with index.html.
+app.get('/app-ads.txt', (_req, res) => {
+  res.type('text/plain').set('Cache-Control', 'public, max-age=3600');
+  res.send('google.com, pub-2780806346630674, DIRECT, f08c47fec0942fa0\n');
+});
+
 if (fs.existsSync(WEB_DIST)) {
   app.use(express.static(WEB_DIST, {
     setHeaders: (res, filePath) => {
