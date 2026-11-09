@@ -6,8 +6,9 @@ import {
 import { router } from 'expo-router';
 import { Colors } from '../../constants/colors';
 import { AdminContext } from '../../constants/adminContext';
+import { API_BASE } from '../../constants/api';
+import { setAdminKey } from '../../constants/adminKey';
 
-const ADMIN_PASSWORD = 'batumi2024';
 
 export default function AdminLogin() {
   const [password, setPassword] = useState('');
@@ -20,13 +21,17 @@ export default function AdminLogin() {
     if (isAdmin) router.replace('/admin/dashboard');
   }, [isAdmin]);
 
-  const handleLogin = () => {
-    if (password === ADMIN_PASSWORD) {
-      setAdmin(true);
-      router.replace('/admin/dashboard');
-    } else {
-      setError('סיסמה שגויה');
-    }
+  // (owner, 9.11.2026) the password is checked by the server, not in the app's code
+  const handleLogin = async () => {
+    try {
+      const r = await fetch(`${API_BASE}/api/admin/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password }) });
+      const j = await r.json();
+      if (j && j.success) {
+        setAdminKey(password);
+        setAdmin(true);
+        router.replace('/admin/dashboard');
+      } else setError('סיסמה שגויה');
+    } catch (e) { setError('אין חיבור לשרת'); }
   };
 
   return (

@@ -156,13 +156,49 @@ const listingsUpload = multer({
   },
 });
 
+
+// ─── Admin auth (owner, 9.11.2026) ───────────────────────────
+// Until now the server trusted everyone: GET /api/content returned the whole DB (admin passwords, messages,
+// subscribers) and every write endpoint was open. Now private data and admin actions need the admin key,
+// sent by the admin panel as the "x-admin-key" header. The key is the ADMIN_PASSWORD env var (set on Railway),
+// or a password from adminAuth (master or a user) kept in the DB.
+const PRIVATE_KEYS = ['adminAuth', 'contactSubmissions', 'subscribers', 'pushTokens'];
+function adminRole(req) {
+  const k = String(req.get('x-admin-key') || '').trim();
+  if (!k) return null;
+  // once ADMIN_PASSWORD is set on Railway it is the only key: the passwords kept in the DB were public until today
+  if (process.env.ADMIN_PASSWORD) return k === process.env.ADMIN_PASSWORD ? 'owner' : null;
+  try {
+    const a = (readDB() || {}).adminAuth || {};
+    if (a.password && k === a.password) return 'owner';
+    const u = (a.users || []).find(x => x && x.password && x.password === k);
+    if (u) return u.role || 'viewer';
+  } catch (e) {}
+  return null;
+}
+function requireAdmin(req, res, next) {
+  if (adminRole(req)) return next();
+  res.status(401).json({ success: false, error: 'admin key required' });
+}
+function publicView(data) {
+  if (!data || typeof data !== 'object') return data;
+  const o = { ...data };
+  for (const k of PRIVATE_KEYS) delete o[k];
+  return o;
+}
+app.post('/api/admin/login', (req, res) => {
+  const role = adminRole({ get: () => String((req.body || {}).password || '') });
+  if (!role) return res.status(401).json({ success: false, error: 'wrong password' });
+  res.json({ success: true, role });
+});
+
 // ─── API Routes ───────────────────────────────────────────────
 
 // GET /api/content — fetch all content
 app.get('/api/content', (req, res) => {
   try {
     const data = readDB();
-    res.json({ success: true, data });
+    res.json({ success: true, data: adminRole(req) ? data : publicView(data) });
   } catch (err) {
     res.status(500).json({ success: false, error: 'Failed to read database' });
   }
@@ -173,6 +209,7 @@ app.get('/api/content/:section', (req, res) => {
   try {
     const data = readDB();
     const section = req.params.section;
+    if (PRIVATE_KEYS.includes(section) && !adminRole(req)) return res.status(401).json({ success: false, error: 'admin key required' });
     if (data[section] !== undefined) {
       res.json({ success: true, data: data[section] });
     } else {
@@ -184,7 +221,7 @@ app.get('/api/content/:section', (req, res) => {
 });
 
 // PUT /api/content — update all content
-app.put('/api/content', (req, res) => {
+app.put('/api/content', requireAdmin, (req, res) => {
   try {
     const newData = req.body;
     if (!newData || typeof newData !== 'object') {
@@ -198,7 +235,7 @@ app.put('/api/content', (req, res) => {
 });
 
 // PUT /api/content/:section — update a specific section
-app.put('/api/content/:section', (req, res) => {
+app.put('/api/content/:section', requireAdmin, (req, res) => {
   try {
     const data = readDB();
     const section = req.params.section;
@@ -228,7 +265,7 @@ app.post('/api/push/register', (req, res) => {
   }
 });
 
-app.post('/api/push/send', async (req, res) => {
+app.post('/api/push/send', requireAdmin, async (req, res) => {
   try {
     if (!expoClient) return res.status(500).json({ success: false, error: 'push server not available' });
     const { title, body, data: extra } = req.body || {};
@@ -254,7 +291,7 @@ app.post('/api/push/send', async (req, res) => {
   }
 });
 
-app.get('/api/push/tokens', (req, res) => {
+app.get('/api/push/tokens', requireAdmin, (req, res) => {
   try {
     const data = readDB();
     res.json({ success: true, count: (data.pushTokens || []).length, history: data.pushHistory || [] });
@@ -308,7 +345,7 @@ app.post('/api/contact', (req, res) => {
   }
 });
 
-app.get('/api/contact', (req, res) => {
+app.get('/api/contact', requireAdmin, (req, res) => {
   try {
     const data = readDB();
     res.json({ success: true, data: Array.isArray(data.contactSubmissions) ? data.contactSubmissions : [] });
@@ -318,7 +355,7 @@ app.get('/api/contact', (req, res) => {
 });
 
 // GET /api/uploads — list all uploaded files with tags
-app.get('/api/uploads', (req, res) => {
+app.get('/api/uploads', requireAdmin, (req, res) => {
   try {
     const data = readDB();
     const tags = data.mediaTags || {};
@@ -354,7 +391,7 @@ app.get('/api/uploads', (req, res) => {
 });
 
 // PUT /api/uploads/:filename/tags — set tags for a file
-app.put('/api/uploads/:filename/tags', (req, res) => {
+app.put('/api/uploads/:filename/tags', requireAdmin, (req, res) => {
   try {
     const filename = path.basename(req.params.filename);
     const tags = Array.isArray(req.body.tags) ? req.body.tags : [];
@@ -370,7 +407,7 @@ app.put('/api/uploads/:filename/tags', (req, res) => {
 });
 
 // DELETE /api/uploads/:filename — delete an uploaded file
-app.delete('/api/uploads/:filename', (req, res) => {
+app.delete('/api/uploads/:filename', requireAdmin, (req, res) => {
   try {
     const filename = path.basename(req.params.filename);
     const fp = path.join(UPLOADS_DIR, filename);
@@ -406,7 +443,7 @@ app.get('/api/gallery', (req, res) => {
 });
 
 // POST /api/gallery — upload an image to the gallery
-app.post('/api/gallery', galleryUpload.single('file'), (req, res) => {
+app.post('/api/gallery', requireAdmin, galleryUpload.single('file'), (req, res) => {
   if (!req.file) return res.status(400).json({ success: false, error: 'No file' });
   res.json({
     success: true,
@@ -416,7 +453,7 @@ app.post('/api/gallery', galleryUpload.single('file'), (req, res) => {
 });
 
 // DELETE /api/gallery/:filename
-app.delete('/api/gallery/:filename', (req, res) => {
+app.delete('/api/gallery/:filename', requireAdmin, (req, res) => {
   try {
     const filename = path.basename(req.params.filename);
     const fp = path.join(GALLERY_DIR, filename);
@@ -434,7 +471,7 @@ app.delete('/api/gallery/:filename', (req, res) => {
 });
 
 // PUT /api/gallery/order — set explicit order
-app.put('/api/gallery/order', (req, res) => {
+app.put('/api/gallery/order', requireAdmin, (req, res) => {
   try {
     const order = Array.isArray(req.body.order) ? req.body.order : [];
     const data = readDB();
@@ -473,7 +510,7 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
 });
 
 // POST /api/upload/multiple — upload multiple files
-app.post('/api/upload/multiple', upload.array('files', 10), (req, res) => {
+app.post('/api/upload/multiple', requireAdmin, upload.array('files', 10), (req, res) => {
   try {
     if (!req.files || req.files.length === 0) {
       return res.status(400).json({ success: false, error: 'No files uploaded' });
@@ -802,7 +839,7 @@ app.get('/api/places', async (req, res) => {
 });
 
 // ─── Admin: backfill hotel/villa photos from Places API ───────
-app.post('/api/admin/fetch-photos', async (req, res) => {
+app.post('/api/admin/fetch-photos', requireAdmin, async (req, res) => {
   const key = process.env.GOOGLE_PLACES_KEY;
   if (!key) return res.status(503).json({ error: 'No key' });
   const { categoryId, placeholder = '/uploads/city.jpg' } = req.body || {};
@@ -861,7 +898,7 @@ app.post('/api/admin/fetch-photos', async (req, res) => {
 });
 
 // ─── Admin: set sub-category tile icon from first hotel image ─
-app.post('/api/admin/set-tile-icon', (req, res) => {
+app.post('/api/admin/set-tile-icon', requireAdmin, (req, res) => {
   const { categoryId } = req.body || {};
   if (!categoryId) return res.status(400).json({ error: 'categoryId required' });
   const db = readDB();
@@ -924,7 +961,7 @@ app.get('/api/guide-recommend/by-phone', (req, res) => {
   res.json({ items: list });
 });
 
-app.delete('/api/guide-recommend/:id', (req, res) => {
+app.delete('/api/guide-recommend/:id', requireAdmin, (req, res) => {
   const id = req.params.id;
   const phone = String(req.body?.phone || req.query.phone || '').replace(/[^\d+]/g, '');
   if (!id || !phone) return res.status(400).json({ error: 'id+phone required' });
@@ -939,7 +976,7 @@ app.delete('/api/guide-recommend/:id', (req, res) => {
 });
 
 // ─── Admin: bulk populate category from Places search ─────────
-app.post('/api/admin/populate-category', async (req, res) => {
+app.post('/api/admin/populate-category', requireAdmin, async (req, res) => {
   const key = process.env.GOOGLE_PLACES_KEY;
   if (!key) return res.status(503).json({ error: 'No key' });
   const { categoryId, query, count = 10 } = req.body || {};
@@ -1022,7 +1059,7 @@ app.post('/api/admin/populate-category', async (req, res) => {
 });
 
 // ─── Diagnostic: check DATA_DIR mount ─────────────────────────
-app.get('/api/admin/diag', (req, res) => {
+app.get('/api/admin/diag', requireAdmin, (req, res) => {
   try {
     const exists = fs.existsSync(DATA_DIR);
     const files = exists ? fs.readdirSync(DATA_DIR) : [];
@@ -1163,7 +1200,7 @@ app.get('/api/recommendations', (req, res) => {
   }
 });
 
-app.get('/api/recommendations/all', (req, res) => {
+app.get('/api/recommendations/all', requireAdmin, (req, res) => {
   try {
     const db = readDB();
     res.json({ success: true, data: db.recommendations || [] });
@@ -1195,7 +1232,7 @@ app.post('/api/recommendations', upload.single('file'), (req, res) => {
   }
 });
 
-app.post('/api/recommendations/:id/approve', (req, res) => {
+app.post('/api/recommendations/:id/approve', requireAdmin, (req, res) => {
   try {
     const db = readDB();
     const rec = (db.recommendations || []).find(r => r.id === req.params.id);
@@ -1208,7 +1245,7 @@ app.post('/api/recommendations/:id/approve', (req, res) => {
   }
 });
 
-app.post('/api/recommendations/:id/reject', (req, res) => {
+app.post('/api/recommendations/:id/reject', requireAdmin, (req, res) => {
   try {
     const db = readDB();
     const rec = (db.recommendations || []).find(r => r.id === req.params.id);
@@ -1221,7 +1258,7 @@ app.post('/api/recommendations/:id/reject', (req, res) => {
   }
 });
 
-app.delete('/api/recommendations/:id', (req, res) => {
+app.delete('/api/recommendations/:id', requireAdmin, (req, res) => {
   try {
     const db = readDB();
     db.recommendations = (db.recommendations || []).filter(r => r.id !== req.params.id);
@@ -1282,7 +1319,7 @@ app.post('/api/tour-album/:tourId', upload.single('file'), (req, res) => {
   }
 });
 
-app.post('/api/tour-album/:tourId/:photoId/approve', (req, res) => {
+app.post('/api/tour-album/:tourId/:photoId/approve', requireAdmin, (req, res) => {
   try {
     const db = readDB();
     const photo = (db.tourAlbums?.[req.params.tourId] || []).find(p => p.id === req.params.photoId);
@@ -1295,7 +1332,7 @@ app.post('/api/tour-album/:tourId/:photoId/approve', (req, res) => {
   }
 });
 
-app.post('/api/tour-album/:tourId/:photoId/reject', (req, res) => {
+app.post('/api/tour-album/:tourId/:photoId/reject', requireAdmin, (req, res) => {
   try {
     const db = readDB();
     const photo = (db.tourAlbums?.[req.params.tourId] || []).find(p => p.id === req.params.photoId);
@@ -1382,7 +1419,7 @@ syncMapData();
 setInterval(syncMapData, 24 * 60 * 60 * 1000);
 
 // Manual sync endpoint
-app.get('/api/sync-map', async (req, res) => {
+app.get('/api/sync-map', requireAdmin, async (req, res) => {
   await syncMapData();
   const db = readDB();
   const layers = db.mapLayers || [];
@@ -1390,7 +1427,7 @@ app.get('/api/sync-map', async (req, res) => {
 });
 
 // GET /api/map-backups — list all layer backups with metadata
-app.get('/api/map-backups', (req, res) => {
+app.get('/api/map-backups', requireAdmin, (req, res) => {
   const db = readDB();
   const backups = db.mapLayersBackup || {};
   const current = db.mapLayers || [];
@@ -1406,7 +1443,7 @@ app.get('/api/map-backups', (req, res) => {
 });
 
 // POST /api/map-backups/restore — body: { layerName, timestamp }
-app.post('/api/map-backups/restore', (req, res) => {
+app.post('/api/map-backups/restore', requireAdmin, (req, res) => {
   const { layerName, timestamp } = req.body || {};
   if (!layerName || !timestamp) return res.status(400).json({ success: false, error: 'layerName and timestamp required' });
   const db = readDB();
@@ -1423,7 +1460,7 @@ app.post('/api/map-backups/restore', (req, res) => {
 });
 
 // DELETE /api/map-backups/:layerName/:timestamp
-app.delete('/api/map-backups/:layerName/:timestamp', (req, res) => {
+app.delete('/api/map-backups/:layerName/:timestamp', requireAdmin, (req, res) => {
   const { layerName, timestamp } = req.params;
   const db = readDB();
   if (!db.mapLayersBackup || !db.mapLayersBackup[layerName]) return res.status(404).json({ success: false });
@@ -1561,13 +1598,13 @@ app.post('/api/upload-listing', listingsUpload.single('file'), (req, res) => {
 });
 
 // POST /api/sync-listings-gallery — manual resync trigger
-app.post('/api/sync-listings-gallery', (_req, res) => {
+app.post('/api/sync-listings-gallery', requireAdmin, (_req, res) => {
   syncRealEstateGalleryFromFolder();
   res.json({ success: true });
 });
 
 // POST /api/migrate-listings-images — one-time migration of existing listing images
-app.post('/api/migrate-listings-images', (_req, res) => {
+app.post('/api/migrate-listings-images', requireAdmin, (_req, res) => {
   try {
     const db = readDB();
     const all = db.listings || [];
@@ -1666,7 +1703,7 @@ app.get('/api/listings/mine', (req, res) => {
 });
 
 // PUT /api/listings/:id — update (admin approve / edit)
-app.put('/api/listings/:id', (req, res) => {
+app.put('/api/listings/:id', requireAdmin, (req, res) => {
   const db = readDB();
   const i = (db.listings || []).findIndex(l => l.id === req.params.id);
   if (i < 0) return res.status(404).json({ success: false, error: 'not found' });
@@ -1694,7 +1731,7 @@ function deleteListingFiles(listing) {
 }
 
 // DELETE /api/listings/:id — admin (legacy, no body)
-app.delete('/api/listings/:id', (req, res) => {
+app.delete('/api/listings/:id', requireAdmin, (req, res) => {
   const db = readDB();
   const item = (db.listings || []).find(l => l.id === req.params.id);
   const before = (db.listings || []).length;
@@ -1786,7 +1823,7 @@ app.post('/api/developers', (req, res) => {
 });
 
 // PUT /api/developers/:id — admin approve / edit
-app.put('/api/developers/:id', (req, res) => {
+app.put('/api/developers/:id', requireAdmin, (req, res) => {
   const db = readDB();
   const i = (db.developers || []).findIndex(d => d.id === req.params.id);
   if (i < 0) return res.status(404).json({ success: false, error: 'not found' });
@@ -1796,7 +1833,7 @@ app.put('/api/developers/:id', (req, res) => {
 });
 
 // DELETE /api/developers/:id
-app.delete('/api/developers/:id', (req, res) => {
+app.delete('/api/developers/:id', requireAdmin, (req, res) => {
   const db = readDB();
   const before = (db.developers || []).length;
   db.developers = (db.developers || []).filter(d => d.id !== req.params.id);
@@ -1819,7 +1856,7 @@ function computeExpiry(plan, startDate) {
 }
 
 // GET /api/subscribers — list all
-app.get('/api/subscribers', (req, res) => {
+app.get('/api/subscribers', requireAdmin, (req, res) => {
   const db = readDB();
   res.json({ success: true, subscribers: db.subscribers || [] });
 });
@@ -1838,7 +1875,7 @@ app.get('/api/subscribers/check', (req, res) => {
 });
 
 // POST /api/subscribers — add (or extend if exists)
-app.post('/api/subscribers', (req, res) => {
+app.post('/api/subscribers', requireAdmin, (req, res) => {
   const { phone, name, plan, startDate } = req.body || {};
   const p = normalizePhone(phone);
   if (!p) return res.status(400).json({ success: false, error: 'phone required' });
@@ -1855,7 +1892,7 @@ app.post('/api/subscribers', (req, res) => {
 });
 
 // PUT /api/subscribers/:phone — update fields
-app.put('/api/subscribers/:phone', (req, res) => {
+app.put('/api/subscribers/:phone', requireAdmin, (req, res) => {
   const p = normalizePhone(req.params.phone);
   const db = readDB();
   const i = (db.subscribers || []).findIndex(s => normalizePhone(s.phone) === p);
@@ -1878,7 +1915,7 @@ app.put('/api/subscribers/:phone', (req, res) => {
 });
 
 // DELETE /api/subscribers/:phone
-app.delete('/api/subscribers/:phone', (req, res) => {
+app.delete('/api/subscribers/:phone', requireAdmin, (req, res) => {
   const p = normalizePhone(req.params.phone);
   const db = readDB();
   const before = (db.subscribers || []).length;
