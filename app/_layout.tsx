@@ -46,7 +46,7 @@ import { AdminContext } from '../constants/adminContext';
 import { PreviewContext, PreviewMode } from '../constants/previewContext';
 import { AccessibilityProvider, useAccessibility } from '../constants/accessibilityContext';
 import { I18nProvider, useI18n } from '../constants/i18n';
-import { setContentLang } from '../constants/api';
+import { setContentLang, API_BASE } from '../constants/api';
 import UpdatePrompt from '../components/UpdatePrompt';
 
 // Remounts the navigator when the language changes so every screen re-fetches
@@ -102,12 +102,15 @@ export default function RootLayout() {
   };
   useEffect(() => {
     if (Platform.OS === 'web') {
-      // (owner, 10.11.2026) admin mode comes back only with the admin key of this session; an old flag alone asks for the password again
+      // (owner, 10.11.2026) admin mode comes back only on a computer that kept a working admin key; anywhere else the password is asked
       try {
-        if (localStorage.getItem('@bo:isAdmin') === '1') {
-          if (sessionStorage.getItem('btm_admin_key')) setAdminRaw(true);
-          else localStorage.removeItem('@bo:isAdmin');
-        }
+        const k = localStorage.getItem('btm_admin_key');
+        if (localStorage.getItem('@bo:isAdmin') === '1' && k) {
+          setAdminRaw(true);
+          fetch(`${API_BASE}/api/admin/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: k }) })
+            .then(r => r.json()).then(j => { if (!(j && j.success)) { localStorage.removeItem('btm_admin_key'); localStorage.removeItem('@bo:isAdmin'); setAdminRaw(false); } })
+            .catch(() => {});
+        } else localStorage.removeItem('@bo:isAdmin');
       } catch {}
     }
   }, []);
