@@ -102,7 +102,13 @@ export default function RootLayout() {
   };
   useEffect(() => {
     if (Platform.OS === 'web') {
-      try { if (localStorage.getItem('@bo:isAdmin') === '1') setAdminRaw(true); } catch {}
+      // (owner, 10.11.2026) admin mode comes back only with the admin key of this session; an old flag alone asks for the password again
+      try {
+        if (localStorage.getItem('@bo:isAdmin') === '1') {
+          if (sessionStorage.getItem('btm_admin_key')) setAdminRaw(true);
+          else localStorage.removeItem('@bo:isAdmin');
+        }
+      } catch {}
     }
   }, []);
   const [previewMode, setPreviewModeRaw] = useState<PreviewMode>(null);
